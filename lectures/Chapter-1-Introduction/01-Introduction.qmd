@@ -1,0 +1,831 @@
+---
+title: 01-Introduction to R
+format:
+  revealjs: 
+    theme: [default, ../custom.scss]
+    fontsize: 1.6em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+filters:
+  - webr
+---
+
+
+## Learning Objectives
+
++ become familiar with programming 
++ become capable of using R software to conduct research independently
+  + manipulate data
+  + visualize data 
+  + report results 
+  + spatial data management
+
+## Table of contents
+
+1. [Introduction to R and RStudio](#sec-intro)
+2. [Various object types](#sec-objects)
+3. [Functions and packages](#sec-functions-pacakges)
+4. [Some fundamentals on vector, matrix, list, and data.frame](#sec-objects-basics)
+
+# Introduction to R and RStudio {#sec-intro}
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+## R 
++ a very popular statistical programming language used in academia and industry  
++ started out as software to do statistics, designed by a number of statisticians
++ is open-source and free
++ has been and is evolving rapidly by the contributions of its users 
+ + state-of-the-art statistical methods (e.g., machine learning algorithms) written by the developers of the methods
+ + geographic information system (GIS)
+ + big data handling and analysis
+
+## RStudio
+
++ R has a terrible graphic user interface 
++ RStudio is by far the most popular graphic user interface of R
+
+![R User Interface](R-interface.png)
+
+## Install R and RStudio 
+
++ Install [R](https://www.r-project.org/)
++ Install [RStudio](https://www.rstudio.com/)
+
+## Introduction to RStudio
+
+**Four panes** 
+
++ R script (upper left)
++ Console (lower left)
++ Environment (upper right)
++ Files, plots, packages, and help (lower right)
+
+**Small tips** 
+
++ Appearance
++ Pane Layout 
+
+# Getting started with R and RStudio 
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+## Objectives
+
+Learn how to 
+
++ do basic mathematical operations 
++ define objects in R 
++ learn different object types
++ use RStudio at the same time 
+
+##  Basic element types (atomic mode)
+
++ integer: e.g., 1, 3,  
++ numeric (double): e.g., 1, 1.3
++ complex: 
++ logical (boolean): true or false 
++ character: combination of letters (numerical operations not allowed)
+
+
+## Basic arithmetic: R as a calculator
+ 
+```{webr-r}
+#--- addition ---#
+2 + 3.3
+
+#--- subtraction ---#
+6 - 2.7
+
+#--- multiplications ---#
+6 * 2
+
+#--- exponentiation ---#
+2^2.4
+
+#--- division ---#
+6 / 2
+
+#--- remainder ---#
+6 %% 4
+
+#--- quotient ---#
+6 %/% 4
+```
+
+<br>
+
+:::{.callout-note title="RStudio Tip"}
+You can run the selected codes by hitting
+
++ Mac: `command` + `enter`
++ Windows: `Control` + `enter`
+:::
+
+## logical values and operators
+
+```{webr-r}
+5 == 5
+
+5 == 4
+
+5 > 4
+
+5 < 4
+```
+
+
+## Character
+
+Contents enclosed by double (or single) quotation marks will be recognized as characters.
+
+```{webr-r}
+#--- character ---#
+"R"
+
+#--- character ---#
+" rocks"
+```
+
+<br>
+
+You cannot do addition using characters
+
+```{webr-r}
+"R" + "rocks"
+```
+
+<br>
+
+We will learn string manipulations later using the `stringr` package.
+
+
+## Assigning contents to an object 
+
+::: {.panel-tabset}
+
+### How
+
++ You can assign contents (numeric numbers, character, boolean, etc) to an object on R and reuse it later using either `<-` or `=`.
+
+```{r eval = F}
+object_name <- contents
+object_name = contents
+```
+
+<br>
+
++ It does not really matter which of `<-` or  `=` to use. You should pick whichever makes sense for you (though it is often recommended to use `<-`). But, it is a good idea to be consistent.
+
+### Example
+
+```{webr-r}
+a <- 1
+b <- 2
+```
+
+<br>
+
+Notice that these objects are now in the list of objects on the **environment** tab of RStudio.
+
+:::{.callout-note}
+You can insert the assignment operator (`<-`) by hitting
+
++ Mac: `Option` + `-`
++ Windows `Alt` + `-` 
+:::
+
+
+
+### Object evaluation 
+
+Once objects are created, you can evaluate them on the console to see what is inside:
+
+```{webr-r}
+a
+```
+
+<br>
+
+:::{.callout-note}
+I often ask you to **evaluate** an R object. That just means looking inside the R object to see what is inside.
+:::
+
+### More examples
+
+```{webr-r}
+#--- character ---#
+b <- "R rocks"
+
+b
+
+#--- logical ---#
+d <- 1 == 2
+
+d
+```
+
+### Notes
+
+Several things to remember about assignment: 
+
++ If you assign contents to an object of the same name, the object that had the same name will be overwritten 
+
+```{webr-r}
+a <- 3
+a <- 1
+a
+```
+
+<br>
+
++ Object names cannot start with a numeric number. Try the following:
+
+```{webr-r}
+1a <- 2  
+```
+
+<br>
+
++ You cannot use a reserved word as the name of an object (complete list found [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html))
+
+```{webr-r}
+#--- try this ---#
+if <- 3  
+```
+:::
+<!--end of panel-->
+
+
+
+# Various object types {#sec-objects}
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+## Objects
+
+::: {.panel-tabset}
+
+### Basics
+
++ R is an object-oriented programming (OOP), which basically means: 
+
+"Everything is an object and everything has a name."
+
+
++ R has many different object types (classes)
+
+  - vector
+  - matrix
+  - data.frame
+  - list
+  - function
+
+### Vector
+
+:::{.callout-note title=Definition}
+A vectors is a class of object that consists of elements of the **same** kind (it can have only one type of elements). You use `c()` to create a vector.
+:::
+
+**Example** 
+
+```{webr-r}
+#--- create a vector of numbers ---#
+a <- c(4, 3, 5, 9, 1)
+
+a
+
+#--- create a vector of characters ---#
+b <- c("python", "is", "better", "than", "R")
+b
+```
+
+<br>
+
+**Different modes?** 
+
+What if we mix elements of different mode  
+
+```{webr-r}
+#--- create a vector of numbers ---#
+a_vector <- c(4, 3, "5", 9, 1)
+
+#--- see its content ---#
+a_vector
+```
+
+<br>
+
+All the numeric values are converted to characters.
+
+### List
+
+:::{.callout-note title=Definition}
+A `list` is a class of object that consists of elements of mixed types.
+:::
+
+**Example** 
+
++ A `list` is very flexible. It can hold basically any type of R objects as its elements. 
+
+```{webr-r}
+#--- create a vector of numbers ---#
+a_list <- list(4, 3, "5", 9, 1)
+
+#--- see its content ---#
+a_list
+```
+
+<br>
+
++ We will see more complex examples later.
+
+### Matrix
+
+:::{.callout-note title=Definition}
+A `matrix` is a class of object that consists of elements of the **same** kind (it can have only one element) stored in a two-dimensional array. 
+:::
+
+**Examples** 
+
+```{webr-r}
+#--- create a matrix of numbers ---#
+M_num <- matrix(c(2, 4, 3, 1, 5, 7), nrow = 3)
+
+M_num
+```
+
+<br>
+
+```{webr-r}
+#--- create a matrix of characters ---#
+M_char <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3)
+
+M_char
+```
+
+
+### `data.frame`
+
+`data.frame` is like a matrix (or a list of columns)
+
+<br>
+
+```{webr-r}
+#--- create a data.frame ---#
+yield_data <- data.frame(
+  nitrogen = c(200, 180, 300),
+  yield = c(240, 220, 230),
+  state = c("Kansas", "Nebraska", "Iowas")
+)
+
+yield_data
+```
+
+<br>
+
+There are different kinds of objects that are like "data.frame"
+
++ tibble 
++ data.table
+
+We will talk about some of them later.
+
+### Recognizing the class
+
+::: {.panel-tabset}
+
+####  Why?
+
+It is critical to recognize the class of the objects:
+
++ the same function does different things depending on the class of the object to which the function is applied  
++ some functions work on some object classes, but not on others 
+
+Many of the errors you will encounter while working on R has something to do with applying functions that are not applicable to the objects you are working on!
+
+#### How
+
+Use `class`, `typeof`, and `str` commands to know more about what kind of objects you are dealing with:
+
+```{webr-r}
+#--- check the class ---#
+class(yield_data)
+
+#--- check the "internal" type ---#
+typeof(yield_data)
+
+#--- look into the structure of an object ---#
+str(yield_data)
+```
+
+#### Visual inspection
+
+You could also use `View()` function for visual inspection:
+
+```{r eval = F}
+View(yield_data)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+
+# Function and package {#sec-functions-pacakges}
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+## Function 
+
+::: {.panel-tabset}
+### What is a function?
+
+A function takes R objects (vector, data.frame, etc), processes them, and returns R objects 
+
+<br>
+
+**Example:** 
+
+`min()` takes a vector of values as an argument and returns the minimum of all the values in the vector
+
+```{webr-r}
+min(c(1, 2))
+```
+
+
+### Why functions?
+
++ Functions (both base and user-written) are what makes R compelling to use as major statistical and programming software!
+     
++ Indeed, this course is pretty much all about learning useful functions that make your life easier
+
++ We will learn lots of functions that are made available through user-written packages
+
+### Some other useful functions
+
++ create a sequence of values 
+
+```{webr-r}
+v1 <- seq(0, 100, by = 5)
+v2 <- seq(0, 100, length = 21)
+```
+
+<br>
+
++ repeat values 
+
+```{webr-r}
+v3 <- rep(10, 5)
+```
+
+<br>
+
++ sum values 
+
+```{webr-r}
+v1_sum <- sum(v1)
+```
+
+<br>
+
++ find the length of an vector
+
+```{webr-r}
+v1_len <- length(v1)
+```
+
+### Exercises
+
+1. generate a vector (call it $x$) that starts from 1 and increase by 2 until 99
+
+```{webr-r}
+
+
+```
+
+<br>
+
+2. calculate the sample mean of $x$ 
+
+$\frac{1}{n}\sum_{i=1}^n x_i$
+
+```{webr-r}
+
+
+```
+
+<br>
+
+3. calculate the sample variance  of $x$
+
+$\frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})^2$, where $\bar{x}$ is the sample mean
+
+```{webr-r}
+
+
+```
+
+:::
+<!--end of panel-->
+
+## Package
+
+::: {.panel-tabset}
+
+### What are packages?
+
+A drawer in your work space (R environment) that has specialized tools (functions) to complete tasks.
+
+<br>
+
+**Example packages:**
+
++ dplyr (data wrangling)
++ data.table (data wrangling)
++ ggplot2 (data visualization)
++ sf (spatial vector data handling)
++ raster (spatial raster data handling)
++ stars (spatiotemporal data handling)
+
+### How to use them?
+
++ Before you use tools (functions) in the drawer (package), you need to buy (install) it first. You can install a package using the following syntax:
+
+```{r echo=TRUE, eval=FALSE}
+install.packages("package name")
+```
+
+<br>
+
++ For example,
+
+```{r eval = F}
+install.packages(ggplot2)
+```
+
+<br>
+
++ You need to bring the drawer (package) to your working space (R environment) by using the `library()` function:
+
+```{r eval = F}
+library(ggplot2)
+```
+
+<br>
+
++ Now, you can start using specialized tools (functions) in the drawer (package)!!
+
+:::
+<!--end of panel-->
+
+## Working with R (or any computer programs)
+
++ You are the architect who has the blueprint of the final product, but does not have an ability to build specific pieces by yourself 
+
++ You work with one worker (R) who can build specific pieces perfectly without any error <span style="color:red"> if given right tools and instructions </span>
+
++ This worker is weird. If you do not give right tools or your instruction is wrong, he/she will speak up and tell you there has been an error. He/she will not try to figure out how things could have been done differently by himself/herself.
+
++ Your job is to provide the right tools and instructions to the worker (R), and correct your instructions when you found out you made a mistake (debugging)
+
+# A bit more on vector, matrix, list, and data.frame {#sec-objects-basics}
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+## Vector
+
+::: {.panel-tabset}
+
+### Prep
+
+Let's define two vectors to work with
+```{webr-r}
+a <- c(1, 2, 3, 4, 5)
+
+b <- a
+```
+
+### Arithmetic operations
+
+
+```{webr-r}
+#--- addition ---#
+a + b
+
+#--- subtraction ---#
+a - b
+
+#--- multiplication ---#
+a * b
+
+#--- division ---#
+a / b
+```
+
+::: {.fragment}
+:::{.callout-note}
+Vector arithmetic operations happen **element by element**!
+:::
+:::
+<!--end of the fragment-->
+
+### Access elements
+
+To access element(s) of a vector, you use `[]` like below:
+
+```{webr-r}
+#--- second element of vector a ---#
+a[2]
+
+#--- third element of vector a ---#
+b[3]
+```
+
+<br>
+
+You can access multiple elements of a vector 
+
+```{webr-r}
+#--- first and second elements of vector a ---#
+a[c(1, 2)]
+
+#--- first and fifth elements of vector b ---#
+b[c(1, 5)]
+```
+
+:::
+<!--end of panel-->
+
+## Matrix
+
+::: {.panel-tabset}
+
+### Prep
+
+```{webr-r}
+#--- define matrix ---#
+# A <- matrix(a value, # of rows, # of cols)
+A <- matrix(2, 3, 2)
+A
+
+# B <- matrix(vector,# rows)
+B <- matrix(c(2, 4, 3, 1, 5, 7), nrow = 3)
+B
+```
+
+### Arithmetic operations
+
+```{webr-r}
+#--- matrix addition by element ---#
+A + B
+
+#--- matrix multiplication by element ---#
+A * B
+```
+
+### Other operations
+
+```{webr-r}
+#--- transpose ---#
+t(B)
+
+#--- matrix multiplication ---#
+A %*% t(B)
+```
+
+### Access elements
+
+To access element(s) of a matrix, you use `[]` just like we did for a vector. But, now you have two arguments inside `[]`. 
+
+```{r eval = F}
+matrix[indices for rows, indices for columns]  
+```
+
+<br>
+
+**Examples** 
+
+```{webr-r}
+#--- 1st row, 2nd column ---#
+A[1, 2]
+
+#--- 1st and 3rd row, 2nd column ---#
+A[c(1, 3), 2]
+
+#--- all the values in the first row ---#
+A[1, ]
+```
+
+:::
+<!--end of panel-->
+
+
+## List
+
+::: {.panel-tabset}
+
+As I mentioned earlier, a `list` can hold mixed objects of any type in a single list.
+
+```{webr-r}
+a_list <- list(
+  a = matrix(2, 3, 2),
+  b = c("R", "rocks"),
+  c = yield_data
+)
+
+a_list
+```
+
+Note that each element has a name.
+
+### Access elements using [[]]
+
+To access element(s) of a matrix, you can use either `[[]]` operator for accessing a single element and use `[]` for multiple elements.
+
+**Example: single element** 
+
+```{webr-r}
+#--- 2nd element ---#
+a_list[[2]]
+```
+
+<br>
+
+**Example: multiple elements** 
+
+```{webr-r}
+#--- 1st and 3rd elements ---#
+a_list[c(1, 3)]
+```
+
+### Access elements using $
+
+You can also use `$` operator to access a single element of a list as long as the element has a name.
+
+```{webr-r}
+#--- check the name of the elements ---#
+names(a_list)
+
+#--- an element called b (2nd element) ---#
+a_list$b
+```
+
+:::
+<!--end of panel-->
+
+## data.frame
+
+::: {.panel-tabset}
+
+### Basics
+
+`data.frame` (and its relatives) 
+
++ is the most common object type we use. 
++ is a special kind of `list` of vectors that are of the same length that makes a `matrix`-like structure
++ shares properties of both the matrix and the list
+
+```{webr-r}
+mtcars
+```
+
+### Access parts of a `data.frame`
+
+Accessing parts of a `data.frame` works like accessing elements of a matrix or list.
+
+## Examples
+
+```{webr-r}
+#--- list-like: access the state column (element) ---#
+mtcars$gear
+
+#--- matrix-like: 1st row, 2nd column (yield) ---#
+mtcars[1, 2]
+```
+
+<br>
+
+<span style="color:red"> We will spend lots of time on how to do data wrangling on `data.frame`s using the `tidyverse` package! </span> 
+
+:::
+<!--end of panel-->
+
+## Next class: Quarto
+
+<html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
+
+
+
+
+
+
+
+
+
+

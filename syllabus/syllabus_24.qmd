@@ -1,0 +1,114 @@
+```{r}
+#| include: false
+library(lubridate)
+library(dplyr)
+library(data.table)
+library(flextable)
+```
+
+# Instructor: 
+
+Taro Mieno:
+
++ Email: tmieno2@unl.edu 
++ Office: 209 Filley Hall
+
+# Schedule
+
++ Lectures: MW 1:00 - 2:30 PM
++ Office Hours: by appointment
+
+# Course Description: 
+
+The goal of this course is to prepare students for jobs that require quantitative skills beyond Microsoft Excel and graduate programs. The R software is used throughout the course. In order to achieve the goal, students will be introduced to the basics of programming and how to apply it to real world issues in the field of agricultural (agricultural economics, agronomy, etc) and environmental sciences. By completing the course, students will know data wrangling (e.g., merging, transforming datasets), data visualization, and exploratory data analysis, spatial data management.
+
+# Reading Materials
+
++ Recommended: 
+
+  - Grolemund, Garrett. and Wickham, Hadley. 2019 \href{https://r4ds.had.co.nz/}{"R for Data Science"} 
+  - Lovelace, Robin., Nowosad, Jakub., and Muenchow, Jannes. 2019 \href{https://geocompr.robinlovelace.net/}{"Geocomputation with R"}
+
++ Prerequisites:
+
+  - Introductory statistics (STAT 218) or equivalent
+
+# Grading
+
+```{r}
+#| echo: false
+grade_table <- 
+  data.table(
+    title = c("Assignments (3 assignments)", "Final Paper", "Total"),
+    score = c("60%", "40%", "100%")
+  )
+
+flextable(grade_table) %>% autofit()
+```
+
++ **Assignments**: There will be 3 assignments. Late submissions will have 1/3 of a letter grade deducted from the grade for that submission, increasing by an additional 1/3 grade for each 24 hours beyond the deadline.
+
++ **Final Paper**: In this assignment, you write a paper with a particular emphasis on programming using real-world data sets. You must identify a topic that would involve collecting datasets from multiple different data sources. The topic has to be approved by me to avoid a final project without significant programming tasks by \textcolor{red}{Oct, 17}. The proposal of your final project detailing what datasets to use, where you collect them, and how you use them have to be submitted by \textcolor{red}{Nov, 7}.
+
+# Important Deadlines: 
+
+```{r}
+#| echo: false
+get_closest_date <- function(date, day) {
+  return_date <-
+    data.table(
+      w_date = seq(start_date, end_date, by = "days")
+    ) %>%
+    .[, w_day := weekdays(w_date)] %>%
+    .[w_date >= date, ] %>%
+    .[w_day == day, ] %>%
+    .[1, w_date]
+
+  return(return_date)
+}
+
+
+start_date <- mdy("08-26-2024")
+end_date <- mdy("12-20-2024") # Friday of the final week
+topic_approval_date <- 
+  get_closest_date(
+    date = start_date + months(2),
+    day = "Wednesday"
+  )
+topic_proposa_data <- 
+  get_closest_date(
+    date = topic_approval_date + weeks(2),
+    day = "Wednesday"
+  )
+
+final_project_date <- end_date
+```
+
++ Final project topic approved by the instructor: `r format(topic_approval_date, "%B %d")`
++ Final project proposal: `r format(topic_proposa_data, "%B %d")`
++ Final project submission: `r format(final_project_date, "%B %d")`
+
+# Topics Covered
+
++ Introduction to R
++ Quarto
++ Data Wrangling
++ Merge and reshape datasets
++ Data visualization
++ Miscellaneous data manipulations
++ How to write and organize codes
++ Research flow illustration 
++ Writing your own function
++ Looping
++ Parallel computing
++ Create tables 
++ Spatial data
++ Writing reproducible articles
+
+# Academic Honesty: 
+
+Students are expected to adhere to guidelines concerning academic dishonesty outlined in Section 4.2 of University's Student Code of Conduct (\url{http://stuafs.unl.edu/ja/code/}). Students are encouraged to contact the instructor for clarification of these guidelines if they have questions or concerns. The Department of Agricultural Economics has a written policy defining academic dishonesty, the potential sanctions for incidents of academic dishonesty, and the appeal process for students facing potential sanctions. The Department also has a policy regarding potential appeals of final course grades. These policies are available for review on the department’s website (\url{http://agecon.unl.edu/undergraduate})
+
+# Students with disabilities:
+
+Students with disabilities are encouraged to contact the instructor for a confidential discussion of their individual needs for academic accommodation. It is the policy of the University of Nebraska-Lincoln to provide flexible and individualized accommodation to students with documented disabilities that may affect their ability to fully participate in course activities or to meet course requirements. To receive accommodation services, students must be registered with the Services for Students with Disabilities (SSD) office, 132 Canfield Administration, 472-3787 voice or TTY. 

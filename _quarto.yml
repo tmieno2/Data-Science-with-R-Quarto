@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+    - "!assignments/"
+    - "!lectures/Chapter-0/logistics.qmd"
+
+website:
+  title: "Data Science with R (AECN 896-05)"
+  open-graph: true # https://quarto.org/docs/websites/website-tools.html#open-graph
+  page-footer: "Made with Quarto"
+  navbar:
+    right:
+      - text: Syllabus
+        href: syllabus/syllabus_24.qmd
+      - text: Lecture Notes
+        href: lectures/index.qmd
+      # - text: Slides
+      #   menu:
+      #     - text: 01 - Univariate Regression
+      #       href: lectures/univariate/univariate_regression_x.rmd
+format:
+  html:
+    mainfont: sans-serif
+    # monofont: system-ui
+    fontsize: 24px
+    # linestretch: # space between lines
+    # max-width:
+    page-layout: full
+    theme: [cosmo, styles.scss]
