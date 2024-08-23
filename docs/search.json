@@ -11,7 +11,7 @@
     "href": "lectures/index.html",
     "title": "Lecture Slides",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\nTitle\n\n\n\n\n\n\n01-Introduction to R\n\n\n\n\n02-Using Quarto to Create Documents\n\n\n\n\n03-1-Data wrangling with tidyverse: The Basics\n\n\n\n\nWriting Articles to WORD using Rmarkdown\n\n\n\n\n\nNo matching items"
+    "text": "Title\n\n\n\n\n\n\n01-Introduction to R\n\n\n\n\n02-Using Quarto to Create Documents\n\n\n\n\n03-1-Data wrangling with tidyverse: The Basics\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "lectures/Chapter-2-Quarto/Quarto.html",
@@ -522,14 +522,14 @@
     "href": "lectures/Chapter-2-Quarto/02-Quarto.html#quarto-the-basics-1",
     "title": "02-Using Quarto to Create Documents",
     "section": "Quarto: the Basics",
-    "text": "Quarto: the Basics\n\nR code chunksLet’s knitqmd v.s. outputInline codeMarkdown basicsCaveat\n\n\nA qmd file would consist of two types of inputs:\n\nR code chunks\nRegular texts\n\n\n\n\n\n\n\nSpecial Syntax\n\n\n\nWe can indicate R codes chunks by placing R codes inside a special syntax.\n```{r}\ncodes\n```\n\n\n\n\n\n\n\n\nDirection\n\n\n\nTake a look at qmd_sample.qmd, which can be downloaded from here.\n\nR codes summary(cars) and plot(pressure) are enclosed individually by the special syntax\nSo, in this qmd file, R knows that it should treat them as R codes, but not regular texts.\nOn the other hand, any texts that are not enclosed by the special syntax would be recognized as regular text.\n\n\n\n\n\nThe process of compiling an qmd file to produce a document is called knitting.\n\nThe easiest way to knit is to hit the Knit button located at the top of the code pane (upper left pane by default)\nAlternatively, you can use the render() function to knit like below:\n\n\nrender(\"sample_rmd.Rmd\")\n\n\n\nInspect the qmd file and its output document:\n\n\nqmd side\n\nlines 1-15: a YAML header where you control the aesthetics of the output document (more on this later)\nlines 36-38: texts not enclosed by the special syntax\nlines 40-42: summary(cars) is an R code, which is enclosed by the special syntax\n\n\nhtml side\n\nlines 1-15: nothing\nlines 36-38: printed as regular texts\nlines 40-42: the R code and its results printed\n\n\n\n\n\n\nYou can refer to an R object previously defined in line and display its content in line:\n.content-box-red[Direction]\nSee lines 62-68 of the qmd file\n\n\n\nheader\nmake a list\nfont\ncode highlighting\ninline math\nmath\nweb link\ncitation\n\n.content-box-red[Direction]\nCompare Chapter 2 of the qmd file and its output html file\n\n\n\nWhen you knit an qmd file and create a report, R creates an R session/environment that is completely  independent  of whatever R sessions or environments you may have on your RStudio.\nThis means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session."
+    "text": "Quarto: the Basics\n\nR code chunksLet’s knitqmd v.s. outputInline codeMarkdown basicsCaveat\n\n\nA qmd file would consist of two types of inputs:\n\nR code chunks\nRegular texts\n\n\n\n\n\nSpecial Syntax\n\n\nWe can indicate R codes chunks by placing R codes inside a special syntax.\n```{r}\ncodes\n```\n\n\n\n\n\n\n\n\nDirection\n\n\nTake a look at qmd_sample.qmd, which can be downloaded from here.\n\nR codes summary(cars) and plot(pressure) are enclosed individually by the special syntax\nSo, in this qmd file, R knows that it should treat them as R codes, but not regular texts.\nOn the other hand, any texts that are not enclosed by the special syntax would be recognized as regular text.\n\n\n\n\n\n\n\nThe process of compiling an qmd file to produce a document is called knitting.\n\nThe easiest way to knit is to hit the Knit button located at the top of the code pane (upper left pane by default)\nAlternatively, you can use the render() function to knit like below:\n\n\nrender(\"sample_rmd.Rmd\")\n\n\n\nInspect the qmd file and its output document:\n\n\nqmd side\n\nlines 1-15: a YAML header where you control the aesthetics of the output document (more on this later)\nlines 36-38: texts not enclosed by the special syntax\nlines 40-42: summary(cars) is an R code, which is enclosed by the special syntax\n\n\nhtml side\n\nlines 1-15: nothing\nlines 36-38: printed as regular texts\nlines 40-42: the R code and its results printed\n\n\n\n\n\n\nYou can refer to an R object previously defined in line and display its content in line:\n.content-box-red[Direction]\nSee lines 62-68 of the qmd file\n\n\n\nheader\nmake a list\nfont\ncode highlighting\ninline math\nmath\nweb link\ncitation\n\n.content-box-red[Direction]\nCompare Chapter 2 of the qmd file and its output html file\n\n\n\nWhen you knit an qmd file and create a report, R creates an R session/environment that is completely  independent  of whatever R sessions or environments you may have on your RStudio.\nThis means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session."
   },
   {
     "objectID": "lectures/Chapter-2-Quarto/02-Quarto.html#chunk-options-1",
     "href": "lectures/Chapter-2-Quarto/02-Quarto.html#chunk-options-1",
     "title": "02-Using Quarto to Create Documents",
     "section": "Chunk options",
-    "text": "Chunk options\n\nWhat?Example: echoVarious optionsSpecify chunk options globally\n\n\nChunk options are special codes inside R code chunks to control how the code chunks operate.\nHere are some example options:\n\necho\neval\nmessage\nwarning\nresults\ninclude\ncache\nfig.cap, fig-height, etc\n\n\n\n\nInspect the qmd file and its output document and observe that\n\nFrom the R code chunk with summary(cars), the code itself and its outcome are presented in the output\nFrom the R code chunk with plot(pressure), only its outcome is presented in the output\n\nThis is because of the chunk option echo = FALSE in the second R code chunk\n\n\n\n\necho and evalmessage and warningresultsincludefigure-related\n\n\n.footnote[ 1 Values in red indicates that they are the default values]\n.content-box-green[Chunk option: echo]\n\necho ( TRUE  or FALSE): specify whether the R codes appear in the output document or not\neval ( TRUE  or FALSE): specify whether the R codes are evaluated or not\n\n\n\n\n\n\n\nDirection\n\n\n\nInspect the qmd file (lines 95-115) and its output document to see their effects.\n\n\n\n\n\nmessage (TRUE or  FALSE ): specify weather messages associated with R codes evaluation appear in the output document or not\nwarning (TRUE or  FALSE ): specify weather warnings associated with R codes evaluation appear in the output document or not\n\n.content-box-red[Direction]\nInspect the rmd file (lines 119-140) and its output document\n\n\nresults ( markup , hide, asis)\n\nhide: hides all the results including warnings and messages\nasis: the outputs of the R codes are printed as-is without any suitable formatting (which the default option markup does)\n\n\n.content-box-red[Direction]\nInspect the rmd file (lines 144-156) and its output document\n.footnote[ 1 Values in red indicates that they are the default values ]\n\n\ninclude = FALSE is equivalent to having eval = TRUE, echo = FALSE, results = \"hide\"\n\n.content-box-red[Direction]\nInspect the rmd file (lines 160-173) and its output document\n\n\n.content-box-green[Chunk option for figure]\n\nfig.align: ‘default’, ‘center’, ‘left’, ‘right’\nfig.width: in inches\nfig.height: in inches\nfig.cap: figure caption\n\n\n.content-box-red[Direction]\nPlay with these options. See here for more chunk options.\n\n\n\n\n\n\n\nWhat and why?How\n\n\nSometimes, it is useful to set chunk options that apply globally (for the entire documents).\nFor example,\n\nYou are writing a term paper and the instructor may want to see only results, but not R codes.\nYou do not want any of the R codes to appear on the output document, but echo = TRUE is the default.\n\n\n\nYou can use opts_chunk$set() from the knitr package to set chunk options globally.\n\nopts_chunk$set(\n  echo = FALSE,\n  messages = FALSE,\n  warnings = FALSE,\n  fig.align = \"center\",\n  fig.width = 5,\n  fig.height = 4\n)\n\n.content-box-red[Direction]\nRemove eval = F from the R chunk at line 17 and knit.\n.content-box-green[Important]: Local option overrides the global option."
+    "text": "Chunk options\n\nWhat?Example: echoVarious optionsSpecify chunk options globally\n\n\nChunk options are special codes inside R code chunks to control how the code chunks operate.\nHere are some example options:\n\necho\neval\nmessage\nwarning\nresults\ninclude\ncache\nfig.cap, fig-height, etc\n\n\n\n\nInspect the qmd file and its output document and observe that\n\nFrom the R code chunk with summary(cars), the code itself and its outcome are presented in the output\nFrom the R code chunk with plot(pressure), only its outcome is presented in the output\n\nThis is because of the chunk option echo = FALSE in the second R code chunk\n\n\n\n\necho and evalmessage and warningresultsincludefigure-related\n\n\n.footnote[ 1 Values in red indicates that they are the default values]\n.content-box-green[Chunk option: echo]\n\necho ( TRUE  or FALSE): specify whether the R codes appear in the output document or not\neval ( TRUE  or FALSE): specify whether the R codes are evaluated or not\n\n\n\n\n\nDirection\n\n\nInspect the qmd file (lines 95-115) and its output document to see their effects.\n\n\n\n\n\n\n\nmessage (TRUE or  FALSE ): specify weather messages associated with R codes evaluation appear in the output document or not\nwarning (TRUE or  FALSE ): specify weather warnings associated with R codes evaluation appear in the output document or not\n\n.content-box-red[Direction]\nInspect the rmd file (lines 119-140) and its output document\n\n\nresults ( markup , hide, asis)\n\nhide: hides all the results including warnings and messages\nasis: the outputs of the R codes are printed as-is without any suitable formatting (which the default option markup does)\n\n\n.content-box-red[Direction]\nInspect the rmd file (lines 144-156) and its output document\n.footnote[ 1 Values in red indicates that they are the default values ]\n\n\ninclude = FALSE is equivalent to having eval = TRUE, echo = FALSE, results = \"hide\"\n\n.content-box-red[Direction]\nInspect the rmd file (lines 160-173) and its output document\n\n\n.content-box-green[Chunk option for figure]\n\nfig.align: ‘default’, ‘center’, ‘left’, ‘right’\nfig.width: in inches\nfig.height: in inches\nfig.cap: figure caption\n\n\n.content-box-red[Direction]\nPlay with these options. See here for more chunk options.\n\n\n\n\n\n\n\nWhat and why?How\n\n\nSometimes, it is useful to set chunk options that apply globally (for the entire documents).\nFor example,\n\nYou are writing a term paper and the instructor may want to see only results, but not R codes.\nYou do not want any of the R codes to appear on the output document, but echo = TRUE is the default.\n\n\n\nYou can use opts_chunk$set() from the knitr package to set chunk options globally.\n\nopts_chunk$set(\n  echo = FALSE,\n  messages = FALSE,\n  warnings = FALSE,\n  fig.align = \"center\",\n  fig.width = 5,\n  fig.height = 4\n)\n\n.content-box-red[Direction]\nRemove eval = F from the R chunk at line 17 and knit.\n.content-box-green[Important]: Local option overrides the global option."
   },
   {
     "objectID": "lectures/Chapter-2-Quarto/02-Quarto.html#caching-1",
@@ -543,7 +543,7 @@
     "href": "lectures/Chapter-2-Quarto/02-Quarto.html#yaml-1",
     "title": "02-Using Quarto to Create Documents",
     "section": "YAML",
-    "text": "YAML\n\nWhat?\n\n\nAt the very beginning of an rmd file, you have a YAML header, where you specify how the resulting documents look like.\n.content-box-green[Example]\n---\ntitle: \"Reporting using Rmarkdown\"\nauthor: \"Taro Mieno\"\ndate: \"2024-08-23\"\noutput:\n  html_document:\n    number_sections: yes\n    theme: flatly\n    toc: yes\n    toc_float: yes\n  word_document:\n    toc: yes\n---\n\n\n\n\n\n\nDirection\n\n\n\n\nTry other themes and highlight methods found here\nVisit here for the other options."
+    "text": "YAML\n\nWhat?\n\n\nAt the very beginning of an rmd file, you have a YAML header, where you specify how the resulting documents look like.\n.content-box-green[Example]\n---\ntitle: \"Reporting using Rmarkdown\"\nauthor: \"Taro Mieno\"\ndate: \"2024-08-23\"\noutput:\n  html_document:\n    number_sections: yes\n    theme: flatly\n    toc: yes\n    toc_float: yes\n  word_document:\n    toc: yes\n---\n\n\n\n\nDirection\n\n\n\nTry other themes and highlight methods found here\nVisit here for the other options."
   },
   {
     "objectID": "lectures/Chapter-2-Quarto/02-Quarto.html#directory-1",
@@ -873,5 +873,103 @@
     "title": "03-1-Data wrangling with tidyverse: The Basics",
     "section": "select() and relocate()",
     "text": "select() and relocate()\nThe approaches to refer to the variables that fit with a specified pattern can be applied to other dplyr operations as well:\nTry:\n\nflights %&gt;% \n  select(c(origin, where(is.numeric)))  \n\n\nflights %&gt;% \n  select(ends_with(\"delay\"))  \n\n\nflights %&gt;% \n  relocate(where(is.character))"
+  },
+  {
+    "objectID": "exercises/data_merging.html",
+    "href": "exercises/data_merging.html",
+    "title": "Merge Datasets",
+    "section": "",
+    "text": "library(dplyr)\nlibrary(ggplot2) # For some datasets"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-1-joining-economics-data",
+    "href": "exercises/data_merging.html#exercise-1-joining-economics-data",
+    "title": "Merge Datasets",
+    "section": "2.1 Exercise 1: Joining Economics Data",
+    "text": "2.1 Exercise 1: Joining Economics Data\nDatasets: economics from the ggplot2 package and a fictitious dataset for financial events.\nTask: Merge the economics dataset with a fictitious dataset that provides a financial event for specific dates. Join these datasets using left_join based on date.\nLoad and Create Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nAnswer Here\n\nAnswerSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\neconomics_with_events &lt;- left_join(economics, financial_events, by = \"date\")"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-2-joining-chick-weight-with-feed-type",
+    "href": "exercises/data_merging.html#exercise-2-joining-chick-weight-with-feed-type",
+    "title": "Merge Datasets",
+    "section": "2.2 Exercise 2: Joining Chick Weight with Feed Type",
+    "text": "2.2 Exercise 2: Joining Chick Weight with Feed Type\nDatasets: chickwts from the datasets package.\nTask: The chickwts dataset contains the weight of chicks alongside feed type. Create a fictitious dataset that provides pricing information for each feed type. Join these datasets based on the feed type.\nLoad Dataset:\n\ndata(chickwts)\n\n# Creating a fictitious dataset for feed pricing\nfeed_prices &lt;- tibble(\n  feed = unique(chickwts$feed),\n  price_per_kg = runif(length(unique(chickwts$feed)), 10, 50)\n)\n\nSolution:\n\nchicks_with_prices &lt;- left_join(chickwts, feed_prices, by = \"feed\")"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-3-joining-plant-growth-data",
+    "href": "exercises/data_merging.html#exercise-3-joining-plant-growth-data",
+    "title": "Merge Datasets",
+    "section": "2.3 Exercise 3: Joining Plant Growth Data",
+    "text": "2.3 Exercise 3: Joining Plant Growth Data\nDatasets: PlantGrowth from the datasets package.\nTask: The PlantGrowth dataset provides information about the weight of plants under different treatment conditions. Create a fictitious dataset that assigns a scientific team responsible for each treatment type. Merge these datasets based on the group column.\nLoad Dataset:\n\ndata(PlantGrowth)\n\n# Creating a fictitious dataset for scientific teams\nteams &lt;- tibble(\n  group = unique(PlantGrowth$group),\n  team = c(\"Team Alpha\", \"Team Beta\", \"Team Gamma\")\n)\n\nSolution:\n\nplants_with_teams &lt;- left_join(PlantGrowth, teams, by = \"group\")"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-1-joining-students-with-courses-by-studentid-and-semester",
+    "href": "exercises/data_merging.html#exercise-1-joining-students-with-courses-by-studentid-and-semester",
+    "title": "Merge Datasets",
+    "section": "3.1 Exercise 1: Joining Students with Courses by StudentID and Semester",
+    "text": "3.1 Exercise 1: Joining Students with Courses by StudentID and Semester\nDatasets: Two fictitious datasets: one containing student enrollment details and another containing their grades.\nTask: Join the enrollment dataset with the grades dataset using student_id and semester as the key variables.\nLoad Dataset:\n\nenrollment &lt;- tibble(\n  student_id = c(101, 102, 103, 101),\n  semester = c(\"Fall\", \"Fall\", \"Spring\", \"Spring\"),\n  course_code = c(\"ENG101\", \"MAT101\", \"SCI101\", \"ENG101\")\n)\n\ngrades &lt;- tibble(\n  student_id = c(101, 102, 103, 101),\n  semester = c(\"Fall\", \"Fall\", \"Spring\", \"Spring\"),\n  course_code = c(\"ENG101\", \"MAT101\", \"SCI101\", \"MAT101\"),\n  grade = c(\"A\", \"B+\", \"A-\", \"B\")\n)\n\nSolution:\n\nstudent_grades &lt;- left_join(enrollment, grades, by = c(\"student_id\", \"semester\", \"course_code\"))"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-2-joining-employees-with-project-assignments-by-department-and-role",
+    "href": "exercises/data_merging.html#exercise-2-joining-employees-with-project-assignments-by-department-and-role",
+    "title": "Merge Datasets",
+    "section": "3.2 Exercise 2: Joining Employees with Project Assignments by Department and Role",
+    "text": "3.2 Exercise 2: Joining Employees with Project Assignments by Department and Role\nDatasets: Two fictitious datasets: one listing employee details and another detailing their project assignments.\nTask: Merge the employees dataset with the projects dataset using both department and role as the key variables.\nLoad Dataset:\n\nemployees &lt;- tibble(\n  emp_id = c(1, 2, 3, 4),\n  name = c(\"Alice\", \"Bob\", \"Charlie\", \"David\"),\n  department = c(\"IT\", \"HR\", \"IT\", \"Finance\"),\n  role = c(\"Developer\", \"Recruiter\", \"Manager\", \"Analyst\")\n)\n\nprojects &lt;- tibble(\n  project_id = c(\"P1\", \"P2\", \"P3\", \"P4\"),\n  department = c(\"IT\", \"HR\", \"IT\", \"Finance\"),\n  role = c(\"Developer\", \"Recruiter\", \"Manager\", \"Manager\"),\n  project_name = c(\"App Dev\", \"Hiring Campaign\", \"IT Strategy\", \"Budget Planning\")\n)\n\nSolution:\n\nemployee_projects &lt;- left_join(employees, projects, by = c(\"department\", \"role\"))"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-3-joining-store-transactions-with-product-pricing-by-date-and-product-code",
+    "href": "exercises/data_merging.html#exercise-3-joining-store-transactions-with-product-pricing-by-date-and-product-code",
+    "title": "Merge Datasets",
+    "section": "3.3 Exercise 3: Joining Store Transactions with Product Pricing by Date and Product Code",
+    "text": "3.3 Exercise 3: Joining Store Transactions with Product Pricing by Date and Product Code\nDatasets: Two fictitious datasets: one containing transaction records and another with product pricing.\nTask: Join the transactions dataset with the pricing dataset using both transaction_date and product_code as the key variables.\nLoad Dataset:\n\ntransactions &lt;- tibble(\n  transaction_id = 1:4,\n  transaction_date = as.Date(c(\"2023-01-01\", \"2023-01-02\", \"2023-01-01\", \"2023-01-03\")),\n  product_code = c(\"X001\", \"X002\", \"X001\", \"X003\")\n)\n\npricing &lt;- tibble(\n  price_date = as.Date(c(\"2023-01-01\", \"2023-01-02\", \"2023-01-01\", \"2023-01-03\")),\n  product_code = c(\"X001\", \"X002\", \"X003\", \"X003\"),\n  price = c(100, 150, 90, 95)\n)\n\nSolution:\n\ntransaction_pricing &lt;- left_join(transactions, pricing, by = c(\"transaction_date\" = \"price_date\", \"product_code\"))\n\nThese exercises emphasize the use of left_join on multiple key variables and should offer comprehensive practice for students."
+  },
+  {
+    "objectID": "exercises/index.html",
+    "href": "exercises/index.html",
+    "title": "Exercises",
+    "section": "",
+    "text": "Title\n\n\n\n\n\n\nMerge Datasets\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-1",
+    "href": "exercises/data_merging.html#exercise-1",
+    "title": "Merge Datasets",
+    "section": "2.1 Exercise 1",
+    "text": "2.1 Exercise 1\nDatasets: economics from the ggplot2 package and a fictitious dataset for financial events.\nTask: Merge the economics dataset with a fictitious dataset that provides a financial event for specific dates. Join these datasets using left_join based on date.\nLoad and Create Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nAnswer Here\n\nAnswer hereSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\neconomics_with_events &lt;- left_join(economics, financial_events, by = \"date\")"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-2",
+    "href": "exercises/data_merging.html#exercise-2",
+    "title": "Merge Datasets",
+    "section": "2.2 Exercise 2",
+    "text": "2.2 Exercise 2\nDatasets: chickwts from the datasets package.\nTask: The chickwts dataset contains the weight of chicks alongside feed type. Create a fictitious dataset that provides pricing information for each feed type. Join these datasets based on the feed type.\nLoad Dataset:\n\ndata(chickwts)\n\n# Creating a fictitious dataset for feed pricing\nfeed_prices &lt;- tibble(\n  feed = unique(chickwts$feed),\n  price_per_kg = runif(length(unique(chickwts$feed)), 10, 50)\n)\n\nSolution:\n\nchicks_with_prices &lt;- left_join(chickwts, feed_prices, by = \"feed\")"
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-3",
+    "href": "exercises/data_merging.html#exercise-3",
+    "title": "Merge Datasets",
+    "section": "2.3 Exercise 3",
+    "text": "2.3 Exercise 3\nDatasets: PlantGrowth from the datasets package.\nTask: The PlantGrowth dataset provides information about the weight of plants under different treatment conditions. Create a fictitious dataset that assigns a scientific team responsible for each treatment type. Merge these datasets based on the group column.\nLoad Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\nAnswer hereSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-1-1",
+    "href": "exercises/data_merging.html#exercise-1-1",
+    "title": "Merge Datasets",
+    "section": "3.1 Exercise 1",
+    "text": "3.1 Exercise 1\nDatasets: Two fictitious datasets: one containing student enrollment details and another containing their grades.\nTask: Join the enrollment dataset with the grades dataset using student_id and semester as the key variables.\nLoad Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nAnswer Here\n\nAnswer hereSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-2-1",
+    "href": "exercises/data_merging.html#exercise-2-1",
+    "title": "Merge Datasets",
+    "section": "3.2 Exercise 2",
+    "text": "3.2 Exercise 2\nDatasets: Two fictitious datasets: one listing employee details and another detailing their project assignments.\nTask: Merge the employees dataset with the projects dataset using both department and role as the key variables.\nLoad Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nAnswer Here\n\nAnswer hereSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
+  },
+  {
+    "objectID": "exercises/data_merging.html#exercise-3-1",
+    "href": "exercises/data_merging.html#exercise-3-1",
+    "title": "Merge Datasets",
+    "section": "3.3 Exercise 3",
+    "text": "3.3 Exercise 3\nDatasets: Two fictitious datasets: one containing transaction records and another with product pricing.\nTask: Join the transactions dataset with the pricing dataset using both transaction_date and product_code as the key variables.\nLoad Dataset:\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nAnswer Here\n\nAnswer hereSolution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page."
   }
 ]
