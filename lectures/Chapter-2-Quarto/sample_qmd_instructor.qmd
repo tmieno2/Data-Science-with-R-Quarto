@@ -1,0 +1,206 @@
+---
+title: "Reporting using Quarto"
+author: "Taro Mieno"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    number-depth: 2
+---
+
+# Basic illustrations
+
+## Quarto
+
+This is a Quarto document. 
+
+```{r cars}
+#| echo: true
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure}
+#| echo: false
+#| fig.align: right
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Including a table
+
+```{r }
+knitr::kable(iris[1:5, ], caption = "A caption")
+```
+
+## Inline r code
+
+```{r}
+#| echo: true
+
+set.seed(2334)
+yield <- 200 * runif(100)
+mean_yield <- mean(yield)
+```
+
+The average yield is `r mean_yield`. 
+
+# Markdown basics (level 1 header)
+
+## level 2 header
+
+### level 3 header
+
+See the source rmd file:
+
++ list item 1
+  - another list
++ list item 2
++ list item 3
++ *italics*
++ **bold**
++ `code` (do not put r right after the first tick mark)
++ inline math: I hate math. What does this $\int_a^b f(x)dx$ even mean?
++ math: $$\sum_{i=1}^n x_i/n$$
++ link: [Markdown basics](https://rmarkdown.rstudio.com/lesson-8.html)
++ citationL: The best resource to learn how to use Rmarkdown is [@xie2018r].
+
+# Chunk options 
+
+## `echo` and `eval`
+
+**R code and results** 
+
+```{r}
+summary(cars)
+```
+
+**R code suppressed** 
+
+```{r}
+#| echo: false
+summary(cars)
+```
+
+**Only R code (R code was not evaluated)**
+
+```{r}
+#| eval: false
+summary(cars)
+```
+
+**Both R codes and results not shown**
+
+```{r}
+#| echo: false
+#| eval: false 
+summary(cars)
+```
+
+---
+
+## `messages` and `warnings`
+
+### both messages and warnings
+
+```{r}
+library(tidyverse)
+detach("package:tidyverse", unload = TRUE)
+```
+
+### messages suppressed
+
+```{r}
+#| message: false
+library(tidyverse)
+detach("package:tidyverse", unload = TRUE)
+```
+
+### both messages and warnings suppressed
+
+```{r}
+#| message: false
+#| warning: false 
+library(tidyverse)
+detach("package:tidyverse", unload = TRUE)
+```
+
+---
+
+## `results`
+
+No results are shown.
+
+```{r}
+#| output: false
+a <- runif(100)
+a
+```
+
+But, this shows the above code was evaluated and object `a` was created.
+
+```{r}
+a
+```
+
+---
+
+## `include = FALSE`
+
+No results are shown.
+
+```{r}
+#| include: false
+b <- runif(100)
+```
+
+But, this shows the above code was evaluated and object `a` was created.
+
+```{r include_ex}
+b
+```
+
+---
+
+# Caching
+
+```{r cache_1}
+#| cache: true
+#| eval: false 
+ 
+#--- repeat steps 1-3 B times ---#
+MC_sim <- function(i) {
+  N <- 50000 # sample size
+
+  #--- steps 1 and 2:  ---#
+  mu <- rnorm(N) # the common term shared by both x and u
+  x <- rnorm(N) + mu # independent variable
+  v <- rnorm(N) + mu # error
+  y <- 1 + 2 * x + v # dependent variable
+  data <- data.frame(y = y, x = x)
+
+  #--- OLS ---#
+  reg <- lm(y ~ x, data = data) # OLS
+
+  #--- return the coef ---#
+  return(reg$coef["x"])
+}
+
+MC_results <- lapply(1:1000, MC_sim) %>%
+  unlist() %>%
+  mean()
+
+MC_results
+```
+
+```{r cache_2}
+#| eval: false
+#| cache: true
+MC_results
+```
+

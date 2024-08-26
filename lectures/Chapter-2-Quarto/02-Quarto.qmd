@@ -19,19 +19,6 @@ library(dplyr)
 library(here) 
 ```
 
-# Table of contents
-
-1. [What is Quarto?](#intro)
-2. [Chunk options](#objects)
-3. [Caching](#cache)
-4. [YAML](#yaml)
-5. [Directory](#directory)
-5. [Output types](#output)
-
-# Quarto: Introduction
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
 ## Quarto: Introduction
 
 ::: {.panel-tabset}
@@ -44,6 +31,13 @@ library(here)
 + The power of Quarto goes well beyond just creating a simple html document. The full power of Quarto is on display [here](https://quarto.org/docs/gallery/).
 
 
+:::{.callout-note title="Quarto Installation"}
+Visit [here](https://quarto.org/docs/get-started/).
+:::
+
+
+:::
+
 ###  Using WORD?
 
 + It would be a real pain to do so because you need to copy and paste all the R codes you run and the results onto WORD **manually**. 
@@ -52,22 +46,23 @@ library(here)
 
 + Quarto obviates the need of repeating copying and pasting when you would like to communicate what you did (R codes) and what you found (results) without worrying too much about formatting.
 
-### Generating a report using Quarto
+### Make a report with Quarto
 
 Generating a report using Quarto is a two-step process:
 
-1. Create an Quarto file (file with .qmd as an extension) with regular texts and R codes mixed inside it. 
-  + You use a special syntax to let the computer know which parts of the file are simple texts and which parts are R codes.
++ Create an Quarto file (file with .qmd as an extension) with regular texts and R codes mixed inside it. 
 
-2. Tell the computer to process the qmd file (a click of a button on RStudio, or use the `render()` function)
-  + The computer runs the R codes and get their outcomes
-  + Combine the text parts, R codes, and their results to produce a document
+  - You use a special syntax to let the computer know which parts of the file are simple texts and which parts are R codes.
+
++ Tell the computer to process the qmd file (a click of a button on RStudio, or use the `render()` function)
+
+  - The computer runs the R codes and get their outcomes
+  - Combine the text parts, R codes, and their results to produce a document
+
+
+
 :::
 <!--end of panel-->
-
-# Quarto: the Basics
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ## Quarto: the Basics
 
@@ -93,7 +88,7 @@ codes
 :::
 
 :::{.callout-note title="Direction"}
-Take a look at **qmd_sample.qmd**, which can be downloaded from [here](https://tmieno2.github.io/AECN-Data-Science-R/Chapter-2-Rmarkdown/sample_rmd.Rmd).
+Take a look at **sample_qmd.qmd**, which can be downloaded from [here](https://www.dropbox.com/scl/fi/3qza1ctgeacjvxz3q2waq/sample_qmd.qmd?rlkey=vtcfgbh6pocqoox6ll2rdrvj2&st=uqz8tsvt&dl=0).
 
 + R codes `summary(cars)` and `plot(pressure)` are enclosed individually by the special syntax
 
@@ -111,7 +106,7 @@ The process of compiling an qmd file to produce a document is called **knitting*
 + Alternatively, you can use the `render()` function to knit like below:
 
 ```{r eval = F}
-render("sample_rmd.Rmd")
+render("sample_qmd.qmd")
 ```
 
 ### qmd v.s. output
@@ -123,17 +118,17 @@ Inspect the qmd file and its output document:
 ::: {.column width="50%"}
 **qmd side**
 
-1. lines 1-15: a **YAML header** where you control the aesthetics of the output document (more on this later) 
-2. lines 36-38: texts not enclosed by the special syntax
-3. lines 40-42: `summary(cars)` is an R code, which is enclosed by the special syntax
+1. lines 1-10: a **YAML header** where you control the aesthetics of the output document (more on this later) 
+2. line 16: texts not enclosed by the special syntax
+3. lines 18-21: `summary(cars)` is an R code, which is enclosed by the special syntax
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
 **html side**
 
-1. lines 1-15: nothing 
-2. lines 36-38: printed as regular texts 
-3. lines 40-42: the R code and its results printed
+1. lines 1-10: nothing 
+2. line 16: printed as regular texts 
+3. lines 18-21: the R code and its results printed
 :::
 <!--end of the 2nd column-->
 :::
@@ -143,9 +138,10 @@ Inspect the qmd file and its output document:
 
 You can refer to an R object previously defined in line and display its content in line:
 
-.content-box-red[**Direction**]
+:::{.callout-note title="Direction"}
+See lines 41-51 of the qmd file
+:::
 
-See lines 62-68 of the qmd file
 
 ### Markdown basics
 
@@ -158,9 +154,10 @@ See lines 62-68 of the qmd file
 + web link
 + citation
 
-.content-box-red[**Direction**]
+:::{.callout-note title="Direction"}
+Compare the chapter called "Markdown basics" of the qmd file and its corresponding output in the knitted html file
+:::
 
-Compare Chapter 2 of the qmd file and its output html file
 
 ### Caveat
 
@@ -169,10 +166,6 @@ Compare Chapter 2 of the qmd file and its output html file
 + This means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session.
 :::
 <!--end of panel-->
-
-# Chunk options
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ## Chunk options
 
@@ -188,10 +181,12 @@ Here are some example options:
 + `eval`
 + `message`
 + `warning`
-+ `results`
++ `output`
 + `include`
 + `cache`
 + `fig.cap`, `fig-height`, etc
+
+See all the options [here](https://quarto.org/docs/computations/execution-options.html#output-options).
 
 ### Example: `echo`
 
@@ -200,7 +195,47 @@ Here are some example options:
   - From the R code chunk with `summary(cars)`, the code itself and its outcome are presented in the output
   - From the R code chunk with `plot(pressure)`, only its outcome is presented in the output
 
-+ This is because of the chunk option `echo = FALSE` in the second R code chunk
++ This is because of the chunk option `echo: false` in the second R code chunk
+
+### How
+
+To set a chunk option, use the following syntax:
+
+````{verbatim}
+```{r}
+#| option-name: choice
+
+R codes come here
+```
+````
+
+<br>
+
+**Example**
+
+````{verbatim}
+```{r}
+#| echo: false
+
+R codes come here
+```
+````
+
+<br>
+
+:::{.callout-important titel=Caveat}
+No space between the initiation of an R code chunk and chunk option. For example,  the `echo` chunk option is going to be ignored below:
+
+````{verbatim}
+```{r}
+
+#| echo: false
+
+R codes come here
+```
+````
+:::
+
 
 ### Various options
 
@@ -208,60 +243,65 @@ Here are some example options:
 
 #### `echo` and `eval`
 
-.footnote[
-<sup>1</sup> Values in red indicates that they are the default values
-]
+<br>
 
-.content-box-green[**Chunk option: echo**]
++ `echo` (<span style="color:red"> true </span> or false): specify whether the R codes appear in the  output document or not
 
-+ `echo` (<span style="color:red"> TRUE </span> or FALSE): specify whether the R codes appear in the  output document or not
++ `eval` (<span style="color:red"> true </span> or false): specify whether the R codes are evaluated or not
 
-+ `eval` (<span style="color:red"> TRUE </span> or FALSE): specify whether the R codes are evaluated or not
+<br>
 
 :::{.callout-note title=Direction}
-Inspect the qmd file (lines 95-115) and its output document to see their effects.
+Inspect the qmd file (lines 75-103) and its output document to see their effects.
 :::
 
 #### `message` and `warning`
-+ `message` (TRUE or <span style="color:red"> FALSE </span>): specify weather messages associated with R codes evaluation appear in the output document or not
-
-+ `warning` (TRUE or <span style="color:red"> FALSE </span>): specify weather warnings associated with R codes evaluation appear in the output document or not
-
-
-.content-box-red[**Direction**]
-
-Inspect the rmd file (lines 119-140) and its output document
-
-#### `results`
-
-`results` (<span style="color:red"> markup </span>, hide, asis)
-
-+ `hide`: hides all the results including warnings and messages
-+ `asis`: the outputs of the R codes are printed as-is without any suitable formatting (which the default option `markup` does)
 
 <br>
 
-.content-box-red[**Direction**]
++ `message` (true or <span style="color:red"> false </span>): specify weather messages associated with R codes evaluation appear in the output document or not
 
-Inspect the rmd file (lines 144-156) and its output document
++ `warning` (true or <span style="color:red"> false </span>): specify weather warnings associated with R codes evaluation appear in the output document or not
 
-.footnote[
-<sup>1</sup> Values in red indicates that they are the default values <br>
-]
+<br>
+
+:::{.callout-note title=Direction}
+Inspect the qmd file (lines 107-131) and its output document
+:::
+
+#### `output`
+
+<br>
+
+`output` (<span style="color:red"> true </span>, false, asis)
+
++ `true`: pint all the results including warnings and messages
++ `false`: hides all the results including warnings and messages
++ `asis`: the outputs of the R codes are printed as-is without any suitable formatting
+
+<br>
+
+:::{.callout-note title=Direction}
+Inspect the qmd file (lines 135-149) and its output document
+:::
 
 #### `include`
 
-`include = FALSE` is equivalent to having `eval = TRUE, echo = FALSE, results = "hide"`
+<br>
+
+`include: false` is equivalent to having `eval: true`, `echo: false`, and `results: false`
 
 <br>
 
-.content-box-red[**Direction**]
-
-Inspect the rmd file (lines 160-173) and its output document
+:::{.callout-note title="Direction"}
+Inspect the qmd file (lines 153-166) and its output document
+:::
 
 #### figure-related
 
-.content-box-green[**Chunk option for figure**]
+<br>
+
+**Chunk option for figure**
 
 + `fig.align`: 'default', 'center', 'left', 'right'
 + `fig.width`: in inches
@@ -270,9 +310,10 @@ Inspect the rmd file (lines 160-173) and its output document
 
 <br>
 
-.content-box-red[**Direction**]
-
+:::{.callout-note title="Direction"}
 Play with these options. See [here](https://yihui.org/knitr/options/) for more chunk options.
+:::
+
 
 :::
 <!--end of panel-->
@@ -288,40 +329,52 @@ Sometimes, it is useful to set chunk options that apply globally (for the entire
 For example,
 
 + You are writing a term paper and the instructor may want to see only results, but not R codes.
-+ You do not want any of the R codes to appear on the output document, but `echo = TRUE` is the default.
++ You do not want any of the R codes to appear on the output document, but `echo: true` is the default.
++ It is a waste of time to type `echo: false` for all the R code chunks
 
 #### How
 
-You can use `opts_chunk$set()` from the **knitr** package to set chunk options globally.
+You can set chunk options globally in the YAML header with the `execute` option like below:
 
-```{r , eval = F}
-opts_chunk$set(
-  echo = FALSE,
-  messages = FALSE,
-  warnings = FALSE,
-  fig.align = "center",
-  fig.width = 5,
-  fig.height = 4
-)
-```
+````{verbatim}
+---
+title: "Reporting using Quarto"
+author: "Taro Mieno"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    number-depth: 2
+execute:
+  echo: false
+---
+````
 
-.content-box-red[**Direction**]
+:::{.callout-note title=Direction}
++ Insert the following in the YAML header of `sample_qmd.qmd` file so that it looks like above
 
-Remove `eval = F` from the R chunk at line 17 and knit.
+````{verbatim}
+execute:
+  echo: false
+````
 
-.content-box-green[**Important**]: Local option overrides the global option.
++ Knit the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.
+:::
+
+#### Note
+
+:::{.callout-important}
+Local option always overrides the global option.
+:::
+
 :::
 <!--end of panel-->
 
 :::
 <!--end of panel-->
-
-# Caching
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ## Caching
-
 
 ::: {.panel-tabset}
 
@@ -337,85 +390,49 @@ Remove `eval = F` from the R chunk at line 17 and knit.
 
 + By adding the option, once an R chunk is processed, its results are saved and can be reused again by R later when you compile the document again. 
 
-###
+### Let's try
 
-.content-box-red[**Direction**]
+:::{.callout-note title=Direction}
++ Change `eval: false` to `eval: true` in the **cache_1** chunk
++ Knit and confirm that **sample_qmd_cache** and **sample_qmd_files** folders are created
++ Knit again and observe that the knitting process is much faster now
+:::
 
-+ change `eval = F` to `eval = T` in the **cache_1** chunk
-+ knit and confirm that **sample_rmd_cache** and **sample_rmd_files** folders are created
-+ knit again and observe that the knitting process is much faster now
+### Changes in codes
 
-###
 When any part of the R codes within a cached R code chunk is changed, R is smart enough to recognize the change and evaluate the R code chunk again without using the cached results for the chunk. 
 
-.content-box-red[**Direction**]
 
+:::{.callout-note title=Direction}
 Change `y = 1 + x + v` to `y = 1 + 2 * x +v` in the **cache_1** chunk and knit
+:::
 
-###
+### Changes in contents
 
 + Sometimes, your R codes within an cached R code chunk have not changed, but the content of a dataset used in the R code chunk may have changed. 
 
-+ In such a case, R is unable to recognize the change in the content of the dataset. 
++ In such a case, R is unable to recognize the change in the <span style = "color: blue;"> content </span> of the dataset. 
 
-.content-box-red[**Direction**]
+<br>
 
-+ change `eval = F` to `eval = T` in the `cache_2` chunk and knit
-+ change `y = 1 + 2 * x + v` back to `y = 1 + x +v` and knit (notice that the printed number from `cache_2` did not change)
+:::{.callout-note title="Direction"}
++ Change `eval: false` to `eval: true` in the `cache_2` chunk and knit
++ Change `y = 1 + 2 * x + v` back to `y = 1 + x +v` and knit (notice that the printed number from `cache_2` did not change)
+:::
 
-###
+
+### `dependson`
 
 + To R, everything in the `cache_2` chunk looks the same as they only look at the code texts, but not the contents of R objects. 
 + Therefore, R would call up the saved results instead of rerunning the R codes, which is not what you want.
 + You can use the `dependson` option to make R recognize any changes in cached R objects 
 
-.content-box-green[**Direction**]
-
-Add `dependson = "cache_1"` to the `cache_2` chunk as an option and knit again.
-:::
-<!--end of panel-->
-
-# YAML
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
-## YAML
-
-::: {.panel-tabset}
-
-### What?
-At the very beginning of an rmd file, you have a YAML header, where you specify how the resulting documents look like.
-
-.content-box-green[**Example**]
-
-```
----
-title: "Reporting using Rmarkdown"
-author: "Taro Mieno"
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    number_sections: yes
-    theme: flatly
-    toc: yes
-    toc_float: yes
-  word_document:
-    toc: yes
----
-```
-
 :::{.callout-note title=Direction}
-+ Try other themes and highlight methods found [here](https://bookdown.org/yihui/rmarkdown/html-document.html#appearance-and-style)
-+ Visit [here](https://bookdown.org/yihui/rmarkdown/html-document.html) for the other options.
+Add `dependson: cache_1` to the `cache_2` chunk as an option and knit again.
 :::
 
 :::
 <!--end of panel-->
-
-
-# Directory
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ## Directory
 
@@ -430,130 +447,117 @@ read.csv("corn_price.csv")
 
 <br>
 
-.content-box-red[**Important**]:
-
-By default, RStudio looks for **corn_price.csv** in the same folder in which the Rmd file is located. 
+:::{.callout-important}
+By default, R looks for **corn_price.csv** in the same folder in which the qmd file is located. 
+:::
 
 <br>
 
-.content-box-green[**So,**]
++ In my case, the sample_qmd.qmd is located in <span style = "color: blue;"> `r here::here("Chapter-2-Quarto")` </span>.
 
-+ In my case, the sample_rmd.rmd is located in `r here("Chapter-2-Rmarkdown")`.
-
-+ So, RStudio tries to find `r here("Chapter-2-Rmarkdown", "corn_price.csv")`.
++ This means that RStudio tries to find  <span style = "color: blue;"> `r here::here("Chapter-2-Quarto", "corn_price.csv")`</span>.
 
 + If the file is not in the directory, RStudio won't be able to find the file to import and returns an error. Clearly, all the subsequent actions dependent on the dataset will not run.
 
-###
+### What to do?
 
 To avoid errors in reading files, there are three options:
 
 <br>
 
-.content-box-green[**Option 1.**] (recommended for a beginner)
+**Option 1** (recommended for a beginner)
 
-Put all the datasets you intend to use in the same directory in which your rmd file is located
+Put all the datasets you intend to use in the same directory in which your qmd file is located.
 
-.content-box-green[**Option 2.**]
+<br>
+
+**Option 2**
 
 If the file is not in the directory, supply the full path to the file like this
 
 ```{r eval = F}
-read.csv("~/Dropbox/TeachingUNL/Data-Science-with-R/Chapter-2-Rmarkdown/corn_price.csv")
+read.csv("~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Chapter-2-Quarto/corn_price.csv")
 ```
 
-.content-box-green[**Option 3.**]
+<br>
 
-Tell R to look for a specific directory for datasets by setting a working directory using `opts_knit$set(root.dir = directory)` at the beginning
+**Option 3**
 
-```{r eval = F}
-opts_knit$set(root.dir = "~/Dropbox/TeachingUNL/Data-Science-with-R/Chapter-2-Rmarkdown/")
+Tell R to look for a specific directory for datasets by setting a working directory using `opts_knit$set(root.dir = directory)` at the beginning by adding the code like below in your qmd file after the YAML header:
+
+
+````{verbatim}
+```{r}
+knir::opts_knit$set(root.dir = "~/Dropbox/TeachingUNL/Data-Science-with-R/Chapter-2-Quarto")
 ```
-
+````
 :::
 <!--end of panel-->
-
-
-# Output types
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
 
 ## Output types
 
 ::: {.panel-tabset}
 
-###
+### Various formats
 
-+ html 
-+ Word
-+ pdf
+You can knit an qmd file to various formats using various engines (visit [here](https://quarto.org/docs/output-formats/all-formats.html) to see all the document types).
+
+![](document-options)
+
+:::{.callout-important}
++ In this course, we only use the html option. Submit your assignment in html. 
++ html is void of the concept of **page**. Consequently, you do not have to worry about how you should organize texts, tables, and figures within a page (fixed amount of space).
+:::
+
+
+### How
+
+**Step 1** 
+
+To write to an output type you want, first add an appropriate options under the `format` option to the YAML header like below.
+
+````{verbatim}
+title: "Reporting using Quarto"
+author: "Taro Mieno"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    number-depth: 2
+  docx: default 
+  typst:  
+    papersize: a5
+    margin:
+      x: 1cm
+      y: 1cm
+    columns: 2
+````
+
+Here, 
+
++ WORD (with `word` option) is generated with the default options. 
++ PDF (with `typst` option) is generated with the options specified below `typst:`.
+
+:::{.callout-note title=Direction}
+Add the docx option and typst options in the YAML above to your qmd file.
+:::
 
 <br>
 
-.content-box-green[**How**]
+**Step 2**
 
-To select the output type, first click on the black triangle button next to the "Knit" button, and then select your preferred option type.
+You should see a downward triangle right to the "Render" button. Pick one format to knit to a document of the format.
 
-+ By far the preferred version of the three is html if you do not intend to print out the output document. 
-+ html is void of the concept of **page**. Consequently, you do not have to worry about how you should organize texts, tables, and figures within a page (fixed amount of space). 
-+ The formatting of figure and tables can be screwed up in Word
+### Note
 
-### Interactive features
-
-html is much more powerful than pdf or WORD in the sense that it is interactive.
-
-**htmlwidgets**: tools to generate interactive contents using R
-
-See the list of htmlwidgets [here](https://www.htmlwidgets.org/)
-
-### Interactive features: table
-
-`datatable()` from the `DT` package lets you create an interactive table
-
-```{r echo = F, fig.width = 9, fig.height = 7}
-library(tidyverse)
-library(DT)
-
-iris %>% datatable(
-  extensions = "Buttons",
-  options = list(
-    dom = "Blfrtip",
-    buttons = c("copy", "csv", "excel", "pdf", "print"),
-    lengthMenu = list(
-      c(10, 25, 50, -1),
-      c(10, 25, 50, "All")
-    )
-  )
-)
-```
-
-### time-series data
-
-```{r fig.width = 9, fig.height = 5}
-library(dygraphs)
-dygraph(nhtemp, main = "New Haven Temperatures") %>%
-  dyRangeSelector(dateWindow = c("1920-01-01", "1960-01-01"))
-```
-
-### ggplot2 figures
-
-```{r fig.width = 9, fig.height = 5}
-library(ggplot2)
-library(plotly)
-p <- ggplot(data = diamonds) +
-  geom_bar(aes(x = cut, fill = clarity), position = "dodge")
-
-ggplotly(p)
-```
-
+YAML and chunk options available are different based on the output format and engine. Visit [here](https://quarto.org/docs/reference/formats/html.html) to see the options specific to particular formats.
 :::
 <!--end of panel-->
 
 ## Resources
 
-Here is a list of some useful resources to learn Rmarkdown.   
+The best resource to learn Quarto is its official website:
 
-+ [R Markdown: The Definitive Guide](<https://bookdown.org/yihui/rmarkdown/>)
-+ [Introduction to R markdown by Rstudio](<http://rmarkdown.rstudio.com/lesson-1.html>)
-+ [Cheat sheet by Rstudio](<https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&ved=0ahUKEwj97pD72vjVAhVk74MKHYBqBMsQFgg0MAE&url=https%3A%2F%2Fwww.rstudio.com%2Fwp-content%2Fuploads%2F2015%2F02%2Frmarkdown-cheatsheet.pdf&usg=AFQjCNHTjjlYFQjxyljotaYc6U4Wagw-CQ>)
-
++ [General and specific (to document type) syntax](https://quarto.org/docs/guide/)
++ [YAML options specific to document type](https://quarto.org/docs/reference/)
