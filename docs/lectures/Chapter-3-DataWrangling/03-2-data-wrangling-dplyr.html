@@ -8,9 +8,9 @@
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.554">
+  <meta name="generator" content="quarto-1.5.56">
 
-  <title>Data Science with R (AECN 896-05) - 03-1-Data wrangling with tidyverse: The Basics</title>
+  <title>Data Science with R (AECN 896-05) – 03-1-Data wrangling with tidyverse: The Basics</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -41,7 +41,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -69,7 +69,7 @@
     code span.at { color: #657422; } /* Attribute */
     code span.bn { color: #ad0000; } /* BaseN */
     code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #20794d; } /* Char */
     code span.cn { color: #8f5902; } /* Constant */
     code span.co { color: #5e5e5e; } /* Comment */
@@ -83,7 +83,7 @@
     code span.fu { color: #4758ab; } /* Function */
     code span.im { color: #00769e; } /* Import */
     code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; } /* Keyword */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
     code span.op { color: #5e5e5e; } /* Operator */
     code span.ot { color: #003b4f; } /* Other */
     code span.pp { color: #ad0000; } /* Preprocessor */
@@ -653,7 +653,7 @@
   // Document level settings ----
 
   // Determine if we need to install R packages
-  globalThis.qwebrInstallRPackagesList = ['fixest', 'dplyr', 'ggplot2'];
+  globalThis.qwebrInstallRPackagesList = ['dplyr', 'ggplot2', 'nycflights13'];
 
   // Specify possible locations to search for the repository
   globalThis.qwebrPackageRepoURLS = ['https://repo.r-wasm.org/'];
@@ -675,7 +675,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-1","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":1},{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-2","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":2},{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-3","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":3},{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-4","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":4},{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-5","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":5},{"code":"flights_carrier <- dplyr::group_by(flights_slim, carrier)  \n\nflights_carrier","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-6","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":6},{"code":"dplyr::summarize(flights_carrier, mean_arr_delay = mean(arr_delay, na.rm = TRUE)) ","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-7","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":7},{"code":"flights_slim %>% \n  dplyr::group_by(carrier) %>% \n  dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) ","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-8","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":8},{"code":"flights_slim %>%  \n  dplyr::group_by(carrier) %>% \n  dplyr::summarize(\n    mean_arr_delay = mean(arr_delay, na.rm = TRUE),\n    min_arr_delay = min(arr_delay, na.rm = TRUE),\n    quantile_arr_delay = quantile(arr_delay, prob = 0.9, na.rm = TRUE)\n  ) ","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-9","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":9},{"code":"flights_new <- \n  flights_slim %>% \n  dplyr::group_by(carrier, month) %>% \n  dplyr::mutate(\n    mean_arr_delay = mean(arr_delay, na.rm = TRUE)\n  ) %>% \n  dplyr::relocate(mean_arr_delay)\n\nflights_new","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-10","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":10},{"code":"","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-11","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"false","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":11},{"code":"#--- load the weather data ---#\ndata(weather)\n\n#--- omit observations with NA in any of the variables ---#\nweather <- na.omit(weather)\n\n#--- take a look ---#\nweather","options":{"context":"interactive","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-12","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"true","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":12},{"code":"(\ndaily_weather <- \n  weather %>%\n  dplyr::group_by(origin, month, day) %>%\n  dplyr::summarize(\n    temp = mean(temp),\n    humid = mean(humid),\n    wind_speed = mean(wind_speed),\n    precip = mean(precip)\n  )\n)","options":{"context":"output","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-13","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"true","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":13},{"code":"(\ndaily_weather %>%\n  dplyr::filter(month %in% c(11, 12, 1, 2)) %>%\n  dplyr::filter(origin == \"EWR\")\n)","options":{"context":"output","warning":"false","read-only":"false","dpi":72,"label":"unnamed-chunk-14","editor-max-height":"","out-width":"100%","message":"false","editor-word-wrap":"true","autorun":"true","fig-cap":"","fig-width":7,"results":"markup","classes":"","fig-height":5,"editor-font-scale":"0.8","output":"true","editor-quick-suggestions":"false","comment":"","out-height":""},"id":14}];
+  globalThis.qwebrCellDetails = [{"code":"mtcars\n\nclass(mtcars)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-1","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":1},{"code":"mtcars_tbl <- as_tibble(mtcars)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-2","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":2},{"code":"class(mtcars_tbl)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-3","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":3},{"code":"mtcars","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-4","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":4},{"code":"mtcars_tbl","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-5","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":5},{"code":"mtcars[2:8, c(3,5)]","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-6","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":6},{"code":"mtcars_tbl[2:8, c(3,5)]","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-7","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":7},{"code":"head(mtcars[, \"mpg\"])","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-8","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":8},{"code":"head(mtcars_tbl[, \"mpg\"])","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-9","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":9},{"code":"head(mtcars$mpg)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-10","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":10},{"code":"head(mtcars_tbl$mpg)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-11","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":11},{"code":"#--- get data ---# \ndata(flights, package = \"nycflights13\") \n\n#--- make it slim ---#\n(\nflights_slim <- dplyr::select(flights, year, month, origin, carrier, arr_delay, dep_delay)\n)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-12","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":12},{"code":"(\n  flights_mini <-\n    dplyr::distinct(flights, month, day, .keep_all = TRUE) %>%\n    dplyr::filter(day %in% c(1, 2)) %>%\n    dplyr::arrange(month) %>%\n    dplyr::select(year, month, day, dep_time, dep_delay, arr_time, arr_delay, air_time, origin)\n)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-13","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":13},{"code":"#--- not piped ---#\nmean(seq(1, 99, by = 2))\n\n#--- piped ---#\nseq(1, 99, by = 2) %>% mean()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-14","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":14},{"code":"a_string <- \"I do not like space\"\n\ngsub(\" \", \"\", a_string)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-15","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":15},{"code":"a_string %>%  gsub(\" \", \"\") ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-16","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":16},{"code":"a_string <- gsub(a_string, \" \", \"\") ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-17","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":17},{"code":"a_string %>% gsub(\" \", \"\", .)  ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-18","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":18},{"code":"flights_mini %>% \n  dplyr::select(year, month, dep_time) %>% \n  dplyr::relocate(dep_time) %>% \n  dplyr::filter(month <= 3)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-19","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":19},{"code":"a1 <- dplyr::filter(flights_mini, month <= 3)\n\na2 <- dplyr::select(a1, year, month, dep_time)\n\na3 <- dplyr::relocate(a2, dep_time)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-20","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":20},{"code":"a3 <- dplyr::relocate(\n  dplyr::select(\n    dplyr::filter(flights_mini, month <= 3)\n    , year, month, dep_time\n  ), \n  dep_time\n)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-21","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":21},{"code":"a3 <- \n  flights_mini %>% \n  dplyr::filter(month <= 3) %>% \n  dplyr::select(year, month, dep_time) %>% \n  dplyr::relocate(dep_time)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-22","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":22},{"code":"dplyr::filter(flights_mini, month == 4) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-23","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":23},{"code":"dplyr::filter(flights_mini, month != 4) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-24","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":24},{"code":"dplyr::filter(flights_mini, month < 4) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-25","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":25},{"code":"dplyr::filter(flights_mini, month >= 9 & month <= 11) \n\n#--- alternatively ---#\n# dplyr::filter(flights_mini, month >= 9, month <= 11)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-26","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":26},{"code":"dplyr::filter(flights_mini, month >= 11 | month <= 1) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-27","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":27},{"code":"dplyr::filter(flights_mini, month %in% c(1, 2, 3)) \n\n#--- equivalently ---#\n# dplyr::filter(flights_mini, month == 1 | month == 2 | month == 2) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-28","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":28},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-29","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":29},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-30","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":30},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-31","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":31},{"code":"dplyr::select(flights_mini, arr_delay)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-32","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":32},{"code":"dplyr::select(flights_mini, month, arr_delay, dep_delay)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-33","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":33},{"code":"dplyr::select(flights_mini, - year, - month)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-34","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":34},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-35","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":35},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-36","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":36},{"code":"relocate(flights_mini, dep_time, dep_delay)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-37","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":37},{"code":"flights_mini %>%\n  dplyr::mutate(gain = arr_delay - dep_delay) %>%\n  dplyr::filter(month <= 2) %>%\n  dplyr::relocate(gain)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-38","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":38},{"code":"flights_mini %>%\n  dplyr::mutate(\n    gain = arr_delay-dep_delay,\n    loss = dep_delay- arr_delay,\n    gain_per_hour = gain / (air_time / 60)\n  ) %>% \n  dplyr::filter(month <= 2) %>% \n  dplyr::relocate(gain, gain_per_hour)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-39","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":39},{"code":"flights_mini %>%\n  dplyr::mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%\n  dplyr::filter(month <= 1) %>%\n  dplyr::relocate(avg_arr_delay)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-40","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":40},{"code":"flights_mini %>% \n  dplyr::mutate(\n    dep_time_correct = ifelse(origin == \"JFK\", dep_time + 10, dep_time)\n  ) %>% \n  dplyr::relocate(origin, dep_time, dep_time_correct) %>% \n  dplyr::arrange(origin) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-41","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":41},{"code":"flights_mini %>% \n  dplyr::mutate(\n    loss_or_gain = ifelse(arr_delay > 0, \"time-loss\", \"time-gain\") #<<\n  ) %>% \n  dplyr::relocate(arr_delay, loss_or_gain)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-42","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":42},{"code":"flights_mini %>% \n  dplyr::mutate(origin = case_when(\n    origin == \"JFK\" ~ \"John F. Kennedy\",\n    origin == \"EWR\" ~ \"Newark Liberty International\", \n    origin == \"LGA\" ~ \"LaGuardia\" \n    )\n  ) %>% \n  dplyr::relocate(origin)","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-43","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":43},{"code":"#| \ndplyr::rename(\n  flights_mini, \n  departure_delay = dep_delay,\n  departure_time = dep_time\n) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-44","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":44},{"code":"flights_mini\n\n\n","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-45","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":45},{"code":"dplyr::arrange(flights_mini, dep_delay) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-46","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":46},{"code":"dplyr::arrange(flights_mini, desc(dep_delay)) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-47","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":47},{"code":"flights_mini_filtered <- dplyr::filter(flights_mini, month == 4) \n\nflights_mini_filtered","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-48","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":48},{"code":"flights_carrier <- dplyr::group_by(flights_slim, carrier)  \n\nflights_carrier","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-49","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":49},{"code":"dplyr::summarize(flights_carrier, mean_arr_delay = mean(arr_delay, na.rm = TRUE)) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-50","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":50},{"code":"flights_slim %>% \n  dplyr::group_by(carrier) %>% \n  dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-51","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":51},{"code":"flights_slim %>%  \n  dplyr::group_by(carrier) %>% \n  dplyr::summarize(\n    mean_arr_delay = mean(arr_delay, na.rm = TRUE),\n    min_arr_delay = min(arr_delay, na.rm = TRUE),\n    quantile_arr_delay = quantile(arr_delay, prob = 0.9, na.rm = TRUE)\n  ) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-52","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":52},{"code":"flights_new <- \n  flights_slim %>% \n  dplyr::group_by(carrier, month) %>% \n  dplyr::mutate(\n    mean_arr_delay = mean(arr_delay, na.rm = TRUE)\n  ) %>% \n  dplyr::relocate(mean_arr_delay)\n\nflights_new","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-53","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":53},{"code":"","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-54","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":54},{"code":"#--- load the weather data ---#\ndata(weather)\n\n#--- omit observations with NA in any of the variables ---#\nweather <- na.omit(weather)\n\n#--- take a look ---#\nweather","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-55","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":55},{"code":"(\ndaily_weather <- \n  weather %>%\n  dplyr::group_by(origin, month, day) %>%\n  dplyr::summarize(\n    temp = mean(temp),\n    humid = mean(humid),\n    wind_speed = mean(wind_speed),\n    precip = mean(precip)\n  )\n)","options":{"comment":"","dpi":72,"results":"markup","context":"output","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-56","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":56},{"code":"(\ndaily_weather %>%\n  dplyr::filter(month %in% c(11, 12, 1, 2)) %>%\n  dplyr::filter(origin == \"EWR\")\n)","options":{"comment":"","dpi":72,"results":"markup","context":"output","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-57","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"true","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":57},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(c(arr_delay, dep_delay, air_time, time_hour),\n    mean, # function \n    na.rm = TRUE # an option to the function \n    )\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-58","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":58},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    mean_arr_delay = mean(arr_delay, na.rm = TRUE),\n    mean_dep_delay = mean(dep_delay, na.rm = TRUE),\n    mean_air_time = mean(air_time, na.rm = TRUE),\n    mean_time_hour = mean(time_hour, na.rm = TRUE)\n  ) ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-59","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":59},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(c(arr_delay, dep_delay, air_time, time_hour),\n    mean,\n    na.rm = TRUE\n    )\n  )","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-60","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":60},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(where(is.numeric),\n    mean, # function to apply\n    na.rm = TRUE # option to the function\n    )\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-61","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":61},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(where(is.character),\n    n_distinct # function to apply\n    )\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-62","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":62},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(ends_with(\"delay\"),\n    mean,\n    na.rm = TRUE\n    )\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-63","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":63},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(!where(is.numeric), n_distinct)\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-64","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":64},{"code":"flights %>% \n  group_by(carrier) %>% \n  summarize(\n    across(c(month, ends_with(\"delay\")), mean, na.rm = TRUE),\n    across(where(is.character), n_distinct)\n  ) %>% head()","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-65","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":65},{"code":"flights %>% \n  select(c(origin, where(is.numeric)))  ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-66","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":66},{"code":"flights %>% \n  select(ends_with(\"delay\"))  ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-67","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":67},{"code":"flights %>% \n  relocate(where(is.character))  ","options":{"comment":"","dpi":72,"results":"markup","context":"interactive","editor-quick-suggestions":"false","editor-max-height":"","editor-font-scale":"0.8","output":"true","label":"unnamed-chunk-68","fig-height":5,"read-only":"false","out-width":"100%","classes":"","message":"false","out-height":"","autorun":"false","editor-word-wrap":"true","warning":"false","fig-width":7,"fig-cap":""},"id":68}];
 
   </script>
   <script type="module">
@@ -1872,7 +1872,7 @@
   }
 
   </script>
-<meta property="og:title" content="Data Science with R (AECN 896-05) - 03-1-Data wrangling with tidyverse: The Basics">
+<meta property="og:title" content="03-1-Data wrangling with tidyverse: The Basics – Data Science with R (AECN 896-05)">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 <body class="quarto-light">
@@ -2170,491 +2170,85 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 
 </section>
-<section>
-<section id="data-manipulation-using-the-dplyr-package" class="title-slide slide level1 center">
-<h1>Data manipulation using the <code>dplyr</code> package</h1>
-
-<div style="float:left">
-
-</div>
-<hr color="#EB811B" size="1px" width="796px">
-
-</section>
-<section id="essential-verbs" class="slide level2">
-<h2>Essential verbs</h2>
-<ul>
-<li><code>filter()</code></li>
-<li><code>mutate()</code></li>
-<li><code>select()</code></li>
-<li><code>rename()</code></li>
-<li><code>arrange()</code></li>
-<li><code>relocate()</code></li>
-</ul>
-</section>
-<section id="before-we-start" class="slide level2">
-<h2>Before we start</h2>
-<p>For illustrations, we will use <code>flights_mini</code> that we create below:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="fu">library</span>(nycflights13)</span>
-<span id="cb1-2"><a></a></span>
-<span id="cb1-3"><a></a>(</span>
-<span id="cb1-4"><a></a>flights_mini <span class="ot">&lt;-</span> <span class="fu">distinct</span>(flights,month,day,<span class="at">.keep_all=</span><span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-5"><a></a>  <span class="fu">filter</span>(day <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-6"><a></a>  <span class="fu">arrange</span>(month)</span>
-<span id="cb1-7"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 19
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     1     2       42           2359        43      518            442
- 3  2013     2     1      456            500        -4      652            648
- 4  2013     2     2        3           2359         4      513            444
- 5  2013     3     1        4           2159       125      318             56
- 6  2013     3     2       43           2355        48      605            440
- 7  2013     4     1      454            500        -6      636            640
- 8  2013     4     2        9           2355        14      346            345
- 9  2013     5     1        9           1655       434      308           2020
-10  2013     5     2        3           1905       298      241           2224
-# ℹ 14 more rows
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</section>
-<section id="filter-row-wise-subset" class="slide level2">
-<h2><code>filter()</code>: row-wise subset</h2>
+<section id="tips-to-make-the-most-of-the-lecture-notes" class="slide level2">
+<h2>Tips to make the most of the lecture notes</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Instruction</a></li><li><a href="#tabset-4-2">Single condition</a></li><li><a href="#tabset-4-3"><code>filter()</code>: multiple conditions</a></li><li><a href="#tabset-4-4">Important</a></li><li><a href="#tabset-4-5">Exercises</a></li></ul>
-<div class="tab-content">
-<div id="tabset-4-1">
-<p><br></p>
-<p><code>filter()</code>: subset data row-wise using logical conditions based on variables</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co">#--- syntax ---# </span></span>
-<span id="cb3-2"><a></a><span class="fu">filter</span>(dataset, condition <span class="dv">1</span>, ..., condition K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-4-2">
-<div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">equal to</a></li><li><a href="#tabset-1-2">not equal to</a></li><li><a href="#tabset-1-3">inequality</a></li></ul>
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Interactive navigation tools</a></li><li><a href="#tabset-1-2">Running and writing codes</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1">
-<p>Observations where <code>month</code> is 4:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">==</span> <span class="dv">4</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     4     1      454            500        -6      636            640
-2  2013     4     2        9           2355        14      346            345
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
+<ul>
+<li><p>Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want</p></li>
+<li><p>Hit letter “o” on your keyboard and you will have a panel view of all the slides</p></li>
+</ul>
 </div>
 <div id="tabset-1-2">
-<p>Observations where <code>month</code> is NOT 4:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">!=</span> <span class="dv">4</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 22 × 19
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     1     2       42           2359        43      518            442
- 3  2013     2     1      456            500        -4      652            648
- 4  2013     2     2        3           2359         4      513            444
- 5  2013     3     1        4           2159       125      318             56
- 6  2013     3     2       43           2355        48      605            440
- 7  2013     5     1        9           1655       434      308           2020
- 8  2013     5     2        3           1905       298      241           2224
- 9  2013     6     1        2           2359         3      341            350
-10  2013     6     2       14           2359        15      339            341
-# ℹ 12 more rows
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-1-3">
-<p>Observations where <code>month</code> is less than 4:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">&lt;</span> <span class="dv">4</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     1     1      517            515         2      830            819
-2  2013     1     2       42           2359        43      518            442
-3  2013     2     1      456            500        -4      652            648
-4  2013     2     2        3           2359         4      513            444
-5  2013     3     1        4           2159       125      318             56
-6  2013     3     2       43           2355        48      605            440
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
+<ul>
+<li>The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the “code area”).</li>
+<li>Hit the “Run Code” button to execute all the code inside the code area.</li>
+<li>You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).</li>
+<li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
+<li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
+</ul>
 </div>
 </div>
 </div>
 <!--end of panel-->
-</div>
-<div id="tabset-4-3">
+</section>
+<section id="tidyverse-package" class="title-slide slide level1 center">
+<h1><code>tidyverse</code> package</h1>
 <div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">and (&amp;)</a></li><li><a href="#tabset-2-2">or (|)</a></li><li><a href="#tabset-2-3">in any of (<code>%in%</code>)</a></li></ul>
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">What is it?</a></li><li><a href="#tabset-2-2">Preparation</a></li><li><a href="#tabset-2-3">Conflicts?</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">&gt;=</span> <span class="dv">9</span> <span class="sc">&amp;</span> month <span class="sc">&lt;=</span> <span class="dv">11</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     9     1        9           2359        10      343            340
-2  2013     9     2        8           2255        73      126             19
-3  2013    10     1      447            500       -13      614            648
-4  2013    10     2      449            500       -11      620            648
-5  2013    11     1        5           2359         6      352            345
-6  2013    11     2      453            500        -7      644            651
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co">#--- alternatively ---#</span></span>
-<span id="cb12-2"><a></a><span class="co"># filter(flights_mini, month &gt;= 9, month &lt;= 11)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<ul>
+<li><p>The <code>tidyverse</code> is a package of a collection of packages. Some of the packages included are</p>
+<ul>
+<li><code>readr</code>: read datasets in various formats</li>
+<li><code>dplyr</code>: manipulate and merge datasets</li>
+<li><code>tidyr</code>: reshape datasets</li>
+<li><code>ggplot2</code>: data visualization</li>
+<li><code>stringr</code>: character string operations</li>
+</ul></li>
+<li><p>These packages are by no means the only ways to do the operations we will learn today. However, we learn these packages because they are easy to use.</p></li>
+<li><p>They are also easy to learn and get help as they are extremely popular and very well-documented. Go to the <a href="http://www.tidyverse.org/">tidyverse website</a>, and click on the icon of the package you would like to learn, then you will have a nice documentation of the packages.</p></li>
+<li><p>You could also google the package name, and you will see bunch of introductions/tutorials.</p></li>
+</ul>
 </div>
 <div id="tabset-2-2">
+<p>Install the package if you have not.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">&gt;=</span> <span class="dv">11</span> <span class="sc">|</span> month <span class="sc">&lt;=</span> <span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     1     1      517            515         2      830            819
-2  2013     1     2       42           2359        43      518            442
-3  2013    11     1        5           2359         6      352            345
-4  2013    11     2      453            500        -7      644            651
-5  2013    12     1       13           2359        14      446            445
-6  2013    12     2       12           2250        82      103           2356
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>When you load the <code>tidyverse</code> package, it automatically loads many of the packages contained in it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
 </div>
 </div>
 <div id="tabset-2-3">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="fu">filter</span>(flights_mini, month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     1     1      517            515         2      830            819
-2  2013     1     2       42           2359        43      518            442
-3  2013     2     1      456            500        -4      652            648
-4  2013     2     2        3           2359         4      513            444
-5  2013     3     1        4           2159       125      318             56
-6  2013     3     2       43           2355        48      605            440
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co">#--- equivalently ---#</span></span>
-<span id="cb17-2"><a></a><span class="co"># filter(flights_mini, month == 1 | month == 2 | month == 2) </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>This is very useful when you have many values to check.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-4-4">
-<p>Notice that the original data <code>flights_mini</code> was not affected by the <code>filter()</code> operations in the previous slides.</p>
-<p>This is consistent across all the verbs in <code>dplyr</code>. Whatever actions you take, the original data is unaltered.</p>
-<p>–</p>
-<p>To use the transformed data for later use, you need to assign it to a new object (or overwrite if that is okay):</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>flights_mini_filtered <span class="ot">&lt;-</span> <span class="fu">filter</span>(flights_mini, month <span class="sc">==</span> <span class="dv">4</span>) </span>
-<span id="cb18-2"><a></a></span>
-<span id="cb18-3"><a></a>flights_mini_filtered</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     4     1      454            500        -6      636            640
-2  2013     4     2        9           2355        14      346            345
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-4-5">
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Exercise 1</a></li><li><a href="#tabset-3-2">Exercise 2</a></li><li><a href="#tabset-3-3">Exercise 3</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<p><br></p>
-<p>Find the observations in June and July</p>
-<div id="qwebr-insertion-location-1"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should get:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     6     1        2           2359         3      341            350
-2  2013     6     2       14           2359        15      339            341
-3  2013     7     1        1           2029       212      236           2359
-4  2013     7     2       12           2245        87      117              4
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-3-2">
-<p><br></p>
-<p>Find the observations in January, April, July, September, and December</p>
-<div id="qwebr-insertion-location-2"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should get:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 19
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     1     2       42           2359        43      518            442
- 3  2013     4     1      454            500        -6      636            640
- 4  2013     4     2        9           2355        14      346            345
- 5  2013     6     1        2           2359         3      341            350
- 6  2013     6     2       14           2359        15      339            341
- 7  2013     9     1        9           2359        10      343            340
- 8  2013     9     2        8           2255        73      126             19
- 9  2013    12     1       13           2359        14      446            445
-10  2013    12     2       12           2250        82      103           2356
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-3-3">
-<p><br></p>
-<p>Find the observations by carrier “US”</p>
-<div id="qwebr-insertion-location-3"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should get:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 5 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013     2     1      456            500        -4      652            648
-2  2013     4     1      454            500        -6      636            640
-3  2013    10     1      447            500       -13      614            648
-4  2013    10     2      449            500       -11      620            648
-5  2013    11     2      453            500        -7      644            651
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="select-column-wise-subset" class="slide level2">
-<h2><code>select()</code>: column-wise subset</h2>
-<div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Instruction</a></li><li><a href="#tabset-7-2">Examples</a></li><li><a href="#tabset-7-3">Exercises</a></li></ul>
-<div class="tab-content">
-<div id="tabset-7-1">
-<p>You can select a subset of variables using <code>select()</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">select</span>(dataset, variable <span class="dv">1</span>, variable <span class="dv">2</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>If you would like to drop some variables, but want to keep all the other variables, you can take advantage of <code>−</code> operator:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="fu">select</span>(dataset, <span class="sc">-</span> variable <span class="dv">1</span>, <span class="sc">-</span> variable <span class="dv">2</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-7-2">
-<div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Example 1</a></li><li><a href="#tabset-5-2">Example 2</a></li><li><a href="#tabset-5-3">Example 3</a></li></ul>
-<div class="tab-content">
-<div id="tabset-5-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">select</span>(flights_mini, arr_delay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 1
-   arr_delay
-       &lt;dbl&gt;
- 1        11
- 2        36
- 3         4
- 4        29
- 5       142
- 6        85
- 7        -4
- 8         1
- 9       408
-10       257
-# ℹ 14 more rows</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-5-2">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">select</span>(flights_mini, month, arr_delay, dep_delay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 3
-   month arr_delay dep_delay
-   &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;
- 1     1        11         2
- 2     1        36        43
- 3     2         4        -4
- 4     2        29         4
- 5     3       142       125
- 6     3        85        48
- 7     4        -4        -6
- 8     4         1        14
- 9     5       408       434
-10     5       257       298
-# ℹ 14 more rows</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-5-3">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="fu">select</span>(flights_mini, <span class="sc">-</span> year, <span class="sc">-</span> month)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 17
-     day dep_time sched_dep_time dep_delay arr_time sched_arr_time arr_delay
-   &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
- 1     1      517            515         2      830            819        11
- 2     2       42           2359        43      518            442        36
- 3     1      456            500        -4      652            648         4
- 4     2        3           2359         4      513            444        29
- 5     1        4           2159       125      318             56       142
- 6     2       43           2355        48      605            440        85
- 7     1      454            500        -6      636            640        -4
- 8     2        9           2355        14      346            345         1
- 9     1        9           1655       434      308           2020       408
-10     2        3           1905       298      241           2224       257
-# ℹ 14 more rows
-# ℹ 10 more variables: carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
-#   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
-#   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-7-3">
-<div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Exercise 1</a></li><li><a href="#tabset-6-2">Exercise 2</a></li></ul>
-<div class="tab-content">
-<div id="tabset-6-1">
-<p>Select all the columns except <code>arr_delay</code>.</p>
-<div id="qwebr-insertion-location-4"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should get:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 18
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     1     2       42           2359        43      518            442
- 3  2013     2     1      456            500        -4      652            648
- 4  2013     2     2        3           2359         4      513            444
- 5  2013     3     1        4           2159       125      318             56
- 6  2013     3     2       43           2355        48      605            440
- 7  2013     4     1      454            500        -6      636            640
- 8  2013     4     2        9           2355        14      346            345
- 9  2013     5     1        9           1655       434      308           2020
-10  2013     5     2        3           1905       298      241           2224
-# ℹ 14 more rows
-# ℹ 10 more variables: carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
-#   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
-#   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-6-2">
-<p>Select <code>arr_delay</code> and <code>month</code>.</p>
-<div id="qwebr-insertion-location-5"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should get:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 2
-   month arr_delay
-   &lt;int&gt;     &lt;dbl&gt;
- 1     1        11
- 2     1        36
- 3     2         4
- 4     2        29
- 5     3       142
- 6     3        85
- 7     4        -4
- 8     4         1
- 9     5       408
-10     5       257
-# ℹ 14 more rows</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
+<p>Sometimes packages share the same functions names.</p>
+<p>When those packages are loaded, there are function name conflicts where the function from the package loaded later masks the function from the other package.</p>
 </div>
 </div>
 </div>
 <!--end of panel-->
 </section>
-<section id="relocate-change-the-column-order" class="slide level2">
-<h2><code>relocate()</code>: change the column order</h2>
-<p>You can use <code>relocate()</code> to change the column order.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">relocate</span>(flights_mini, dep_time, dep_delay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 19
-   dep_time dep_delay  year month   day sched_dep_time arr_time sched_arr_time
-      &lt;int&gt;     &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;          &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
- 1      517         2  2013     1     1            515      830            819
- 2       42        43  2013     1     2           2359      518            442
- 3      456        -4  2013     2     1            500      652            648
- 4        3         4  2013     2     2           2359      513            444
- 5        4       125  2013     3     1           2159      318             56
- 6       43        48  2013     3     2           2355      605            440
- 7      454        -6  2013     4     1            500      636            640
- 8        9        14  2013     4     2           2355      346            345
- 9        9       434  2013     5     1           1655      308           2020
-10        3       298  2013     5     2           1905      241           2224
-# ℹ 14 more rows
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-<p>Chosen variables come front with the order of the rest of the variable unchanged.</p>
-</section></section>
+
 <section>
-<section id="piping-with" class="title-slide slide level1 center">
-<h1>Piping with <code>%&gt;%</code></h1>
+<section id="data.frame-and-tibble" class="title-slide slide level1 center">
+<h1><code>data.frame</code> and <code>tibble</code></h1>
 
 <div style="float:left">
 
@@ -2662,90 +2256,253 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <hr color="#EB811B" size="1px" width="796px">
 
 </section>
-<section id="piping-with-1" class="slide level2">
+<section id="data.frame-and-tibble-1" class="slide level2">
+<h2><code>data.frame</code> and <code>tibble</code></h2>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">What are they?</a></li><li><a href="#tabset-3-2">Objectives</a></li><li><a href="#tabset-3-3">Preparation</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<p><code>data.frame</code></p>
+<ul>
+<li>The traditional (most common) class of two-dimensional data (rows and columns) supported by R.</li>
+</ul>
+<p><br></p>
+<p><code>tibble</code></p>
+<ul>
+<li><p>A relatively newer class of two-dimensional data that brings minor enhancements over <code>data.frame</code>.</p></li>
+<li><p><code>tibble</code> is defined by the <code>tibble</code> package, which is part of the <code>tidyverse</code> package.</p></li>
+</ul>
+</div>
+<div id="tabset-3-2">
+<ul>
+<li><p>Learn basic operations on <code>data.frame</code> and <code>tibble</code></p></li>
+<li><p>Highlight some differences between the two (They are almost interchangeable, and you do no need to pay much attention to which class of data you are dealing with)</p></li>
+</ul>
+</div>
+<div id="tabset-3-3">
+<p>We use <code>mtcars</code> dataset. It is readily available to you.</p>
+<div id="qwebr-insertion-location-1"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>You can convert a <code>data.frame</code> into a <code>tibble</code> using <code>as_tibble()</code>:</p>
+<div id="qwebr-insertion-location-2"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><code>mtcars</code> is a <code>tibble</code> (and also a <code>data.frame</code>).</p>
+<div id="qwebr-insertion-location-3"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="display-method" class="slide level2">
+<h2>display method</h2>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1"><code>data.frame</code></a></li><li><a href="#tabset-4-2"><code>tibble</code></a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<div id="qwebr-insertion-location-4"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-4-2">
+<div id="qwebr-insertion-location-5"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="accessing-parts-of-the-data" class="slide level2">
+<h2>Accessing parts of the data</h2>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Numerical index</a></li><li><a href="#tabset-5-2">Variable names</a></li><li><a href="#tabset-5-3">Using $</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<p>Subsetting a data.frame works in a very similar manner as a matrix:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>matrix[rows of interest, columns of interest]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<p>2nd to 8th rows, the 3rd and 5th columns</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>data.frame</code></p>
+<div id="qwebr-insertion-location-6"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><code>tibble</code></p>
+<div id="qwebr-insertion-location-7"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-5-2">
+<p>But, subsetting a data.frame using numerical indexes are not recommended because it is not immediately clear to you (or your collaborators who might look at the code) what you intended to do with the code.</p>
+<p>Instead, the following is better:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>data[, <span class="fu">c</span>(<span class="st">"variable 1"</span>, <span class="st">"variable 2"</span>, ...)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Examples:</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>data.frame</code></p>
+<div id="qwebr-insertion-location-8"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><code>tibble</code></p>
+<div id="qwebr-insertion-location-9"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-5-3">
+<p>Alternatively, to access a column (variable) from a dataset, you can use <code>$</code> like below (remember? A <code>data.frame</code> is a special kind of <code>list</code>).</p>
+<p><strong>Examples:</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><code>data.frame</code></p>
+<div id="qwebr-insertion-location-10"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><code>tibble</code></p>
+<div id="qwebr-insertion-location-11"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section></section>
+<section>
+<section id="data-manipulation-using-the-dplyr-package" class="title-slide slide level1 center">
+<h1>Data manipulation using the <code>dplyr</code> package</h1>
+
+</section>
+<section id="data-preparation" class="slide level2">
+<h2>Data Preparation</h2>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1"><code>flights</code></a></li><li><a href="#tabset-6-2"><code>flights_mini</code></a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<p>We use <code>flights</code>, which is from the <code>nycflights13</code> package.</p>
+<div id="qwebr-insertion-location-12"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-6-2">
+<p>We also use <code>flights_mini</code>, which is created by running the code below.</p>
+<div id="qwebr-insertion-location-13"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>You do not have to understand the code just yet. You will, once you have completed the lecture. Just inspect the data and familiarize yourself with it.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="sec-piping" class="slide level2">
 <h2>Piping with <code>%&gt;%</code></h2>
 <div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">The Basic</a></li><li><a href="#tabset-9-2">More generally</a></li><li><a href="#tabset-9-3">.</a></li><li><a href="#tabset-9-4">Chaining</a></li><li><a href="#tabset-9-5">Why piping with <code>%&gt;%</code></a></li></ul>
-<div class="tab-content">
-<div id="tabset-9-1">
-<p>Let <code>f()</code> be a function and <code>x</code> is an R object that <code>f()</code> accepts. Then,</p>
-<p><code>x %&gt;% f()</code> is the same as <code>f(x)</code></p>
-<p><strong>Example</strong></p>
-<p>Try the following codes and confirm they return the same results:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a><span class="co">#--- not piped ---#</span></span>
-<span id="cb35-2"><a></a><span class="fu">mean</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">99</span>, <span class="at">by =</span> <span class="dv">2</span>))  </span>
-<span id="cb35-3"><a></a></span>
-<span id="cb35-4"><a></a><span class="co">#--- piped ---#</span></span>
-<span id="cb35-5"><a></a><span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">99</span>, <span class="at">by =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">mean</span>()   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-9-2">
-<p>Suppose you have more than one arguments to the function like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">f</span>(x1, x2, option <span class="dv">1</span>, option <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Then,</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>z <span class="sc">%&gt;%</span> <span class="fu">f</span>(x2, option <span class="dv">1</span>, option <span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>is equivalent to</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">f</span>(z, x2, option <span class="dv">1</span>, option <span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>That is, in general, an R object that precedes the piping operator (<code>%&gt;%</code>) becomes the <span style="color:red"> first </span> argument of the function that comes after the piping operator.</p>
-</div>
-<div id="tabset-9-3">
-<p>What if the object before the piping operator is not the first argument of the subsequent function?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a>a_string <span class="ot">&lt;-</span> <span class="st">"I do not like space"</span></span>
-<span id="cb39-2"><a></a></span>
-<span id="cb39-3"><a></a><span class="fu">gsub</span>(<span class="st">" "</span>, <span class="st">""</span>, a_string)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Idonotlikespace"</code></pre>
-</div>
-</div>
-<p>This does not work:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>a_string <span class="sc">%&gt;%</span>  <span class="fu">gsub</span>(<span class="st">" "</span>, <span class="st">""</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>because the above is equivalent to</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>a_string <span class="ot">&lt;-</span> <span class="fu">gsub</span>(a_string, <span class="st">" "</span>, <span class="st">""</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>You can refer to the preceding object by <code>.</code> like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>a_string <span class="sc">%&gt;%</span> <span class="fu">gsub</span>(<span class="st">" "</span>, <span class="st">""</span>, .)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Idonotlikespace"</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-9-4">
-<p>You can keep piping like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>flights_mini <span class="sc">%&gt;%</span> </span>
-<span id="cb45-2"><a></a>  <span class="fu">select</span>(year, month, dep_time) <span class="sc">%&gt;%</span> </span>
-<span id="cb45-3"><a></a>  <span class="fu">relocate</span>(dep_time) <span class="sc">%&gt;%</span> </span>
-<span id="cb45-4"><a></a>  <span class="fu">filter</span>(month <span class="sc">&lt;=</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><span style="color:red"> Important: </span> The object created by all the codes preceding the piping operator is passed down to the function after the piping operator.</p>
-<p>For example, <code>relocate(dep_time)</code> receives as its first argument the outcome of the evaluation of the highlighted parts of the code below.</p>
-</div>
-<div id="tabset-9-5">
-<div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Problem</a></li><li><a href="#tabset-8-2">Alternative 1</a></li><li><a href="#tabset-8-3">Alternative 2 (with piping)</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Introduction</a></li><li><a href="#tabset-8-2">More generally</a></li><li><a href="#tabset-8-3">Refer to the preceding object</a></li><li><a href="#tabset-8-4">Chaining</a></li><li><a href="#tabset-8-5">Why?</a></li></ul>
 <div class="tab-content">
 <div id="tabset-8-1">
+<p>Let <code>f()</code> be a function and <code>x</code> is an R object that <code>f()</code> accepts. Then,</p>
+<p><code>x %&gt;% f()</code> is the same as <code>f(x)</code></p>
+<p>Try the following codes and confirm they return the same results:</p>
+<div id="qwebr-insertion-location-14"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<p>Consider the following sequence of actions:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a>a1 <span class="ot">&lt;-</span> <span class="fu">filter</span>(flights_mini, month <span class="sc">&lt;=</span> <span class="dv">3</span>)</span>
-<span id="cb46-2"><a></a></span>
-<span id="cb46-3"><a></a>a2 <span class="ot">&lt;-</span> <span class="fu">select</span>(a1, year, month, dep_time)</span>
-<span id="cb46-4"><a></a></span>
-<span id="cb46-5"><a></a>a3 <span class="ot">&lt;-</span> <span class="fu">relocate</span>(a2, dep_time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
 </div>
+<div class="callout-content">
+<p>The piping operator <code>%&gt;%</code> is actually from the <code>magrittr</code> package. But, when you load the <code>dplyr</code> package, it is automatically loaded as well.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-8-2">
+<p>Suppose you have more than one arguments to the function like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">f</span>(x1, x2, option <span class="dv">1</span>, option <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>Then,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>z <span class="sc">%&gt;%</span> <span class="fu">f</span>(x2, option <span class="dv">1</span>, option <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>is equivalent to</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">f</span>(z, x2, option <span class="dv">1</span>, option <span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="columns">
+<div class="column" style="width:70%;">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>That is, in general, an R object that precedes the piping operator (<code>%&gt;%</code>) becomes the <span style="color:red"> first </span> argument of the function that comes after the piping operator.</p>
+</div>
+</div>
+</div>
+</div><!--end of the 1st column--><div class="column" style="width:30%;">
+
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-8-3">
+<p>What if the object before the piping operator is not the first argument of the subsequent function?</p>
+<div id="qwebr-insertion-location-15"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>This does not work:</p>
+<div id="qwebr-insertion-location-16"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>because the above is equivalent to</p>
+<div id="qwebr-insertion-location-17"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>You can refer to the preceding object by <code>.</code> like this:</p>
+<div id="qwebr-insertion-location-18"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-8-4">
+<p>You can keep piping like this:</p>
+<div id="qwebr-insertion-location-19"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>The object created by all the codes preceding the piping operator is passed down to the function after the piping operator.</p>
+</div>
+</div>
+</div>
+<p>For example, <code>relocate(dep_time)</code> receives as its first argument the outcome of the evaluation of the highlighted parts of the code below.</p>
+</div>
+<div id="tabset-8-5">
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Setup</a></li><li><a href="#tabset-7-2">Alternative 1</a></li><li><a href="#tabset-7-3">Alternative 2 (with piping)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
+<p>Consider the following sequence of actions:</p>
+<div id="qwebr-insertion-location-20"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
 <li><p>Notice that you generated two intermediate datasets (<code>a1</code> and <code>a2</code>) to obtain the dataset you wanted (<code>a3</code>).</p></li>
@@ -2753,532 +2510,492 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <li><p>It is easy to imagine that you will soon have lots of unnecessary intermediate objects on R.</p></li>
 </ul>
 </div>
-<div id="tabset-8-2">
-<p><br></p>
+<div id="tabset-7-2">
 <p>Alternatively, you can do the following:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a>a3 <span class="ot">&lt;-</span> <span class="fu">relocate</span>(</span>
-<span id="cb47-2"><a></a>  <span class="fu">select</span>(</span>
-<span id="cb47-3"><a></a>    <span class="fu">filter</span>(flights_mini, month <span class="sc">&lt;=</span> <span class="dv">3</span>)</span>
-<span id="cb47-4"><a></a>    , year, month, dep_time</span>
-<span id="cb47-5"><a></a>  ), </span>
-<span id="cb47-6"><a></a>  dep_time</span>
-<span id="cb47-7"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<div id="qwebr-insertion-location-21"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
 <li><p>This does not create any intermediate objects unlike the first example.</p></li>
-<li><p>However, it is hard to understand the code partly because the order of actions is the reverse of the order of the corresponding functions you see as you read the code from left to right.</p></li>
+<li><p>However, it can be difficult to understand the code because the order of execution is the reverse of the order in which the functions are written when you read the code from left to right.</p></li>
 </ul>
 </div>
-<div id="tabset-8-3">
-<p><br></p>
+<div id="tabset-7-3">
 <p>Taking advantage of the piping operator,</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a>a3 <span class="ot">&lt;-</span> flights_mini <span class="sc">%&gt;%</span> </span>
-<span id="cb48-2"><a></a>  <span class="fu">filter</span>(month <span class="sc">&lt;=</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-3"><a></a>  <span class="fu">select</span>(year, month, dep_time) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-4"><a></a>  <span class="fu">relocate</span>(dep_time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="mutate-define-new-or-update-variables" class="slide level2">
-<h2><code>mutate()</code>: define new (or update) variables</h2>
-<div class="panel-tabset">
-<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">What</a></li><li><a href="#tabset-12-2">multiple variables</a></li><li><a href="#tabset-12-3">function</a></li><li><a href="#tabset-12-4">More on <code>mutate()</code></a></li><li><a href="#tabset-12-5">Exercises</a></li></ul>
-<div class="tab-content">
-<div id="tabset-12-1">
-<p>You can use <code>mutate()</code> to create a new variable (or overwrite the existing one) in the dataset:</p>
-<p><strong>Synatax</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a></a><span class="fu">mutate</span>(data, new variable <span class="at">name =</span> expression)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a><span class="fu">mutate</span>(flights_mini, <span class="at">gain =</span> arr_delay <span class="sc">-</span> dep_delay) <span class="sc">%&gt;%</span> </span>
-<span id="cb50-2"><a></a>  <span class="fu">filter</span>(month <span class="sc">&lt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb50-3"><a></a>  <span class="fu">relocate</span>(gain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 20
-   gain  year month   day dep_time sched_dep_time dep_delay arr_time
-  &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-1     9  2013     1     1      517            515         2      830
-2    -7  2013     1     2       42           2359        43      518
-3     8  2013     2     1      456            500        -4      652
-4    25  2013     2     2        3           2359         4      513
-# ℹ 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,
-#   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-12-2">
-<p>You can define multiple variables within a single <code>mutate()</code> function.</p>
-<p>You can create a new variable based on the variables that have been just created within the same <code>mutate()</code> function.</p>
-<p><strong>Examples</strong></p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 21
-   gain gain_per_hour  year month   day dep_time sched_dep_time dep_delay
-  &lt;dbl&gt;         &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
-1     9          2.38  2013     1     1      517            515         2
-2    -7         -2.22  2013     1     2       42           2359        43
-3     8          4.90  2013     2     1      456            500        -4
-4    25          7.28  2013     2     2        3           2359         4
-# ℹ 13 more variables: arr_time &lt;int&gt;, sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
-#   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
-#   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-12-3">
-<p>You can apply functions to variables when creating new variables:</p>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 20
-  avg_arr_delay  year month   day dep_time sched_dep_time dep_delay arr_time
-          &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
-1          61.1  2013     1     1      517            515         2      830
-2          61.1  2013     1     2       42           2359        43      518
-# ℹ 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,
-#   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-<p>Note: the function you apply has to accept a vector (a variable column).</p>
-</div>
-<div id="tabset-12-4">
-<div class="panel-tabset">
-<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">selective mutation</a></li><li><a href="#tabset-10-2">dichotomous</a></li><li><a href="#tabset-10-3">More than two cases</a></li></ul>
-<div class="tab-content">
-<div id="tabset-10-1">
-<p>Sometimes, you want to to alter the values of a variable for specific rows that satisfy certain conditions.</p>
-<p><strong>Example</strong>: Suppose you found out that <code>dep_time</code> for all the flights from <code>JFK</code> was misreported so that <code>dep_time</code> is 10 minutes earlier than the true departure times.</p>
-<p>So, we would like to add 10 minutes to all the flights by <code>JFK</code>.</p>
-<p>You can use <code>ifelse()</code> like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a>flights_mini <span class="sc">%&gt;%</span> </span>
-<span id="cb54-2"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb54-3"><a></a>    <span class="at">dep_time_correct =</span> <span class="fu">ifelse</span>(origin <span class="sc">==</span> <span class="st">"JFK"</span>, dep_time <span class="sc">+</span> <span class="dv">10</span>, dep_time) <span class="co">#&lt;&lt;</span></span>
-<span id="cb54-4"><a></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb54-5"><a></a>  <span class="fu">relocate</span>(origin, dep_time, dep_time_correct) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(origin) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 20
-   origin dep_time dep_time_correct  year month   day sched_dep_time dep_delay
-   &lt;chr&gt;     &lt;int&gt;            &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
- 1 EWR         517              517  2013     1     1            515         2
- 2 EWR         456              456  2013     2     1            500        -4
- 3 EWR         454              454  2013     4     1            500        -6
- 4 EWR         447              447  2013    10     1            500       -13
- 5 EWR         449              449  2013    10     2            500       -11
- 6 EWR         453              453  2013    11     2            500        -7
- 7 JFK          42               52  2013     1     2           2359        43
- 8 JFK           3               13  2013     2     2           2359         4
- 9 JFK           4               14  2013     3     1           2159       125
-10 JFK          43               53  2013     3     2           2355        48
-# ℹ 14 more rows
-# ℹ 12 more variables: arr_time &lt;int&gt;, sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
-#   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-10-2">
-<p>Suppose you want to label flights with <code>arr_delay &gt; 0</code> to be <code>time-loss</code> and <code>time-gain</code> otherwise:</p>
-<p>You can use <code>ifelse()</code> for defining a dichotomous variable like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a>flights_mini <span class="sc">%&gt;%</span> </span>
-<span id="cb56-2"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb56-3"><a></a>    <span class="at">loss_or_gain =</span> <span class="fu">ifelse</span>(arr_delay <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"time-loss"</span>, <span class="st">"time-gain"</span>) <span class="co">#&lt;&lt;</span></span>
-<span id="cb56-4"><a></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb56-5"><a></a>  <span class="fu">relocate</span>(arr_delay, loss_or_gain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 20
-   arr_delay loss_or_gain  year month   day dep_time sched_dep_time dep_delay
-       &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;
- 1        11 time-loss     2013     1     1      517            515         2
- 2        36 time-loss     2013     1     2       42           2359        43
- 3         4 time-loss     2013     2     1      456            500        -4
- 4        29 time-loss     2013     2     2        3           2359         4
- 5       142 time-loss     2013     3     1        4           2159       125
- 6        85 time-loss     2013     3     2       43           2355        48
- 7        -4 time-gain     2013     4     1      454            500        -6
- 8         1 time-loss     2013     4     2        9           2355        14
- 9       408 time-loss     2013     5     1        9           1655       434
-10       257 time-loss     2013     5     2        3           1905       298
-# ℹ 14 more rows
-# ℹ 12 more variables: arr_time &lt;int&gt;, sched_arr_time &lt;int&gt;, carrier &lt;chr&gt;,
-#   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-10-3">
-<p>The <code>case_when()</code> function is useful if you have more than two cases.</p>
-<p><strong>Syntax</strong>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a><span class="fu">case_when</span>(</span>
-<span id="cb58-2"><a></a>  condition <span class="dv">1</span> <span class="sc">~</span> value to assign,</span>
-<span id="cb58-3"><a></a>  condition <span class="dv">2</span> <span class="sc">~</span> value to assign,</span>
-<span id="cb58-4"><a></a>  condition <span class="dv">3</span> <span class="sc">~</span> value to assign,</span>
-<span id="cb58-5"><a></a>  ...</span>
-<span id="cb58-6"><a></a>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Example</strong>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a></a>flights_mini <span class="sc">%&gt;%</span> </span>
-<span id="cb59-2"><a></a>  <span class="fu">mutate</span>(<span class="at">origin =</span> <span class="fu">case_when</span>(</span>
-<span id="cb59-3"><a></a>    origin <span class="sc">==</span> <span class="st">"JFK"</span> <span class="sc">~</span> <span class="st">"John F. Kennedy"</span>,</span>
-<span id="cb59-4"><a></a>    origin <span class="sc">==</span> <span class="st">"EWR"</span> <span class="sc">~</span> <span class="st">"Newark Liberty International"</span>, </span>
-<span id="cb59-5"><a></a>    origin <span class="sc">==</span> <span class="st">"LGA"</span> <span class="sc">~</span> <span class="st">"LaGuardia"</span> </span>
-<span id="cb59-6"><a></a>    )</span>
-<span id="cb59-7"><a></a>  ) <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(origin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 19
-   origin            year month   day dep_time sched_dep_time dep_delay arr_time
-   &lt;chr&gt;            &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
- 1 Newark Liberty …  2013     1     1      517            515         2      830
- 2 John F. Kennedy   2013     1     2       42           2359        43      518
- 3 Newark Liberty …  2013     2     1      456            500        -4      652
- 4 John F. Kennedy   2013     2     2        3           2359         4      513
- 5 John F. Kennedy   2013     3     1        4           2159       125      318
- 6 John F. Kennedy   2013     3     2       43           2355        48      605
- 7 Newark Liberty …  2013     4     1      454            500        -6      636
- 8 John F. Kennedy   2013     4     2        9           2355        14      346
- 9 John F. Kennedy   2013     5     1        9           1655       434      308
-10 John F. Kennedy   2013     5     2        3           1905       298      241
-# ℹ 14 more rows
-# ℹ 11 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,
-#   flight &lt;int&gt;, tailnum &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- panel ends here -->
-</div>
-<div id="tabset-12-5">
-<div class="panel-tabset">
-<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Exercise 1</a></li><li><a href="#tabset-11-2">Exercise 2</a></li></ul>
-<div class="tab-content">
-<div id="tabset-11-1">
-<p>Find the mean value of <code>arr_delay</code> in April and May (combined) and define it as a new variable named <code>avg_arr_delay</code></p>
-</div>
-<div id="tabset-11-2">
-<p>Find the sum of <code>dep_delay</code> in January, February, and December (combined) and define it as a new variable named <code>sum_arr_delay</code>, and then move the variable to the first column of the dataset.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- panel ends here -->
-</section></section>
-<section id="rename-rename-variables" class="title-slide slide level1 center">
-<h1><code>rename()</code>: rename variables</h1>
-<div class="panel-tabset">
-<ul id="tabset-13" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-13-1">How</a></li><li><a href="#tabset-13-2">White space</a></li></ul>
-<div class="tab-content">
-<div id="tabset-13-1">
-<p><strong>Syntax</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a></a><span class="fu">rename</span>(data, new variable <span class="at">name =</span> old variable name, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="fu">rename</span>(flights_mini, </span>
-<span id="cb62-2"><a></a>  <span class="at">departure_delay =</span> dep_delay,</span>
-<span id="cb62-3"><a></a>  <span class="at">departure_time =</span> dep_time</span>
-<span id="cb62-4"><a></a>) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day departure_time sched_dep_time departure_delay arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;          &lt;int&gt;          &lt;int&gt;           &lt;dbl&gt;    &lt;int&gt;
-1  2013     1     1            517            515               2      830
-2  2013     1     2             42           2359              43      518
-3  2013     2     1            456            500              -4      652
-4  2013     2     2              3           2359               4      513
-5  2013     3     1              4           2159             125      318
-6  2013     3     2             43           2355              48      605
-# ℹ 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,
-#   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
-#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-13-2">
-<p>Let’s create a dataset with variables that have a white space in their names:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a>df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb64-2"><a></a>  <span class="st">'County ID'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>),</span>
-<span id="cb64-3"><a></a>  <span class="st">'County Name'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'Dundy'</span>,<span class="st">'Chase'</span>,<span class="st">'Perkins'</span>)</span>
-<span id="cb64-4"><a></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>When you have a white space in a variable name, and refer to the variable in a function, it would not work most of the time . For example,</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a></a><span class="fu">filter</span>(df, County ID <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>You could actually enclose the variable name with a white space with back ticks like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a></a><span class="fu">filter</span>(df, <span class="st">`</span><span class="at">County ID</span><span class="st">`</span> <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 2
-  `County ID` `County Name`
-        &lt;dbl&gt; &lt;chr&gt;        
-1           1 Dundy        </code></pre>
-</div>
-</div>
-<p>But, you do not want do this.</p>
-<p>Rename it:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a></a><span class="fu">rename</span>(df, <span class="at">county_id =</span> <span class="st">`</span><span class="at">County ID</span><span class="st">`</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-
-<section id="arrange-ordering-rows" class="title-slide slide level1 center">
-<h1><code>arrange()</code>: ordering rows</h1>
-<div class="panel-tabset">
-<ul id="tabset-14" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-14-1">What</a></li><li><a href="#tabset-14-2">How</a></li><li><a href="#tabset-14-3">Descending</a></li></ul>
-<div class="tab-content">
-<div id="tabset-14-1">
-<p>You can use <code>arrange()</code> to reorder rows based on the value of variables.</p>
-</div>
-<div id="tabset-14-2">
-<p><strong>Syntax</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a></a><span class="co">#--- Syntax (NOT RUN) ---#</span></span>
-<span id="cb69-2"><a></a><span class="fu">arrange</span>(flights_mini, variable name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a></a><span class="fu">arrange</span>(flights_mini, dep_delay) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 19
-   year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
-1  2013    10     1      447            500       -13      614            648
-2  2013    10     2      449            500       -11      620            648
-3  2013    11     2      453            500        -7      644            651
-4  2013     4     1      454            500        -6      636            640
-5  2013     2     1      456            500        -4      652            648
-6  2013     1     1      517            515         2      830            819
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-<p>As you can see, the default is the ascending order.</p>
-</div>
-<div id="tabset-14-3">
-<p>To arrange in the descending order, you use <code>desc()</code> function:</p>
-</div>
-</div>
-</div>
-</section>
-
-<section>
-<section id="distinct-extract-rows-with-unique-values" class="title-slide slide level1 center">
-<h1><code>distinct()</code>: extract rows with unique values</h1>
-<div class="panel-tabset">
-<ul id="tabset-15" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-15-1">What</a></li><li><a href="#tabset-15-2">Example</a></li><li><a href="#tabset-15-3">.keep_all</a></li></ul>
-<div class="tab-content">
-<div id="tabset-15-1">
-<p><code>distinct()</code> extract rows with unique values.</p>
-</div>
-<div id="tabset-15-2">
+<div id="qwebr-insertion-location-22"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
 <ul>
-<li>(left): <code>flights_mini</code> has two observations per month (left).</li>
-<li>(right): Only one observation per month (12 unique values) after applying <code>distinct()</code></li>
+<li>This is much easier to read as the order of execution is the same as the order in which the functions are written.</li>
 </ul>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a></a>flights_mini</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 19
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     1     2       42           2359        43      518            442
- 3  2013     2     1      456            500        -4      652            648
- 4  2013     2     2        3           2359         4      513            444
- 5  2013     3     1        4           2159       125      318             56
- 6  2013     3     2       43           2355        48      605            440
- 7  2013     4     1      454            500        -6      636            640
- 8  2013     4     2        9           2355        14      346            345
- 9  2013     5     1        9           1655       434      308           2020
-10  2013     5     2        3           1905       298      241           2224
-# ℹ 14 more rows
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-</div>
-</div>
-</div><!--end of the 1st column--><div class="column" style="width:50%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a></a><span class="fu">distinct</span>(flights_mini, month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 12 × 1
-   month
-   &lt;int&gt;
- 1     1
- 2     2
- 3     3
- 4     4
- 5     5
- 6     6
- 7     7
- 8     8
- 9     9
-10    10
-11    11
-12    12</code></pre>
-</div>
-</div>
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
-</div>
-<div id="tabset-15-3">
-<p>You do not want to lose the other variables? Add <code>.keep_all = TRUE</code></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a></a><span class="fu">distinct</span>(flights_mini, month, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 12 × 19
-    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
- 1  2013     1     1      517            515         2      830            819
- 2  2013     2     1      456            500        -4      652            648
- 3  2013     3     1        4           2159       125      318             56
- 4  2013     4     1      454            500        -6      636            640
- 5  2013     5     1        9           1655       434      308           2020
- 6  2013     6     1        2           2359         3      341            350
- 7  2013     7     1        1           2029       212      236           2359
- 8  2013     8     1       12           2130       162      257             14
- 9  2013     9     1        9           2359        10      343            340
-10  2013    10     1      447            500       -13      614            648
-11  2013    11     1        5           2359         6      352            345
-12  2013    12     1       13           2359        14      446            445
-# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
-#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
-#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
 </div>
 </div>
 </div>
+<!--end of panel-->
 </div>
 </div>
+</div>
+<!--end of panel-->
 </section>
-<section id="sec-group-operation" class="slide level2">
-<h2>Grouped Operations</h2>
+<section id="sec-dplyr-wrangle" class="slide level2">
+<h2>Data wrangling with the <code>dplyr</code> package</h2>
 <div class="panel-tabset">
-<ul id="tabset-18" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-18-1">Motivation</a></li><li><a href="#tabset-18-2">How</a></li><li><a href="#tabset-18-3">Other summarizing functions</a></li><li><a href="#tabset-18-4">New variable</a></li><li><a href="#tabset-18-5">Exercises</a></li></ul>
+<ul id="tabset-18" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-18-1">What is it?</a></li><li><a href="#tabset-18-2"><code>filter</code></a></li><li><a href="#tabset-18-3"><code>select</code></a></li><li><a href="#tabset-18-4"><code>relocate</code></a></li><li><a href="#tabset-18-5"><code>mutate</code></a></li><li><a href="#tabset-18-6"><code>rename</code></a></li><li><a href="#tabset-18-7"><code>arrange</code></a></li><li><a href="#tabset-18-8">Important</a></li></ul>
 <div class="tab-content">
 <div id="tabset-18-1">
-<p>Group-wise operations, such as the mean of arrival delay by carrier are very useful to gain an insight into differences across groups.</p>
-<p>The <code>group_by()</code> function in conjunction with <code>summarize()</code> function does exactly that.</p>
-<p><br></p>
-<p><strong>Syntax</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a></a><span class="co">#--- group by variables ---#</span></span>
-<span id="cb78-2"><a></a><span class="fu">group_by</span>(dataset, variable to group by, variable to group by, ...)  </span>
-<span id="cb78-3"><a></a></span>
-<span id="cb78-4"><a></a><span class="co">#--- summarize ---#</span></span>
-<span id="cb78-5"><a></a><span class="fu">summarize</span>(grouped dataset, expression)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>dplyr</code> packages provides useful functions to transform data.</p>
+<ul>
+<li><code>filter()</code>: select rows that satisfy user-specified conditions</li>
+<li><code>select()</code>: keep (remove) only the variables the user specified</li>
+<li><code>mutate()</code>: create (over-write) a variable based on user-specified formula</li>
+<li><code>rename()</code>: rename variables</li>
+<li><code>arrange()</code>: sort by variables specified by the user</li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>There are other useful functions. But, we limit our attention to only the above as they are sufficient to keep up with the main lectures.</p>
+</div>
+</div>
 </div>
 </div>
 <div id="tabset-18-2">
 <div class="panel-tabset">
-<ul id="tabset-16" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-16-1">Step 1: grouping</a></li><li><a href="#tabset-16-2">Step 2: summarizing</a></li><li><a href="#tabset-16-3">Piped</a></li></ul>
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Introduction</a></li><li><a href="#tabset-11-2">Examples</a></li><li><a href="#tabset-11-3">multiple conditions</a></li><li><a href="#tabset-11-4">Exercises</a></li></ul>
 <div class="tab-content">
-<div id="tabset-16-1">
-<p>You first use <code>group_by()</code> to set the group for a dataset:</p>
-<div id="qwebr-insertion-location-6"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>There are no apparent differences in <code>flights_carrier</code> from <code>flights_slim</code>. The only thing you did by <code>group_by()</code> was to tell R that whatever we will do to the new dataset is going to be done by group, which is reflected in “Groups” of the printed data.</p>
+<div id="tabset-11-1">
+<p><code>dplyr::filter()</code> subsets data row-wise using logical conditions based on variables.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#--- syntax ---# </span></span>
+<span id="cb9-2"><a></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(dataset, condition <span class="dv">1</span>, ..., condition K)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="tabset-16-2">
-<p>Once the group is set, we are ready to do some group-wise (by carrier) operations. Let’s now find the means of <code>arr_delay</code> by carrier so we know which carriers perform better than others. We can do so using <code>summarize()</code>.</p>
-<div id="qwebr-insertion-location-7"></div>
+</div>
+<div id="tabset-11-2">
+<p>Observations where <code>month</code> is 4:</p>
+<div id="qwebr-insertion-location-23"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Observations where <code>month</code> is NOT 4:</p>
+<div id="qwebr-insertion-location-24"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Observations where <code>month</code> is less than 4:</p>
+<div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-16-3">
-<p>Using the piping operator,</p>
-<div id="qwebr-insertion-location-8"></div>
+<div id="tabset-11-3">
+<div class="panel-tabset">
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">and (<code>&amp;</code>)</a></li><li><a href="#tabset-9-2">or (<code>|</code>)</a></li><li><a href="#tabset-9-3">in any of (<code>%in%</code>)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<div id="qwebr-insertion-location-26"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-9-2">
+<div id="qwebr-insertion-location-27"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-9-3">
+<p>This is very useful when you have many values to check.</p>
+<div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-18-3">
-<p>You can apply any functions that work on a vector (a variable)</p>
-<div id="qwebr-insertion-location-9"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-18-4">
-<p>You can assign the results of the grouped operations to new variables using <code>mutate()</code></p>
-<div id="qwebr-insertion-location-10"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-18-5">
+<div id="tabset-11-4">
 <div class="panel-tabset">
-<ul id="tabset-17" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-17-1">Exercise 1</a></li><li><a href="#tabset-17-2">Instruction</a></li><li><a href="#tabset-17-3">Exercise 2</a></li><li><a href="#tabset-17-4">Exercise 3</a></li></ul>
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Exercise 1</a></li><li><a href="#tabset-10-2">Exercise 2</a></li><li><a href="#tabset-10-3">Exercise 3</a></li></ul>
 <div class="tab-content">
-<div id="tabset-17-1">
-<p>Find the carrier that had the longest average departure delay (<code>dep_delay</code>) during May through August. Below is the output you will see if you get it right.</p>
-<div id="qwebr-insertion-location-11"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-17-2">
-<p>For the rest of the exercises, we are going to use the weather data for the three airports in NY. First load the weather data and get familiar with the data set.</p>
-<div id="qwebr-insertion-location-12"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-17-3">
-<p>Find the daily mean temperature (temp), humidity (humid), wind speed (wind_speed), and precipitation (precip) by the origin of departure. Do not forget to name each daily weather variable. Below is the output you will see if you get it right.</p>
-<div id="qwebr-insertion-location-13"></div>
+<div id="tabset-10-1">
+<p>Find the observations in June and July.</p>
+<div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a></a>daily_weather <span class="ot">&lt;-</span> </span>
-<span id="cb79-2"><a></a>  weather <span class="sc">%&gt;%</span></span>
-<span id="cb79-3"><a></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(origin, month, day) <span class="sc">%&gt;%</span></span>
-<span id="cb79-4"><a></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(</span>
-<span id="cb79-5"><a></a>    <span class="at">temp =</span> <span class="fu">mean</span>(temp),</span>
-<span id="cb79-6"><a></a>    <span class="at">humid =</span> <span class="fu">mean</span>(humid),</span>
-<span id="cb79-7"><a></a>    <span class="at">wind_speed =</span> <span class="fu">mean</span>(wind_speed),</span>
-<span id="cb79-8"><a></a>    <span class="at">precip =</span> <span class="fu">mean</span>(precip)</span>
-<span id="cb79-9"><a></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(flights_mini, month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
-<div id="tabset-17-4">
-<p>Subset the daily weather data you obtained in exercise 2 so that it contains weather information only in Nov, Dec, Jan, and Feb for flights that depart from “EWR”. Below is the output you will see if you get it right.</p>
-<div id="qwebr-insertion-location-14"></div>
+<div id="tabset-10-2">
+<p>Find the observations in January, April, July, September, and December.</p>
+<div id="qwebr-insertion-location-30"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a></a>(</span>
-<span id="cb80-2"><a></a>daily_weather <span class="sc">%&gt;%</span></span>
-<span id="cb80-3"><a></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb80-4"><a></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(origin <span class="sc">==</span> <span class="st">"EWR"</span>)</span>
-<span id="cb80-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(flights_mini, month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-10-3">
+<p>Find the observations by carrier “US”</p>
+<div id="qwebr-insertion-location-31"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Answer</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>dplyr<span class="sc">::</span><span class="fu">filter</span>(flights_mini, carrier <span class="sc">==</span> <span class="st">"US"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-18-3">
+<div class="panel-tabset">
+<ul id="tabset-13" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-13-1">Introduction</a></li><li><a href="#tabset-13-2">Examples</a></li><li><a href="#tabset-13-3">Exercises</a></li></ul>
+<div class="tab-content">
+<div id="tabset-13-1">
+<p>You can select a subset of variables using <code>dplyr::select()</code>.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>dplyr<span class="sc">::</span><span class="fu">select</span>(dataset, variable <span class="dv">1</span>, variable <span class="dv">2</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+<p>If you want to drop some variables, but want to keep all the other variables, you can take advantage of <code>−</code> operator:</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>dplyr<span class="sc">::</span><span class="fu">select</span>(dataset, <span class="sc">-</span> variable <span class="dv">1</span>, <span class="sc">-</span> variable <span class="dv">2</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-13-2">
+<p>Select <code>arr_delay</code>:</p>
+<div id="qwebr-insertion-location-32"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Select <code>month</code>, <code>arr_delay</code>, and <code>dep_delay</code>:</p>
+<div id="qwebr-insertion-location-33"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Deselect (remove) <code>year</code> and <code>month</code>:</p>
+<div id="qwebr-insertion-location-34"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-13-3">
+<div class="panel-tabset">
+<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">Exercise 1</a></li><li><a href="#tabset-12-2">Exercise 2</a></li></ul>
+<div class="tab-content">
+<div id="tabset-12-1">
+<p>Select all the columns except <code>arr_delay</code></p>
+<div id="qwebr-insertion-location-35"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Answer</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>dplyr<span class="sc">::</span><span class="fu">select</span>(flights_mini, <span class="sc">-</span> arr_delay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-12-2">
+<p>Select <code>arr_delay</code> and <code>month</code></p>
+<div id="qwebr-insertion-location-36"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Answer</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a>dplyr<span class="sc">::</span><span class="fu">select</span>(flights_mini, month, arr_delay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-18-4">
+<p>You can use <code>relocate()</code> to change the column order.</p>
+<div id="qwebr-insertion-location-37"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Chosen variables come front with the order of the rest of the variable unchanged.</p>
+</div>
+<div id="tabset-18-5">
+<div class="panel-tabset">
+<ul id="tabset-16" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-16-1">Introduction</a></li><li><a href="#tabset-16-2">Example</a></li><li><a href="#tabset-16-3">Multiple variables</a></li><li><a href="#tabset-16-4">Function</a></li><li><a href="#tabset-16-5">Selective mutation</a></li><li><a href="#tabset-16-6">Exercises</a></li></ul>
+<div class="tab-content">
+<div id="tabset-16-1">
+<p>You can use <code>mutate()</code> to create a new variable (or overwrite the existing one) in the dataset:</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>dplyr<span class="sc">::</span><span class="fu">mutate</span>(data, new variable <span class="at">name =</span> expression)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-16-2">
+<div id="qwebr-insertion-location-38"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-16-3">
+<p>You can define multiple variables within a single <code>mutate()</code> function.</p>
+<p>You can create a new variable based on the variables that have been just created within the same <code>mutate()</code> function.</p>
+<div id="qwebr-insertion-location-39"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-16-4">
+<p>You can apply functions to variables when creating new variables:</p>
+<div id="qwebr-insertion-location-40"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The function you apply has to accept a vector (a variable column).</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-16-5">
+<p>Sometimes, you want to to alter the values of a variable for specific rows that satisfy certain conditions.</p>
+<div class="panel-tabset">
+<ul id="tabset-14" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-14-1">Example</a></li><li><a href="#tabset-14-2">dichotomous</a></li><li><a href="#tabset-14-3">more than two cases</a></li></ul>
+<div class="tab-content">
+<div id="tabset-14-1">
+<p>Suppose you found out that <code>dep_time</code> for all the flights from <code>JFK</code> was misreported so that <code>dep_time</code> is 10 minutes earlier than the true departure times.</p>
+<p>So, we would like to add 10 minutes to all the flights by <code>JFK</code>.</p>
+<p>You can use <code>ifelse()</code> like this:</p>
+<div id="qwebr-insertion-location-41"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-14-2">
+<p>Suppose you want to label flights with <code>arr_delay &gt; 0</code> to be <code>time-loss</code> and <code>time-gain</code> otherwise:</p>
+<p>You can use <code>ifelse()</code> for defining a dichotomous variable like this:</p>
+<div id="qwebr-insertion-location-42"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-14-3">
+<p>The <code>case_when()</code> function is useful if you have more than two cases.</p>
+<p><strong>Syntax</strong>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">case_when</span>(</span>
+<span id="cb18-2"><a></a>  condition <span class="dv">1</span> <span class="sc">~</span> value to assign,</span>
+<span id="cb18-3"><a></a>  condition <span class="dv">2</span> <span class="sc">~</span> value to assign,</span>
+<span id="cb18-4"><a></a>  condition <span class="dv">3</span> <span class="sc">~</span> value to assign,</span>
+<span id="cb18-5"><a></a>  ...</span>
+<span id="cb18-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><strong>Example</strong>:</p>
+<div id="qwebr-insertion-location-43"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-16-6">
+<div class="panel-tabset">
+<ul id="tabset-15" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-15-1">Exercise 1</a></li><li><a href="#tabset-15-2">Exercise 2</a></li></ul>
+<div class="tab-content">
+<div id="tabset-15-1">
+<p>Find the mean value of <code>arr_delay</code> in April and May (combined) and define it as a new variable named <code>avg_arr_delay</code></p>
+<p><br></p>
+<p><strong>Answer</strong></p>
+</div>
+<div id="tabset-15-2">
+<p>Find the sum of <code>dep_delay</code> in January, February, and December (combined) and define it as a new variable named <code>sum_arr_delay</code>, and then move the variable to the first column of the dataset.</p>
+<p><br></p>
+<p><strong>Answer</strong></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-18-6">
+<p>You can rename variables using <code>dplyr::rename()</code>.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">rename</span>(data, new variable <span class="at">name =</span> old variable name, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Renamed:</p>
+<div id="qwebr-insertion-location-44"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p>Original:</p>
+<div id="qwebr-insertion-location-45"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-18-7">
+<p>You can use <code>arrange()</code> to reorder rows based on the value of variables.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="co">#--- Syntax (NOT RUN) ---#</span></span>
+<span id="cb20-2"><a></a><span class="fu">arrange</span>(flights_mini, variable name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="panel-tabset">
+<ul id="tabset-17" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-17-1">Example (ascending)</a></li><li><a href="#tabset-17-2">Example (descending)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-17-1">
+<p>The default is the ascending order.</p>
+<div id="qwebr-insertion-location-46"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-17-2">
+<p>To arrange in the descending order, you use <code>desc()</code> function:</p>
+<div id="qwebr-insertion-location-47"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-18-8">
+<p>Notice that the original data <code>flights_mini</code> was not affected by the <code>dplyr::filter()</code> operations in the previous slides.</p>
+<p>This is consistent across all the verbs in <code>dplyr</code>. Whatever actions you take, the original data is unaltered.</p>
+<p>To use the transformed data for later use, you need to assign it to a new object (or overwrite if that is okay):</p>
+<div id="qwebr-insertion-location-48"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="sec-group-operation" class="slide level2">
+<h2>Grouped Operations</h2>
+<div class="panel-tabset">
+<ul id="tabset-21" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-21-1">Motivation</a></li><li><a href="#tabset-21-2">How</a></li><li><a href="#tabset-21-3">Other summarizing functions</a></li><li><a href="#tabset-21-4">New variable</a></li><li><a href="#tabset-21-5">Exercises</a></li></ul>
+<div class="tab-content">
+<div id="tabset-21-1">
+<p>Group-wise operations, such as the mean of arrival delay by carrier are very useful to gain an insight into differences across groups.</p>
+<p>The <code>group_by()</code> function in conjunction with <code>summarize()</code> function does exactly that.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="co">#--- group by variables ---#</span></span>
+<span id="cb21-2"><a></a><span class="fu">group_by</span>(dataset, variable to group by, variable to group by, ...)  </span>
+<span id="cb21-3"><a></a></span>
+<span id="cb21-4"><a></a><span class="co">#--- summarize ---#</span></span>
+<span id="cb21-5"><a></a><span class="fu">summarize</span>(grouped dataset, expression)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-21-2">
+<div class="panel-tabset">
+<ul id="tabset-19" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-19-1">Step 1: grouping</a></li><li><a href="#tabset-19-2">Step 2: summarizing</a></li><li><a href="#tabset-19-3">Piped</a></li></ul>
+<div class="tab-content">
+<div id="tabset-19-1">
+<p>You first use <code>group_by()</code> to set the group for a dataset:</p>
+<div id="qwebr-insertion-location-49"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>There are no apparent differences in <code>flights_carrier</code> from <code>flights_slim</code>. The only thing you did by <code>group_by()</code> was to tell R that whatever we will do to the new dataset is going to be done by group, which is reflected in “Groups” of the printed data.</p>
+</div>
+<div id="tabset-19-2">
+<p>Once the group is set, we are ready to do some group-wise (by carrier) operations. Let’s now find the means of <code>arr_delay</code> by carrier so we know which carriers perform better than others. We can do so using <code>summarize()</code>.</p>
+<div id="qwebr-insertion-location-50"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-19-3">
+<p>Using the piping operator,</p>
+<div id="qwebr-insertion-location-51"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-21-3">
+<p>You can apply any functions that work on a vector (a variable)</p>
+<div id="qwebr-insertion-location-52"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-21-4">
+<p>You can assign the results of the grouped operations to new variables using <code>mutate()</code></p>
+<div id="qwebr-insertion-location-53"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-21-5">
+<div class="panel-tabset">
+<ul id="tabset-20" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-20-1">Exercise 1</a></li><li><a href="#tabset-20-2">Instruction</a></li><li><a href="#tabset-20-3">Exercise 2</a></li><li><a href="#tabset-20-4">Exercise 3</a></li></ul>
+<div class="tab-content">
+<div id="tabset-20-1">
+<p>Find the carrier that had the longest average departure delay (<code>dep_delay</code>) during May through August. Below is the output you will see if you get it right.</p>
+<div id="qwebr-insertion-location-54"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-20-2">
+<p>For the rest of the exercises, we are going to use the weather data for the three airports in NY. First load the weather data and get familiar with the data set.</p>
+<div id="qwebr-insertion-location-55"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-20-3">
+<p>Find the daily mean temperature (temp), humidity (humid), wind speed (wind_speed), and precipitation (precip) by the origin of departure. Do not forget to name each daily weather variable. Below is the output you will see if you get it right.</p>
+<div id="qwebr-insertion-location-56"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Answer</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a>daily_weather <span class="ot">&lt;-</span> </span>
+<span id="cb22-2"><a></a>  weather <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(origin, month, day) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(</span>
+<span id="cb22-5"><a></a>    <span class="at">temp =</span> <span class="fu">mean</span>(temp),</span>
+<span id="cb22-6"><a></a>    <span class="at">humid =</span> <span class="fu">mean</span>(humid),</span>
+<span id="cb22-7"><a></a>    <span class="at">wind_speed =</span> <span class="fu">mean</span>(wind_speed),</span>
+<span id="cb22-8"><a></a>    <span class="at">precip =</span> <span class="fu">mean</span>(precip)</span>
+<span id="cb22-9"><a></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-20-4">
+<p>Subset the daily weather data you obtained in exercise 2 so that it contains weather information only in Nov, Dec, Jan, and Feb for flights that depart from “EWR”. Below is the output you will see if you get it right.</p>
+<div id="qwebr-insertion-location-57"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Answer</strong></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>(</span>
+<span id="cb23-2"><a></a>daily_weather <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(origin <span class="sc">==</span> <span class="st">"EWR"</span>)</span>
+<span id="cb23-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -3303,74 +3020,44 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="across" class="slide level2">
 <h2><code>across()</code></h2>
 <div class="panel-tabset">
-<ul id="tabset-19" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-19-1">What</a></li><li><a href="#tabset-19-2">Syntax and Example</a></li><li><a href="#tabset-19-3">Compare</a></li></ul>
+<ul id="tabset-22" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-22-1">What</a></li><li><a href="#tabset-22-2">Syntax and Example</a></li><li><a href="#tabset-22-3">Compare</a></li></ul>
 <div class="tab-content">
-<div id="tabset-19-1">
+<div id="tabset-22-1">
 <ul>
 <li><p><code>across()</code> lets you apply the same operation (function) to multiple columns at the same time.</p></li>
 <li><p>It is used with <code>summarize()</code> and <code>mutate()</code></p></li>
 <li><p>It is useful when you want to apply the same function to many variables.</p></li>
 </ul>
 </div>
-<div id="tabset-19-2">
+<div id="tabset-22-2">
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a></a><span class="fu">across</span>(which variables to apply the <span class="cf">function</span>, <span class="cf">function</span>, options to the <span class="cf">function</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="fu">across</span>(which variables to apply the <span class="cf">function</span>, <span class="cf">function</span>, options to the <span class="cf">function</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Examples</strong></p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 5
-  carrier arr_delay dep_delay air_time time_hour          
-  &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dttm&gt;             
-1 9E          7.38      16.7      86.8 2013-07-03 17:06:54
-2 AA          0.364      8.59    189.  2013-07-01 03:46:41
-3 AS         -9.93       5.80    326.  2013-06-29 05:05:27
-4 B6          9.46      13.0     151.  2013-07-02 13:05:56
-5 DL          1.64       9.26    174.  2013-07-04 01:49:32
-6 EV         15.8       20.0      90.1 2013-07-04 04:33:39</code></pre>
-</div>
-</div>
+<div id="qwebr-insertion-location-58"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Note: <code>na.rm = TRUE</code> is an option for the <code>mean()</code> function.</p>
 </div>
-<div id="tabset-19-3">
+<div id="tabset-22-3">
 <p>Without <code>across()</code></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a></a>flights <span class="sc">%&gt;%</span> </span>
-<span id="cb83-2"><a></a>  <span class="fu">group_by</span>(carrier) <span class="sc">%&gt;%</span> </span>
-<span id="cb83-3"><a></a>  <span class="fu">summarize</span>(</span>
-<span id="cb83-4"><a></a>    <span class="at">mean_arr_delay =</span> <span class="fu">mean</span>(arr_delay, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb83-5"><a></a>    <span class="at">mean_dep_delay =</span> <span class="fu">mean</span>(dep_delay, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb83-6"><a></a>    <span class="at">mean_air_time =</span> <span class="fu">mean</span>(air_time, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb83-7"><a></a>    <span class="at">mean_time_hour =</span> <span class="fu">mean</span>(time_hour, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb83-8"><a></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<div id="qwebr-insertion-location-59"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>With <code>across()</code></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a></a>flights <span class="sc">%&gt;%</span> </span>
-<span id="cb84-2"><a></a>  <span class="fu">group_by</span>(carrier) <span class="sc">%&gt;%</span> </span>
-<span id="cb84-3"><a></a>  <span class="fu">summarize</span>(</span>
-<span id="cb84-4"><a></a>    <span class="fu">across</span>(<span class="fu">c</span>(arr_delay, dep_delay, air_time, time_hour),</span>
-<span id="cb84-5"><a></a>    mean,</span>
-<span id="cb84-6"><a></a>    <span class="at">na.rm =</span> <span class="cn">TRUE</span></span>
-<span id="cb84-7"><a></a>    )</span>
-<span id="cb84-8"><a></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="qwebr-insertion-location-60"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section class="slide level2">
-
 </section></section>
 <section>
 <section id="across-with-pattern-functions" class="title-slide slide level1 center">
 <h1><code>across()</code> with pattern functions</h1>
 <div class="panel-tabset">
-<ul id="tabset-20" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-20-1">What</a></li><li><a href="#tabset-20-2">numeric</a></li><li><a href="#tabset-20-3">character</a></li><li><a href="#tabset-20-4">end with</a></li><li><a href="#tabset-20-5">logical operator</a></li><li><a href="#tabset-20-6">mix</a></li></ul>
+<ul id="tabset-23" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-23-1">What</a></li><li><a href="#tabset-23-2">numeric</a></li><li><a href="#tabset-23-3">character</a></li><li><a href="#tabset-23-4">end with</a></li><li><a href="#tabset-23-5">logical operator</a></li><li><a href="#tabset-23-6">mix</a></li></ul>
 <div class="tab-content">
-<div id="tabset-20-1">
+<div id="tabset-23-1">
 <p><br></p>
 <p>You can use <code>across()</code> (and other <code>dplyr</code> functions) in conjunction with functions that identify variables that fit with the pattern you specify:</p>
 <ul>
@@ -3383,98 +3070,41 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <li><code>ends_with()</code></li>
 </ul>
 </div>
-<div id="tabset-20-2">
+<div id="tabset-23-2">
 <p><br></p>
 <p>Applying the same function to all numeric variables using <code>where(is.numeric)</code>:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 15
-  carrier  year month   day dep_time sched_dep_time dep_delay arr_time
-  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 9E       2013  6.56  15.6    1487.          1472.     16.7     1639.
-2 AA       2013  6.48  15.7    1297.          1290.      8.59    1521.
-3 AS       2013  6.41  15.8    1295.          1285.      5.80    1565.
-4 B6       2013  6.52  15.8    1381.          1397.     13.0     1406.
-5 DL       2013  6.57  15.8    1351.          1346.      9.26    1573.
-6 EV       2013  6.58  15.7    1369.          1354.     20.0     1488.
-# ℹ 7 more variables: sched_arr_time &lt;dbl&gt;, arr_delay &lt;dbl&gt;, flight &lt;dbl&gt;,
-#   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;</code></pre>
+<div id="qwebr-insertion-location-61"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-</div>
-</div>
-<div id="tabset-20-3">
+<div id="tabset-23-3">
 <p><br></p>
 <p>Applying the same function to all character variables using <code>where(is.character)</code>:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 4
-  carrier tailnum origin  dest
-  &lt;chr&gt;     &lt;int&gt;  &lt;int&gt; &lt;int&gt;
-1 9E          204      3    49
-2 AA          601      3    19
-3 AS           84      1     1
-4 B6          193      3    42
-5 DL          629      3    40
-6 EV          316      3    61</code></pre>
-</div>
-</div>
+<div id="qwebr-insertion-location-62"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <ul>
 <li><code>n_distinct()</code> identifies the number of unique values.</li>
 </ul>
 </div>
-<div id="tabset-20-4">
+<div id="tabset-23-4">
 <p><br></p>
 <p>Applying the same function to all the variables that end with <code>delay</code>:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 3
-  carrier dep_delay arr_delay
-  &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
-1 9E          16.7      7.38 
-2 AA           8.59     0.364
-3 AS           5.80    -9.93 
-4 B6          13.0      9.46 
-5 DL           9.26     1.64 
-6 EV          20.0     15.8  </code></pre>
-</div>
-</div>
+<div id="qwebr-insertion-location-63"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <ul>
 <li>Use <code>starts_with()</code> to apply the same function to all the variables that star with a particular sting of characters:</li>
 </ul>
 </div>
-<div id="tabset-20-5">
+<div id="tabset-23-5">
 <p><br></p>
 <p>You can use logical operators:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 5
-  carrier tailnum origin  dest time_hour
-  &lt;chr&gt;     &lt;int&gt;  &lt;int&gt; &lt;int&gt;     &lt;int&gt;
-1 9E          204      3    49      4696
-2 AA          601      3    19      6182
-3 AS           84      1     1       714
-4 B6          193      3    42      6881
-5 DL          629      3    40      5838
-6 EV          316      3    61      6017</code></pre>
+<div id="qwebr-insertion-location-64"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-</div>
-</div>
-<div id="tabset-20-6">
+<div id="tabset-23-6">
 <p><br></p>
 <p>Mixing explicitly naming variables and using functions:</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 7
-  carrier month dep_delay arr_delay tailnum origin  dest
-  &lt;chr&gt;   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;int&gt;  &lt;int&gt; &lt;int&gt;
-1 9E       6.56     16.7      7.38      204      3    49
-2 AA       6.48      8.59     0.364     601      3    19
-3 AS       6.41      5.80    -9.93       84      1     1
-4 B6       6.52     13.0      9.46      193      3    42
-5 DL       6.57      9.26     1.64      629      3    40
-6 EV       6.58     20.0     15.8       316      3    61</code></pre>
-</div>
-</div>
+<div id="qwebr-insertion-location-65"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
@@ -3483,18 +3113,12 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <h2><code>select()</code> and <code>relocate()</code></h2>
 <p>The approaches to refer to the variables that fit with a specified pattern can be applied to other <code>dplyr</code> operations as well:</p>
 <p>Try:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a></a>flights <span class="sc">%&gt;%</span> </span>
-<span id="cb90-2"><a></a>  <span class="fu">select</span>(<span class="fu">c</span>(origin, <span class="fu">where</span>(is.numeric)))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a></a>flights <span class="sc">%&gt;%</span> </span>
-<span id="cb91-2"><a></a>  <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"delay"</span>))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a></a>flights <span class="sc">%&gt;%</span> </span>
-<span id="cb92-2"><a></a>  <span class="fu">relocate</span>(<span class="fu">where</span>(is.character))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<div id="qwebr-insertion-location-66"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div id="qwebr-insertion-location-67"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div id="qwebr-insertion-location-68"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
@@ -3782,18 +3406,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
         }
         return false;
       }
-      const clipboard = new window.ClipboardJS('.code-copy-button', {
-        text: function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
-            }
-          }
-          return codeEl.innerText;
-        }
-      });
-      clipboard.on('success', function(e) {
+      const onCopySuccess = function(e) {
         // button target
         const button = e.trigger;
         // don't keep focus
@@ -3825,7 +3438,29 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
         }, 1000);
         // clear code selection
         e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
       });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        // For code content inside modals, clipBoardJS needs to be initialized with a container option
+        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
           var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -3833,7 +3468,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }
         // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
         for (var i=0; i<links.length; i++) {
           const link = links[i];
           if (!isInternal(link.href)) {

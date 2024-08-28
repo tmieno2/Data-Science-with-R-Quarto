@@ -3,13 +3,13 @@ title: "03-1-Data wrangling with `tidyverse`: The Basics"
 format: 
   revealjs: 
     theme: [default, ../custom.scss]
-    fontsize: 1.6em
+    fontsize: 1.4em
     callout-icon: false
     scrollable: true
     echo: true
     fig-dpi: 400
 webr:
-  packages: ['fixest', 'dplyr', 'ggplot2']
+  packages: ['dplyr', 'ggplot2', 'nycflights13']
   cell-options:
     editor-font-scale: 0.8
     message: false
@@ -19,303 +19,323 @@ filters:
   - webr
 ---
 
-```{r}
-#| include: false 
-library(dplyr) 
-library(readr) 
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+# `tidyverse` package
+
+::: {.panel-tabset}
+
+### What is it?
+
++ The `tidyverse` is a package of a collection of packages. Some of the packages included are
+
+  - `readr`: read datasets in various formats
+  - `dplyr`: manipulate and merge datasets
+  - `tidyr`: reshape datasets 
+  - `ggplot2`: data visualization 
+  - `stringr`: character string operations
+
++ These packages are by no means the only ways to do the operations we will learn today. However, we learn these packages because they are easy to use. 
+
++ They are also easy to learn and get help as they are extremely popular and very well-documented. Go to the [tidyverse website](http://www.tidyverse.org/), and click on the icon of the package you would like to learn, then you will have a nice documentation of the packages. 
+ 
++ You could also google the package name, and you will see bunch of introductions/tutorials.
+
+### Preparation
+
+Install the package if you have not.
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
 ```
+
+<br>
+
+When you load the `tidyverse` package, it automatically loads many of the packages contained in it.
+
+```{r, message = TRUE}
+library(tidyverse)
+```
+
+### Conflicts?
+
+Sometimes packages share the same functions names. 
+
+When those packages are loaded, there are function name conflicts where the function from the package loaded later masks the function from the other package.
+:::
+<!--end of panel-->
+
+# `data.frame` and `tibble`
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+## `data.frame` and `tibble`
+
+::: {.panel-tabset}
+
+### What are they?
+
+`data.frame`
+
++ The traditional (most common) class of two-dimensional data (rows and columns) supported by R.
+
+<br>
+
+`tibble` 
+
++ A relatively newer class of two-dimensional data that brings minor enhancements over `data.frame`.
+
++ `tibble` is defined by the `tibble` package, which is part of the `tidyverse` package.
+
+### Objectives
+
++ Learn basic operations on `data.frame` and `tibble` 
+
++ Highlight some differences between the two (They are almost interchangeable, and you do no need to pay much attention to which class of data you are dealing with)
+
+### Preparation
+
+We use `mtcars` dataset. It is readily available to you.
+
+```{webr-r}
+mtcars
+
+class(mtcars)
+```
+
+<br>
+
+You can convert a `data.frame` into a `tibble` using `as_tibble()`:
+
+```{webr-r}
+#| autorun: true
+mtcars_tbl <- as_tibble(mtcars)
+```
+
+<br>
+
+`mtcars` is a `tibble` (and also a `data.frame`).
+
+```{webr-r}
+class(mtcars_tbl)
+```
+
+:::
+<!--end of panel-->
+
+## display method
+
+::: {.panel-tabset}
+
+### `data.frame`
+
+```{webr-r}
+mtcars
+```
+
+### `tibble`
+
+```{webr-r}
+mtcars_tbl
+```
+:::
+<!--end of panel-->
+
+
+## Accessing parts of the data
+
+::: {.panel-tabset}
+
+### Numerical index
+
+Subsetting a data.frame works in a very similar manner as a matrix:
+
+```{r eval = F}
+matrix[rows of interest, columns of interest]
+```
+
+**Example:**
+
+2nd to 8th rows, the 3rd and 5th columns
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+```{webr-r}
+mtcars[2:8, c(3,5)]
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+`tibble`
+
+```{webr-r}
+mtcars_tbl[2:8, c(3,5)]
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Variable names
+
+But, subsetting a data.frame using numerical indexes are not recommended because it is not immediately clear to you (or your collaborators who might look at the code) what you intended to do with the code.
+
+Instead, the following is better:
+
+```{r eval = F}
+data[, c("variable 1", "variable 2", ...)]
+```
+
+**Examples:** 
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+```{webr-r}
+head(mtcars[, "mpg"])
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+`tibble`
+
+```{webr-r}
+head(mtcars_tbl[, "mpg"])
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Using $
+
+Alternatively, to access a column (variable) from a dataset, you can use `$` like below (remember? A `data.frame` is a special kind of `list`).
+
+**Examples:** 
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+```{webr-r}
+head(mtcars$mpg)
+```
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+`tibble`
+
+```{webr-r}
+head(mtcars_tbl$mpg)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
 
 
 # Data manipulation using the `dplyr` package
 
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+## Data Preparation
 
-## Essential verbs
+::: {.panel-tabset}
 
-+ `filter()`
-+ `mutate()`
-+ `select()`
-+ `rename()`
-+ `arrange()`
-+ `relocate()`
+We will use the following data throughout this lecture: 
 
-## Before we start
+### `flights`
 
-For illustrations, we will use `flights_mini` that we create below:
+We use `flights`, which is from the `nycflights13` package.
 
-```{r }
-library(nycflights13)
+```{webr-r}
+#| autorun: true
+#--- get data ---# 
+data(flights, package = "nycflights13") 
 
+#--- make it slim ---#
 (
-flights_mini <- distinct(flights,month,day,.keep_all=TRUE) %>% 
-  filter(day %in% c(1,2)) %>% 
-  arrange(month)
+flights_slim <- dplyr::select(flights, year, month, origin, carrier, arr_delay, dep_delay)
 )
-
 ```
 
-## `filter()`: row-wise subset
+### `flights_mini`
 
-::: {.panel-tabset} 
+We also use `flights_mini`, which is created by running the code below.
 
-### Instruction
+```{webr-r}
+#| autorun: true
+(
+  flights_mini <-
+    dplyr::distinct(flights, month, day, .keep_all = TRUE) %>%
+    dplyr::filter(day %in% c(1, 2)) %>%
+    dplyr::arrange(month) %>%
+    dplyr::select(year, month, day, dep_time, dep_delay, arr_time, arr_delay, air_time, origin)
+)
+```
 
 <br>
 
-`filter()`: subset data row-wise using logical conditions based on variables  
- 
+You do not have to understand the code just yet. You will, once you have completed the lecture. Just inspect the data and familiarize yourself with it.
 
-```{r eval = F}
-#--- syntax ---# 
-filter(dataset, condition 1, ..., condition K)
-```
-
-### Single condition
-
-::: {.panel-tabset}
-#### equal to
-
-Observations where `month` is 4:
-
-```{r }
-filter(flights_mini, month == 4) 
-```
-
-#### not equal to
-
-Observations where `month` is NOT 4:
-
-```{r }
-filter(flights_mini, month != 4) 
-```
-
-#### inequality
-
-Observations where `month` is less than 4:
-
-```{r }
-filter(flights_mini, month < 4) 
-```
-:::
-<!--end of panel-->
-
-### `filter()`: multiple conditions
-
-::: {.panel-tabset}
-
-#### and (&)
-
-```{r }
-filter(flights_mini, month >= 9 & month <= 11) 
-
-#--- alternatively ---#
-# filter(flights_mini, month >= 9, month <= 11)
-```
-
-#### or (|)
-
-```{r }
-filter(flights_mini, month >= 11 | month <= 1) 
-```
-
-#### in any of (`%in%`)
-
-```{r }
-filter(flights_mini, month %in% c(1, 2, 3)) 
-
-#--- equivalently ---#
-# filter(flights_mini, month == 1 | month == 2 | month == 2) 
-```
-
-This is very useful when you have many values to check.  
-:::
-
-### Important
-
-Notice that the original data `flights_mini` was not affected by the `filter()` operations in the previous slides.
-
-This is consistent across all the verbs in `dplyr`. Whatever actions you take, the original data is unaltered.
-
---
-
-To use the transformed data for later use, you need to assign it to a new object (or overwrite if that is okay):
-
-```{r }
-flights_mini_filtered <- filter(flights_mini, month == 4) 
-
-flights_mini_filtered
-```
-
-### Exercises
-
-::: {.panel-tabset} 
-
-#### Exercise 1
-
-<br>
-
-Find the observations in June and July
-
-```{webr-r}
-
-```
-
-Here is the output you should get: 
-
-```{r echo = F}
-filter(flights_mini, month %in% c(6, 7))  
-```
-
-#### Exercise 2
-
-<br>
-
-Find the observations in January, April, July, September, and December
-
-```{webr-r}
-
-```
-
-Here is the output you should get: 
-
-```{r echo = F}
-filter(flights_mini, month %in% c(1, 4, 6, 9, 12))  
-```
-
-#### Exercise 3
-
-<br>
-
-Find the observations by carrier "US"
-
-```{webr-r}
-
-```
-
-Here is the output you should get: 
-
-```{r echo = F}
-filter(flights_mini, carrier == "US")  
-```
-
-:::
-
-:::
-
-## `select()`: column-wise subset
-
-::: {.panel-tabset} 
-
-### Instruction
-
-You can select a subset of variables using `select()`. 
-
-```{r eval = F}
-select(dataset, variable 1, variable 2, ...)
-```
-
-If you would like to drop some variables, but want to keep all the other variables, you can take advantage of  `−` operator:
-
-```{r eval = F}
-select(dataset, - variable 1, - variable 2, ...)
-```
-
-### Examples 
-
-::: {.panel-tabset}
-#### Example 1
-
-```{r }
-select(flights_mini, arr_delay)
-```
-
-#### Example 2
-
-```{r }
-select(flights_mini, month, arr_delay, dep_delay)
-```
-
-#### Example 3
-
-```{r }
-select(flights_mini, - year, - month)  
-```
-
-:::
-
-### Exercises
-
-::: {.panel-tabset} 
-
-#### Exercise 1
-
-Select all the columns except `arr_delay`.
-
-```{webr-r}
-
-```
-
-Here is the output you should get: 
-
-```{r echo = F}
-select(flights_mini, - arr_delay)  
-```
-
-#### Exercise 2
-
-Select `arr_delay` and `month`.
-
-```{webr-r}
-
-```
-
-Here is the output you should get: 
-
-```{r echo = F}
-select(flights_mini, month, arr_delay)  
-```
-
-:::
 :::
 <!--end of panel-->
 
 
-## `relocate()`: change the column order
+## Piping with `%>%` {#sec-piping}
 
+::: {.panel-tabset}
 
-You can use `relocate()` to change the column order. 
-
-```{r }
-relocate(flights_mini, dep_time, dep_delay)
-```
-
-Chosen variables come front with the order of the rest of the variable unchanged.
-
-# Piping with `%>%`
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
-## Piping with `%>%`
-
-::: {.panel-tabset} 
-
-### The Basic
+### Introduction
 
 Let `f()` be a function and `x` is an R object that `f()` accepts. Then, 
 
 `x %>% f()` is the same as `f(x)`
 
-**Example**
-
 Try the following codes and confirm they return the same results:
 
-```{r eval = F}
+```{webr-r}
 #--- not piped ---#
-mean(seq(1, 99, by = 2))  
+mean(seq(1, 99, by = 2))
 
 #--- piped ---#
-seq(1, 99, by = 2) %>% mean()   
+seq(1, 99, by = 2) %>% mean()
 ```
+
+<br>
+
+:::{.callout-note}
+The piping operator `%>%` is actually from the `magrittr` package. But, when you load the `dplyr` package, it is automatically loaded as well.
+:::
 
 ### More generally
 
@@ -325,11 +345,15 @@ Suppose you have more than one arguments to the function like this:
 f(x1, x2, option 1, option 2)
 ```
 
+<br>
+
 Then,
 
 ```{r eval = F}
-z %>% f(x2, option 1, option 2) 
+z %>% f(x2, option 1, option 2)
 ```
+
+<br>
 
 is equivalent to
 
@@ -337,70 +361,89 @@ is equivalent to
 f(z, x2, option 1, option 2) 
 ```
 
-That is, in general, an R object that precedes the piping operator (`%>%`) becomes the <span style="color:red"> first </span> argument of the function that comes after the piping operator.
+<br>
 
-### .
+::: {.columns}
+::: {.column width="70%"}
+:::{.callout-important}
+That is, in general, an R object that precedes the piping operator (`%>%`) becomes the <span style="color:red"> first </span> argument of the function that comes after the piping operator.
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Refer to the preceding object
 
 What if the object before the piping operator is not the first argument of the subsequent function? 
 
-
-```{r }
+```{webr-r}
 a_string <- "I do not like space"
 
 gsub(" ", "", a_string)
 ```
 
+<br>
+
 This does not work:
 
-```{r eval = F}
+```{webr-r}
 a_string %>%  gsub(" ", "") 
 ```
 
+<br>
+
 because the above is equivalent to 
 
-```{r eval = F}
+```{webr-r}
 a_string <- gsub(a_string, " ", "") 
 ```
 
+<br>
+
 You can refer to the preceding object by `.` like this:
 
-```{r }
+```{webr-r}
 a_string %>% gsub(" ", "", .)  
 ```
 
 ### Chaining
 
-You can keep piping like this:  
+You can keep piping like this:
 
-```{r pipe-illustrate, eval = F}
+```{webr-r}
 flights_mini %>% 
-  select(year, month, dep_time) %>% 
-  relocate(dep_time) %>% 
-  filter(month <= 3)
+  dplyr::select(year, month, dep_time) %>% 
+  dplyr::relocate(dep_time) %>% 
+  dplyr::filter(month <= 3)
 ```
-
-<span style="color:red"> Important: </span> The object created by all the codes preceding the piping operator is passed down to the function after the piping operator. 
-
-For example, `relocate(dep_time)` receives as its first argument the outcome of the evaluation of the highlighted parts of the code below.
-
-
-
-### Why piping with `%>%`
-
-::: {.panel-tabset} 
-
-#### Problem
 
 <br>
 
+:::{.callout-important}
+The object created by all the codes preceding the piping operator is passed down to the function after the piping operator.
+:::
+
+For example, `relocate(dep_time)` receives as its first argument the outcome of the evaluation of the highlighted parts of the code below.
+
+### Why?
+
+::: {.panel-tabset}
+
+#### Setup
+
 Consider the following sequence of actions:
 
-```{r }
-a1 <- filter(flights_mini, month <= 3)
+```{webr-r}
+a1 <- dplyr::filter(flights_mini, month <= 3)
 
-a2 <- select(a1, year, month, dep_time)
+a2 <- dplyr::select(a1, year, month, dep_time)
 
-a3 <- relocate(a2, dep_time)
+a3 <- dplyr::relocate(a2, dep_time)
 ```
 
 <br>
@@ -413,14 +456,12 @@ a3 <- relocate(a2, dep_time)
 
 #### Alternative 1
 
-<br>
-
 Alternatively, you can do the following:
 
-```{r }
-a3 <- relocate(
-  select(
-    filter(flights_mini, month <= 3)
+```{webr-r}
+a3 <- dplyr::relocate(
+  dplyr::select(
+    dplyr::filter(flights_mini, month <= 3)
     , year, month, dep_time
   ), 
   dep_time
@@ -431,130 +472,393 @@ a3 <- relocate(
 
 + This does not create any intermediate objects unlike the first example. 
 
-+ However, it is hard to understand the code partly because the order of actions is the reverse of the order of the corresponding functions you see as you read the code from left to right.
++ However, it can be difficult to understand the code because the order of execution is the reverse of the order in which the functions are written when you read the code from left to right.
 
 #### Alternative 2 (with piping)
 
-<br>
-
 Taking advantage of the piping operator, 
 
+```{webr-r}
+a3 <- 
+  flights_mini %>% 
+  dplyr::filter(month <= 3) %>% 
+  dplyr::select(year, month, dep_time) %>% 
+  dplyr::relocate(dep_time)
+```
+
+<br> 
+
++ This is much easier to read as the order of execution is the same as the order in which the functions are written.
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Data wrangling with the `dplyr` package {#sec-dplyr-wrangle}
+
+::: {.panel-tabset}
+
+### What is it?
+
+The `dplyr` packages provides useful functions to transform data. 
+
++ `filter()`: select rows that satisfy user-specified conditions
++ `select()`: keep (remove) only the variables the user specified
++ `mutate()`: create (over-write) a variable based on user-specified formula
++ `rename()`: rename variables
++ `arrange()`: sort by variables specified by the user
+
+:::{.callout-note}
+There are other useful functions. But, we limit our attention to only the above as they are sufficient to keep up with the main lectures.
+:::
+
+### `filter`
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`dplyr::filter()` subsets data row-wise using logical conditions based on variables.
+
+<br>
+
+**Syntax** 
+
 ```{r eval = F}
-a3 <- flights_mini %>% 
-  filter(month <= 3) %>% 
-  select(year, month, dep_time) %>% 
-  relocate(dep_time)
+#--- syntax ---# 
+dplyr::filter(dataset, condition 1, ..., condition K)
+```
+
+#### Examples
+
+Observations where `month` is 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month == 4) 
+```
+
+<br>
+
+Observations where `month` is NOT 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month != 4) 
+```
+
+<br>
+
+Observations where `month` is less than 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month < 4) 
+```
+
+#### multiple conditions
+
+::: {.panel-tabset}
+
+##### and (`&`)
+
+```{webr-r}
+dplyr::filter(flights_mini, month >= 9 & month <= 11) 
+
+#--- alternatively ---#
+# dplyr::filter(flights_mini, month >= 9, month <= 11)
+```
+
+
+##### or (`|`)
+
+```{webr-r}
+dplyr::filter(flights_mini, month >= 11 | month <= 1) 
+```
+
+##### in any of (`%in%`)
+
+This is very useful when you have many values to check.  
+
+```{webr-r}
+dplyr::filter(flights_mini, month %in% c(1, 2, 3)) 
+
+#--- equivalently ---#
+# dplyr::filter(flights_mini, month == 1 | month == 2 | month == 2) 
 ```
 
 :::
+<!--end of panel-->
+
+#### Exercises
+
+::: {.panel-tabset}
+
+Use `flights_mini` dataset 
+
+##### Exercise 1
+
+Find the observations in June and July.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_mini, month %in% c(6, 7))
+```
+
+##### Exercise 2
+
+Find the observations in January, April, July, September, and December.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_mini, month %in% c(1, 4, 6, 9, 12))
+```
+
+##### Exercise 3
+
+Find the observations by carrier "US"
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_mini, carrier == "US")
+```
 
 :::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+### `select`
+
+::: {.panel-tabset}
+
+#### Introduction
+
+You can select a subset of variables using `dplyr::select()`. 
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::select(dataset, variable 1, variable 2, ...)
+```
+
+<br>
+
+---
+
+<br>
+
+If you want to drop some variables, but want to keep all the other variables, you can take advantage of  `−` operator:
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::select(dataset, - variable 1, - variable 2, ...)
+```
+
+#### Examples
+
+Select `arr_delay`:
+
+```{webr-r}
+dplyr::select(flights_mini, arr_delay)
+```
+
+<br>
+
+Select `month`, `arr_delay`, and `dep_delay`:
+
+```{webr-r}
+dplyr::select(flights_mini, month, arr_delay, dep_delay)
+```
+
+<br>
+
+Deselect (remove) `year` and `month`:
+
+```{webr-r}
+dplyr::select(flights_mini, - year, - month)
+```
+
+#### Exercises
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Select all the columns except `arr_delay`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::select(flights_mini, - arr_delay)
+```
+
+##### Exercise 2
+
+Select `arr_delay` and `month`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::select(flights_mini, month, arr_delay)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
 
 
-## `mutate()`: define new (or update) variables
+### `relocate`
 
-::: {.panel-tabset} 
+You can use `relocate()` to change the column order. 
 
-### What
+```{webr-r}
+relocate(flights_mini, dep_time, dep_delay)
+```
+
+<br>
+
+Chosen variables come front with the order of the rest of the variable unchanged.
+
+
+### `mutate`
+
+::: {.panel-tabset}
+
+#### Introduction
 
 You can use `mutate()` to create a new variable (or overwrite the existing one) in the dataset:
 
-**Synatax** 
+<br>
+
+**Syntax** 
 
 ```{r eval = F}
-mutate(data, new variable name = expression)
+dplyr::mutate(data, new variable name = expression)
 ```
 
-**Example** 
+#### Example
 
-```{r }
-mutate(flights_mini, gain = arr_delay - dep_delay) %>% 
-  filter(month <= 2) %>% 
-  relocate(gain)
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(gain = arr_delay - dep_delay) %>%
+  dplyr::filter(month <= 2) %>%
+  dplyr::relocate(gain)
 ```
 
-### multiple variables
+#### Multiple variables
 
-You can define multiple variables within a single `mutate()` function.  
+You can define multiple variables within a single `mutate()` function.
 
 You can create a new variable based on the variables that have been just created within the same `mutate()` function.
 
-**Examples** 
-
-```{r m-mult, echo = F, eval = F}
-flights_mini %>% mutate(
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(
     gain = arr_delay-dep_delay,
+    loss = dep_delay- arr_delay,
     gain_per_hour = gain / (air_time / 60)
   ) %>% 
-  filter(month <= 2) %>% 
-  relocate(gain, gain_per_hour)
+  dplyr::filter(month <= 2) %>% 
+  dplyr::relocate(gain, gain_per_hour)
 ```
 
-```{r ref.label = "m-mult", echo = F}
-  
-```
-
-### function
+#### Function
 
 You can apply functions to variables when creating new variables:
 
-**Example** 
-
-```{r ex-func, echo = F, eval = F}
-flights_mini %>% 
-  mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
-  filter(month <= 1) %>% 
-  relocate(avg_arr_delay)
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  dplyr::filter(month <= 1) %>%
+  dplyr::relocate(avg_arr_delay)
 ```
 
+<br>
 
-```{r echo = F}
-flights_mini %>% 
-  mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
-  filter(month <= 1) %>% 
-  relocate(avg_arr_delay)
-```
+:::{.callout-note}
+The function you apply has to accept a vector (a variable column).
+:::
 
-Note: the function you apply has to accept a vector (a variable column).
-
-### More on `mutate()`
-
-::: {.panel-tabset} 
-
-#### selective mutation
+#### Selective mutation
 
 Sometimes, you want to to alter the values of a variable for specific rows that satisfy certain conditions.
 
-**Example**:
+::: {.panel-tabset}
+
+##### Example
+
+
 Suppose you found out that `dep_time` for all the flights from `JFK` was misreported so that `dep_time` is 10 minutes earlier than the true departure times. 
 
 So, we would like to add 10 minutes to all the flights by `JFK`.
 
 You can use `ifelse()` like this:
 
-```{r }
+```{webr-r}
 flights_mini %>% 
-  mutate(
-    dep_time_correct = ifelse(origin == "JFK", dep_time + 10, dep_time) #<<
+  dplyr::mutate(
+    dep_time_correct = ifelse(origin == "JFK", dep_time + 10, dep_time)
   ) %>% 
-  relocate(origin, dep_time, dep_time_correct) %>% arrange(origin) 
+  dplyr::relocate(origin, dep_time, dep_time_correct) %>% 
+  dplyr::arrange(origin) 
 ```
 
-#### dichotomous
+##### dichotomous
 
 Suppose you want to label flights with `arr_delay > 0` to be `time-loss` and `time-gain` otherwise:
 
 You can use `ifelse()` for defining a dichotomous variable like this:
 
-```{r }
+```{webr-r}
 flights_mini %>% 
-  mutate(
+  dplyr::mutate(
     loss_or_gain = ifelse(arr_delay > 0, "time-loss", "time-gain") #<<
   ) %>% 
-  relocate(arr_delay, loss_or_gain)
+  dplyr::relocate(arr_delay, loss_or_gain)
 ```
 
-#### More than two cases
+##### more than two cases
 
 The `case_when()` function is useful if you have more than two cases.
 
@@ -566,170 +870,162 @@ case_when(
   condition 2 ~ value to assign,
   condition 3 ~ value to assign,
   ...
-)  
+)
 ```
+
+---
 
 **Example**:
 
-```{r }
+```{webr-r}
 flights_mini %>% 
-  mutate(origin = case_when(
+  dplyr::mutate(origin = case_when(
     origin == "JFK" ~ "John F. Kennedy",
     origin == "EWR" ~ "Newark Liberty International", 
     origin == "LGA" ~ "LaGuardia" 
     )
-  ) %>% relocate(origin)
+  ) %>% 
+  dplyr::relocate(origin)
 ```
 
 :::
-<!-- panel ends here -->
+<!--end of panel-->
 
-### Exercises
+#### Exercises
 
-::: {.panel-tabset} 
+::: {.panel-tabset}
 
-#### Exercise 1
+##### Exercise 1
 
 Find the mean value of `arr_delay` in April and May (combined) and define it as a new variable named `avg_arr_delay`
 
-#### Exercise 2
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+
+```
+
+##### Exercise 2
 
 Find the sum of `dep_delay` in January, February, and December (combined) and define it as a new variable named `sum_arr_delay`, and then move the variable to the first column of the dataset.
 
-:::
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+
+```
 
 :::
-<!-- panel ends here -->
 
+:::
+<!--end of panel-->
 
-# `rename()`: rename variables
+### `rename`
 
-::: {.panel-tabset} 
+You can rename variables using `dplyr::rename()`.
 
-### How
+<br>
 
-**Syntax** 
+**Syntax**
 
 ```{r eval = F}
 rename(data, new variable name = old variable name, ...)
 ```
 
-**Example** 
+<br>
 
-```{r }
-rename(flights_mini, 
-  departure_delay = dep_delay,
-  departure_time = dep_time
-) %>% head()
-```
-
-### White space
-
-Let’s create a dataset with variables that have a white space in their names:
-
-```{r }
-df <- tibble(
-  'County ID' = c(1,2,3),
-  'County Name' = c('Dundy','Chase','Perkins')
-) 
-```
-
-When you have a white space in a variable name, and refer to the variable in a function, it would not work most of the time . For example,
-
-```{r eval = F}
-filter(df, County ID == 1)
-```
-
-You could actually enclose the variable name with a white space with back ticks like this:
-
-```{r }
-filter(df, `County ID` == 1)
-```
-
-But, you do not want do this.
-
-Rename it:
-
-```{r eval = F}
-rename(df, county_id = `County ID`)  
-```
-
-:::
-
-# `arrange()`: ordering rows
-
-::: {.panel-tabset} 
-
-### What
-
-You can use `arrange()` to reorder rows based on the value of variables.
-
-### How
-
-**Syntax** 
-
-```{r eval = F}
-#--- Syntax (NOT RUN) ---#
-arrange(flights_mini, variable name)
-```
-
-**Example** 
-
-```{r }
-arrange(flights_mini, dep_delay) %>% head()
-```
-
-As you can see, the default is the ascending order. 
-
-### Descending
-
-To arrange in the descending order, you use `desc()` function:
-
-```{r arrange-desc, echo = F, eval = F}
-arrange(flights_mini, desc(dep_delay))
-```
-
-:::
-
-# `distinct()`: extract rows with unique values
-
-::: {.panel-tabset} 
-
-### What
-
-`distinct()` extract rows with unique values.
-
-### Example
-
-+ (left): `flights_mini` has two observations per month (left). 
-+ (right): Only one observation per month (12 unique values) after applying `distinct()` 
+**Example**
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-```{r }
-flights_mini
+Renamed:
+
+```{webr-r}
+#| autorun: true
+#| 
+dplyr::rename(
+  flights_mini, 
+  departure_delay = dep_delay,
+  departure_time = dep_time
+) %>% head()
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-```{r }
-distinct(flights_mini, month)
+Original:
+
+```{webr-r}
+#| autorun: true
+flights_mini
+
+
+
+
 ```
 :::
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
 
-### .keep_all
+### `arrange`
 
-You do not want to lose the other variables? Add `.keep_all = TRUE`
+You can use `arrange()` to reorder rows based on the value of variables.
 
-```{r }
-distinct(flights_mini, month, .keep_all = TRUE)
+<br>
+
+**Syntax**
+
+```{r eval = F}
+#--- Syntax (NOT RUN) ---#
+arrange(flights_mini, variable name)
+```
+
+<br>
+
+::: {.panel-tabset}
+
+#### Example (ascending)
+
+The default is the ascending order. 
+
+```{webr-r}
+dplyr::arrange(flights_mini, dep_delay) %>% head()
+```
+
+#### Example (descending)
+
+To arrange in the descending order, you use `desc()` function:
+
+```{webr-r}
+dplyr::arrange(flights_mini, desc(dep_delay)) %>% head()
 ```
 
 :::
+<!--end of panel-->
+
+
+### Important
+
+Notice that the original data `flights_mini` was not affected by the `dplyr::filter()` operations in the previous slides.
+
+This is consistent across all the verbs in `dplyr`. Whatever actions you take, the original data is unaltered.
+
+To use the transformed data for later use, you need to assign it to a new object (or overwrite if that is okay):
+
+```{webr-r}
+flights_mini_filtered <- dplyr::filter(flights_mini, month == 4) 
+
+flights_mini_filtered
+```
+
+:::
+<!--end of panel-->
+
 
 ## Grouped Operations {#sec-group-operation}
 
@@ -919,6 +1215,7 @@ daily_weather %>%
 <!--end of panel-->
 
 
+
 # Extensions (may be helpful occasionally)
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
@@ -946,7 +1243,7 @@ across(which variables to apply the function, function, options to the function)
 
 **Examples** 
 
-```{r across-ex, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -957,16 +1254,13 @@ flights %>%
   ) %>% head()
 ```
 
-```{r ref.label = "across-ex", echo = F, message = F}
-```
-
 Note: `na.rm = TRUE` is an option for the `mean()` function.
 
 ### Compare
 
 Without `across()`
 
-```{r eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -981,7 +1275,7 @@ flights %>%
 
 With `across()`
 
-```{r eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -993,9 +1287,6 @@ flights %>%
 ```
 
 :::
-
-
----
 
 # `across()` with pattern functions
 
@@ -1019,7 +1310,7 @@ You can use `across()` (and other `dplyr` functions) in conjunction with functio
 Applying the same function to all numeric variables using `where(is.numeric)`:
 
 
-```{r numeric-across, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -1030,11 +1321,6 @@ flights %>%
   ) %>% head()
 ```
 
-
-```{r ref.label = "numeric-across", echo = F, message = F}
-
-```
-
 ### character
 
 <br>
@@ -1042,7 +1328,7 @@ flights %>%
 Applying the same function to all character variables using `where(is.character)`:
 
 
-```{r char-across, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -1053,10 +1339,6 @@ flights %>%
 ```
 
 
-```{r ref.label = "char-across", echo = F, message = F}
-
-```
-
 + `n_distinct()` identifies the number of unique values.
 
 ### end with
@@ -1065,7 +1347,7 @@ flights %>%
 
 Applying the same function to all the variables that end with `delay`:
 
-```{r end-with, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -1077,10 +1359,6 @@ flights %>%
 
 ```
 
-```{r ref.label = "end-with", echo = F, message = F}
-
-```
-
 + Use `starts_with()` to apply the same function to all the variables that star with a particular sting of characters:
 
 ### logical operator
@@ -1089,16 +1367,12 @@ flights %>%
 
 You can use logical operators:
 
-```{r logical, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
     across(!where(is.numeric), n_distinct)
   ) %>% head()
-```
-
-```{r ref.label = "logical", echo = F, message = F}
-
 ```
 
 ### mix
@@ -1107,7 +1381,7 @@ flights %>%
 
 Mixing explicitly naming variables and using functions:
 
-```{r mix, echo = F, eval = F}
+```{webr-r}
 flights %>% 
   group_by(carrier) %>% 
   summarize(
@@ -1116,9 +1390,6 @@ flights %>%
   ) %>% head()
 ```
 
-```{r ref.label = "mix", echo = F, message = F}
-
-```
 
 :::
 
@@ -1129,17 +1400,17 @@ The approaches to refer to the variables that fit with a specified pattern can b
 
 Try:
 
-```{r eval = F}
+```{webr-r}
 flights %>% 
   select(c(origin, where(is.numeric)))  
 ```
 
-```{r eval = F}
+```{webr-r}
 flights %>% 
   select(ends_with("delay"))  
 ```
 
-```{r eval = F}
+```{webr-r}
 flights %>% 
   relocate(where(is.character))  
 ```

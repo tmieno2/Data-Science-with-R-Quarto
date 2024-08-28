@@ -16,235 +16,6 @@ library(dplyr)
 library(readr)
 ```
 
-# `tidyverse` package
-
-::: {.panel-tabset}
-
-### What is it?
-
-+ The `tidyverse` is a package of a collection of packages. Some of the packages included are
-
-  - `readr`: read datasets in various formats
-  - `dplyr`: manipulate and merge datasets
-  - `tidyr`: reshape datasets 
-  - `ggplot2`: data visualization 
-  - `stringr`: character string operations
-
-+ These packages are by no means the only ways to do the operations we will learn today. However, we learn these packages because they are easy to use. 
-
-+ They are also easy to learn and get help as they are extremely popular and very well-documented. Go to the [tidyverse website](http://www.tidyverse.org/), and click on the icon of the package you would like to learn, then you will have a nice documentation of the packages. 
- 
-+ You could also google the package name, and you will see bunch of introductions/tutorials.
-
-### Preparation
-
-Install the package if you have not.
-
-```{r, eval = FALSE}
-install.packages("tidyverse")
-```
-
-<br>
-
-When you load the `tidyverse` package, it automatically loads many of the packages contained in it.
-
-```{r, message = TRUE}
-library(tidyverse)
-```
-
-### Conflicts?
-
-Sometimes packages share the same functions names. 
-
-When those packages are loaded, there are function name conflicts where the function from the package loaded later masks the function from the other package.
-:::
-<!--end of panel-->
-
-
-# `data.frame` and `tibble`
-
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
-## `data.frame` and `tibble`
-
-::: {.panel-tabset}
-
-### What are they?
-
-`data.frame`
-
-The traditional (most common) class of two-dimensional data (rows and columns) supported by R.
-
-<br>
-
-`tibble` 
-
-A relatively newer class of two-dimensional data that brings minor enhancements over `data.frame`.
-
-`tibble` is defined by the `tibble` package, which is part of the `tidyverse` package.
-
-### Objectives
-
-+ Learn basic operations on `data.frame` and `tibble` 
-
-+ Highlight some differences between the two (They are almost interchangeable, and you do no need to pay much attention to which class of data you are dealing with)
-
-### Preparation 1
-
-We use `HousePrices` dataset from the `AER` package.
-
-```{r}
-#--- load the AER package ---#
-library(AER)
-
-#--- load the HousePrices data ---#
-data(HousePrices)
-```
-
-<br>
-
-`HousePrices` is a `data.frame`.
-
-```{r }
-class(HousePrices)
-```
-
-### Preparation 2
-
-You can convert a `data.frame` into a `tibble` using `as_tibble()`:
-
-```{r }
-HousePrices_tbl <- as_tibble(HousePrices)
-```
-
-`HousePrices` is a `tibble` (and also a `data.frame`).
-
-```{r }
-class(HousePrices_tbl)
-```
-
-:::
-<!--end of panel-->
-
-## display method
-
-::: {.panel-tabset}
-
-### `data.frame`
-
-```{r}
-HousePrices
-```
-
-### `tibble`
-
-```{r}
-HousePrices_tbl
-```
-:::
-<!--end of panel-->
-
-
-## Accessing parts of the data
-
-::: {.panel-tabset}
-
-### Numerical index
-
-Subsetting a data.frame works in a very similar manner as a matrix:
-
-```{r eval = F}
-matrix[rows of interest, columns of interest]
-```
-
-**Example:**
-
-2nd to 8th rows, the 3rd and 5th columns
-
-::: {.columns}
-
-::: {.column width="50%"}
-`data.frame`
-
-```{r, cache=TRUE}
-HousePrices[2:8, c(3,5)]
-```
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-`tibble`
-
-```{r, cache=TRUE}
-HousePrices_tbl[2:8, c(3,5)]
-```
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
-### Variable names
-
-But, subsetting a data.frame using numerical indexes are not recommended because it is not immediately clear to you (or your collaborators who might look at the code) what you intended to do with the code.
-
-Instead, the following is better:
-
-```{r eval = F}
-data[, c("variable 1", "variable 2", ...)]
-```
-
-**Examples:** 
-
-::: {.columns}
-
-::: {.column width="50%"}
-`data.frame`
-
-```{r, cache=TRUE}
-head(HousePrices[, "price"])
-```
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-`tibble`
-
-```{r, cache=TRUE}
-head(HousePrices_tbl[, "price"])
-```
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
-### Using $
-
-Alternatively, to access a column (variable) from a dataset, you can use `$` like below (remember? A `data.frame` is a special kind of `list`).
-
-**Examples:** 
-
-::: {.columns}
-
-::: {.column width="50%"}
-`data.frame`
-
-```{r, cache=TRUE}
-head(HousePrices$price)
-```
-:::
-<!--end of the 1st column-->
-
-::: {.column width="50%"}
-`tibble`
-
-```{r, cache=TRUE}
-head(HousePrices_tbl$price)
-```
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
-:::
-<!--end of panel-->
 
 # Importing and Exporting Datasets
 
@@ -255,24 +26,31 @@ head(HousePrices_tbl$price)
 ::: {.panel-tabset}
 ### Objectives and Directions
 
-**Objectives**
++ Read datasets in various formats (**csv**, **xlsx**, **dta**, and **rds**) containing corn yields in Nebraska counties for the year of 2008.  
 
-+ read datasets in various formats (**csv**, **xlsx**, **dta**, and **rds**) containing corn yields in Nebraska counties for the year of 2008.  
++ Write R objects as files in various formats 
 
-+ write R objects as files in various formats 
+### Directions
 
-**Directions** 
++ Go [here](https://github.com/tmieno2/data-science-course-supplementary-datasets) and clone the repository that hosts datasets used in this lecture
++ Install the `tidyverse` and `haven` packages, which we will use later to read/write files.
 
-+ Go [here](https://www.dropbox.com/sh/8gkfwhwjwua84j1/AADPqpUxCnYc6FP6pSe4Mkeua?dl=0) and download all the files
-+ Place all the data files in the same folder (any folder) 
+```{r}
+#| eval: false
+install.packages(c("tidyverse", "haven"))
+```
+
+:::{.callout-note}
+The `tidyverse` package does far more than just reading and writing files. We will learn it extensively later.
+:::
 
 ### How
 
 Check the format in which the dataset is stored by looking at the extension of the file (what comes after the file name and a dot)
 
-  * **corn.csv**: a file format Microsof Excel supports. 
+  * **corn.csv**: a file format Microsoft Excel supports. 
 
-  * **corn.xlsx**: another format supported by Microsof Excel, which may have more than one tabs of data sheets. 
+  * **corn.xlsx**: another format supported by Microsoft Excel, which may have more than one tabs of data sheets. 
 
   * **corn.dta**: a format that STATA support (software that is immensely popular for economists). 
 
@@ -290,6 +68,8 @@ When you import a dataset, you need to use a particular function that is appropr
 ### `read.csv()`
 
 You can use `read.csv()` from the `base` package.
+
+<br>
 
 **Syntax** 
 
@@ -309,6 +89,8 @@ corn_yields_df <- read.csv("~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lec
 ### `read_csv()`
 
 You can use `read_csv()` from the `readr` package.
+
+<br>
 
 **Syntax** 
 
@@ -356,13 +138,13 @@ class(corn_yields_tbl)
 
 + In the previous slide, we provided a full path to the csv file to read onto R.
 
-+ If you expect to import and/or export (save) datasets and R objects often from/to a particular directory, it would be nice to tell R to look for files in the directory **by default**.
-
-So, a code like this works:
++ If you expect to import and/or export (save) datasets and R objects often from/to a particular directory, it would be nice to tell R to look for files in the directory **by default**. So, the R code looks more like this:
 
 ```{r csv-read, eval = F}
 corn_yield <- read.csv("corn_yields.csv")
 ```
+
+<br>
 
 + This will save us from writing out the full path every time we either import or export datasets.
 
@@ -408,6 +190,14 @@ data <- read_csv("Datasets/Chapter_3_data_wrangling/corn_yields.csv")
 
 <br>
 
+This is equivalent to:
+
+```{r eval = F}
+data <- read_csv("~/Dropbox/TeachingUNL/DataScience/Datasets/Chapter_3_data_wrangling/corn_yields.csv")
+```
+
+<br>
+
 You can use `..` to move up a folder. For example, if you want to import **corn_yields.csv** stored in "~/Dropbox/TeachingUNL", then the following works:
 
 ```{r eval = F}
@@ -421,13 +211,14 @@ You can create an R Project using RStudio:
 + click on a blue transparent box with a plus sign at the upper left corner of RStudio
 + click on "new directory" (to initiate a new folder) or "existing directory" (to designate an existing folder)
 
-(<span style="color:blue"> Direction: </span> demonstrate on RStduio)
-
-When you open an R Project folder, then the working directory is set at the project folder. Confirm this:
+:::{.callout-note title="Let's try"}
++ Create an R project
++ When you open an R Project folder, then the working directory is set at the project folder. Confirm this:
 
 ```{r eval = F}
 getwd() 
 ```
+:::
 
 :::
 <!--end of panel-->
@@ -491,14 +282,11 @@ Notice that the data is converted into a **tibble** (because the `readxl` packag
 
 ::: {.panel-tabset} 
 
-### Instruction
+### Syntax and Examples
 
-Use the `read.dta13()` function from the `readstata13` package.
+Use the `read_dta()` function from the `haven` package.
 
 ```{r, eval = FALSE}
-#--- install the package ---#
-install.packages(haven)
-
 #--- load the package ---#
 library(haven) 
 ```
@@ -507,7 +295,7 @@ library(haven)
 library(haven) 
 ```
 
-### Syntax and Examples
+<br>
 
 **Syntax** 
 
@@ -515,6 +303,8 @@ library(haven)
 #--- Syntax (NOT RUN) ---#
 haven::read_dta(file path)
 ```
+
+<br>
 
 **Examples** 
 
@@ -559,6 +349,8 @@ Notice that the data is converted into a **data.frame** object, not a **tibble**
 readRDS("path to the file") 
 ```
 
+<br>
+
 **Examples** 
 
 ```{r read_rds, eval = F}
@@ -592,7 +384,7 @@ Notice that the imported dataset is already a `tibble` object. This is because t
 
 + Here is the list of functions that let you export a `data.frame` or (`tibble`) in different formats:
   * **csv**: `write_csv()`
-  * **dta**: `save.dta13()`
+  * **dta**: `write_dta()`
   * **rds**: `saveRDS()`
  
 ### Syntax and Examples
@@ -603,14 +395,16 @@ Notice that the imported dataset is already a `tibble` object. This is because t
 export_function(obeject name, file name)
 ```
 
+<br>
+
 **Examples** 
 
 ```{r exp, eval=FALSE}
 #--- export as csv ---#
-write_csv(corn_yields, "corn_yields_exp_rownames.csv")
+readr::write_csv(corn_yields, "corn_yields_exp_rownames.csv")
 
 #--- export as dta ---#
-save.dta13(corn_yields, "corn_yields_exp.dta")
+haven::write_dta(corn_yields, "corn_yields_exp.dta")
 
 #--- export as rds ---#
 saveRDS(corn_yields, "corn_yields_exp.rds")
@@ -621,7 +415,9 @@ saveRDS(corn_yields, "corn_yields_exp.rds")
 
 ### Notes on RDS
 
-**type preservation**
+::: {.panel-tabset}
+
+### Object type preservation
 
 You can export any kind of R objects as an **rds** file.
 
@@ -635,10 +431,14 @@ readRDS("a_list.rds")
 
 As you can see a list is saved as an rds file, and when imported, it is still a list.
 
-**file size**
+### File size
+
 Check the size of the corn data files in different formats. 
 
 Which one is the smallest?
+
+:::
+<!--end of panel-->
 
 :::
 
