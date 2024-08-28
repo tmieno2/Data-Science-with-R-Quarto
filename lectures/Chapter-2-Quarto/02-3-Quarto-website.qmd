@@ -1,0 +1,474 @@
+---
+title: "02-3: Using Quarto to Create a Website"
+format:
+  revealjs: 
+    theme: [default, ../custom.scss]
+    logo: nebraska-n.jpg
+    fontsize: 1.6em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+filters:
+  - webr
+draft: true
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+library(dplyr)
+```
+
+## Get Started
+
+::: {.panel-tabset}
+
+### YAML
+
+The first thing you need to do to create a presentation using Quarto via `revealjs` is to add appropriate format information in the YAML header of the qmd file like below:
+
+<br>
+
+````{verbatim}
+---
+title: "02-1 Using Quarto to Create Presentations"
+format:
+  revealjs: 
+    theme: [default, ../custom.scss]
+    fontsize: 1.6em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+---
+````
+
+<br>
+
+:::{.callout-note}
++ `format` needs to be specified as `revealjs`
++ You can add `revealjs`-specific options below `revealjs:` (We will look at various options later). 
+:::
+
+### Creating a new slide
+
+You can start a new slide using either `#` or `##`.
+
+<br>
+
+**Use # (level 1 header)**
+
+````{verbatim}
+# new section title
+````
+
+<br>
+
+By default, this creates a new slide with `new section title` printed left-aligned at the middle of the slide.
+
+<br>
+
+**Use ## (level 2 header)**
+
+````{verbatim}
+## new slide title
+````
+
+<br>
+
+By default, this creates a new slide with `new slide title` printed at the top left corner of the slide.
+
+:::{.callout-note title=Direction}
+Look at the `sample_qmd_revealjs.qmd`
+:::
+
+### Include R codes and results
+
+We have already learned how to do this. The way we include R codes are consistent across different output formats (including presentation with **revealjs**)!!  
+
+````{verbatim}
+```{r}
+R codes 
+```
+````
+
+:::{.callout-note title="Recommended global settings for research presentations"}
+Place the options below in the YAML header, which hides all the codes, messages, and warnings that the audience does not have to see.
+
+````{verbatim}
+execute:
+  echo: false
+  message: false
+  warning: false
+````
+:::
+
+
+
+:::
+<!--end of panel-->
+
+## Useful Tools
+
+::: {.panel-tabset}
+
+### Incremental list
+
+::: {.panel-tabset}
+
+#### Code
+````{verbatim}
+::: {.incremental}
+- collect data
+- run statistical analysis
+- report
+:::
+````
+
+#### Output
+
+::: {.incremental}
+- collect data
+- run statistical analysis
+- report
+:::
+
+:::
+<!--end of panel-->
+
+
+### Multiple columns
+
+::: {.panel-tabset}
+
+#### Code
+````{verbatim}
+:::: {.columns}
+
+::: {.column width="40%"}
+
+Plot 1
+
+```{r}
+ggplot(data = mtcars) +
+  geom_point(aes(y = mpg,  x = cyl))
+```
+
+:::
+
+::: {.column width="60%"}
+
+Plot 2
+
+```{r}
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+:::
+
+::::
+````
+
+#### Output
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+Plot 1
+
+```{r}
+ggplot(data = mtcars) +
+  geom_point(aes(y = mpg,  x = cyl))
+```
+
+:::
+
+::: {.column width="60%"}
+
+Plot 2
+
+```{r}
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+:::
+
+::::
+
+:::
+<!--end of panel-->
+
+### Scrollable
+
+Add `scrollable: true` under `revealjs:` to make each of the slides scrollable when the contents are too big to present on a screen.
+
+<br>
+
+````{verbatim}
+---
+format:
+  revealjs:
+    scrollable: true
+---
+````
+
+<br>
+
+`scrollable: true` is enabled in this presentation. 
+
+you
+
+
+can
+
+
+see
+
+
+that
+
+
+right?
+
+### Speaker Note
+
+```{r}
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+
+:::{.notes}
+You do not see me!
+:::
+
+
+:::{.callout-note title="Try"}
+Hitting the "**s**" key will generate a pop-up window with speaker view.
+:::
+
+
+### Logo
+
+You can add a logo with the `logo` option under `revealjs:`.
+
+````{verbatim}
+---
+format:
+  revealjs:
+    logo: logo.png
+---
+````
+
+<br>
+
+This presentation has the code below in the YAMl and you can see the logo at the bottom-right corner.
+
+````{verbatim}
+---
+format:
+  revealjs:
+    logo: nebraska-n.jpg
+---
+````
+
+### Tabsets
+
+You can create tabs using the following code:
+
+<br>
+
+````{verbatim}
+::: {.panel-tabset}
+
+### Tab A
+
+Content for `Tab A`
+
+### Tab B
+
+Content for `Tab B`
+
+:::
+````
+
+:::
+<!--end of panel-->
+
+## Figure
+
+::: {.panel-tabset}
+
+### How
+
+You can use 
+
++ `out-width: ` option to control the size of a figure.
++ `fig-align: ` option to control the alignment of a figure.
+
+See [here](https://quarto.org/docs/reference/formats/html.html#figures) for all the options available.
+
+### Example 1
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 100%
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+````
+
+#### Output
+
+```{r}
+#| out-width: 100%
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+:::
+<!--end of panel-->
+
+
+### Example 2
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 80%
+#| fig-align: center
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+````
+
+#### Output
+
+```{r}
+#| out-width: 80%
+#| fig-align: center
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+
+:::
+<!--end of panel-->
+
+### Example 3
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 50%
+#| fig-align: right
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+````
+
+#### Output
+
+```{r}
+#| out-width: 50%
+#| fig-align: right
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+
+:::
+<!--end of panel-->
+
+### To be exact
+
+::: {.panel-tabset}
+
+#### How
+
+To set the figure size exactly you can specify all of the four options:
+
++ `fig-width`
++ `fig-height`
++ `out-width`
++ `out-height`
+
+:::{.callout-note}
++ By default `fig-` options take numeric numbers and the unit is inch. 
++ For `out-` options you need to add `in` after a numeric number to make them consistent with the `fig-` options.
+:::
+
+
+#### Code
+
+````{verbatim}
+```{r}
+#| fig-width: 10
+#| fig-height: 3
+#| out-width: 10in
+#| out-height: 3in
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+````
+
+#### Output
+
+```{r}
+#| fig-width: 10
+#| fig-height: 3
+#| out-width: 10in
+#| out-height: 3in
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg)) 
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Theme
+
+::: {.panel-tabset}
+
+### Pre-made themes
+
+There are many pre-made themes that you can apply to `revealjs` presentations. See the list [here](https://quarto.org/docs/presentations/revealjs/themes.html#using-themes).
+
+You can set a theme using the `theme` option in the YAML header like below:
+
+<br>
+
+````{verbatim}
+format:
+  revealjs: 
+    theme: dark
+````
+
+<br>
+
+:::{.callout-note title="Direction"}
+Try one of the themes listed and see how the theme of the presentation changes. 
+:::
+
+### Customized themes
+
+:::
+<!--end of panel-->
+
+## Resources
+
++ The best resources is the official documentation of how to use Quarto
+with `revealjs` found [here](https://quarto.org/docs/presentations/revealjs).
+
++ There are more you can do with `revealjs`, which can be found [here](https://quarto.org/docs/presentations/revealjs/advanced.html) (I have not found them necessary). 

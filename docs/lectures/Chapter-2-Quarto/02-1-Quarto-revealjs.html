@@ -10,7 +10,7 @@
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.56">
 
-  <title>Data Science with R (AECN 896-05) – 02-Using Quarto to Create Documents</title>
+  <title>Data Science with R (AECN 896-05) – 02-1 Using Quarto to Create Presentations</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -385,7 +385,7 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="02-Using Quarto to Create Documents – Data Science with R (AECN 896-05)">
+<meta property="og:title" content="02-1 Using Quarto to Create Presentations – Data Science with R (AECN 896-05)">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 <body class="quarto-light">
@@ -393,350 +393,88 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">02-Using Quarto to Create Documents</h1>
+  <h1 class="title">02-1 Using Quarto to Create Presentations</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="quarto-introduction" class="slide level2">
-<h2>Quarto: Introduction</h2>
+<section id="get-started" class="slide level2">
+<h2>Get Started</h2>
 <div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">What is and why Quarto?</a></li><li><a href="#tabset-1-2">Using WORD?</a></li><li><a href="#tabset-1-3">Make a report with Quarto</a></li></ul>
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">YAML</a></li><li><a href="#tabset-1-2">Creating a new slide</a></li><li><a href="#tabset-1-3">Include R codes and results</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1">
-<ul>
-<li><p>It allows you to effortlessly generate documents that can print both R codes and their outcomes (this lecture note is indeed written using <strong>Quarto</strong>) in a single document.</p></li>
-<li><p>It is useful when you report the analysis you conducted and its source R codes to your advisor or anyone you report to (as long as that person understands R).</p></li>
-<li><p>The power of Quarto goes well beyond just creating a simple html document. The full power of Quarto is on display <a href="https://quarto.org/docs/gallery/">here</a>.</p></li>
-</ul>
-<div title="Quarto Installation">
+<p>The first thing you need to do to create a presentation using Quarto via <code>revealjs</code> is to add appropriate format information in the YAML header of the qmd file like below:</p>
+<p><br></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>---</span>
+<span id="cb1-2"><a></a>title: "02-1 Using Quarto to Create Presentations"</span>
+<span id="cb1-3"><a></a>format:</span>
+<span id="cb1-4"><a></a>  revealjs: </span>
+<span id="cb1-5"><a></a>    theme: [default, ../custom.scss]</span>
+<span id="cb1-6"><a></a>    fontsize: 1.6em</span>
+<span id="cb1-7"><a></a>    callout-icon: false</span>
+<span id="cb1-8"><a></a>    scrollable: true</span>
+<span id="cb1-9"><a></a>    echo: true</span>
+<span id="cb1-10"><a></a>    fig-dpi: 400</span>
+<span id="cb1-11"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
-<p><strong>Quarto Installation</strong></p>
+<p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p>Visit <a href="https://quarto.org/docs/get-started/">here</a>.</p>
-</div>
+<ul>
+<li><code>format</code> needs to be specified as <code>revealjs</code></li>
+<li>You can add <code>revealjs</code>-specific options below <code>revealjs:</code> (We will look at various options later).</li>
+</ul>
 </div>
 </div>
 </div>
 </div>
 <div id="tabset-1-2">
-<ul>
-<li><p>It would be a real pain to do so because you need to copy and paste all the R codes you run and the results onto WORD <strong>manually</strong>.</p></li>
-<li><p>Often times, copied R codes and results are very much likely to be badly formatted when pasting them</p></li>
-<li><p>Quarto obviates the need of repeating copying and pasting when you would like to communicate what you did (R codes) and what you found (results) without worrying too much about formatting.</p></li>
-</ul>
+<p>You can start a new slide using either <code>#</code> or <code>##</code>.</p>
+<p><br></p>
+<p><strong>Use # (level 1 header)</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a># new section title</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>By default, this creates a new slide with <code>new section title</code> printed left-aligned at the middle of the slide.</p>
+<p><br></p>
+<p><strong>Use ## (level 2 header)</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a></a>## new slide title</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>By default, this creates a new slide with <code>new slide title</code> printed at the top left corner of the slide.</p>
+<div title="Direction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Direction</strong></p>
+</div>
+<div class="callout-content">
+<p>Look at the <code>sample_qmd_revealjs.qmd</code></p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-1-3">
-<p>Generating a report using Quarto is a two-step process:</p>
-<ul>
-<li><p>Create an Quarto file (file with .qmd as an extension) with regular texts and R codes mixed inside it.</p>
-<ul>
-<li>You use a special syntax to let the computer know which parts of the file are simple texts and which parts are R codes.</li>
-</ul></li>
-<li><p>Tell the computer to process the qmd file (a click of a button on RStudio, or use the <code>render()</code> function)</p>
-<ul>
-<li>The computer runs the R codes and get their outcomes</li>
-<li>Combine the text parts, R codes, and their results to produce a document</li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="quarto-the-basics" class="slide level2 scrollable">
-<h2>Quarto: the Basics</h2>
-<div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">R code chunks</a></li><li><a href="#tabset-2-2">Let’s knit</a></li><li><a href="#tabset-2-3">qmd v.s. output</a></li><li><a href="#tabset-2-4">Inline code</a></li><li><a href="#tabset-2-5">Markdown basics</a></li><li><a href="#tabset-2-6">Caveat</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1">
-<p>A qmd file would consist of two types of inputs:</p>
-<ul>
-<li>R code chunks</li>
-<li>Regular texts</li>
-</ul>
-<div title="Special Syntax">
-<div class="callout callout-important no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Special Syntax</strong></p>
-</div>
-<div class="callout-content">
-<p>We can indicate R codes chunks by placing R codes inside a special syntax.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>```{r}</span>
-<span id="cb1-2"><a></a>codes</span>
-<span id="cb1-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Take a look at <strong>sample_qmd.qmd</strong>, which can be downloaded from <a href="https://www.dropbox.com/scl/fi/3qza1ctgeacjvxz3q2waq/sample_qmd.qmd?rlkey=vtcfgbh6pocqoox6ll2rdrvj2&amp;st=uqz8tsvt&amp;dl=0">here</a>.</p>
-<ul>
-<li><p>R codes <code>summary(cars)</code> and <code>plot(pressure)</code> are enclosed individually by the special syntax</p></li>
-<li><p>So, in this qmd file, R knows that it should treat them as R codes, but not regular texts.</p></li>
-<li><p>On the other hand, any texts that are not enclosed by the special syntax would be recognized as regular text.</p></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-2-2">
-<p>The process of compiling an qmd file to produce a document is called <strong>knitting</strong>.</p>
-<ul>
-<li><p>The easiest way to knit is to hit the Knit button located at the top of the code pane (upper left pane by default)</p></li>
-<li><p>Alternatively, you can use the <code>render()</code> function to knit like below:</p></li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">render</span>(<span class="st">"sample_qmd.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-2-3">
-<p>Inspect the qmd file and its output document:</p>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>qmd side</strong></p>
-<ol type="1">
-<li>lines 1-10: a <strong>YAML header</strong> where you control the aesthetics of the output document (more on this later)</li>
-<li>line 16: texts not enclosed by the special syntax</li>
-<li>lines 18-21: <code>summary(cars)</code> is an R code, which is enclosed by the special syntax</li>
-</ol>
-</div><!--end of the 1st column--><div class="column" style="width:50%;">
-<p><strong>html side</strong></p>
-<ol type="1">
-<li>lines 1-10: nothing</li>
-<li>line 16: printed as regular texts</li>
-<li>lines 18-21: the R code and its results printed</li>
-</ol>
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
-</div>
-<div id="tabset-2-4">
-<p>You can refer to an R object previously defined in line and display its content in line:</p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>See lines 41-51 of the qmd file</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-2-5">
-<ul>
-<li>header</li>
-<li>make a list</li>
-<li>font</li>
-<li>code highlighting</li>
-<li>inline math</li>
-<li>math</li>
-<li>web link</li>
-<li>citation</li>
-</ul>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Compare the chapter called “Markdown basics” of the qmd file and its corresponding output in the knitted html file</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-2-6">
-<ul>
-<li><p>When you knit an qmd file and create a report, R creates an R session/environment that is completely <span style="color: blue;"> independent </span> of whatever R sessions or environments you may have on your RStudio.</p></li>
-<li><p>This means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session.</p></li>
-</ul>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="chunk-options" class="slide level2">
-<h2>Chunk options</h2>
-<div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">What?</a></li><li><a href="#tabset-5-2">Example: <code>echo</code></a></li><li><a href="#tabset-5-3">How</a></li><li><a href="#tabset-5-4">Various options</a></li><li><a href="#tabset-5-5">Specify chunk options globally</a></li></ul>
-<div class="tab-content">
-<div id="tabset-5-1">
-<p>Chunk options are special codes inside R code chunks to control how the code chunks operate.</p>
-<p>Here are some example options:</p>
-<ul>
-<li><code>echo</code></li>
-<li><code>eval</code></li>
-<li><code>message</code></li>
-<li><code>warning</code></li>
-<li><code>output</code></li>
-<li><code>include</code></li>
-<li><code>cache</code></li>
-<li><code>fig.cap</code>, <code>fig-height</code>, etc</li>
-</ul>
-<p>See all the options <a href="https://quarto.org/docs/computations/execution-options.html#output-options">here</a>.</p>
-</div>
-<div id="tabset-5-2">
-<ul>
-<li><p>Inspect the qmd file and its output document and observe that</p>
-<ul>
-<li>From the R code chunk with <code>summary(cars)</code>, the code itself and its outcome are presented in the output</li>
-<li>From the R code chunk with <code>plot(pressure)</code>, only its outcome is presented in the output</li>
-</ul></li>
-<li><p>This is because of the chunk option <code>echo: false</code> in the second R code chunk</p></li>
-</ul>
-</div>
-<div id="tabset-5-3">
-<p>To set a chunk option, use the following syntax:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a></a>```{r}</span>
-<span id="cb3-2"><a></a>#| option-name: choice</span>
-<span id="cb3-3"><a></a></span>
-<span id="cb3-4"><a></a>R codes come here</span>
-<span id="cb3-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<p><strong>Example</strong></p>
+<p>We have already learned how to do this. The way we include R codes are consistent across different output formats (including presentation with <strong>revealjs</strong>)!!</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a></a>```{r}</span>
-<span id="cb4-2"><a></a>#| echo: false</span>
-<span id="cb4-3"><a></a></span>
-<span id="cb4-4"><a></a>R codes come here</span>
-<span id="cb4-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<div data-titel="Caveat">
-<div class="callout callout-important no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Important</strong></p>
-</div>
-<div class="callout-content">
-<p>No space between the initiation of an R code chunk and chunk option. For example, the <code>echo</code> chunk option is going to be ignored below:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>```{r}</span>
-<span id="cb5-2"><a></a></span>
-<span id="cb5-3"><a></a>#| echo: false</span>
-<span id="cb5-4"><a></a></span>
-<span id="cb5-5"><a></a>R codes come here</span>
-<span id="cb5-6"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-5-4">
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1"><code>echo</code> and <code>eval</code></a></li><li><a href="#tabset-3-2"><code>message</code> and <code>warning</code></a></li><li><a href="#tabset-3-3"><code>output</code></a></li><li><a href="#tabset-3-4"><code>include</code></a></li><li><a href="#tabset-3-5">figure-related</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<p><br></p>
-<ul>
-<li><p><code>echo</code> (<span style="color:red"> true </span> or false): specify whether the R codes appear in the output document or not</p></li>
-<li><p><code>eval</code> (<span style="color:red"> true </span> or false): specify whether the R codes are evaluated or not</p></li>
-</ul>
-<p><br></p>
-<div title="Direction">
+<span id="cb4-2"><a></a>R codes </span>
+<span id="cb4-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div title="Recommended global settings for research presentations">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
-<p><strong>Direction</strong></p>
+<p><strong>Recommended global settings for research presentations</strong></p>
 </div>
 <div class="callout-content">
-<p>Inspect the qmd file (lines 75-103) and its output document to see their effects.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-2">
-<p><br></p>
-<ul>
-<li><p><code>message</code> (true or <span style="color:red"> false </span>): specify weather messages associated with R codes evaluation appear in the output document or not</p></li>
-<li><p><code>warning</code> (true or <span style="color:red"> false </span>): specify weather warnings associated with R codes evaluation appear in the output document or not</p></li>
-</ul>
-<p><br></p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Inspect the qmd file (lines 107-131) and its output document</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-3">
-<p><br></p>
-<p><code>output</code> (<span style="color:red"> true </span>, false, asis)</p>
-<ul>
-<li><code>true</code>: pint all the results including warnings and messages</li>
-<li><code>false</code>: hides all the results including warnings and messages</li>
-<li><code>asis</code>: the outputs of the R codes are printed as-is without any suitable formatting</li>
-</ul>
-<p><br></p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Inspect the qmd file (lines 135-149) and its output document</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-4">
-<p><br></p>
-<p><code>include: false</code> is equivalent to having <code>eval: true</code>, <code>echo: false</code>, and <code>results: false</code></p>
-<p><br></p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Inspect the qmd file (lines 153-166) and its output document</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-5">
-<p><br></p>
-<p><strong>Chunk option for figure</strong></p>
-<ul>
-<li><code>fig.align</code>: ‘default’, ‘center’, ‘left’, ‘right’</li>
-<li><code>fig.width</code>: in inches</li>
-<li><code>fig.height</code>: in inches</li>
-<li><code>fig.cap</code>: figure caption</li>
-</ul>
-<p><br></p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Play with these options. See <a href="https://yihui.org/knitr/options/">here</a> for more chunk options.</p>
+<p>Place the options below in the YAML header, which hides all the codes, messages, and warnings that the audience does not have to see.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>execute:</span>
+<span id="cb5-2"><a></a>  echo: false</span>
+<span id="cb5-3"><a></a>  message: false</span>
+<span id="cb5-4"><a></a>  warning: false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -745,158 +483,249 @@
 </div>
 </div>
 <!--end of panel-->
-</div>
-<div id="tabset-5-5">
+</section>
+<section id="useful-tools" class="slide level2">
+<h2>Useful Tools</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">What and why?</a></li><li><a href="#tabset-4-2">How</a></li><li><a href="#tabset-4-3">Note</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Incremental list</a></li><li><a href="#tabset-4-2">Multiple columns</a></li><li><a href="#tabset-4-3">Scrollable</a></li><li><a href="#tabset-4-4">Speaker Note</a></li><li><a href="#tabset-4-5">Logo</a></li><li><a href="#tabset-4-6">Tabsets</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
-<p>Sometimes, it is useful to set chunk options that apply globally (for the entire documents).</p>
-<p>For example,</p>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Code</a></li><li><a href="#tabset-2-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>::: {.incremental}</span>
+<span id="cb6-2"><a></a>- collect data</span>
+<span id="cb6-3"><a></a>- run statistical analysis</span>
+<span id="cb6-4"><a></a>- report</span>
+<span id="cb6-5"><a></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-2-2">
+<div>
 <ul>
-<li>You are writing a term paper and the instructor may want to see only results, but not R codes.</li>
-<li>You do not want any of the R codes to appear on the output document, but <code>echo: true</code> is the default.</li>
-<li>It is a waste of time to type <code>echo: false</code> for all the R code chunks</li>
+<li class="fragment">collect data</li>
+<li class="fragment">run statistical analysis</li>
+<li class="fragment">report</li>
 </ul>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
 </div>
 <div id="tabset-4-2">
-<p>You can set chunk options globally in the YAML header with the <code>execute</code> option like below:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>---</span>
-<span id="cb6-2"><a></a>title: "Reporting using Quarto"</span>
-<span id="cb6-3"><a></a>author: "Taro Mieno"</span>
-<span id="cb6-4"><a></a>format:</span>
-<span id="cb6-5"><a></a>  html:</span>
-<span id="cb6-6"><a></a>    toc: true</span>
-<span id="cb6-7"><a></a>    toc-depth: 2</span>
-<span id="cb6-8"><a></a>    number-sections: true</span>
-<span id="cb6-9"><a></a>    number-depth: 2</span>
-<span id="cb6-10"><a></a>execute:</span>
-<span id="cb6-11"><a></a>  echo: false</span>
-<span id="cb6-12"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Code</a></li><li><a href="#tabset-3-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>:::: {.columns}</span>
+<span id="cb7-2"><a></a></span>
+<span id="cb7-3"><a></a>::: {.column width="40%"}</span>
+<span id="cb7-4"><a></a></span>
+<span id="cb7-5"><a></a>Plot 1</span>
+<span id="cb7-6"><a></a></span>
+<span id="cb7-7"><a></a>```{r}</span>
+<span id="cb7-8"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb7-9"><a></a>  geom_point(aes(y = mpg,  x = cyl))</span>
+<span id="cb7-10"><a></a>```</span>
+<span id="cb7-11"><a></a></span>
+<span id="cb7-12"><a></a>:::</span>
+<span id="cb7-13"><a></a></span>
+<span id="cb7-14"><a></a>::: {.column width="60%"}</span>
+<span id="cb7-15"><a></a></span>
+<span id="cb7-16"><a></a>Plot 2</span>
+<span id="cb7-17"><a></a></span>
+<span id="cb7-18"><a></a>```{r}</span>
+<span id="cb7-19"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb7-20"><a></a>  geom_histogram(aes(x = mpg))</span>
+<span id="cb7-21"><a></a>```</span>
+<span id="cb7-22"><a></a>:::</span>
+<span id="cb7-23"><a></a></span>
+<span id="cb7-24"><a></a>::::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="callout-content">
-<ul>
-<li>Insert the following in the YAML header of <code>sample_qmd.qmd</code> file so that it looks like above</li>
-</ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>execute:</span>
-<span id="cb7-2"><a></a>  echo: false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li>Knit the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.</li>
-</ul>
+<div id="tabset-3-2">
+<div class="columns">
+<div class="column" style="width:40%;">
+<p>Plot 1</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb8-2"><a></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> mpg,  <span class="at">x =</span> cyl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-9-1.png" width="4000"></p>
+</figure>
 </div>
 </div>
 </div>
+</div><div class="column" style="width:60%;">
+<p>Plot 2</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb9-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-10-1.png" width="4000"></p>
+</figure>
 </div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</div>
+<!--end of panel-->
 </div>
 <div id="tabset-4-3">
-<div class="callout callout-important no-icon callout-titled callout-style-default">
+<p>Add <code>scrollable: true</code> under <code>revealjs:</code> to make each of the slides scrollable when the contents are too big to present on a screen.</p>
+<p><br></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>---</span>
+<span id="cb10-2"><a></a>format:</span>
+<span id="cb10-3"><a></a>  revealjs:</span>
+<span id="cb10-4"><a></a>    scrollable: true</span>
+<span id="cb10-5"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p><code>scrollable: true</code> is enabled in this presentation.</p>
+<p>you</p>
+<p>can</p>
+<p>see</p>
+<p>that</p>
+<p>right?</p>
+</div>
+<div id="tabset-4-4">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb11-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-12-1.png" width="4000"></p>
+</figure>
+</div>
+</div>
+</div>
+<aside class="notes">
+<p>You do not see me!</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+<div title=":&quot;Try&quot;">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
-<p><strong>Important</strong></p>
+<p><strong>:“Try”</strong></p>
 </div>
 <div class="callout-content">
-<p>Local option always overrides the global option.</p>
+<p>Hitting the <strong>s</strong> key will generate a pop-up window with speaker view.</p>
 </div>
 </div>
 </div>
 </div>
 </div>
+<div id="tabset-4-5">
+<p>You can add a logo with the <code>logo</code> option under <code>revealjs:</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>---</span>
+<span id="cb12-2"><a></a>format:</span>
+<span id="cb12-3"><a></a>  revealjs:</span>
+<span id="cb12-4"><a></a>    logo: logo.png</span>
+<span id="cb12-5"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>This presentation has the code below in the YAMl and you can see the logo at the bottom-right corner.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>---</span>
+<span id="cb13-2"><a></a>format:</span>
+<span id="cb13-3"><a></a>  revealjs:</span>
+<span id="cb13-4"><a></a>    logo: nebraska-n.jpg</span>
+<span id="cb13-5"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<!--end of panel-->
+<div id="tabset-4-6">
+<p>You can create tabs using the following code:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a></a>::: {.panel-tabset}</span>
+<span id="cb14-2"><a></a></span>
+<span id="cb14-3"><a></a>### Tab A</span>
+<span id="cb14-4"><a></a></span>
+<span id="cb14-5"><a></a>Content for `Tab A`</span>
+<span id="cb14-6"><a></a></span>
+<span id="cb14-7"><a></a>### Tab B</span>
+<span id="cb14-8"><a></a></span>
+<span id="cb14-9"><a></a>Content for `Tab B`</span>
+<span id="cb14-10"><a></a></span>
+<span id="cb14-11"><a></a>:::</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 <!--end of panel-->
 </section>
-<section id="caching" class="slide level2">
-<h2>Caching</h2>
+<section id="figure" class="slide level2">
+<h2>Figure</h2>
 <div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">What?</a></li><li><a href="#tabset-6-2">Let’s try</a></li><li><a href="#tabset-6-3">Changes in codes</a></li><li><a href="#tabset-6-4">Changes in contents</a></li><li><a href="#tabset-6-5"><code>dependson</code></a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">How</a></li><li><a href="#tabset-9-2">Example 1</a></li><li><a href="#tabset-9-3">Example 2</a></li><li><a href="#tabset-9-4">Example 3</a></li><li><a href="#tabset-9-5">To be exact</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<p>You can use</p>
+<ul>
+<li><code>out-width:</code> option to control the size of a figure.</li>
+<li><code>fig-align:</code> option to control the alignment of a figure.</li>
+</ul>
+<p>See <a href="https://quarto.org/docs/reference/formats/html.html#figures">here</a> for all the options available.</p>
+</div>
+<div id="tabset-9-2">
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Code</a></li><li><a href="#tabset-5-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>```{r}</span>
+<span id="cb15-2"><a></a>#| out-width: 100%</span>
+<span id="cb15-3"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb15-4"><a></a>  geom_histogram(aes(x = mpg)) </span>
+<span id="cb15-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-5-2">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb16-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-17-1.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-9-3">
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Code</a></li><li><a href="#tabset-6-2">Output</a></li></ul>
 <div class="tab-content">
 <div id="tabset-6-1">
-<ul>
-<li><p>In the course of creating a document using Rmarkdown, You are going to hit the “Knit” button numerous times when you are writing a report to check whether the final output looks fine.</p></li>
-<li><p>Every time you knit, all the R code chunks are evaluated, which is inefficient because R has evaluated those R code chunks before.</p></li>
-<li><p>So, if we can somehow store the results of R code chunks (caching), and then let R call up the saved results instead of re-evaluating the codes all over again, we can save lots of time.</p></li>
-<li><p>The benefit of doing so is greater when the processing time of the codes is longer. Caching can be done by adding <code>cache==TRUE</code> as a chunk option.</p></li>
-<li><p>By adding the option, once an R chunk is processed, its results are saved and can be reused again by R later when you compile the document again.</p></li>
-</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a></a>```{r}</span>
+<span id="cb17-2"><a></a>#| out-width: 80%</span>
+<span id="cb17-3"><a></a>#| fig-align: center</span>
+<span id="cb17-4"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb17-5"><a></a>  geom_histogram(aes(x = mpg)) </span>
+<span id="cb17-6"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-6-2">
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Change <code>eval: false</code> to <code>eval: true</code> in the <strong>cache_1</strong> chunk</li>
-<li>Knit and confirm that <strong>sample_qmd_cache</strong> and <strong>sample_qmd_files</strong> folders are created</li>
-<li>Knit again and observe that the knitting process is much faster now</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-6-3">
-<p>When any part of the R codes within a cached R code chunk is changed, R is smart enough to recognize the change and evaluate the R code chunk again without using the cached results for the chunk.</p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Change <code>y = 1 + x + v</code> to <code>y = 1 + 2 * x +v</code> in the <strong>cache_1</strong> chunk and knit</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-6-4">
-<ul>
-<li><p>Sometimes, your R codes within an cached R code chunk have not changed, but the content of a dataset used in the R code chunk may have changed.</p></li>
-<li><p>In such a case, R is unable to recognize the change in the <span style="color: blue;"> content </span> of the dataset.</p></li>
-</ul>
-<p><br></p>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Change <code>eval: false</code> to <code>eval: true</code> in the <code>cache_2</code> chunk and knit</li>
-<li>Change <code>y = 1 + 2 * x + v</code> back to <code>y = 1 + x +v</code> and knit (notice that the printed number from <code>cache_2</code> did not change)</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-6-5">
-<ul>
-<li>To R, everything in the <code>cache_2</code> chunk looks the same as they only look at the code texts, but not the contents of R objects.</li>
-<li>Therefore, R would call up the saved results instead of rerunning the R codes, which is not what you want.</li>
-<li>You can use the <code>dependson</code> option to make R recognize any changes in cached R objects</li>
-</ul>
-<div title="Direction">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Direction</strong></p>
-</div>
-<div class="callout-content">
-<p>Add <code>dependson: cache_1</code> to the <code>cache_2</code> chunk as an option and knit again.</p>
-</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb18-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-19-1.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
 </div>
 </div>
 </div>
@@ -904,102 +733,106 @@
 </div>
 </div>
 <!--end of panel-->
-</section>
-<section id="directory" class="slide level2">
-<h2>Directory</h2>
+</div>
+<div id="tabset-9-4">
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Reading Files</a></li><li><a href="#tabset-7-2">What to do?</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Code</a></li><li><a href="#tabset-7-2">Output</a></li></ul>
 <div class="tab-content">
 <div id="tabset-7-1">
-<p>Suppose you are interested in reading a dataset file like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">read.csv</span>(<span class="st">"corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<div class="callout callout-important no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Important</strong></p>
-</div>
-<div class="callout-content">
-<p>By default, R looks for <strong>corn_price.csv</strong> in the same folder in which the qmd file is located.</p>
-</div>
-</div>
-</div>
-<p><br></p>
-<ul>
-<li><p>In my case, the sample_qmd.qmd is located in <span style="color: blue;"> /Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Chapter-2-Quarto </span>.</p></li>
-<li><p>This means that RStudio tries to find <span style="color: blue;"> /Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Chapter-2-Quarto/corn_price.csv</span>.</p></li>
-<li><p>If the file is not in the directory, RStudio won’t be able to find the file to import and returns an error. Clearly, all the subsequent actions dependent on the dataset will not run.</p></li>
-</ul>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a></a>```{r}</span>
+<span id="cb19-2"><a></a>#| out-width: 50%</span>
+<span id="cb19-3"><a></a>#| fig-align: right</span>
+<span id="cb19-4"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb19-5"><a></a>  geom_histogram(aes(x = mpg)) </span>
+<span id="cb19-6"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-7-2">
-<p>To avoid errors in reading files, there are three options:</p>
-<p><br></p>
-<p><strong>Option 1</strong> (recommended for a beginner)</p>
-<p>Put all the datasets you intend to use in the same directory in which your qmd file is located.</p>
-<p><br></p>
-<p><strong>Option 2</strong></p>
-<p>If the file is not in the directory, supply the full path to the file like this</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">read.csv</span>(<span class="st">"~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Chapter-2-Quarto/corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-layout-align="right">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb20-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-right">
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-21-1.png" class="quarto-figure quarto-figure-right" style="width:50.0%"></p>
+</figure>
 </div>
-<p><br></p>
-<p><strong>Option 3</strong></p>
-<p>Tell R to look for a specific directory for datasets by setting a working directory using <code>opts_knit$set(root.dir = directory)</code> at the beginning by adding the code like below in your qmd file after the YAML header:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>```{r}</span>
-<span id="cb10-2"><a></a>knir::opts_knit$set(root.dir = "~/Dropbox/TeachingUNL/Data-Science-with-R/Chapter-2-Quarto")</span>
-<span id="cb10-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <!--end of panel-->
-</section>
-<section id="output-types" class="slide level2">
-<h2>Output types</h2>
+</div>
+<div id="tabset-9-5">
 <div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Various formats</a></li><li><a href="#tabset-8-2">How</a></li><li><a href="#tabset-8-3">Note</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">How</a></li><li><a href="#tabset-8-2">Code</a></li><li><a href="#tabset-8-3">Output</a></li></ul>
 <div class="tab-content">
 <div id="tabset-8-1">
-<p>You can knit an qmd file to various formats using various engines (visit <a href="https://quarto.org/docs/output-formats/all-formats.html">here</a> to see all the document types).</p>
-<p><img data-src="document-options.png"></p>
-<div class="callout callout-important no-icon callout-titled callout-style-default">
+<p>To set the figure size exactly you can specify all of the four options:</p>
+<ul>
+<li><code>fig-width</code></li>
+<li><code>fig-height</code></li>
+<li><code>out-width</code></li>
+<li><code>out-height</code></li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
-<p><strong>Important</strong></p>
+<p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
 <ul>
-<li>In this course, we only use the html option. Submit your assignment in html.</li>
-<li>html is void of the concept of <strong>page</strong>. Consequently, you do not have to worry about how you should organize texts, tables, and figures within a page (fixed amount of space).</li>
+<li>By default <code>fig-</code> options take numeric numbers and the unit is inch.</li>
+<li>For <code>out-</code> options you need to add <code>in</code> after a numeric number to make them consistent with the <code>fig-</code> options.</li>
 </ul>
 </div>
 </div>
 </div>
 </div>
 <div id="tabset-8-2">
-<p><strong>Step 1</strong></p>
-<p>To write to an output type you want, first add an appropriate options under the <code>format</code> option to the YAML header like below.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>title: "Reporting using Quarto"</span>
-<span id="cb11-2"><a></a>author: "Taro Mieno"</span>
-<span id="cb11-3"><a></a>format:</span>
-<span id="cb11-4"><a></a>  html:</span>
-<span id="cb11-5"><a></a>    toc: true</span>
-<span id="cb11-6"><a></a>    toc-depth: 2</span>
-<span id="cb11-7"><a></a>    number-sections: true</span>
-<span id="cb11-8"><a></a>    number-depth: 2</span>
-<span id="cb11-9"><a></a>  docx: default </span>
-<span id="cb11-10"><a></a>  typst:  </span>
-<span id="cb11-11"><a></a>    papersize: a5</span>
-<span id="cb11-12"><a></a>    margin:</span>
-<span id="cb11-13"><a></a>      x: 1cm</span>
-<span id="cb11-14"><a></a>      y: 1cm</span>
-<span id="cb11-15"><a></a>    columns: 2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Here,</p>
-<ul>
-<li>WORD (with <code>word</code> option) is generated with the default options.</li>
-<li>PDF (with <code>typst</code> option) is generated with the options specified below <code>typst:</code>.</li>
-</ul>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a></a>```{r}</span>
+<span id="cb21-2"><a></a>#| fig-width: 10</span>
+<span id="cb21-3"><a></a>#| fig-height: 3</span>
+<span id="cb21-4"><a></a>#| out-width: 10in</span>
+<span id="cb21-5"><a></a>#| out-height: 3in</span>
+<span id="cb21-6"><a></a>ggplot(data = mtcars) +</span>
+<span id="cb21-7"><a></a>  geom_histogram(aes(x = mpg)) </span>
+<span id="cb21-8"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-8-3">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb22-2"><a></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> mpg)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="02-1-Quarto-revealjs_files/figure-revealjs/unnamed-chunk-23-1.png" style="width:10in;height:3in"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="theme" class="slide level2">
+<h2>Theme</h2>
+<div class="panel-tabset">
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Pre-made themes</a></li><li><a href="#tabset-10-2">Customized themes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1">
+<p>There are many pre-made themes that you can apply to <code>revealjs</code> presentations. See the list <a href="https://quarto.org/docs/presentations/revealjs/themes.html#using-themes">here</a>.</p>
+<p>You can set a theme using the <code>theme</code> option in the YAML header like below:</p>
+<p><br></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a></a>format:</span>
+<span id="cb23-2"><a></a>  revealjs: </span>
+<span id="cb23-3"><a></a>    theme: dark</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
 <div title="Direction">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -1007,17 +840,14 @@
 <p><strong>Direction</strong></p>
 </div>
 <div class="callout-content">
-<p>Add the docx option and typst options in the YAML above to your qmd file.</p>
+<p>Try one of the themes listed and see how the theme of the presentation changes.</p>
 </div>
 </div>
 </div>
 </div>
-<p><br></p>
-<p><strong>Step 2</strong></p>
-<p>You should see a downward triangle right to the “Render” button. Pick one format to knit to a document of the format.</p>
 </div>
-<div id="tabset-8-3">
-<p>YAML and chunk options available are different based on the output format and engine. Visit <a href="https://quarto.org/docs/reference/formats/html.html">here</a> to see the options specific to particular formats.</p>
+<div id="tabset-10-2">
+
 </div>
 </div>
 </div>
@@ -1025,13 +855,13 @@
 </section>
 <section id="resources" class="slide level2">
 <h2>Resources</h2>
-<p>The best resource to learn Quarto is its official website:</p>
 <ul>
-<li><a href="https://quarto.org/docs/guide/">General and specific (to document type) syntax</a></li>
-<li><a href="https://quarto.org/docs/reference/">YAML options specific to document type</a></li>
+<li><p>The best resources is the official documentation of how to use Quarto with <code>revealjs</code> found <a href="https://quarto.org/docs/presentations/revealjs">here</a>.</p></li>
+<li><p>There are more you can do with <code>revealjs</code>, which can be found <a href="https://quarto.org/docs/presentations/revealjs/advanced.html">here</a> (I did not find them necessary).</p></li>
 </ul>
 
 <div class="quarto-auto-generated-content">
+<p><img src="nebraska-n.jpg" class="slide-logo"></p>
 <div class="footer footer-default">
 
 </div>
