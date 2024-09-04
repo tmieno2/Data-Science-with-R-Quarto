@@ -1,0 +1,738 @@
+---
+title: "04-1: Data Visualization with `ggplot2`: Basics"
+abstract: "Chapter 4: Data Visualization"
+format:
+  revealjs:
+    theme: [default, ../custom.scss]
+    fontsize: 1.4em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 60%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Preparation
+
+::: {.panel-tabset}
+
+### `ggplot2` package
+
+Install the package if you have not.
+
+```{r ggplot2-install, eval = FALSE}
+install.packages("ggplot2")
+```
+
+<br>
+
+Or, when you load the `tidyverse` package, it automatically loads it.
+
+```{r tidyverse, message = FALSE}
+#--- load ggplot2 along with others in the tidyverse package ---#
+library(tidyverse)
+
+#--- or ---#
+library(ggplot2)
+```
+
+### Dataset
+
+```{webr-r}
+#| context: setup
+
+#--- install and library the data package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+
+data(county_yield, package = "r.spatial.workshop.datasets")
+
+county_yield <- dplyr::select(county_yield, - geometry)
+```
+
+::: {.panel-tabset}
+
+#### Data
+
+We use `county_yield`, which records corn and soybean yield data by county over multiple years.
+
+```{webr-r}
+#| autorun: true
+county_yield
+```
+
+
+
+#### Variable Definitions
+
++ `soy_yield`: soybean yield (bu/acre)
++ `corn_yield`: corn yield (bu/acre)
++ `d0_5_9`: ratio of weeks under drought severity of 0 from May to September
++ `d1_5_9`: ~ drought severity of 1 from May to September   
++ `d2_5_9`: ~ drought severity of 2 from May to September   
++ `d3_5_9`: ~ drought severity of 3 from May to September   
++ `d4_5_9`: ~ drought severity of 4 from May to September
+
+#### Derived data
+
+We also use the derivative of `county_yield`, which records average corn yield by year.
+
+```{webr-r}
+#| autorun: true
+( 
+mean_yield <-
+  county_yield %>%
+  group_by(year) %>%
+  summarize(
+    corn_yield = mean(corn_yield, na.rm = TRUE)
+  ) %>%
+  filter(!is.na(year))
+)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel--> 
+
+
+
+# `ggplot2` basics
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## `ggplot2` basics
+
+::: {.panel-tabset}
+
+### Step 1
+
+The very first job you need to do in creating a figure using the `ggplot2` package is to let R know the dataset you are trying to visualize, which can be done using `ggplot()` like below:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+g_fig <- ggplot(data = county_yield)
+```
+
+<br>
+
+When you create a figure using the `ggplot2` package, `ggplot()` is always the function you call first.
+
+Let's now see what is inside `g_fig`:
+
+<br>
+
+```{webr-r}
+g_fig
+```
+
+<br>
+
+Well, it's blank. Obviously, `g_fig` still does not have enough information to create any kind of figures. You have not told R anything specific about how you would like to use the information in the dataset.
+
+### Step 2
+
+The next thing you need to do is tell `g_fig` what type of figure you want by `geom_*()` functions. For example, we use `geom_point()` to create a scatter plot. To create a scatter plot, R needs to know which variables should be on the y-axis and x-axis. These information can be passed to `g_fig` by the following code:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+g_fig_scatter <- g_fig + geom_point(aes(x = d3_5_9, y = corn_yield))
+```
+
+<br>
+
+Here, 
+
++ `geom_point()` was added to `g_fig` to declare that you want a scatter plot 
++ `aes(x = d3_5_9, y = corn_yield)` inside `geom_point()` tells R that you want to create a scatter plot where you have `d3_5_9` on the x-axis and `corn_yield` on the y-axis
+
+This is what `g_fig_scatter` looks:
+
+```{webr-r}
+g_fig_scatter
+```
+
+### `aes()`
+
+::: {.panel-tabset}
+
+#### What does it do?
+
+Going back to the code,
+
+<br>
+
+```{webr-r}
+g_fig_scatter <- g_fig + geom_point(aes(x = d3_5_9, y = corn_yield))
+```
+
+<br>
+
+Note that `x = d3_5_9`, `y = corn_yield` are inside `aes()`. 
+
+<br>
+
+:::{.callout-important}
+`aes()` is used to make the <span style='color:red'>aes</span>thetic of the figure to be a function of variables in the dataset that you told `ggplot` to use (here, `county_yield`).
+:::
+
+<br>
+
+`aes(x = d3_5_9, y = corn_yield)` is telling `ggplot` to use `d3_5_9` and `corn_yield` variables in the `county_yield` dataset for the x-axis and y-axis, respectively. 
+
+#### If not in aes()?
+
+If you do not have `x = d3_5_9`, `y = corn_yield` inside `aes()`, R is going to look for `d3_5_9` and `corn_yield` themselves (but not in `county_yield`), which you have not defined.
+
+Try:
+
+```{webr-r}
+g_fig + geom_point(x = d3_5_9, y = corn_yield)
+```
+:::
+<!--end of panel-->
+
+
+### Summary
+
++ `ggplot(data = dataset)` to initiate the process of creating a figure
+
++ add `geom_*()` to declare what kind of figure you would like to make 
+
++ specify what variables in the dataset to use and how they are used inside `aes()` 
+
++ place the `aes()` you defined above in the `geom_*()` you specified above
+
+:::
+<!--end of panel-->
+
+# Different types of figures
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Different types of figures
+
+::: {.panel-tabset}
+
+### Figure types
+
+<br>
+
+`ggplot2` lets you create lots of different kinds of figures via various `geom_*()` functions.
+
++ `geom_histogram()`/`geom_density()`
++ `geom_line()`
++ `geom_boxplot()`
++ `geom_bar()`
+
+How to specify aesthetics vary by `geom_*()`.
+
+### Histogram
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+g_fig +
+  geom_histogram(aes(x = corn_yield))
+```
+::: 
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+`geom_histogram()` only needs `x`.
+:::
+::: 
+<!--end of the 2nd column-->
+::: 
+<!--end of the columns-->
+
+### Density Plot
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+g_fig + 
+  geom_density(aes(x = corn_yield))
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+`geom_density()` only needs `x`.
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Line plot
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = mean_yield) +
+  geom_line(aes(x = year, y = corn_yield))
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+`geom_line()` needs `x` and `y`.
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Boxplot
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = county_yield) +
+  geom_boxplot(
+    aes(x = factor(year), y = corn_yield)
+  )
+```
+
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
++ `geom_boxplot()` needs `x` and `y`.
++ Why `factor(year)`?
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Bar plot
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = mean_yield) +
+  geom_bar(
+    aes(
+      x = year,
+      y = corn_yield
+    ),
+    stat = "identity"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+`geom_bar()` needs `x` and `y`
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+:::
+<!--end of panel-->
+
+
+## Modifying how figures look
+
+::: {.panel-tabset}
+
+### Introduction
+
+All the elements in the figures we have created so far are in black and white.
+
+You can change how figure elements look by providing options inside `geom_*()`.
+
+Here are the list of options to control the aesthetics of figures: 
+
++ fill
++ color
++ size
++ shape
++ linetype
+
+Elements of figures that you can modify differ by `geom` types
+
+The same element name can mean different things based on `geom` types
+
+
+### scatter plot
+
+```{webr-r}
+#| autorun: true
+g_fig + 
+  geom_point(
+    aes(x = d3_5_9, y = corn_yield),
+    color = "red",
+    size = 0.7,
+    shape = 0
+  )
+```
+
+### histogram
+
+```{webr-r}
+#| autorun: true
+g_fig +
+  geom_histogram(
+    aes(x = corn_yield),
+    color = "blue",
+    fill = "green",
+    size = 2,
+    shape = 2
+  )
+```
+
+### boxplot
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield) + 
+  geom_boxplot(
+    aes(x = factor(year), y = corn_yield),
+    color = "red",
+    fill = "orange",
+    size = 0.2,
+    shape = 1
+  )
+```
+
+### line plot
+
+```{webr-r}
+#| autorun: true
+ggplot(data = mean_yield) +
+  geom_line(
+    aes(x = year, y = corn_yield),
+    color = "blue",
+    size = 1.5,
+    fill = "red",
+    linetype = "dotted",
+  )
+```
+
+:::
+<!--end of panel-->
+
+## Exercises
+
+::: {.panel-tabset}
+
+### Instruction
+
+This exercise use the `diamonds` dataset from the `ggplot2()` package. First, load the dataset and extract observations with `Premium` cut whose color is one of `E`, `I`, and `F`:
+
+```{webr-r}
+#| autorun: true
+data("diamonds")
+premium <-
+  diamonds %>%
+  dplyr::filter(cut == "Premium" & color %in% c("E", "I", "F"))
+
+#--- take a look ---#
+premium
+```
+
+### Exercise 1
+
+<br>
+
+Using `carat` and `price` variables from `premium`, generate the figure below:
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+#| eval: false
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price), color = "red")
+```
+
+### Exercise 2
+
+<br>
+
+Using `price` variables from `premium`, generate a histogram of `price` shown below:
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+#| eval: false
+ggplot(data = premium) +
+  geom_histogram(aes(x = price), fill = "white", color = "blue")
+```
+
+:::
+<!--end of panel-->
+
+# Other supplementary `geom_*()`s
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Other supplementary `geom_*()`s
+
+::: {.panel-tabset}
+
+### geom_*()
+
+Here are the list of useful **geom_**.
+
++ `geom_vline()`: draw a vertical line
++ `geom_hline()`: draw a horizontal line
++ `geom_abline()`: draw a line with the specified intercept and slope
++ `geom_smooth()`: draw an OLS-estimated regression line (other regression methods available)
++ `geom_ribbon()`: create a shaded area
++ `geom_text()` and `annotate()`: add texts in the figure
+
+We will use `g_fig_scatter` to illustrate how these functions work.
+
+### vline and hline
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_vline(
+    xintercept = 10, 
+    color = "blue"
+  ) +
+  geom_hline(
+    yintercept = 100, 
+    color = "red"
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
++ `xintercept` in `geom_vline`: where the vertical line is placed
++ `yintercept` in `geom_hline`: where the horizontal line is placed
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+### abline
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_abline(
+    #--- a ---#
+    intercept = 50, 
+    #--- b ---#
+    slope = 4,
+    color = "blue"
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+$$y = a + b\times x$$
+
++ `intercept`: $a$
++ `slope`: $b$
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### smooth
+
+::: {.columns}
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_smooth(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+Also try adding `method = "lm"`.
+:::
+:::
+<!--end of the 2nd column-->
+
+:::
+<!--end of the columns-->  
+
+### ribbon
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_ribbon(
+    aes(
+      x = d3_5_9, 
+      ymin = 100,
+      ymax = 200
+    ),
+    fill = "green",
+    alpha = 0.3
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
+
++ `ymin`: lower bound of the ribbon
++ `ymax`: upper bound of the ribbon
+
+It is useful when drawing confidence intervals.
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### text
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_text(
+    aes(
+      x = d3_5_9,
+      y = corn_yield,
+      label = state_name,
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
++ `x`, `y`: position of where texts are placed
++ `label`: variable to print
+:::
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### annotate
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  annotate(
+    'text',
+    x = 10,
+    y = 50,
+    label = 'Drought hurts \n a lot!!',
+    size = 3,
+    color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+
+:::{.callout-note}
++ `x`: where on x-axis
++ `y`: where on y-axis
++ `label`: text to print (\n break the line)
++ size: font size
+:::
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->

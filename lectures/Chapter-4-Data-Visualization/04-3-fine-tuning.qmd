@@ -1,0 +1,1736 @@
+---
+title: "Data visualization with `ggplot2`: Fine Tuning"
+abstract: "Chapter 4: Data Visualization"
+format: 
+  revealjs: 
+    theme: [default, ../custom.scss]
+    fontsize: 1.4em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'nycflights13', `ggthemes`]
+  cell-options:
+    editor-font-scale: 0.8
+    out-width: 100%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+# Make your figures presentable to others
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Make your figures presentable to others
+
+::: {.panel-tabset}
+
+### Motivation
+
++ Figures we have created so far cannot be used for formal presentations or publications. They are simply too crude.
+
++ We need fine-tune raw figures before they are publishable. 
+
++ You can control virtually every element of a figure under the `ggplot2` framework.
+
++ Take a look at [here](https://ggplot2.tidyverse.org/reference/theme.html) for the complete list of options you can use to modify the theme of figures
+
+<span style="color:red"> Key:</span> The most important thing is actually to know which part of a figure a theme option refers to (e.g., `axis.text`)
+
+
+:::
+<!--end of panel-->
+
+### two types
+
+**Two types of operations** 
+
+Operations to make your figures presentable can be categorized into two types:
+
++ Content-altering
++ Theme-altering
+ 
+They are two separate things.
+
+**Examples** 
+
+For the y-axis title,
+
++ The axis title text itself (say "Corn Yield (bu/acre)") falls under the **content** category.
+
++ The position of or the font size of the axis-title fall under the **theme** category
+
+The content itself does not change when theme is altered.
+
+
+### content-altering
+
+```{r echo = F}
+county_yield_s_b2010 <- county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+
+g_box <- ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield, 
+      fill = state_name
+    )
+  )
+```
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original
+
+```{r original-f, echo = F}
+g_box 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Altered
+
+```{r altered-f, echo = F}
+g_box +
+  xlab("Year") +
+  ylab("Corn Yield (bu/acre)") +
+  scale_fill_viridis_d()
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### theme-altering
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original
+
+```{r t-original-f, echo = F}
+g_box 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Altered
+
+```{r t-altered-f, echo = F}
+g_box +
+  theme(
+    axis.title = element_text(size = 20)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Note
+
++ Distinctions between the two types of actions are not always clear
+
++ But, typically, you use 
+  * `scale_*()` function series to alter contents
+  * `theme()` function to alter the theme
+
++ Note that there are shorthand convenience functions to alter figure contents for commonly altered parts of figures
+
+:::
+<!--end of panel-->
+
+## Axes content
+
+::: {.panel-tabset}
+
+### Preparation
+
+We are going to build on this figure in this section:
+
+```{webr-r}
+#| autorun: true
+county_yield_s_b2010 <- 
+  county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+
+g_box <- 
+  ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield, 
+      fill = state_name
+    )
+  )
+```
+
+### How
+
+We can use 
+
++ `scale_x_discrete()`/`scale_x_continuous()` for x-axis
++ `scale_y_discrete()`/`scale_y_continuous()` for y-axis
+
+to control the following elements of axes:
+
++ `name`: an axis title 
++ `limit`: the range of an axis
++ `breaks`: axis ticks positions
++ `label`: axis texts at ticks
+
+:::{.callout-note}
++ We use `scale_x_discrete()` if `x` is a discrete variable (not numeric) and `scale_x_continuous()` if `x` is a continuous variable (numeric).
++ The same applies for `y`.
+:::
+
+### axis title
+
+```{webr-r}
+#| autorun: true
+g_box + 
+  scale_x_discrete(name = "Year") + 
+  scale_y_continuous(name = "Corn Yield (bu/acre)") 
+```
+
+Or just this,
+
+```{webr-r}
+#| autorun: true
+g_box + 
+  xlabel("Year") +
+  ylabel("Corn Yield (bu/acre)") 
+```
+
+### limit
+
+```{webr-r}
+#| autorun: true
+g_box + 
+  scale_x_discrete(
+    name = "Year" 
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    #--- first min, second max ---#
+    limit = c(100, 200) #<<
+  ) 
+```
+
+Or just,
+
+```{webr-r}
+g_box + 
+  xlabel("Year") +
+  ylabel("Corn Yield (bu/acre)") +
+  ylim(100, 200) #<<
+```
+
+Or,
+
+You can filter the data first and then use the filtered data.
+
+### breaks and labels
+
+
+::: {.columns}
+
+::: {.column width="60%"}
+```{webr-r} 
+#| autorun: true
+g_box + 
+  scale_x_discrete(
+    name = "Year",
+    label = gsub("20", "", as.character(2000:2018)) #<<
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    limit = c(100, 200),
+    breaks = seq(100, 200, by = 10) #<<
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+:::{.callout-note}
++ `breaks`: determines where the ticks are located
++ `labels`: defines the texts at the ticks
+:::
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+
+
+### Exercise
+
+::: {.panel-tabset}
+
+#### Instruction
+
+Run the following code to create `gg_delay`, which you will build on.
+
+```{r prep-ex-axes}  
+library(nycflights13)
+
+gg_delay <- flights %>% 
+  group_by(origin, month) %>% 
+  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  ggplot(.) +
+    geom_line(aes(y = mean_arr_delay, x = month, color = origin))
+```
+
+#### Exercise 1
+
+::: {.columns}
+::: {.column width="50%"}
+Change the axes content to create the figure on the right using `scale_x_continuous()` and `scale_y_continuous()`. 
+
+Here are the list of changes you need to make:
+
++ x-axis 
+  * change the x-axis title to "Month"
+  * change the limit of the x-axis title to 4 through 8
+  * change the the breaks and their labels of the x-axis ticks (breaks) to 4 through 8 
++ y-axis 
+  * change the y-axis title to "Average Arrival Delay (minutes)"
+  * change the limit of the y-axis title to 0 through 25
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+gg_delay + 
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  ) 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| eval: false
+gg_delay + 
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  ) 
+```
+
+#### Exercise 2
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+Change the axes content to create the figure on the right. But, use `scale_x_continuous()` only for changing the x-axis breaks. 
+
+Here are the list of changes you need to make:
+
++ x-axis 
+  * change the x-axis title to "Month"
+  * change the limit of the x-axis title to 4 through 8
+  * change the the breaks and their labels of the x-axis ticks (breaks) to 4 through 8 
++ y-axis 
+  * change the y-axis title to "Average Arrival Delay (minutes)"
+  * change the limit of the y-axis title to 0 through 25
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+gg_delay + 
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  ) 
+```
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r}
+#| eval: false
+gg_delay +
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  )
+```
+
+:::
+<!--end of panel-->
+
+## Legends content
+
+::: {.panel-tabset}
+
+
+
+### Preparation
+
+We are going to build on this figure in this section:
+
+```{webr-r}
+#| autorun: true
+( 
+g_axis <-
+  g_box +
+  scale_x_discrete(
+    name = "Year",
+    label = gsub("20", "", as.character(2000:2018))
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    limit = c(100, 200),
+    breaks = seq(100, 200, by = 10)
+  )
+)
+```
+
+### Title
+
+.left-code[
+
+```{r l-title, eval = F}  
+g_axis + 
+  scale_fill_brewer(name = "State") #<<
+```
+
+Or,
+
+```{r , eval = F}  
+g_axis + 
+  labs(fill = "State") #<<
+```
+
+]
+
+.right-plot[
+```{r ref.label = "l-title", echo = F, dependson = "starting-point", out.width = "90%"}  
+
+```
+
+### Fill color
+
+.left-code[
+
+```{r l-fill, eval = F}  
+g_axis + 
+  scale_fill_brewer(
+    name = "state", 
+    palette = "Set1"
+    )
+```
+
+<span style="color:red"> We are going to spend lots of time on color scheme later. </span>
+
+]
+
+.right-plot[
+```{r ref.label = "l-fill", echo = F, dependson = "starting-point", out.width = "90%"}  
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+### Title position
+
+.left-code[
+
+```{r l-title-pos, eval = F}  
+g_axis + 
+  scale_fill_brewer(
+    name = "state", 
+    palette = "Set1",
+    guide = guide_legend( #<<
+      title.position = "left" #<<
+    ) #<<
+  )
+```
+
+]
+
+.right-plot[
+```{r ref.label = "l-title-pos", echo = F, dependson = "starting-point", out.width = "90%"}  
+
+```
+]
+
+
+### wrapping
+
+.left-code[
+
+```{r l-wrapping, eval = F}  
+g_axis + 
+  scale_fill_brewer(
+    name = "state", 
+    palette = "Set1",
+    guide = guide_legend(
+      title.position = "left",
+      nrow = 2 #<<
+    )
+  )
+```
+
+]
+
+.right-plot[
+```{r ref.label = "l-wrapping", echo = F, dependson = "starting-point", out.width = "90%"}  
+
+```
+]
+
+### Exercise
+
+::: {.panel-tabset}
+
+:::
+<!--end of panel-->
+
+#### Instruction
+
+Run the following code to create `gg_delay`, which you will build on.
+
+```{r prep-ex-legends}
+#| autorun: true
+
+(
+gg_delay <- 
+  flights %>% 
+  group_by(origin, month) %>% 
+  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  ggplot(.) +
+    geom_line(aes(y = mean_arr_delay, x = month, color = origin))
+)
+```
+
+#### Exercise
+
+::: {.columns}
+
+::: {.column width="50%"}
+Change the legend contents to create the figure on the right. Using `scale_*_brewer()`. You need to identify what goes into `*` in `scale_*_brewer()`.
+
+Here are the list of changes you need to make:
+
+* change the legend title to "Airports in NY"
+* change the the legend title position to "bottom"
+* change the legend items to be spread in 3 columns
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+gg_delay + 
+  scale_color_brewer(
+    name = "Airports in NY",
+    palette = "Set2",
+    guide = guide_legend(
+      title.position = "bottom",
+      ncol = 3
+    )
+  ) 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+**Work here**
+
+<br>
+
+**Answer**
+
+```{r}
+#| eval: false 
+gg_delay + 
+  scale_color_brewer(
+    name = "Airports in NY",
+    palette = "Set2",
+    guide = guide_legend(
+      title.position = "bottom",
+      ncol = 3
+    )
+  )
+```
+
+
+:::
+<!--end of panel-->
+
+## Theme
+
+::: {.panel-tabset}
+
+### Naming rules
+
+When specifying the theme of figure elements, it is good to know the naming convention of figure elements:
+
+For example:
+
++ `axis.title` 
+
+This refers to the title of both x- and y-axis. Any aesthetic theme you apply to this element will be reflected on the title of both x- and y-axis.  
+
++ `axis.title.x` 
+
+This refers to the title of only x-axis. Any aesthetic theme you apply to this element will be reflected on the title of only x-axis.
+
+So, basically appending `.name` narrows down the scope of the figure elements the element name refers to.
+
+### Common functions
+
+There are common functions we use to specify the aesthetic nature of figure elements based on the type of the elements:
+
+<br>
+
++ `element_text()`: for text elements like `axis.text`, `axis.title`, `legend.text`
+
+Inside the function, you specify things like font size, font family, angle, etc.
+
++ `element_rect()`: for box-like elements like `legend.background`, `plot.background`, `strip.background`
+
+Inside the function, you specify things like font background color, border line color, etc.
+
++ `element_line()`: for line elements like `panel.grid.major`, `axis.line.x`
+
+Inside the function, you specify things like line thickness, line color, etc.
+
++ `element_blank()`: any components
+
+It makes the specified component disappear.
+
++ `unit()`: for attributes of figure elements like `legend.key.width`, `legend.box.spacing` 
+
+:::
+<!--end of panel-->
+
+
+## Axis theme
+
+::: {.panel-tabset}
+
+### Preparation
+
+We are going to build on this figure in this section:
+
+```{webr-r}
+#| autorun: true
+g_axis
+```
+
+:::
+<!--end of panel-->
+
+### title and text
+
+
+
+```{webr-r}
+#| autorun: true
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times")
+  )
+```
+
+### line
+
+```{webr-r}
+#| autorun: true
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times"),
+    axis.line.y = element_line(size = 2, color = "blue")
+  )
+```
+
+### ticks
+
+```{webr-r}
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times"),
+    axis.line.y = element_line(size = 2, color = "blue"),
+    axis.ticks.length.x = unit(2, "cm") #<<
+  )
+```
+
+## Legends theme
+
+::: {.panel-tabset}
+### How
+
+We can use `them()` to change the aesthetics of legends. Some of the elements include
+
++ title
++ position
++ key 
++ text
++ direction
++ background
+
+See [here](https://ggplot2.tidyverse.org/reference/theme.html) for the full list of options related to legends.
+
+We will discuss how to change the color scheme of legends later in much detail.
+
+### Preparation
+
+This is what we will build on: 
+
+```{webr-r}
+#| autorun: true
+(  
+g_l <- 
+  g_axis +
+  scale_fill_brewer(
+    palette = "Paired",
+    guide = guide_legend(
+      title.position = "left",
+      nrow = 2
+    )
+  )
+)
+```
+
+:::
+<!--end of panel-->
+
+### position
+
+```{webr-r}
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+### key
+
+```{webr-r}  
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm")
+  ) 
+```
+
+### font
+
+```{webr-r}  
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm"),
+    legend.text = element_text(
+      size = 16,
+      family = "Times"
+    ), 
+    legend.title = element_text(
+      size = 6,
+      family = "Courier",
+      color = "red"
+    ), 
+  ) 
+```
+
+### background
+
+```{r background, eval = F}  
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm"),
+    legend.text = element_text(
+      size = 16, 
+      family = "Times"
+    ),
+    legend.title = element_text(
+      size = 6, 
+      family = "Courier",
+      color = "red"
+    ),
+    legend.background = element_rect(
+      fill = "lightblue",
+      linetype = "solid"
+    )
+  ) 
+```
+
+## Pre-made themes
+
+::: {.panel-tabset}
+
+:::
+<!--end of panel-->
+
+### Instruction
+
+There are a bunch of pre-made themes from the `ggplot2` and `ggthemes` packages that can quickly change how figures look.
+
+Install and library  `ggthemes` package first:
+
+```{r eval = F}
+#--- install ---#
+install.packages("ggthemes") 
+
+#--- library ---#
+library("ggthemes") 
+```
+
+See the full list of pre-made themes [here](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/).
+
+### bw
+
+.left-code[
+```{r bw, eval = F}  
+g_axis +
+  theme_bw()
+```
+]
+
+.right-plot[
+```{r bw-f, ref.label = "bw", echo = F, out.width = "90%"}  
+
+```
+]
+
+### void
+
+.left-code[
+```{r void, eval = F}  
+g_axis +
+  theme_void()
+```
+]
+
+.right-plot[
+```{r void-f, ref.label = "void", echo = F, out.width = "90%"}  
+
+```
+]
+
+
+### stata
+
+.left-code[
+```{r stata, eval = F}  
+g_axis +
+  theme_stata()
+```
+]
+
+.right-plot[
+```{r stata-f, ref.label = "stata", echo = F, out.width = "90%"}  
+
+```
+]
+
+  ]
+
+### gdocs
+
+.left-code[
+```{r gdocs, eval = F}  
+g_axis +
+  theme_gdocs()
+```
+]
+
+.right-plot[
+```{r gdocs-f, ref.label = "gdocs", echo = F, out.width = "90%"}  
+
+```
+]
+
+  ]
+
+###economist]
+
+.left-code[
+```{r economist, eval = F}  
+g_axis +
+  theme_economist()
+```
+]
+
+.right-plot[
+```{r economist-f, ref.label = "economist", echo = F, out.width = "90%"}  
+
+```
+]
+
+  ]
+
+###excel]
+
+.left-code[
+```{r excel, eval = F}  
+g_axis +
+  theme_excel()
+```
+]
+
+.right-plot[
+```{r excel-f, ref.label = "excel", echo = F, out.width = "90%"}  
+
+```
+]
+
+  ]
+
+]
+
+---
+
+# Panel (build on a pre-made theme)
+
+.panelset[ 
+
+###How]
+
+.left-full[
+
+## Build on pre-made theme
+You can simply override parts of the pre-made theme by adding theme options like this (see more on this [here](#custom-theme)):
+
+```{r eval = F}
+g_axis +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+So, you can pick the pre-made theme that looks the closest to what you would like, and then add on theme elements to the part you do not like.
+
+]
+
+  ]
+
+###Preparation]
+
+.left-code[
+This is what we will be building on:
+
+```{r start-panel, eval = F}  
+g_axis +
+  theme_bw()  
+```
+]
+
+.right-plot[
+```{r start-panel-f, ref.label = "start-panel", echo = F, out.width = "90%"}  
+
+```
+]
+
+
+  ] <!-- panel ends here -->
+
+###minor grid]
+
+
+.left-code[
+```{r panel-grid-minor, eval = F}
+g_axis +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank() #<<
+  )
+```
+
+]
+
+.right-plot[
+```{r panel-grid-minor-f, ref.label = "panel-grid-minor", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+###major grid]
+
+.left-code[
+```{r panel-grid-major, eval = F}
+g_axis +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(), #<<
+    panel.grid.major.y = element_line( #<<
+      size = 1,  #<<
+      color = "blue", #<< 
+      linetype = "dotted" #<<
+    ) #<<
+  )
+```
+
+See [here](http://sape.inf.usi.ch/quick-reference/ggplot2/linetype) for the line types available.
+
+]
+
+.right-plot[
+```{r panel-grid-major-f, ref.label = "panel-grid-major", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+]
+
+---
+
+
+# Faceted figure theme
+
+.panelset[ 
+
+###Instruction]
+
+<br>
+
+Faceted figures have `strip` elements that do no exist for non-faceted figures like
+
++ `strip.background`
++ `strip.placement`
++ `strip.text`
++ `panel.spacing`
+
+We learn how to modify these elements. 
+
+  ]
+
+###Preparation]
+
+.left-code[
+
+Create a dataset for this section:
+
+```{r }
+county_yield_f <- county_yield %>% 
+  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>% 
+  filter(year %in% c(2005, 2006))  
+```
+
+Create a faceted figure we will build on:
+
+```{r f-prep, echo = F}
+g_f <- ggplot(data = county_yield_f) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year, 
+    scales = "free_x"
+  )
+```
+
+]
+
+.right-plot[
+```{r f-prep-f, echo = F, out.width = "90%"}  
+g_f
+```
+]
+
+  ] 
+
+###text]
+
+.left-code[
+```{r st-text, eval = F}
+g_f +
+  theme(
+    strip.text.x = element_text( #<<
+      size = 12, #<<
+      family = "Times", #<< 
+      color = "red" #<<
+    ), #<<
+    strip.text.y = element_text( #<<
+      angle = 0, #<< 
+      size = 6, #<<
+      color = "blue" #<<
+    ) #<<
+  )
+```
+
+]
+
+.right-plot[
+```{r st-text-f, ref.label = "st-text", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+###background]
+
+.left-code[
+```{r st-background, eval = F}
+g_f +
+  theme(
+    strip.text.x = element_text(
+      size = 12, 
+      family = "Times", 
+      color = "red"
+    ),
+    strip.text.y = element_text(
+      angle = 0, 
+      size = 6, 
+      color = "blue"
+    ),
+    strip.background.x = element_rect( #<<
+      color = "blue" #<<
+    ), #<<
+    strip.background.y = element_blank() #<<
+  ) 
+```
+
+]
+
+.right-plot[
+```{r st-background-f, ref.label = "st-background", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] 
+
+###panel spacing]
+
+
+.left-code[
+```{r p-spacing, eval = F}
+g_f +
+  theme(
+    strip.text.x = element_text(
+      size = 12, 
+      family = "Times", 
+      color = "red"
+    ),
+    strip.text.y = element_text(
+      angle = 0, 
+      size = 6, 
+      color = "blue"
+    ),
+    strip.background.x = element_rect(
+      color = "blue"
+    ),
+    strip.background.y = element_blank(),
+    panel.spacing.x = unit(2, "cm"), #<<
+    panel.spacing.y = unit(0.01, "cm") #<<
+  ) 
+```
+
+]
+
+.right-plot[
+```{r p-spacing-f, ref.label = "p-spacing", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+]
+
+---
+
+
+# More flexible color options with HEX
+
+.panelset[ 
+
+###Instruction]
+
+.left-full[
+Instead of naming the color you want to use, you can use **HEX color codes** instead.
+
+<span style="color:red"> Direction: </span>
+
++ Visit [here](https://www.color-hex.com/)
++ Click on any color you like
++ Then you will see two sets of color gradients (thicker and lighter from the color you picked)
++ Pick the color you like from the color bar and copy the HEX color code beneath the color you picked
+
+You could alternatively use the RGB codes, but I do not see any reasons to do so because the use of HEX codes is sufficient. 
+
+]
+
+  ]
+
+###Example]
+
+
+.left-code[
+```{r color-hex, eval = F}
+ggplot(data = county_yield) +
+  geom_point(
+    aes(y = corn_yield, x = d3_5_9), 
+    color = "#824283" #<<
+  ) 
+```
+
+You can use HEX color codes for any color-related elements in a figure.
+
+]
+
+.right-plot[
+```{r color-hex-f, ref.label = "color-hex", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+]
+
+
+---
+
+# Color scale
+
+.panelset[ 
+ 
+###Intro 1]
+
+.left-full[
+
+The choice of color schemes for your figures are very important (not so much for academic journals ...)
+
+We use `scale_A_B()` functions to for color specification:
+
++ **A** is the name of aesthetic (`color` or `fill`)
++ **B** is the type of color specification method
+
+]
+
+   ]
+ 
+###Intro 2]
+
+.left-full[
+
+For example, consider the following code:
+
+```{r color-aes, eval = F, echo = F}
+ggplot(data = county_yield) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield))
+```
+
+```{r echo = F}
+decorate("color-aes", eval = F) %>% 
+  flair("color = corn_yield") %>%
+  knit_print.with_flair()
+```
+
+Since it is the `color` aesthetic that we want to work on, **A** = `color`.
+
+There are many options for **B**. Indeed, there are so many that, it gets confusing!
+
++ `scale_color_brewer()` (discrete)
++ `scale_color_distiller()` (continuous)
++ `scale_color_viridis_d()` (discrete)
++ `scale_color_viridis_c()` (continuous)
++ `scale_color_continuous()` (continuous)
++ `scale_color_discrete()` (discrete)
++ `scale_color_hue()` (discrete)
+
+One thing to remember is that you need to be aware of whether the aesthetic variable (here, `corn_yield`) is numeric or not as that determines acceptable type of **B**.
+
+]
+
+
+   ]
+ 
+ ]
+  
+---
+
+# Viridis
+
+.panelset[ 
+
+###Instruction]
+
+<br>
+
+We have four `scale` functions for Viridis color map:
+
++ `scale_color_viridis_c()`: for `color` aesthetic with a continuous variable
++ `scale_color_viridis_d()`: for `color` aesthetic with a discrete variable
++ `scale_fill_viridis_c()`: for `fill` aesthetic with a continuous variable
++ `scale_fill_viridis_d()`: for `fill` aesthetic with a discrete variable
+
+There are five color scheme types under the Viridis color map:
+
++ magma
++ inferno
++ plasma
++ viridis
++ civiris
+
+You can use `option` to specify which one of them you want to use inside the `scale` functions.
+
+These color schemes are color-blind sage.
+
+  ] <!-- panel ends here -->
+
+###types]
+
+```{r viridis-ex, echo = F, fig.dim = c(6, 3.5), out.width = "80%"}
+data("geyser", package = "MASS")
+
+ggplot(geyser, aes(x = duration, y = waiting)) +
+  xlim(0.5, 6) + ylim(40, 110) +
+  stat_density2d(aes(fill = ..level..), geom="polygon") +
+  theme_bw() +
+  theme(panel.grid=element_blank()) -> gg
+
+((gg + scale_fill_viridis_c(option="A") + labs(x="magma (option A)", y=NULL)) |
+(gg + scale_fill_viridis_c(option="B") + labs(x="inferno (option B)", y=NULL)))/ 
+((gg + scale_fill_viridis_c(option="C") + labs(x="plasma (option C)", y=NULL)) |
+(gg + scale_fill_viridis_c(option="D") + labs(x="viridis (default)", y=NULL)))
+
+```
+
+  ]
+
+###Example 1]
+
+
+.left-code[
+```{r viridis-ex-1, eval = F}
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9, 
+      color = corn_yield
+    )
+  ) +
+  scale_color_viridis_c() #<<
+```
+
+]
+
+.right-plot[
+```{r viridis-ex-1-f, ref.label = "viridis-ex-1", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+###Example 2]
+
+.left-code[
+```{r viridis-ex-2, eval = F}
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9, 
+      color = corn_yield
+    )
+  ) +
+  scale_color_viridis_c(option = 2) #<<
+```
+
+]
+
+.right-plot[
+```{r viridis-ex-2-f, ref.label = "viridis-ex-2", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+###reverse]
+
+.left-code[
+```{r viridis-reverse, eval = F}
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9, 
+      color = corn_yield
+    )
+  ) +
+  scale_color_viridis_c(
+    option = 2, 
+    direction = - 1 #<<
+  )
+```
+
+]
+
+.right-plot[
+```{r viridis-reverse-f, ref.label = "viridis-reverse", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+]
+
+---
+
+# RColorBrewer
+
+.panelset[ 
+
+###Instruction]
+
+.left-full[
+`RColorBrewer` package provides a number of color palettes of three types:
+
++ **sequential**: suitable for a variable that has ordinal meaning (e.g., temperature, precipitation)
++ **diverging**: suitable for variables that take both negative and positive values (e.g., changes in groundwater level)
++ **qualitative**: suitable for qualitative or categorical variable
+
+These palettes are particularly suitable for maps.
+
+<span style="color:red"> Direction: </span>visit [here](https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3). 
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+We use two types of scale functions for the palettes:
+
++ `scale_A_brewer()`: for discrete aesthetic variable
++ `scale_A_distiller()`: for continuous aesthetic variable 
+ 
+]
+
+  ]
+
+###sequential]
+
+```{r seq-s, out.width = "60%", fig.dim = c(6, 5)}
+display.brewer.all(type = "seq")  
+```
+
+  ]
+
+###diverging]
+
+```{r div-s, out.width = "60%", fig.dim = c(6, 4)}
+display.brewer.all(type = "div")  
+```
+
+  ]
+
+###qualitative]
+
+```{r qua-s, out.width = "60%", fig.dim = c(6, 4)}
+display.brewer.all(type = "qual")  
+```
+
+  ]
+
+###Example 1]
+
+
+.left-code[
+
+Generate a dataset for visualization:
+
+```{r , results = "hide"}  
+county_yield_s_b2010 <- county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+```
+
+Create a figure:
+
+```{r rb-ex-1, eval = F}
+ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield, 
+      fill = state_name
+    )
+  ) +
+  scale_fill_brewer(palette = "Set2") #<<
+```
+
+]
+
+.right-plot[
+```{r rb-ex-1-f, ref.label = "rb-ex-1", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+###Example 2]
+
+.left-code[
+
+```{r rb-ex-2, eval = F}
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9, 
+      color = corn_yield
+    )
+  ) +
+  scale_color_distiller(palette = "RdYlGn") #<<
+```
+
+]
+
+.right-plot[
+```{r rb-ex-2-f, ref.label = "rb-ex-2", echo = F, out.width = "90%"}
+
+```
+]
+
+  ] <!-- panel ends here -->
+
+]
+
+---
+
+
+# Set discrete color scale manually
+
+.panelset[ 
+
+###Instruction]
+
+.left-full[
+
+Sometimes, you just want to pick colors yourself. In that case, you can use 
+
++ `scale_color_manual()`
++ `scale_fill_manual()`
+
+Inside the `scale_*_manual()` function, you provide a named vector where a sequence of group names and their corresponding colors are specified to the `scale` function via the `values` option.
+
+For example, consider the box plot of corn yield for four states: Colorado, Kansas, Nebraska, and South Dakota. Then, a sample named vector looks like this:
+
+```{r eval = F}
+(
+cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "orange", "South Dakota" = "#ff0080")
+)
+```
+
+Now that a named vector is created, you can do the following to impose the color scheme you just defined.
+
+```{r eval = F}
+scale_fill_manual(values = cols)
+```
+
+]
+ 
+  ]
+
+###Example]
+
+.left-code[
+
+Define a named color vector:
+
+```{r }
+cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "orange", "South Dakota" = "#ff0080")
+```
+
+Create a figure:
+
+```{r manu-ex, eval = F}
+ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield, 
+      fill = state_name
+    )
+  ) +
+  scale_fill_manual(values = cols) #<<
+```
+
+]
+
+.right-plot[
+```{r manu-ex-f, ref.label = "manu-ex", echo = F, out.width = "90%"}
+
+```
+]
+
+
+  ]
+
+]
+
+---
+
+# Set continuous color scale manually
+
+.panelset[ 
+
+###Instruction]
+
+.left-full[
+
+
+.content-box-green[**How**]
+
+You can use `scale_*_gradientn()` to create your own continuous color scale. 
+
+.content-box-green[**Syntax**]
+
+```{r eval = F}
+`scale_*_gradientn(colors, values)`
+```
+    
++ `colors`: a vector of colors 
++ `values`: a vector of numeric numbers ranging from 0 to 1
++ `limits`: define the lower and upper bounds of the scale bar
+
+`n`th value of `colors` is used for the interval defined by `n`th and `n+1`th values in `values`.
+
+]
+ 
+  ]
+
+###Example]
+
+.left4[
+
+Create a figure:
+
+```{r manu-gradient, eval = F}
+ggplot(data = county_yield) + 
+  geom_point(
+    aes(
+      x = d1_5_9, 
+      y = corn_yield,
+      color = corn_yield
+    ),
+    size = 0.3
+  ) +
+  scale_color_gradientn(
+    colors = c("red", "orange", "green", "blue"),
+    values = c(0, 0.1, 0.2, 0.9, 1),
+    limits = c(100, 250)
+  ) 
+```
+
+In this example, green is dominant in the color bar because the interval [0.2, 0.9] is for `"green"` in `colors`, where the interval represents [`r 100 + (250-100)*0.2`, `r 100 + (250-100)*0.9`] 
+([100 + (250-100)\times 0.2, 100 + (250-100)\times 0.9]).
+
+]
+
+.right6[
+```{r manu-gradient-f, ref.label = "manu-gradient", echo = F, out.width = "90%"}
+
+```
+]
+
+  ]
+
+]
+

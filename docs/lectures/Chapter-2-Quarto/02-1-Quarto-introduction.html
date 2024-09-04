@@ -10,7 +10,7 @@
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.56">
 
-  <title>Data Science with R (AECN 896-05) – 02-1: Using Quarto to Create Documents</title>
+  <title>Data Science with R (AECN 896-05) – 02-1: Introduction to Quarto</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -385,7 +385,8 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="02-1: Using Quarto to Create Documents – Data Science with R (AECN 896-05)">
+<meta property="og:title" content="02-1: Introduction to Quarto – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Chapter 2: Quarto">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 <body class="quarto-light">
@@ -393,7 +394,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">02-1: Using Quarto to Create Documents</h1>
+  <h1 class="title">02-1: Introduction to Quarto</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -503,7 +504,7 @@
 <p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p>Alternatively, you can use the <code>render()</code> function to knit like below:</p>
+<p>Alternatively, you can use the <code>render()</code> function to render like below:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">render</span>(<span class="st">"sample_qmd.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -565,7 +566,7 @@
 <p><strong>Direction</strong></p>
 </div>
 <div class="callout-content">
-<p>Compare the chapter called “Markdown basics” of the qmd file and its corresponding output in the knitted html file</p>
+<p>Compare the chapter called “Markdown basics” of the qmd file and its corresponding output in the rendered html file</p>
 </div>
 </div>
 </div>
@@ -573,8 +574,8 @@
 </div>
 <div id="tabset-2-6">
 <ul>
-<li><p>When you knit an qmd file and create a report, R creates an R session/environment that is completely <span style="color: blue;"> independent </span> of whatever R sessions or environments you may have on your RStudio.</p></li>
-<li><p>This means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session.</p></li>
+<li><p>When you render an qmd file and create a report, R creates an R session/environment that is completely <span style="color: blue;"> independent </span> of whatever R sessions or environments you may have on your RStudio.</p></li>
+<li><p>This means that when you render an qmd file, you cannot refer to R objects you have defined on your current R session.</p></li>
 </ul>
 </div>
 </div>
@@ -795,7 +796,7 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>execute:</span>
 <span id="cb7-2"><a></a>  echo: false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li>Knit the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.</li>
+<li>Render the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.</li>
 </ul>
 </div>
 </div>
@@ -829,8 +830,8 @@
 <div class="tab-content">
 <div id="tabset-6-1">
 <ul>
-<li><p>In the course of creating a document using Rmarkdown, You are going to hit the “Knit” button numerous times when you are writing a report to check whether the final output looks fine.</p></li>
-<li><p>Every time you knit, all the R code chunks are evaluated, which is inefficient because R has evaluated those R code chunks before.</p></li>
+<li><p>In the course of creating a document using Quarto, You are going to hit the “Render” button numerous times when you are writing a report to check whether the final output looks fine.</p></li>
+<li><p>Every time you render, all the R code chunks are evaluated, which is inefficient because R has evaluated those R code chunks before.</p></li>
 <li><p>So, if we can somehow store the results of R code chunks (caching), and then let R call up the saved results instead of re-evaluating the codes all over again, we can save lots of time.</p></li>
 <li><p>The benefit of doing so is greater when the processing time of the codes is longer. Caching can be done by adding <code>cache==TRUE</code> as a chunk option.</p></li>
 <li><p>By adding the option, once an R chunk is processed, its results are saved and can be reused again by R later when you compile the document again.</p></li>
@@ -846,8 +847,8 @@
 <div class="callout-content">
 <ul>
 <li>Change <code>eval: false</code> to <code>eval: true</code> in the <strong>cache_1</strong> chunk</li>
-<li>Knit and confirm that <strong>sample_qmd_cache</strong> and <strong>sample_qmd_files</strong> folders are created</li>
-<li>Knit again and observe that the knitting process is much faster now</li>
+<li>Render and confirm that <strong>sample_qmd_cache</strong> and <strong>sample_qmd_files</strong> folders are created</li>
+<li>Render again and observe that the rendering process is much faster now</li>
 </ul>
 </div>
 </div>
@@ -863,7 +864,7 @@
 <p><strong>Direction</strong></p>
 </div>
 <div class="callout-content">
-<p>Change <code>y = 1 + x + v</code> to <code>y = 1 + 2 * x +v</code> in the <strong>cache_1</strong> chunk and knit</p>
+<p>Change <code>y = 1 + x + v</code> to <code>y = 1 + 2 * x +v</code> in the <strong>cache_1</strong> chunk and render</p>
 </div>
 </div>
 </div>
@@ -883,8 +884,8 @@
 </div>
 <div class="callout-content">
 <ul>
-<li>Change <code>eval: false</code> to <code>eval: true</code> in the <code>cache_2</code> chunk and knit</li>
-<li>Change <code>y = 1 + 2 * x + v</code> back to <code>y = 1 + x +v</code> and knit (notice that the printed number from <code>cache_2</code> did not change)</li>
+<li>Change <code>eval: false</code> to <code>eval: true</code> in the <code>cache_2</code> chunk and render</li>
+<li>Change <code>y = 1 + 2 * x + v</code> back to <code>y = 1 + x +v</code> and render (notice that the printed number from <code>cache_2</code> did not change)</li>
 </ul>
 </div>
 </div>
@@ -904,7 +905,7 @@
 <p><strong>Direction</strong></p>
 </div>
 <div class="callout-content">
-<p>Add <code>dependson: cache_1</code> to the <code>cache_2</code> chunk as an option and knit again.</p>
+<p>Add <code>dependson: cache_1</code> to the <code>cache_2</code> chunk as an option and render again.</p>
 </div>
 </div>
 </div>
@@ -970,7 +971,7 @@
 <ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Various formats</a></li><li><a href="#tabset-8-2">How</a></li><li><a href="#tabset-8-3">Note</a></li></ul>
 <div class="tab-content">
 <div id="tabset-8-1">
-<p>You can knit an qmd file to various formats using various engines (visit <a href="https://quarto.org/docs/output-formats/all-formats.html">here</a> to see all the document types).</p>
+<p>You can render an qmd file to various formats using various engines (visit <a href="https://quarto.org/docs/output-formats/all-formats.html">here</a> to see all the document types).</p>
 <p><img data-src="document-options.png"></p>
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -1023,7 +1024,7 @@
 </div>
 <p><br></p>
 <p><strong>Step 2</strong></p>
-<p>You should see a downward triangle right to the “Render” button. Pick one format to knit to a document of the format.</p>
+<p>You should see a downward triangle right to the “Render” button. Pick one format to render to a document of the format.</p>
 </div>
 <div id="tabset-8-3">
 <p>YAML and chunk options available are different based on the output format and engine. Visit <a href="https://quarto.org/docs/reference/formats/html.html">here</a> to see the options specific to particular formats.</p>

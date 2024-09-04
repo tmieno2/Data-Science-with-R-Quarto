@@ -1,5 +1,6 @@
 ---
-title: "02-1: Using Quarto to Create Documents"
+title: "02-1: Introduction to Quarto"
+abstract: "Chapter 2: Quarto"
 format:
   revealjs: 
     theme: [default, ../custom.scss]
@@ -14,9 +15,9 @@ filters:
 
 ```{r}
 #| include: false 
-library(ggplot2) 
-library(dplyr) 
-library(here) 
+library(ggplot2)
+library(dplyr)
+library(here)
 ```
 
 ## Quarto: Introduction
@@ -101,7 +102,7 @@ The process of compiling an qmd file to produce a document is called **rendering
 + The easiest way to render is to hit the **Render** button located at the top of the code pane (upper left pane by default)
 
 :::{.callout-note}
-Alternatively, you can use the `render()` function to knit like below:
+Alternatively, you can use the `render()` function to render like below:
 
 ```{r eval = F}
 render("sample_qmd.qmd")
@@ -155,15 +156,15 @@ See lines 41-51 of the qmd file
 + citation
 
 :::{.callout-note title="Direction"}
-Compare the chapter called "Markdown basics" of the qmd file and its corresponding output in the knitted html file
+Compare the chapter called "Markdown basics" of the qmd file and its corresponding output in the rendered html file
 :::
 
 
 ### Caveat
 
-+ When you knit an qmd file and create a report, R creates an R session/environment that is completely <span style = "color: blue;"> independent </span> of whatever R sessions or environments you may have on your RStudio. 
++ When you render an qmd file and create a report, R creates an R session/environment that is completely <span style = "color: blue;"> independent </span> of whatever R sessions or environments you may have on your RStudio. 
 
-+ This means that when you knit an qmd file, you cannot refer to R objects you have defined on your current R session.
++ This means that when you render an qmd file, you cannot refer to R objects you have defined on your current R session.
 :::
 <!--end of panel-->
 
@@ -359,7 +360,7 @@ execute:
   echo: false
 ````
 
-+ Knit the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.
++ Render the qmd file again and then compare lines 35-39 of the qmd file and its corresponding output.
 :::
 
 #### Note
@@ -380,9 +381,9 @@ Local option always overrides the global option.
 
 ### What?
 
-+ In the course of creating a document using Rmarkdown, You are going to hit the "Knit" button numerous times when you are writing a report to check whether the final output looks fine. 
++ In the course of creating a document using Quarto, You are going to hit the "Render" button numerous times when you are writing a report to check whether the final output looks fine. 
 
-+ Every time you knit, all the R code chunks are evaluated, which is inefficient because R has evaluated those R code chunks before.
++ Every time you render, all the R code chunks are evaluated, which is inefficient because R has evaluated those R code chunks before.
 
 + So, if we can somehow store the results of R code chunks (caching), and then let R call up the saved results instead of re-evaluating the codes all over again, we can save lots of time.
 
@@ -394,8 +395,8 @@ Local option always overrides the global option.
 
 :::{.callout-note title=Direction}
 + Change `eval: false` to `eval: true` in the **cache_1** chunk
-+ Knit and confirm that **sample_qmd_cache** and **sample_qmd_files** folders are created
-+ Knit again and observe that the knitting process is much faster now
++ Render and confirm that **sample_qmd_cache** and **sample_qmd_files** folders are created
++ Render again and observe that the rendering process is much faster now
 :::
 
 ### Changes in codes
@@ -404,7 +405,7 @@ When any part of the R codes within a cached R code chunk is changed, R is smart
 
 
 :::{.callout-note title=Direction}
-Change `y = 1 + x + v` to `y = 1 + 2 * x +v` in the **cache_1** chunk and knit
+Change `y = 1 + x + v` to `y = 1 + 2 * x +v` in the **cache_1** chunk and render
 :::
 
 ### Changes in contents
@@ -416,8 +417,8 @@ Change `y = 1 + x + v` to `y = 1 + 2 * x +v` in the **cache_1** chunk and knit
 <br>
 
 :::{.callout-note title="Direction"}
-+ Change `eval: false` to `eval: true` in the `cache_2` chunk and knit
-+ Change `y = 1 + 2 * x + v` back to `y = 1 + x +v` and knit (notice that the printed number from `cache_2` did not change)
++ Change `eval: false` to `eval: true` in the `cache_2` chunk and render
++ Change `y = 1 + 2 * x + v` back to `y = 1 + x +v` and render (notice that the printed number from `cache_2` did not change)
 :::
 
 
@@ -428,7 +429,7 @@ Change `y = 1 + x + v` to `y = 1 + 2 * x +v` in the **cache_1** chunk and knit
 + You can use the `dependson` option to make R recognize any changes in cached R objects 
 
 :::{.callout-note title=Direction}
-Add `dependson: cache_1` to the `cache_2` chunk as an option and knit again.
+Add `dependson: cache_1` to the `cache_2` chunk as an option and render again.
 :::
 
 :::
@@ -500,7 +501,7 @@ knir::opts_knit$set(root.dir = "~/Dropbox/TeachingUNL/Data-Science-with-R/Chapte
 
 ### Various formats
 
-You can knit an qmd file to various formats using various engines (visit [here](https://quarto.org/docs/output-formats/all-formats.html) to see all the document types).
+You can render an qmd file to various formats using various engines (visit [here](https://quarto.org/docs/output-formats/all-formats.html) to see all the document types).
 
 ![](document-options)
 
@@ -547,7 +548,7 @@ Add the docx option and typst options in the YAML above to your qmd file.
 
 **Step 2**
 
-You should see a downward triangle right to the "Render" button. Pick one format to knit to a document of the format.
+You should see a downward triangle right to the "Render" button. Pick one format to render to a document of the format.
 
 ### Note
 
