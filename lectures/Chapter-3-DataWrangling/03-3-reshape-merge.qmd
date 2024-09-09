@@ -1,0 +1,1046 @@
+---
+title: "03-3: Reshaping and Merging"
+abstract: "Chapter 3: Data Wrangling"
+format:
+  revealjs:
+    theme: [default, ../custom.scss]
+    fontsize: 1.4em
+    callout-icon: false
+    scrollable: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'nycflights13', 'tidyr']
+  cell-options:
+    editor-font-scale: 0.8
+    out-width: 100%
+execute:
+  echo: true
+filters:
+  - webr
+---
+
+# Reshaping
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Long and wide formats
+
+::: {.panel-tabset}
+
+### long vs wide
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Long format** 
+
+A single column representing a single variable 
+
+```{webr-r}
+#| context: output
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+    )
+  ) %>%
+  as_tibble()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**Wide format** 
+
+Multiple column representing a single variable 
+
+```{webr-r}
+#| context: output
+(
+  yield_data_wide <-
+    tidyr::pivot_wider(yield_data_long, names_from = year, values_from = yield)
+)
+```
+
+Note: there is nothing in the dataset that tells you what the data values represent in the wide format.
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### wide or long?
+
+Suppose you are interested in estimating the following statistical model:
+
+$$corn yield = \beta_0 + \beta_1 R_{May}  + \beta_2 R_{June} + \beta_2 R_{July} + \beta_2 R_{August} + \beta_2 R_{September} + v$$
+
+where $R$ refers to rainfall.
+
+Then the following dataset is in a <span style="color:red"> long </span> format:
+
+```{webr-r}
+#| context: output
+data.frame(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  ) %>% 
+  .[rep(1:nrow(.), each = 5), ] %>% 
+  mutate(
+    month = rep(c("May", "June", "July", "August", "September"), 8),
+    rainfall = 20*runif(40)
+  ) %>% 
+  tidyr::pivot_wider(names_from  = month, values_from = rainfall, names_prefix = "R_")
+```
+
+### too long
+
+This is <span style = "color: red;"> too long </span> for your analysis. 
+
+```{webr-r}
+#| context: output
+data.frame(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  ) %>% 
+  .[rep(1:nrow(.), each = 5), ] %>% 
+  mutate(
+    month = rep(c("May", "June", "July", "August", "September"), 8),
+    rainfall = 20*runif(40)
+  ) %>% 
+  head(15)
+```
+
+<br>
+
+:::{.callout-note title="Point"}
+Whether a dataset is wide or long is determined based on what you are doing with the dataset.
+:::
+
+:::
+<!--end of panel-->
+
+## Long to wide 
+
+::: {.panel-tabset}
+### prepare
+
+Create the following dataset in long format:
+
+```{webr-r}
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  )
+)
+```
+
+### how and example
+
+::: {.columns}
+
+::: {.column width="40%"}
+**How** 
+
+To convert a long-formatted `data.frame` into a wide-formatted `data.frame`, you can use `tidyr::pivot_wider()` function from the `tidyr` package.
+
+```{r eval = F}
+#| echo: true
+#--- NOT RUN ---#
+tidyr::pivot_wider(
+  data,
+  names_from = variable 1,
+  values_from = variable 2
+)
+```
+
++ the value of `variable 1` becomes the name the new variables
++ the value of `variable 2` becomes the value of the new variables
+:::
+<!--end of the 1st column-->
+::: {.column width="60%"}
+**Example**
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_wide <- 
+  tidyr::pivot_wider(
+    yield_data_long, 
+    names_from = year, 
+    values_from = yield
+  )
+)
+```
+
++ the value of `year` becomes the name the new variables
++ the value of `yield` becomes the value of the new variables
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### prefix
+
+You can append a character string to the new variable names. The previous example had `2019` and `2010` as the name of the new variables.
+
+```{webr-r}
+yield_data_long %>%
+  tidyr::pivot_wider(
+    #--- let R know what the prefix is ---#
+    names_prefix = "yield_",
+    names_from = "year",
+    values_from = "yield"
+  )
+```
+
+### multiple columns
+
+::: {.panel-tabset}
+
+
+
+#### Prepare a dataset
+
+Create the following data in long format;
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  )
+)
+```
+
+#### demonstration
+
+You can simply supply multiple variables to be made wide like this:
+
+```{webr-r}
+#| autorun: true
+yield_data_long %>%  
+  tidyr::pivot_wider(
+    names_from = "year",
+    values_from = c("yield", "rainfall")
+  )  
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Wide to long
+
+::: {.panel-tabset}
+
+### how and example
+
+::: {.columns}
+
+::: {.column width="40%"}
+**How** 
+
+To convert a long-formatted `data.frame` into a wide-formatted `data.frame`, you can use `tidyr::pivot_longer()` function from the `tidyr` package.
+
+```{r eval = F}
+#| echo: true
+#--- NOT RUN ---#
+tidyr::pivot_longer(
+  data, 
+  cols = x,
+  names_to = y, 
+  values_to = z 
+)
+```
+
++ `x`: list of the name of the columns to pivot into longer format
++ `y`: what the name of `x` represents
++ `z`: what the values stored in `x` represents
+:::
+<!--end of the 1st column-->
+::: {.column width="60%"}
+**Example**
+
+```{webr-r}
+yield_data_wide %>% 
+  tidyr::pivot_longer(
+    - state, 
+    names_to = "year", 
+    values_to = "yield"
+  )
+```
+
++ `x`: all the variables except `state`
++ `y`: "year"
++ `z`: "yield"
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### prefix
+
+You do not want `year_` in front of the year numbers in the new `year` variable? You can use the `names_prefix` option as follows:
+
+```{webr-r}
+yield_data_wide %>%  
+  tidyr::pivot_longer(
+    - state,
+    #--- let R know what the prefix is ---#
+    names_prefix = "yield_",
+    names_to = "year",
+    values_to = "yield"
+  )
+```
+
+Notice `year` is character. Convert it to numeric using `as.numeric()` if you use is as a numeric variable.
+
+### multiple sets of columns
+
+::: {.panel-tabset}
+
+#### Prep
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Long**
+
+Create the following dataset in the long format;
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  )
+)
+```
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**Wide**
+
+Convert the long dataset into the wide format: 
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_wide <- 
+  yield_data_long %>% 
+  tidyr::pivot_wider(
+    names_from = year, 
+    values_from = c(yield, rainfall)
+  )
+)
+```
+
+.red[Objective]: We would like to convert the wide data back to the original long data.
+:::
+<!--end of the 2nd column-->
+
+:::
+<!--end of the columns-->
+
+#### one-step?
+
+You cannot revert this data back to the original long-formatted data in one step. 
+
+```{webr-r}
+yield_data_wide %>% 
+  tidyr::pivot_longer(
+    - state,
+    names_to = "year",
+    values_to = "yield"
+  )
+```
+
+#### separate()
+
+However, you take advantage of `dplyr::separate()` function, which separate a variable of type character by a user-specified separator into two variables in the dataset.
+
+```{r eval = F}
+#--- NOT RUN ---#
+separate(data, variable name, the name of variables, separator)
+```
+
+::: {.columns}
+
+::: {.column width="50%"}
+Before separation: 
+
+```{webr-r}
+#| autorun: true
+yield_data_wide %>% 
+  #--- select only state and yield variables ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) 
+```
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+After separation: 
+
+```{webr-r}
+#| autorun: true
+yield_data_wide %>% 
+  #--- select only state and yield variables ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) %>% separate(type_year, c("type", "year"), sep = "_") #<<
+```
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### three-step
+
+After separating `type_year` to `type` and `year`, all you have to do is to apply `tidyr::pivot_wider()` to have the desired long-formatted data.
+
+```{webr-r}
+yield_data_wide %>% 
+  #--- select only state and yield variables ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) %>% 
+  separate(type_year, c("type", "year"), sep = "_") %>% 
+  tidyr::pivot_wider(
+    names_from = "type",
+    values_from = "value"
+  )
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Exercises 
+
+::: {.panel-tabset}
+
+### Data
+
+We will use `flights` data from the `nycflights13` package.
+
+<br>
+
+```{webr-r}
+#| autorun: true
+flights
+```
+
+### Exercise 1
+
+Using `flights` data, calculate the total number of flights by carrier-month, which is in the long format. Name the resulting object `num_flights`.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+num_flights <-
+  flights %>% 
+  group_by(carrier, month) %>% 
+  summarize(num_obs = n()) 
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+(
+num_flights <- 
+  flights %>% 
+  group_by(carrier, month) %>% 
+  summarize(num_obs = n())
+)
+```
+
+### Exercise 2
+
+Reshape the data (`num_flights`) into a wide format so that you have number of flights per month in columns and assign it to an R object named `num_flights_wide`.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+num_flights %>% 
+  tidyr::pivot_wider(
+    names_from = month,
+    names_prefix = "month_",
+    values_from = num_obs
+  ) 
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+(
+num_flights %>% 
+  tidyr::pivot_wider(
+    names_from = month,
+    names_prefix = "month_",
+    values_from = num_obs
+  ) 
+)
+```
+
+### Exercise 3
+
+Reshape the data (`num_flights_wide`) back into the long format so that a single columns has all the flight number values 
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+num_flights_wide %>% 
+  tidyr::pivot_longer(
+    starts_with("month_"),
+    names_to = "month",
+    names_prefix = "month_",
+    values_to = "num_flights"
+  )
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+num_flights_wide %>%
+  tidyr::pivot_longer(
+    starts_with("month_"),
+    names_to = "month",
+    names_prefix = "month_",
+    values_to = "num_flights"
+  ) 
+```
+
+:::
+<!--end of panel-->
+
+# Merging multiple datasets
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+```{webr-r}
+#| context: setup
+N <- 2
+T <- 2
+
+set.seed(582374)
+
+price_data <- data.frame(
+  price = runif(N * T, min = 2, max = 6),
+  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  year = c(2015, 2016, 2015, 2016)
+  )
+
+yield_data <- data.frame(
+  yield = runif(N * T, min = 180, max = 280),
+  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  year = c(2015, 2015, 2016, 2016)
+  )
+```
+
+## Merging multiple datasets
+
+::: {.panel-tabset}
+
+### Motivation
+
+It is very common that you have data stored in separate files, and you need to combine them before you conduct any statistical analysis. 
+
+For example, if you are interested in how crop price affects the supply of crops, you want to have price and production data in a single dataset. However, it may be that price and production data are stored in two separate files.
+
+### Match? 1
+
+Now suppose, you have collected price and production data for Lancaster and Douglas County from 2015 to 2016. 
+
+Here is what the datasets look like (these are made-up numbers).
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(price_data, price)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(yield_data, yield)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+:::{.callout-note title="Question"}
+Can you merge the two?
+:::
+
+### Match? 2
+
+Let's display one more variable from each of the datasets.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}  
+#| context: output
+select(price_data, price, county)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}  
+#| context: output
+select(yield_data, yield, county)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+Okay, great. At least we know which price and prod belong to which county! In other words, we know which price and prod belong to **who** (or **where**). 
+
+<br>
+
+:::{.callout-note title="Question"}
+Can you merge the two?
+:::
+
+### Match? 3
+
+Let's display one more variable from each of the datasets.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(price_data, price, county, year)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(yield_data, yield, county, year)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+:::{.callout-note title="Question"}
+Can you merge the two now?
+:::
+
+<br>
+
+:::{.callout-important title="Key"}
++ The variables that let you merge two datasets are called <span style="color:blue"> keys</span>.
++ What are the keys here?
+:::
+
+### How
+
++ You can use the `left_join()` function from the `dplyr` package to merge two datasets.
+
++ There are different types of join functions:
+  * `right_join()` (you never need to use this one)
+  * `inner_join()`
+  * `full_join()`
+  * `semi_join()`
+  * `nest_join()`
+
++ But, most of the time, `left_join()` is sufficient. 
+
++ Try to learn other functions when you encounter a case where `left_join()` is not sufficient. Do not waster your time until then.
+
+:::
+<!--end of panel-->
+
+## Joining datasets with `dplyr::left_join()`
+
+::: {.panel-tabset}
+### `left_join()`
+
+**Syntax**
+
+```{r eval = F}
+#--- Syntax (NOT RUN) ---#
+left_join(data_x, data_y, by = keys)  
+```
+
+<br>
+
+**Rules to be aware of**
+
++ .blue[Rule 1]: It returns all rows from `data_x`, and all columns from `data_x` and `data_y`
++ .blue[Rule 2]: Rows in `data_x` with no match in `data_y` will have NA values in the new columns 
++ .blue[Rule 3]: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned
+
+:::{.callout-note title="Note"}
+The order of datasets matter.
+:::
+
+
+
+### demonstration: 1 to 1
+
+::: {.panel-tabset}
+
+#### Data prep
+
+We use `price_data` and `yield_data` for demonstrations.
+
+```{webr-r}
+#| context: setup
+N <- 2
+T <- 2
+
+set.seed(582374)
+
+price_data <- data.frame(
+  price = runif(N * T, min = 2, max = 6),
+  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  year = c(2015, 2016, 2015, 2016)
+  )
+
+yield_data <- data.frame(
+  yield = runif(N * T, min = 180, max = 280),
+  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  year = c(2015, 2015, 2016, 2016)
+  )
+```
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+price_data
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+yield_data
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+:::{.callout-note title="Question"}
+What are the keys?
+:::
+
+#### Demo 1
+
+The keys are `county` and `year`, so
+
+```{webr-r}
+left_join(yield_data, price_data, by = c("county", "year"))  
+```
+
+<br>
+
+Switching the two?
+
+```{webr-r}
+left_join(price_data, yield_data, by = c("county", "year"))  
+```
+
+<br>
+
+:::{.callout-note}
+In this instance, .red[which comes first does not matter] because all the individual rows in `yield_data` (left data) have exactly one match in `price_data` (right data) without fail, and vice versa.
+:::
+
+#### Data prep 2
+
+Let's expand the `yield_data` as follows:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data <- 
+  data.frame(
+    yield = runif(6, min = 180, max = 280),
+    county = c("Lancaster", "Douglas", "Chase", "Lancaster", "Douglas", "Chase"),
+    year = c(2015, 2015, 2015, 2016, 2016, 2016)
+  )
+)
+```
+
+#### Demo 2
+
+**`yield_data` on the right**:
+
+```{webr-r}
+left_join(price_data, yield_data, by = c("county", "year"))  
+```
+
+<br>
+
+**`yield_data` on the left**:
+
+```{webr-r}
+left_join(yield_data, price_data, by = c("county", "year"))  
+```
+
+<br>
+
+:::{.callout-note title="Remember?"}
++ **Rule 1**: `left_join()` returns all rows from `data_x`, and all columns from `data_x` and `data_y`
++ **Rule 2**: Rows in `data_x` with no match in `data_y` will have NA values in the new columns 
+:::
+
+#### keeping all rows
+
+We saw in the previous slide having `price_data` (as `data_x`) and `yield_data` as (`data_y`), `left_join()` discarded rows in `yield_data` (`data_y`).
+
+If you would like to keep unmatched rows in `data_y`, you can use `full_join()`.
+
+```{webr-r}
+#| echo: true
+full_join(price_data, yield_data, by = c("county", "year"))  
+```
+
+:::
+<!--end of panel-->
+
+### demonstration: 1 to m
+
+::: {.panel-tabset}
+
+#### Data prep
+
+Let's create a weather dataset where you have more than one observations per county-year:
+
+```{webr-r}
+#| autorun: true
+( 
+weather_data <- 
+  data.frame(
+    rainfall = 20 * runif(12),
+    county = rep(c("Lancaster", "Douglas", "Chase"), each = 4),
+    year = rep(c(2015, 2016), each = 2) %>% rep(3),
+    month = rep(c(4, 5), 6)
+  ) 
+)
+```
+
+#### Demo
+
+```{webr-r}
+#| autorun: true
+left_join(yield_data, weather_data, by = c("county", "year"))
+```
+
+:::{.callout-note title="Remember?"}
+**Rule 3**: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned.
+:::
+
+:::
+<!--end of panel-->
+
+### Exercises
+
+::: {.panel-tabset}
+
+#### Preparation
+
+Create the following datasets and take a look at them to understand what's in them:
+
+<br>
+
+**Flights in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  flights_Jan <- 
+    flights %>% 
+    filter(month == 1) %>% 
+    select(month, day, dep_delay, origin)
+)
+```
+
+**daily temperature in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  daily_temp_Jan <- 
+    weather %>% 
+    filter(month == 1) %>% 
+    group_by(origin, month, day) %>% 
+    summarize(temp = mean(temp))
+)
+```
+
+**hourly temperature in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  hourly_temp_Jan <- 
+    weather %>% 
+    filter(month == 1) %>% 
+    select(origin, month, day, hour, temp) 
+)
+```
+
+#### Exercise 1
+
++ You are interested in learning the impact of **daily** temperature on departure delay for the flights in January. To do so, you need to have the variables in a single dataset.  
+
++ Is this going to be a 1-to-1 matching or 1-to-m matching?
+
++ Merge `daily_temp_Jan` to `flights_Jan` using `left_join()`
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+left_join(flights_Jan, daily_temp_Jan, by = c("origin", "month", "day"))
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+left_join(flights_Jan, daily_temp_Jan, by = c("origin", "month", "day"))
+```
+
+#### Exercise 2
+
++ You are interested in learning the impact of **hourly** temperature on departure delay for the flights in January. To do so, you need to have them in a single dataset.  
+
++ Is this going to be a 1-to-1 matching or 1-to-m matching?
+
++ Merge `hourly_temp_Jan` to `flights_Jan` using `left_join()`
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"))
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"))
+``` 
+
+
+:::
+<!--end of panel-->
+
+
+
+:::
+<!--end of panel-->
+
+
+
+
+
