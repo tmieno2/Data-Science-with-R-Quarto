@@ -2,7 +2,8 @@
 title: "04-3: Data visualization with `ggplot2`: Fine Tuning"
 abstract: "Chapter 4: Data Visualization"
 format: 
-  revealjs: 
+  revealjs:
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
     theme: [default, ../custom.scss]
     fontsize: 1.4em
     callout-icon: false
@@ -810,7 +811,7 @@ g_l +
 :::
 <!--end of panel-->
 
-## Pre-made themes
+## Pre-made and customized themes
 
 ::: {.panel-tabset}
 
@@ -941,6 +942,77 @@ g_axis +
 ```
 
 See [here](http://sape.inf.usi.ch/quick-reference/ggplot2/linetype) for the line types available.
+
+:::
+<!--end of panel-->
+
+### Custom theme
+
+::: {.panel-tabset}
+
+#### Introduction
+
+You can create your own theme, save it, and then use it later. 
+
+Here, I am creating my own theme off of `theme_economist()`, where axis titles and major panel grids are absent.
+
+```{webr-r}
+#| autorun: true
+my_theme <- 
+  theme_economist() +
+  theme(
+    axis.title = element_blank(),
+    panel.grid.major = element_blank()  
+  )
+```
+
+You can add `my_theme` like below just like a regular pre-made theme:
+
+```{r}
+#| eval: false
+ggplot(data = weather) +
+  geom_boxplot(
+    aes(y = temp, x = factor(month))
+  ) +
+  my_theme
+```
+
+#### Compare
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+ggplot(data = weather) +
+  geom_boxplot(aes(y = temp, x = factor(month))) +
+  theme_economist()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+ggplot(data = weather) +
+  geom_boxplot(aes(y = temp, x = factor(month))) +
+  my_theme
+```
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `theme_set()`
+
+If you would like to apply your theme to all the figures you generate, then use `theme_set()` like below:
+
+```{r eval = F}
+theme_set(my_theme)
+```
+
+After this, all of your figures will follow  `my_theme`.
+
 
 :::
 <!--end of panel-->
