@@ -1,0 +1,515 @@
+---
+title: "06-1: How to write R codes, manage Projects, work with RStudio"
+abstract: "Chapter 6: Misc"
+format: 
+  revealjs:
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss]
+    fontsize: 1.4em
+    callout-icon: false
+    scrollable: true
+    echo: true
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Learning objectives
+
++ Learn how to organize your project: folder, codes, data files, etc
++ Learn how to organize R codes
++ Learn how to use various RStudio tips for efficient programming
+
+# Reproducibility
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Reproducibility
+
+::: {.panel-tabset}
+
+### What is it?
+
+First of all, you may have heard of “reproducibility” and “replicability.” While they sometimes are used interchangeably, they mean different things. Here are commonly used definitions of the two terms (Cacioppo et al. 2015).
+
+<br>
+
+:::{.callout-note title="Definition: Reproducibility"}
+A research study is **reproducible** if anybody (including the author of the study) can generate exactly the same results by using the same materials (e.g., data) and procedures used in the study.
+:::
+
+<br>
+
+:::{.callout-note title="Definition: Replicability"}
+A research study is **replicable** if other teams reach the same conclusion by applying the same procedure to the different materials (e.g., data).
+:::
+
+
+This lecture focuses only on reproducibility and do not deal with replicability.
+
+### How
+
+:::{.callout-note title="Minimum Requirement"}
+Every single action taken during the entire research process is documented in a way that anybody can follow to implement the same actions (no hidden actions) to produce exactly the same results.
+:::
+
+<br>
+
+Note that this does not necessarily mean every single action needs to be computer-programmed and automated. Even if you manually delete rows of data on Excel (highly discouraged), this does not make your research non-reproducible as long as this action is recorded and the original data (before deletion of the rows) are provided because anybody can implement this action.
+
+### High v.s. low quality
+
+Your project is reproducible if the minimum requirement is satisfied, but is of low-quality if it is too costly/time-consuming to reproduce. A high-quality reproducible project exhibits the following characteristics:
+
+<br>
+
+**Organized Project Folder**:
+
+It maintains a well-structured and organized project folder, making it easy to locate files your are looking for.
+
+<br>
+
+**Streamlined Automation**:
+
+Workflows are automated with well-annotated computer programs, simplifying the replication process and providing clarity in the workflow.
+
+<br>
+
+**Comprehensive Documentation**:
+
+Robust documentation, encompassing data and reproduction guidance, ensures transparency, saving time on data interpretation and replication instructions.
+
+### Why high-quality reproducible research
+
+The main beneficiaries of reproducible research include:
+
++ You (Y)
++ Members of your team (M)
++ The scientific community (S)
+
+<br>
+
+Here are the benefits of high-quality reproducible research with their beneficiaries:
+
++ Scientific Integrity and Error Prevention (S)
++ Educational Value (MS)
++ Repeatability (YM)
++ Transferability (YM)
++ Reducing Errors (YM)
+
+### Check list
+
++ [ ] The project has organized folder system and all the files (code, manuscript, journal articles in pdf) are placed where they should be
++ [ ] Data is clearly documented
++ [ ] All the actions (data processing, analysis, figure and table creation) are computer-programmed without any manual procedures (e.g., deleting rows of a CSV file on Microsoft Excel)
++ [ ] The computer programs are well annotated and organized
++ [ ] An instruction to reproduce (what computer programs to run in what order) is provided
++ [ ] There are no unnecessary files in the project folder
+
+:::
+<!--end of panel-->
+
+# How to organize your project
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## How to organize your project
+
+::: {.panel-tabset}
+### Motivation
+
+* confusions between objects of the same or similar name (accidentally using the one you do not intend to use)
+
+* wasting memory by holding objects on the global environment that are completely irrelevant to your working project
+
+### RStudio project 
+
+We can initiate an RStudio project with a dedicated folder from within RStudio.
+
+::: {.panel-tabset}
+
+### Step 1
+
+::: {.columns}
+
+::: {.column width="30%"}
+At the top right corner of RStudio, navigate through:
+
+<br>
+
+**Project (None)** 
+
+-> **New Project...** 
+
+-> **New Directory** 
+
+-> **New Project**
+
+:::
+<!--end of the 1st column-->
+::: {.column width="70%"}
+![](RStudio-project.png)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Step 2
+
+::: {.columns}
+
+::: {.column width="30%"}
++ type in a directory name
++ select the directory in which the project folder (directory) is going to be created
++ hit the *create folder* button
+:::
+<!--end of the 1st column-->
+::: {.column width="70%"}
+![](New-Project.png)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Step 3
+
+::: {.columns}
+
+::: {.column width="30%"}
+You will be automatically taken to a new R session inside the newly-created RStudio project.
+
+In this folder you just created, you have a single file named **<directory-name>.Rproj** (here, it is **test.Rproj**). It holds information about this project, but you do not have to touch it.  
+
+:::
+<!--end of the 1st column-->
+::: {.column width="70%"}
+![](RStudio-project-initial.png)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### Folder organization
+
+Here is a recommended folder organization. You should modify/add folders as you see fit. 
+
+::: {.columns}
+
+::: {.column width="60%"}
++ **Code**: all the codes go in here
+  * **DataPrep**: 
+  * **Analysis**: 
++ **Data**
+  * **Raw**: place the raw datasets here
+  * **Processed**: save the intermediate datasets here 
++ **Literature**: journal articles and other relevant documents
++ **Results**: results (regression, figures, tables)
++ **Writing**: qmd, WORD, Latex files 
+:::
+<!--end of the 1st column-->
+::: {.column width="40%"}
+![](folder-structure.png)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+:::
+<!--end of panel--> 
+
+## Files
+
+::: {.panel-tabset}
+
+### Quarto (.qmd) or R (.R)?
+
+:::{.callout-note title="Recommendation"}
+Use a **qmd** file instead of an **R** file whenever you write codes
+:::
+
++ It is much easier to make comments in a qmd file than an R file
++ You can better organize your codes with markdown section headers (e.g., #, ##)
++ R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Use `Run All Chunks Above` button (click on the triangle right to the `Run` button and select the option, or hit `option` + `command` + `P`).  
+
++ Easily move between sections and subsection using the navigator at the bottom lower corner of the source pane
+
+![](MoveBetweenChunks.png){width="60%"}
+
+### Inside a qmd file
+
+::: {.columns}
+
+::: {.column width="50%"}
+:::{.callout-note title="Recommended Stucture"}
++ Objective statement
+  * state objectives
+  * input: state input files and datasets
+  * output: state output files and datasets
++ Setup
+  * set the working directory (if necessary)
+  * load packages
+  * load functions
++ Actions
+  * Action 1
+  * Action 2
+  * .
+  * .
+  * .
+  * Action n
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+![](inside-qmd.png)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::{.callout-note}
+Dynamically edit the "Objective statement" as its objectives, input, and output are likely to change.
+:::
+
+### R code style 
+
+::: {.panel-tabset}
+
+#### R code readability
+
+You can write R codes however you would like. But, your code may get more readable to you and others who might read your codes by following a style guideline that is accepted by many R users. There are several popular styles of formatting R codes:
+
++ [tidyverse style](https://style.tidyverse.org/)
++ [Google's R Style Guide](http://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html) 
+
+**Examples**
+
+Here are some examples of the `tidyverse` style:
+
++ [how to name objects](https://style.tidyverse.org/syntax.html#object-names)
++ [spacing](https://style.tidyverse.org/syntax.html#spacing)
++ [long lines](https://style.tidyverse.org/syntax.html#long-lines)
++ [piping](https://style.tidyverse.org/pipes.html#introduction)
+
+#### `styler` package
+
+The `styler` package can help you follow partially the `tidyverse` coding style. 
+
+Once the package is installed, you can highlight the lines of codes and hit `cmd` + `shift` + `A` for Mac (`ctrl` + `shift` + `A` for Windows) to reformat the codes to conform with the tidyverse style.
+
+Alternatively, you can click on `Addins` in the middle of the menu at the top, and select `style selection`.
+
+:::
+<!--end of panel-->
+
+### File placement
+
+:::{.callout-note title="Rules 1"}
++ place all the raw datasets (nothing else) in a designated folder inside the **Data/Raw** folder
++ do not ever override them, you only read them and keep them intact
+:::
+
+:::{.callout-note title="Rules 2"}
++ write R codes to process (transform, merge, etc) the raw data and save all the R codes inside the **Code/DataPrep** folder 
++ save intermediate R objects or datasets in the **Data/Processed** folder
++ do not mix codes and datasets in a single folder 
+:::
+  
+:::{.callout-note title="Rules 3"}
++ write R codes to do analysis and save them in **Code/Analysis**
++ save the results/outputs (regression tables, figures, tables) in the **Results** folder
+:::
+
+:::{.callout-note title="Rules 4"}
++ if you are using qmd to write a journal article or report, put them in the Writing folder (same goes for WORD)
++ refer to figures and tables in the **Results** folder to integrate them in the output document
+:::
+
+
+### File names
+
+:::{.callout-note title="Recommendation"}
++ Name files so that you know what purposes they serve for you later
++ Place numbers as prefix to indicate the order in which they should be run
+:::
+
+:::{.callout-note title="Example"}
++ Data Collection and Preparation (in **Code/DataPrep**)
+  * 01-1-download-weather-data.R
+  * 01-2-download-political-boundary-data.R
+  * 01-3-summarize-data.R
+  * 01-4-merge-data.R
++ Data Analysis and Results Preparation (in **Code/Analysis**)
+  * 02-1-regression-analysis.R
+  * 02-2-gen-figures-tables.R
+:::
+
+:::
+<!--end of panel-->
+
+
+# RStudio tips 
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Code snippets
+
+::: {.panel-tabset}
+
+### What is it?
+
+Code snippets are functions that maps sequence of letters and symbols (short) to other sequence of letters and symbols (more complicated and long)
+
+<br>
+
+**Syntax**
+
+```default
+snippet (combination of letters to invoke)
+  (what you want to print) 
+```
+
+:::{.callout-note title="Important"}
+You need a tab before **(what you want to print)**
+:::
+
+### Examples
+
+::: {.panel-tabset}
+
+#### piping operator
+
+<br>
+
+```default
+snippet pi
+  %>% 
+```
+
+<br>
+
+Once you add this, you can type "pi" and hit `tab` (and hit `enter` if there are other competing shortcuts) to have `%>%` printed.
+
+#### assignment operator
+
+<br>
+
+````markdown
+snippet as
+  <- 
+````
+
+<br>
+
+Once you add this, you can type "as" and hit `tab` (and hit `enter` if there are other competing shortcuts) to have `<-` printed.
+:::
+<!--end of panel-->
+
+### How to add snippets
+
+Follow <span style = "color: blue;"> Tools </span> $\rightarrow$ <span style = "color: blue;">Global Options  </span> $\rightarrow$ <span style = "color: blue;"> Code </span> $\rightarrow$ <span style = "color: blue;"> Edit Snippets</span> , select R tab, and add snippets.
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ Place the following
+````markdown
+snippet as
+  <-
+````
++ type “as” and hit tab inside an R code chunk
+:::
+
+### Context-specificity
+
+::: {.panel-tabset}
+
+#### What is it?
+
+Suppose you are working on an Quarto document.
+
++ You are in the R context if your cursor is in an R code chunk
++ You are in the Markdown context if your cursor is outside of an R code chunk
+
+Snippets defined in the R (Markdown) tab only works in the R (Markdown) context.
+
+#### Example
+
+This snippet will let you create an R code chunk with typing "rmc". Place it in the Markdown tab of the snippets list and hit **shift**+**tab** to invoke it.
+
+````markdown
+snippet rmc
+  `r ''````{r }
+  ```
+````
+
+Confirm that this snippet does not work in the R environment.
+
+:::
+<!--end of panel-->
+
+### Variables
+
+````markdown
+snippet rmc
+  `r ''````{r ${1:chunk_title}}
+    ${2:chunk_content}
+  ```
+````
+
+`$` is used as a special character to denote where the cursor should jump (by hitting `tab`) after completing each section of a snippet. 
+
+### More examples 
+
+**ggplot (scatter plot)**
+
+````default
+snippet gl
+  ggplot(data = ${1:dataset}) +
+  geom_line(aes(y = ${2:y}, x = ${3:x}))
+````
+
+<br>
+
+**ggplot (density plot)**
+
+````default
+snippet gd
+  ggplot(data = ${1:dataset}) +
+  geom_density(aes(x = ${2:x}))
+````
+
+:::
+<!--end of panel-->
+
+
+
+
+## Resources 
+
++ [Efficient R Programming](https://csgillespie.github.io/efficientR/)
++ [tidyverse style guide](https://style.tidyverse.org/)
++ [`styler` github page](https://github.com/r-lib/styler)
