@@ -910,7 +910,10 @@ Find the mean value of `arr_delay` in April and May (combined) and define it as 
 ### Answer
 ```{r, eval = FALSE}
 #| code-fold: true
-
+flights_mini %>%
+  filter(month %in% c(4, 5)) %>%
+  mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  relocate(avg_arr_delay)
 ```
 
 :::
@@ -918,7 +921,7 @@ Find the mean value of `arr_delay` in April and May (combined) and define it as 
 
 ##### Exercise 2
 
-Find the sum of `dep_delay` in January, February, and December (combined) and define it as a new variable named `sum_arr_delay`, and then move the variable to the first column of the dataset.
+Find the sum of `dep_delay` in January, February, and December (combined) and define it as a new variable named `sum_dep_delay`, and then move the variable to the first column of the dataset.
 
 <br>
 
@@ -932,7 +935,10 @@ Find the sum of `dep_delay` in January, February, and December (combined) and de
 ### Answer
 ```{r, eval = FALSE}
 #| code-fold: true
-
+flights %>%
+  dplyr::filter(month %in% c(1, 2, 12)) %>%
+  dplyr::mutate(sum_dep_delay = sum(dep_delay, na.rm = TRUE)) %>%
+  dplyr::relocate(sum_dep_delay)
 ```
 
 :::
@@ -1146,11 +1152,25 @@ flights_new
 
 #### Exercise 1
 
-Find the carrier that had the longest average departure delay (`dep_delay`) during May through August. Below is the output you will see if you get it right.
+Using `flights`, find the carrier that had the longest average departure delay (`dep_delay`) during May through August. 
+
+::: {.panel-tabset}
+
+### Work here
 
 ```{webr-r}
 
 ```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+
+```
+
+:::
+<!--end of panel-->
+
 
 #### Instruction
 
@@ -1170,10 +1190,19 @@ weather
 
 #### Exercise 2
 
-Find the daily mean temperature (temp), humidity (humid), wind speed (wind_speed), and precipitation (precip) by the origin of departure. Do not forget to name each daily weather variable. Below is the output you will see if you get it right.
+Find the daily mean temperature (temp), humidity (humid), wind speed (wind_speed), and precipitation (precip) by the origin of departure. Do not forget to name each daily weather variable.
+
+::: {.panel-tabset}
+
+##### Work here
 
 ```{webr-r}
-#| context: output
+
+```
+
+##### Answer
+```{r, eval = FALSE}
+#| code-fold: true
 (
 daily_weather <- 
   weather %>%
@@ -1184,49 +1213,34 @@ daily_weather <-
     wind_speed = mean(wind_speed),
     precip = mean(precip)
   )
-)
+) 
 ```
+:::
+<!--end of panel-->
 
-<br>
-
-**Answer**
-```{r, eval = FALSE}
-#| code-fold: true
-daily_weather <- 
-  weather %>%
-  dplyr::group_by(origin, month, day) %>%
-  dplyr::summarize(
-    temp = mean(temp),
-    humid = mean(humid),
-    wind_speed = mean(wind_speed),
-    precip = mean(precip)
-  )
-```
 
 #### Exercise 3
 
-Subset the daily weather data you obtained in exercise 2 so that it contains weather information only in Nov, Dec, Jan, and Feb for flights that depart from “EWR”. Below is the output you will see if you get it right.
+Subset the daily weather data you obtained in exercise 2 so that it contains weather information only in Nov, Dec, Jan, and Feb for flights that depart from “EWR”.
+
+::: {.panel-tabset}
+
+##### Work here
 
 ```{webr-r}
-#| context: output
-(
-daily_weather %>%
-  dplyr::filter(month %in% c(11, 12, 1, 2)) %>%
-  dplyr::filter(origin == "EWR")
-)
+
 ```
 
-<br>
+##### Answer
 
-**Answer**
 ```{r, eval = FALSE}
 #| code-fold: true
-(
 daily_weather %>%
   dplyr::filter(month %in% c(11, 12, 1, 2)) %>%
   dplyr::filter(origin == "EWR")
-)
 ```
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
