@@ -1,0 +1,821 @@
+---
+title: "07-1: Miscellaneous Useful Functions and Tips"
+abstract: "Chapter 7: Date and String"
+format: 
+  revealjs:
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss]
+    fontsize: 1.4em
+    callout-icon: false
+    scrollable: true
+    echo: true
+webr:
+  packages: ['dplyr', 'stringr', 'lubridate', 'gt']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+    # dpi: 144
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+```{r}
+#| include: false 
+library(stringr) 
+library(dplyr)
+library(ggplot2) 
+library(gt)
+```
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Data Preparation
+
+We use the `pizzaplace` dataset is available in the `gt` package.
+
+```{webr-r}
+#| autorun: true
+data(pizzaplace, package = "gt")
+pizzaplace
+```
+
+# Date
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+## `Date`
+
+::: {.panel-tabset}
+
+### Motivation
+
+R has an object class called `Date`.
+
+This is a date as `character`.
+
+```{webr-r}
+a_date <- "2024-09-12"
+class(a_date)
+```
+
+<br>
+
+This is a date as `Date`.
+
+```{webr-r}
+#--- date as Date ---#
+a_date_as_Date <- as.Date(a_date)
+class(a_date_as_Date)
+```
+
+<br>
+
+Recording dates as an `Date` object instead of a string has several benefits:
+
++ calendar math is possible with `Date` objects
++ you can `filter()` based on the chronological order of dates
++ converting date into an another format is easy
+
+### `as.Date()`
+
+Dates (as string) come in various formats. Several of them are:
+
++ `2010-12-15`
++ `12/15/2010`
++ `Dec 15 10`
++ `15 December 2010`
+
+They all represent the same date. 
+
+We can use `as.Date()` to transform dates stored as characters into `Date`s. 
+
+```{r eval = F}
+#--- NOT RUN ---#  
+as.Date(date in character, format)
+```
+
+<br>
+
+In `format` you specify how day, month, and year are represented in the date characters you intend to convert using special symbols including:
+
++ **%d**: day as a number (0-31)
++ **%m**: month (00, 01, 02, $\dots$, 12)
++ **%b**: abbreviated month (Jan, $\dots$, Dec)
++ **%B**: unabbreviated month (January, $\dots$, December)
++ **%y**: 2-digit year (96 for 1996, 02 for 2002)
++ **%Y**: 4-digit year (1996, 2012)
+
+**Example**
+
+```{webr-r}
+#--- convert from a character to a Date ---#
+(
+a_date <- as.Date("Dec 15 10", format = "%b %d %y")
+)
+
+#--- check the class ---#
+class(a_date)
+```
+
+### `lubridate`
+
+Alternatively, you can use the `lubridate` package to easily convert dates recorded in characters into `Date`s.
+
+Using `lubridate`, you do not need to provide the format information unlike `as.Date()`
+
+Instead, you simply use `y` (year), `m` (month), `d` (day) in the order they appear in the dates in character.
+
+<br>
+
+**Example**
+
+```{webr-r}
+ymd("2010-12-15")
+mdy("12/15/2010")
+mdy("Dec 15 10")
+dmy("15 December 2010") 
+```
+
+### format for presentation
+  
+It is often the case that date values are not formatted in the way you want (e.g., when you are creating figures). 
+
+While you can use string manipulation functions to reformat dates (which we learn next in this lecture), it is easier to just use the `format()` function.
+
+<br>
+
+```{r eval = F}
+#--- NOT RUN ---#  
+format(Date, format)
+```
+
+<br>
+
+You can use the same rule for the `format` argument as the one we saw earlier when using `as.Date()`.
+
+<br>
+
+**Example**
+
+```{webr-r}
+pizzaplace %>% 
+  #--- convert to Date ---#
+  mutate(date = ymd(date)) %>% 
+  #--- format ---#
+  mutate(date_txt_f1 = format(date, "%m/%d/%y")) %>% 
+  mutate(date_txt_f2 = format(date, "%m %B %Y")) %>% 
+  select(date_txt_f1, date_txt_f2)
+```
+
+### components
+
+::: {.columns}
+
+::: {.column width="40%"}
+You can extract components (year, month, day) from a `Date` object using various helper functions offered by `lubridate`. 
+
++ `year()`: year
++ `month()`: month
++ `mday()`: day of month 
++ `yday()`: day of year
++ `wday()`: day of week
+:::
+<!--end of the 1st column-->
+::: {.column width="60%"}
+**Examples**
+
+```{webr-r}
+#| autorun: true
+pizzaplace %>% 
+  mutate(date = ymd(date)) %>%
+  distinct(date) %>% 
+  filter(month(date) >= 8) %>% 
+  mutate(
+    year = year(date),
+    month = month(date),
+    mday = mday(date),
+    yday = yday(date),
+    wday = wday(date)
+  ) %>% 
+  select(year, month, mday, yday, wday)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+### math
+
+Unlike dates in character, you can do some math on `Date` objects.
+
+::: {.panel-tabset}
+
+#### addition and subtraction
+
+You can use `years()`, `months()`, `days()` from the `lubridate` package to add specified years, months, and days, respectively.
+
+<br>
+
+```{webr-r}
+ymd("2015-05-01") + years(3)
+ymd("2015-05-01") - months(3)
+ymd("2015-05-01") + days(1)
+```
+
+#### sequence of dates
+
+You can use `seq()` to create a sequence of dates, where the incremental step is defined by the `by` option.
+
+<br>
+
+```{webr-r}
+seq(ymd("2015-05-01"), ymd("2020-05-01"), by = "years")
+
+seq(ymd("2015-05-01"), ymd("2015-06-01"), by = "weeks")
+
+seq(ymd("2015-05-01"), ymd("2015-05-09"), by = "days")
+```
+
+#### filter (logical evaluation)
+
+<br>
+
+```{webr-r}
+pizzaplace %>% 
+  #--- convert to Date ---#
+  mutate(date = ymd(date)) %>%  
+  filter(date >= as.Date("2015-05-01"))
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+# Strings manipulation
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+## String manipulation 
+
+::: {.panel-tabset}
+
+### Introduction
+::: {.columns}
+
+::: {.column width="50%"}
+**Package**
+
+For string (character) manipulation, we use the `stringr` package, which is part of the `tidyverse` package. So, you have installed it already.
+
+`stringr` is loaded automatically when you load `tidyverse`. So, just load `tidyverse`.
+
+```{r eval = F}
+library(tidyverse)  
+```
+
+<br>
+
+**Resources**
+
++ [stringr cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf)
++ [stringr packagedown website](https://stringr.tidyverse.org/index.html)
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**Functions**
+
+Here are the select functions we learn in this lecture:
+
++ join and split
+  * `stringr::str_c()`
+  * `stringr::str_split()` (`tidyr::separate()`)
++ mutate strings
+  * `stringr::str_replace()`
++ detect matches
+  * `stringr::str_detect()`
++ manage lengths
+  * `stringr::str_trim()`
+  * `stringr::str_pad()`
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+### Concatenate
+
+`stringr::str_c()` lets you concatenate a vector of strings. It is basically the same as `paste()`.
+
+::: {.panel-tabset}
+
+#### join 1
+
+**concatenate**
+
+```{webr-r}
+stringr::str_c("R", "rocks")
+```
+
+<br>
+
+**order matters**
+
+```{webr-r}
+stringr::str_c("rocks", "R")
+```
+
+<br>
+
+**separator**
+
+```{webr-r}
+stringr::str_c("R", "rocks", sep = "+")
+```
+
+<br>
+
+**more than two strings**
+
+
+```{webr-r}
+stringr::str_c("R ", "rocks", ", right", "?", sep = "")
+```
+
+#### join 2
+
+**a string and a vector of strings**
+
+```{webr-r}
+verbs <- c("sucks", "rocks", "is just okay")
+
+stringr::str_c("R", verbs, sep = "+")
+```
+
++ Each of the vector elements (`verbs`) are concatenated with a string (`"R"`)
++ The separator (`"+"`) applied to all the vector elements
+
+<br>
+
+**collapsing a vector of strings to a single string**
+
+```{webr-r}
+stringr::str_c("R", verbs, sep = "+", collapse = "%")
+```
+
++ The `collapse` option collapse all the vector elements into a single string with the collapse separator (here, `%`) placed between the individual vector elements
++ `sep = "+"` is applied when concatenating a vector of strings and a string, and `collapse = "%"` is applied when concatenating the resulting vector of strings. 
+
+#### join 3
+
+**two vectors of equal length**
+
+```{webr-r}
+software_types <- c("R", "Python", "SAS")
+
+stringr::str_c(software_types, verbs, sep = " ")
+```
+
++ `n`th element of a vector (`software_types`) is met with `n` the element of the other vector (`verbs`).
+
+<br>
+
+**two vectors of different lengths**
+
+```{webr-r}
+software_types <- c("R", "Python", "SAS", "STATA", "Matlab")
+
+stringr::str_c(software_types, verbs, sep = " ")
+```
+
++ `n`th element of a vector (`software_types`) is met with `n` the element of the other vector (`verbs`) with `verbs` recycled for the elements in `software_type` that are missing positional matches.
+
+<br>
+
+**all combinations**
+
+```{webr-r}
+software_types <- c("R", "Python", "SAS", "STATA", "Matlab")
+
+stringr::str_c(software_types, rep(verbs, 5), sep = " ")
+```
+
++ take advantage of the recycling feature to create all possible combinations of values
+
+#### use cases
+
+::: {.panel-tabset}
+
+##### Concatenating string variables in a dataset
+
+Sometimes, you want to concatenate two (or more) string variables into one variable. 
+
+For example, suppose you would like to combine pizza `size` and `type` into a single variable to make it easier to create faceted figures by `size`-`type`.
+
+```{webr-r}
+pizzaplace <- mutate(pizzaplace, type_size = stringr::str_c(type, size, sep = "-"))
+
+pizzaplace 
+```
+
+##### Reading files
+
+You can use `stringr::str_c()` to create a vector of file names that have a common pattern. 
+
+For example suppose you have files that are named following this convention: "corn_yield_X.csv", where X represents year. 
+
+You have such csv files starting from 2000 to 2020. Then,
+
+```{r }
+file_names <- stringr::str_c("corn_yield_", 2000:2020, ".csv")  
+```
+
+```{r }
+head(file_names) 
+```
+
+Now, you can easily read each of them iteratively using a loop.
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+### Split
+
+`stringr::str_split()` splits a string based on a pattern you provide:
+
+<br>
+
+```{webr-r}
+stringr::str_split(pizzaplace$type_size, "-") %>% head()
+```
+
+<br>
+
+But, if you are splitting a variable into two variables, `tidyr::separate()` is a better option.
+
+<br>
+
+```{webr-r}
+pizzaplace %>% 
+  tidyr::separate(type_size, c("type_2", "size_2"), "-") %>% 
+  dplyr::select(id, type, type_2, size, size_2)
+```
+
+### Replace 
+
+::: {.panel-tabset}
+
+#### Introduction
+
+**How**
+
+You can use `stringr::str_replace()` to replace parts of the texts matched with the user-specified texts.
+
+<br>
+
+```{r eval = F}
+#--- Syntax ---#
+stringr::str_replace(string, pattern, replacement)
+```
+
+<br>
+
+**Example**
+
+```{webr-r}
+strings_vec <- c("I think R rocks, but some think it does not rock", "Python also rocks, but Julia does not rock")  
+
+stringr::str_replace(strings_vec, "rock", "rock big time")
+```
+
+<br>
+
+Note that the only the first occurrence of "rock" in each of the string vector element was replaced with "rock big time." 
+
+You need to use `stringr::str_replace_all()` to replace all the occurrences. 
+
+```{webr-r}
+stringr::str_replace_all(strings_vec, "rock", "rock big time") 
+```
+
+#### Use case
+
+Suppose you would like to have a particular format of date in a figure you are trying to create using `pizzaplace`: e.g., 07/08/20 (month, day, year without the first 2 digits).
+
+Pretend that `date_text` is the variable that indicates date and it looks like this:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+pizzaplace_for_plot <- 
+  mutate(pizzaplace, date_text = ymd(date) %>% 
+  format("%m/%d/%Y")) 
+
+pizzaplace_for_plot$date_text %>% head()
+```
+
+<br>
+
+So, you would like to replace "20" with "" (nothing).
+
+<br>
+
+```{webr-r}
+pizzaplace_for_plot %>% 
+  mutate(date_text = stringr::str_replace(date_text, "20", "")) %>% 
+  select(id, date_text, size, type)
+```
+
+<br>
+
+Now you can create a figure with the dates in the desired format. From `pizzaplace`, you could have just done this:
+
+<br>
+
+```{webr-r}
+pizzaplace %>% 
+  mutate(
+    date = ymd(date),
+    date = format(date, "%m/%d/%y")
+  ) %>% 
+  .$date %>% head()
+```
+
+:::
+<!--end of panel-->
+
+### Detect 
+
+::: {.panel-tabset}
+
+:::
+<!--end of panel-->
+
+#### Introduction
+
+You can use `stringr::str_detect()` to check if a user-specified texts are part of strings.
+
+It takes a vector of strings and a text pattern, and then return a vector of TRUE/FALSE.
+
+<br>
+
+**Example**
+
+```{webr-r}
+fruit <- c("apple", "banana", "pear", "pineapple")
+
+stringr::str_detect(fruit, "apple")   
+``` 
+
+#### use cases
+
+::: {.panel-tabset}
+
+#### get the list of file names 
+
+First clone [this repository](https://github.com/tmieno2/quarto-examples). 
+
+Inside **data/data-for-loop-demo**, there are two sets of files in a single folder: `corn_experiment_x.rds` and `soy_experiment_y.rds`, where both `x` and `y` range from 1 to 30.
+
+You want to read only the soy files. 
+
+First, let's get the name of the whole list of files in the working directory:
+
+```{r}
+all_files <- 
+  list.files(
+    "supplementary-material/data/data-for-loop-demo",
+    full.names = TRUE
+  )
+
+head(all_files)
+tail(all_files) 
+```
+
+Now use `stringr::str_detect()` to find which elements of `all_files` include "soy."
+
+```{r }
+is_soy <- stringr::str_detect(all_files, "soy")  
+```
+
+Okay so, here is the list of all the "soy" files:
+
+```{r }
+all_files[is_soy]
+```
+
+Now, you can loop to read all the files.
+
+```{r}
+(
+soy_data <- 
+  lapply(all_files, \(x) readRDS(x)) %>%
+  bind_rows()
+)
+```
+
+#### Define a group from a variable 
+
+Consider the following dataset of plant genes.
+
+```{r }
+gene_data <- expand.grid(
+  id = c("Zm_1", "Zm_2"), 
+  gene = c("20_WW_BL_TP1", "20_WW_BL_TP", "20_WW_ML_TP1", "20_WW_ML_TP", "20_WW_TL_TP1", "20_WW_TL_TP3")
+) 
+```
+
+```{r echo = F}
+gene_data 
+```
+
+There are three different types of genes: those that have `_BL_`,`_ML_`, and `_TL_`. The objective here is to make a variable that indicates gene group from the `gene` variable.
+
+```{r }
+gene_data %>% 
+  mutate(gene_group = case_when(
+    stringr::str_detect(gene, "_BL_") ~ "BL",
+    stringr::str_detect(gene, "_ML_") ~ "ML",
+    stringr::str_detect(gene, "_TL_") ~ "TL"
+  ))
+```
+
+:::
+<!--end of panel-->
+
+### letter case 
+
+Here are the collection of functions that let you change the letter case of strings.
+
+**To upper case**
+
+```{webr-r}
+pizzaplace %>% 
+  mutate(name = stringr::str_to_upper(name))
+```
+
+<br>
+
+**To lower case**
+
+```{webr-r}
+pizzaplace %>% 
+  mutate(size = stringr::str_to_lower(size))
+```
+
+<br>
+
+**Only the first letter is capitalized**
+
+```{webr-r}
+pizzaplace %>%  
+  mutate(type = stringr::str_to_title(type)) 
+```
+
+### padding
+
+You can pad strings with symbols of your choice so the resulting string are of the length you specify.
+
+```{r eval = F}
+#--- NOT RUN ---#
+stringr::str_pad(strings, string length, side, padding symbol)
+```
+
+<br>
+
+**Examples**
+
+```{webr-r}
+stringr::str_pad("I am sick of R", 20, side = "left", pad = "?") 
+```
+
+<br>
+
+```{webr-r}
+stringr::str_pad("I am sick of R", 30, side = "both", pad = "?") 
+```
+
+<br>
+
+```{webr-r}
+stringr::str_pad("I am sick of R", 20, side = "right", pad = "-") 
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Exercises 
+
+::: {.panel-tabset}
+
+### Data preparation
+
+We will work with the following data:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+(
+  date_data <-
+    tibble(
+      date = seq(ymd("2012-04-01"), ymd("2012-09-30"), by = "days")
+    ) %>%
+    mutate(
+      year = year(date),
+      month = month(date),
+      day = mday(date),
+      day_of_year = yday(date)
+    ) %>%
+    select(-date)
+)
+```
+
+### Exercise 1
+
+Use `stringr::str_c()` to combine, `year`, `month`, and `day` using "-" as the separator and convert the combined text to Date using `lubridate`.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r, eval = FALSE}
+#| code-fold: true
+date_data %>%
+  mutate(date_as_str = str_c(year, month, day, sep = "-")) %>%
+  mutate(date_as_Date = ymd(date_as_str)) %>%
+  select(date_as_Date)
+```
+
+
+:::
+<!--end of panel-->
+### Exercise 2
+
+Using `Date` math to recover the dates from `year` and `day_of_year`.
+
+<br>
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+date_data %>%
+  mutate(first_day_of_year = ymd(str_c(year, "01-01"))) %>%
+  mutate(date = first_day_of_year + day_of_year - 1)
+```
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+

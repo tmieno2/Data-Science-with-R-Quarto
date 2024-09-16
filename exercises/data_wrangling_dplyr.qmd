@@ -1,0 +1,427 @@
+---
+title: "Ex-1-1: Data Wrangling"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'datasets']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+# Filter
+
+## Exercise 1
+
+**Objective:** Filter the `mtcars` dataset for cars that have an automatic transmission (`am == 1`) and weigh more than 3,000 lbs (`wt > 3`).
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+data(mtcars)
+```
+
+### Answer
+```{webr-r}
+(
+filtered_mtcars <- 
+  mtcars %>%
+  filter(am == 1 & wt > 3)
+)
+```
+:::
+<!--end of panel-->
+
+
+## Exercise 2
+
+**Objective:** Filter the `iris` dataset for flowers of the species `setosa` where the sepal length (`Sepal.Length`) exceeds 5 cm.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+data(iris)
+
+```
+
+### Answer
+```{webr-r}
+( 
+filtered_iris <- 
+  iris %>%
+  filter(Species == "setosa" & Sepal.Length > 5)
+)
+```
+:::
+
+
+## Exercise 3
+
+**Objective:** Filter the dataset for diamonds with a `cut` of "Premium" and a `carat` size between 1 and 2.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(diamonds)
+
+```
+
+### Answer
+
+```{webr-r}
+(
+filtered_diamonds <- 
+  diamonds %>%
+  filter(cut == "Premium" & carat >= 1 & carat <= 2)
+)
+```
+:::
+
+
+## Exercise 4:
+
+**Objective:** Filter the data for days in June (`Month == 6`) where the ozone level (`Ozone`) exceeded 100 (ignoring NA values).
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(airquality)
+```
+
+### Answer
+
+```{webr-r}
+(
+filtered_airquality <- 
+  airquality %>%
+  filter(Month == 6 & Ozone > 100, !is.na(Ozone))
+)
+```
+:::
+
+## Exercise 5: 
+
+**Objective:** Filter for records of chicks (`Chick`) number 1 to 5 (inclusive) and for times (`Time`) less than or equal to 10 days.
+
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(ChickWeight)
+```
+
+### Answer
+
+```{webr-r}
+(
+filtered_chickweight <-
+  ChickWeight %>%
+  filter(Chick %in% c(1:5) & Time <= 10)
+)
+```
+:::
+
+
+# Mutate
+
+## Exercise 1
+
+**Objective:** Add a column named `efficiency` that calculates miles-per-gallon (`mpg`) divided by the number of cylinders (`cyl`).
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+data(mtcars)
+```
+
+### Answer
+
+```{webr-r}
+(
+mutated_mtcars <- 
+  mtcars %>%
+  mutate(efficiency = mpg/cyl)
+)
+```
+:::
+
+## Exercise 2
+
+**Objective:** Create a new column named `area` which multiplies sepal length (`Sepal.Length`) by sepal width (`Sepal.Width`).
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(iris)
+```
+
+### Answer
+
+```{webr-r}
+(
+mutated_iris <- 
+  iris %>%
+  mutate(area = Sepal.Length * Sepal.Width)
+)
+```
+:::
+
+
+## Exercise 3
+
+**Objective:** Calculate the price per carat and name the new column `price_per_carat`.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(diamonds)
+```
+
+### Answer
+
+```{webr-r}
+(
+mutated_diamonds <- 
+  diamonds %>%
+  mutate(price_per_carat = price/carat)
+)
+```
+:::
+
+## Exercise 4
+
+**Objective:** Convert the temperature from Fahrenheit (`Temp`) to Celsius and name the new column `TempC`. The formula is `C = (F - 32) * 5/9`.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(airquality)
+```
+
+### Answer
+
+```{webr-r}
+(
+mutated_airquality <- 
+  airquality %>%
+  mutate(TempC = (Temp - 32) * 5/9)
+)
+```
+:::
+
+
+# Group summary
+
+## Exercise 1
+
+**Objective:** Group by the number of cylinders (`cyl`) and compute the average miles-per-gallon (`mpg`) for each group.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(mtcars)
+```
+
+### Answer
+
+```{webr-r}
+(
+mtcars_grouped1 <- 
+  mtcars %>%
+  group_by(cyl) %>%
+  summarize(avg_mpg = mean(mpg))
+)
+```
+:::
+
+## Exercise 2
+
+**Objective:** Group by flower species (`Species`) and calculate the average sepal length (`Sepal.Length`) and sepal width (`Sepal.Width`) for each species.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+data(iris)
+```
+
+### Answer
+
+```{webr-r}
+(
+iris_grouped <- 
+  iris %>%
+  group_by(Species) %>%
+  summarize(
+    avg_sepal_length = mean(Sepal.Length),
+    avg_sepal_width = mean(Sepal.Width)
+  )
+)
+```
+:::
+
+## Exercise 3
+
+**Objective:** Group by `cut` and `color` and compute the median price for each combination.
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(diamonds)
+```
+
+### Answer
+
+```{webr-r}
+(
+diamonds_grouped <- 
+  diamonds %>%
+  group_by(cut, color) %>%
+  summarize(median_price = median(price))
+)
+```
+:::
+
+## Exercise 4
+
+**Objective:** Group by month (`Month`) and compute the maximum temperature (`Temp`) and average ozone level (`Ozone`, omitting `NA` values) for each month.
+
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(airquality)
+```
+
+### Answer
+
+```{webr-r}
+(
+airquality_grouped <- 
+  airquality %>%
+  group_by(Month) %>%
+  summarize(
+    max_temp = max(Temp),
+    avg_ozone = mean(Ozone, na.rm = TRUE)
+  )
+)
+```
+:::
+
+## Exercise 5
+
+**Objective:** Group by diet (`Diet`) and chick number (`Chick`). For each combination, compute the final weight (i.e., weight at the maximum time).
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(ChickWeight)
+```
+
+### Answer
+
+```{webr-r}
+(
+chickweight_grouped <- 
+  ChickWeight %>%
+  group_by(Diet, Chick) %>%
+  summarize(final_weight = weight[which.max(Time)])
+)
+```
+:::
+
+# Use all
+
+## Exercise 1: Calculate Average MPG by Cylinder
+
+**Task:** Filter the dataset to cars with more than 100 horsepower. Then, for these cars, calculate the average miles per gallon (`mpg`) for each number of cylinders (`cyl`).
+
+**Functions to use:** `filter()`, `mutate()`, `group_by()`, `summarize()`
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(mtcars)
+```
+
+### Answer
+
+```{webr-r}
+mtcars %>%
+  filter(hp > 100) %>%
+  group_by(cyl) %>%
+  summarize(avg_mpg = mean(mpg))
+```
+
+:::
+
+## Exercise 2: Adjusted Price Calculation
+
+**Task:** Filter diamonds that are "Ideal" in `cut` and have `carat` less than 1. Calculate an adjusted price which is 90% of the original `price`. Finally, calculate the average adjusted price for each clarity level.
+
+**Functions to use:** `filter()`, `mutate()`, `group_by()`, `summarize()`
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(diamonds)
+```
+
+### Answer
+
+```{webr-r}
+diamonds %>%
+  filter(cut == "Ideal", carat < 1) %>%
+  mutate(adjusted_price = price * 0.9) %>%
+  group_by(clarity) %>%
+  summarize(avg_adjusted_price = mean(adjusted_price))
+```
+:::
+
+## Exercise 3: Compute Average Dispersion by Gear
+
+**Task:** Filter cars with 4 or 6 cylinders. Create a new column named `disp_per_cyl` that calculates the dispersion (`disp`) per cylinder (`cyl`). Then compute the average `disp_per_cyl` for each gear (`gear`) level.
+
+**Functions to use:** `filter()`, `mutate()`, `group_by()`, `summarize()`
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+data(mtcars)
+```
+
+### Answer
+
+```{webr-r}
+mtcars %>%
+  filter(cyl %in% c(4, 6)) %>%
+  mutate(disp_per_cyl = disp / cyl) %>%
+  group_by(gear) %>%
+  summarize(avg_disp_per_cyl = mean(disp_per_cyl))
+```
+:::
