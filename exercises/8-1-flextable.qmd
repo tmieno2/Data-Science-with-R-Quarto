@@ -27,10 +27,11 @@ library(flextable)
 
 1.  Load the `mtcars` dataset into R.
 2.  Use the `flextable` package to create a table that displays the first 10 rows of the dataset for `mpg`, `cyl`, `disp`, and `hp`.
-3.  Apply styles to the table
-    1. make the texts in the header bold using `bold()`
-    2. make the texts of the `cyl` column center-aligned using ``
-    3. make the texts of the `hp` column colored red using ``
+3.  Apply styles to the table to make
+    1. the texts in the header bold using `bold()`
+    2. the texts of the `cyl` column center-aligned including the `cyl` in the header using `align()`
+    3. the texts of the `hp` column colored red using `color()`
+    4. the font size of the texts of the `mpg` 18 if the value of `disp` is greater than 200 using `fontsize()`.
 
 Here is the finished table you are trying to make:
 
@@ -42,9 +43,10 @@ ft <-
     mtcars[1:10, ],
     col_keys = c("mpg", "cyl", "disp", "hp")
   ) %>%
-  # Apply simple formatting
-  theme_box() %>%
-  bold(part = "header")
+  bold(part = "header") %>%
+  align(j = 2, align = "center", part = "all") %>%
+  color(j = 4, color = "red") %>%
+  fontsize(i = ~ disp > 200, j = 1, size = 18)
 ) 
 ```
 
@@ -64,10 +66,13 @@ data(mtcars)
 #| code-fold: true
 # Create a simple flextable
 ft <- 
-  flextable(mtcars) %>%
-  # Apply simple formatting
-  theme_box() %>%
-  bold(part = "header")
+  flextable(
+    mtcars[1:10, ],
+    col_keys = c("mpg", "cyl", "disp", "hp")
+  ) %>%
+  bold(part = "header") %>%
+  align(j = 2, align = "center", part = "all") %>%
+  color(j = 4, color = "red")
 ```
 
 :::
@@ -79,7 +84,9 @@ ft <-
 
 1.  Load the `iris` dataset.
 2.  Create a `flextable` that displays the first 10 rows of the dataset.
-3.  Apply conditional formatting: Highlight cells in the `Sepal.Length` column where the values are greater than 6.0 in a different color.
+3.  Apply conditional formatting: 
+    1.  Highlight cells in the `Sepal.Length` column where their values are greater than 6.0 in blue using `color`.
+    2.  Draw borders around the paragraphs in the `Sepal.Width` column if their values are less than 3.0 using .
 
 Here is the finished table you are trying to make:
 
