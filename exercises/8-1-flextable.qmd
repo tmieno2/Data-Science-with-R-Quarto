@@ -1,0 +1,209 @@
+---
+title: "Ex-8-1: Make tables with `flextable`"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'datasets', 'flextable']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+```{r}
+#| include: false 
+library(dplyr)
+library(ggplot2)
+library(flextable)
+```
+
+## Exercise 1: Create a Simple Flextable
+
+**Dataset:** `mtcars`
+
+1.  Load the `mtcars` dataset into R.
+2.  Use the `flextable` package to create a table that displays the first 10 rows of the dataset for `mpg`, `cyl`, `disp`, and `hp`.
+3.  Apply styles to the table
+    1. make the texts in the header bold using `bold()`
+    2. make the texts of the `cyl` column center-aligned using ``
+    3. make the texts of the `hp` column colored red using ``
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(
+    mtcars[1:10, ],
+    col_keys = c("mpg", "cyl", "disp", "hp")
+  ) %>%
+  # Apply simple formatting
+  theme_box() %>%
+  bold(part = "header")
+) 
+```
+
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+#| results: asis
+data(mtcars)
+
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Create a simple flextable
+ft <- 
+  flextable(mtcars) %>%
+  # Apply simple formatting
+  theme_box() %>%
+  bold(part = "header")
+```
+
+:::
+
+
+## Exercise 2: Conditional Formatting
+
+**Dataset:** `iris`
+
+1.  Load the `iris` dataset.
+2.  Create a `flextable` that displays the first 10 rows of the dataset.
+3.  Apply conditional formatting: Highlight cells in the `Sepal.Length` column where the values are greater than 6.0 in a different color.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(iris[1:10,]) %>%
+  # Apply conditional formatting to Sepal.Length column
+  bg(i = ~ Sepal.Length > 6, j = "Sepal.Length", bg = "#FFDDC1")
+)
+```
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load iris dataset
+data(iris)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Create flextable for first 10 rows
+ft <- 
+  flextable(iris[1:10,]) %>%
+  # Apply conditional formatting to Sepal.Length column
+  bg(i = ~ Sepal.Length > 6, j = "Sepal.Length", bg = "#FFDDC1")
+
+# Display the table
+ft
+```
+
+:::
+
+
+## Exercise 3: Merging and Grouping Columns
+
+**Dataset:** `airquality`
+
+1.  Load the `airquality` dataset.
+2.  Create a flextable using selected columns: `Month`, `Day`, `Ozone`, `Wind`.
+3.  Group the table by the `Month` column and merge the cells of the `Month` column.
+4.  Add a caption to the table.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  airquality[, c("Month", "Day", "Ozone", "Wind")] %>%
+  # Create flextable
+  flextable() %>%
+  # Merge Month column
+  merge_v(j = "Month") %>%
+  # Add a caption
+  set_caption("Airquality Data Table with Grouped Month")
+) 
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load airquality dataset
+data(airquality)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Select columns
+ft <- 
+  airquality[, c("Month", "Day", "Ozone", "Wind")] %>%
+  # Create flextable
+  flextable() %>%
+  # Merge Month column
+  merge_v(j = "Month") %>%
+  # Add a caption
+  set_caption("Airquality Data Table with Grouped Month")
+```
+
+:::
+
+## Exercise 4: Custom Header and Footer
+
+**Dataset:** `iris`
+
+1.  Load the `iris` dataset.
+2.  Create a flextable with the first 15 rows of the dataset.
+3.  Modify the header by renaming columns `Sepal.Length` and `Sepal.Width` to `Sepal Length` and `Sepal Width`, respectively.
+4.  Add a custom footer explaining what the dataset represents.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(iris[1:15,]) %>%
+  # Modify header labels
+  set_header_labels(Sepal.Length = "Sepal Length", Sepal.Width = "Sepal Width") %>%
+  # Add a footer
+  add_footer_lines("Iris dataset: Measurements of iris flowers from three species") 
+)
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load iris dataset
+data(iris)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ft <- 
+  flextable(iris[1:15,]) %>%
+  # Modify header labels
+  set_header_labels(Sepal.Length = "Sepal Length", Sepal.Width = "Sepal Width") %>%
+  # Add a footer
+  add_footer_lines("Iris dataset: Measurements of iris flowers from three species")
+```
+
+:::

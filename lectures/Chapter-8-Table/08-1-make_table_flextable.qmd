@@ -1,20 +1,19 @@
 ---
-title: "Making Tables with `flextable`"
+title: "08-1: Making Tables with `flextable`"
 abstract: "Chapter 8: Make Tables"
-format: 
+format:
   revealjs:
-    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
     theme: [default, ../custom.scss]
     fontsize: 1.4em
     callout-icon: false
     scrollable: true
     echo: true
+    fig-dpi: 400
 webr:
-  packages: ['dplyr', 'flextable', 'gt']
+  packages: ['dplyr', 'ggplot2', 'gt', 'flextable', 'officer', 'tidyr']
   cell-options:
     editor-font-scale: 0.7
-    out-width: 100%
-    # dpi: 144
 filters:
   - webr
 ---
@@ -24,7 +23,6 @@ filters:
 library(gt)
 library(dplyr)
 library(tidyr)
-library(printr)
 library(flextable)
 library(officer)
 library(flipbookr)
@@ -77,21 +75,21 @@ head(mtcars, 20) %>% #BREAK
 
 ### Instruction
 
-Install the `flextable` package and library it.
+Install the following packages and library them.
 
 ```{r eval = F}
+#--- install if you have not ---#
 install.packages("flextable")
-```
+install.packages("officer")
 
-```{r eval = F}
+#--- library ---#
 library(flextable)
+library(officer)
 ```
 
 ### Data Preparation
 
 ```{r}
-#| output-location: column
- 
 #--- Define regions ---#
 Australasia <- c("AU", "NZ")
 Melanesia <- c("NC", "PG", "SB", "VU")
@@ -99,7 +97,8 @@ Polynesia <- c("PF", "WS", "TO", "TV")
 
 #--- create a dataset ---#
 (
-tab_data <- countrypops %>%
+tab_data <- 
+  countrypops %>%
   filter(country_code_2 %in% c(
     Australasia, Melanesia, Polynesia
   )) %>%
@@ -123,7 +122,8 @@ tab_data <- countrypops %>%
 )
 ```
 
-### Initiate
+
+### Initiate a table
 
 ::: {.panel-tabset}
 
@@ -149,12 +149,38 @@ where `col_keys` are the list of the name of the variables from the `data.frame`
 
 #### Example
 
-```{webr-r}
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+flextable(
+  tab_data,
+  col_keys = 
+    c(
+      "country_name", 
+      "lufhierh", 
+      "region", 
+      "y_1995", 
+      "y_2005"
+    )
+)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
 flextable(
   tab_data,
   col_keys = c("country_name", "lufhierh", "region", "y_1995", "y_2005")
 )
 ```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 
 :::
@@ -171,16 +197,49 @@ flextable(
 
 Many functions let you choose specifically where you apply changes. Those functions have 
 
-+ `i` for rows selection 
++ `i` for selecting rows 
   * formula 
   * integer vector 
   * logical vector
-+ `j` for cols selection
++ `j` for selecting columns
   * formula
   * character vector
   * integer vector
 
 You can use any combinations of the reference methods for `i` and `j`.
+
+### Preparation
+
+We will be building on `ft` created below:
+ 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+ft <-
+  tab_data %>% 
+  flextable(
+    col_keys = 
+      c(
+        "country_name",
+        "region",
+        "y_1995",
+        "y_2005"
+      )
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 ### i, j: formula
 
@@ -198,47 +257,101 @@ function(
 
 **Example**
 
-```{webr-r}
-tab_data %>% 
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
   color(
     i = ~ y_2005 > 2e5,
     j = ~ country_name + region,
     color = "red"
   )
 ```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  color(
+    i = ~ y_2005 > 2e5,
+    j = ~ country_name + region,
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
 
 ### i, j: integer, character
 
-```{webr-r}
-tab_data %>%
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+Using a character vector for `j` is not recommended because using a formula involves less typing.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
   color(
     i = c(2, 4:9),
     j = c("country_name", "y_1995"),
     color = "red"
   )
 ```
-
-Using a character vector for `j` is not recommended because using a formula involves less typing.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  color(
+    i = c(2, 4:9),
+    j = c("country_name", "y_1995"),
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
 
 ### i, j: logical, integer
 
-```{webr-r}
-tab_data %>%
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
   color(
     i = rep(c(TRUE, FALSE), each = 5),
     j = c(1, 3),
     color = "red"
   )
 ```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  color(
+    i = rep(c(TRUE, FALSE), each = 5),
+    j = c(1, 3),
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 ### by parts
 
@@ -251,7 +364,11 @@ You can refer to parts of the table using `part =` option. The available options
 
 <br>
 
-```{webr-r}
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
 tab_data %>% 
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
@@ -261,6 +378,24 @@ tab_data %>%
     color = "red"
   )
 ```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  color(
+    part = "header",
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
 
 Different functions have different default values for `part`.
 
@@ -300,30 +435,44 @@ We can use `fp_*()` functions from the `officer` package to specify the style of
 
 ### `fp_text()`
 
-::: {.columns}
-
-::: {.column width="50%"}
-
-**Introduction**
+::: {.panel-tabset}
+#### Introduction
 
 `fp_text()` lets you update the appearance of texts, including color, font size, bold or not, etc (see the help page below for the complete list of options).
+
+<br>
 
 **Syntax**
 
 ```{webr-r}
 ?fp_text
 ```
-:::
-<!--end of the 1st column-->
+
+#### Example 
+
+::: {.columns}
 
 ::: {.column width="50%"}
-**Example** 
-
-```{webr-r}
-tab_data %>% 
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_t = 
+      fp_text(
+        color = "red",
+        bold = TRUE,
+        underlined = TRUE
+      )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
   style(
     i = 4:6,
     j = ~ country_name,
@@ -340,16 +489,21 @@ tab_data %>%
 :::
 <!--end of the columns-->
 
+
+:::
+<!--end of panel-->
+
 ### paragraph vs cell
 
 + `paragraphs`: rectangular boxes around the texts inside the cells 
 + `cells`: rectangular boxes that contain paragraphs and texts inside 
 
-```{r }
-head(tab_data, 5) %>% 
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
   style(
     pr_p = fp_par(
       border.bottom = fp_border(width = 2, color = "blue")
@@ -359,31 +513,66 @@ head(tab_data, 5) %>%
     )
   )
 ```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  style(
+    pr_p = fp_par(
+      border.bottom = fp_border(width = 2, color = "blue")
+    ),
+    pr_c = fp_cell(
+      border.bottom = fp_border(width = 2, color = "red")
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 ### `fp_par()`
 
-::: {.columns}
+::: {.panel-tabset}
 
-::: {.column width="50%"}
-**Introduction**
+#### Introduction
 
 `fp_paragraph()` lets you update the appearance of paragraphs (see the help page below for the complete list of options).
+
+<br>
 
 **Syntax**
 
 ```{webr-r}
 ?fp_par
 ```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_p = fp_par(
+      text.align = "left",
+      shading.color = "grey"
+    )
+  )
+```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-**Example**
-
-```{webr-r}
-tab_data %>% 
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+```{r}
+#| echo: false
+ft %>% 
   style(
     i = 4:6,
     j = ~ country_name,
@@ -398,30 +587,48 @@ tab_data %>%
 :::
 <!--end of the columns-->
 
+:::
+<!--end of panel-->
+
 ### `fp_cell()`
+
+::: {.panel-tabset}
+#### Introduction
+
+`fp_cell()` lets you update the appearance of cells (see the help page below for the complete list of options).
+
+<br>
+
+**Syntax**
+
+```{r}
+?fp_cell
+```
+
+#### Example
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-**Introduction**
-
-`fp_cell()` lets you update the appearance of cells (see the help page below for the complete list of options).
-
-**Syntax**
-
-```{webr-r}
-?fp_cell
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_c = fp_cell(
+      margin = 2,
+      vertical.align = "top",
+      background.color = "red"
+    )
+  )
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-**Example**
-
-```{webr-r}
-tab_data %>% 
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+```{r}
+#| echo: false
+ft %>% 
   style(
     i = 4:6,
     j = ~ country_name,
@@ -436,6 +643,9 @@ tab_data %>%
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -463,15 +673,42 @@ tab_data %>%
 
 ### Example
 
-```{webr-r}
-tab_data %>%
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  color(
+    i = 1,
+    j = 2,
+    "#fcba03"
   ) %>%
+  bg(
+    i = ~ y_2005 < 2e5,
+    j = c("region"),
+    bg = "grey"
+  ) %>%
+  fontsize(
+    i = 7,
+    size = 16
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
   color(i = 1, j = 2, "#fcba03") %>%
   bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>%
   fontsize(i = 7, size = 16)
 ```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 :::
 <!--end of panel-->
@@ -507,7 +744,8 @@ tab_data %>% #BREAK
   display_type = "both", 
   left_assign = FALSE,
   platform = "quarto",
-  width = c(50, 50)
+  lcolw = "50",
+  rcolw = "50"
   )
 `
 
@@ -518,6 +756,7 @@ tab_data %>% #BREAK
 ### List of functions
 
 Here is a list of convenience functions that you can use to draw border lines on a table:
+
 + `hline()`: set horizontal borders
 + `hline_bottom()`: set bottom horizontal border
 + `hline_top()`: set top horizontal border
@@ -554,10 +793,10 @@ hline(
 
 ### `fp_border()`
 
-::: {.columns}
 
-::: {.column width="50%"}
-**Explanation**
+::: {.panel-tabset}
+
+#### Introduction
 
 `fp_border()` lets you specify the aesthetics of the borders you are drawing.
 
@@ -566,19 +805,32 @@ hline(
 **Syntax**
 
 ```{webr-r}
-?fp_border  
+?fp_border
 ```
+#### Example
 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  hline(
+    i = 3, 
+    j = 1:3, 
+    border = fp_border(
+      color = "red",
+      style = "dotted",
+      width = 4
+    )
+  ) 
+```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-**Example**
-
-```{r }
-tab_data %>%
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>%  
+```{r}
+#| echo: false
+ft %>%
   hline(
     i = 3, 
     j = 1:3, 
@@ -593,6 +845,9 @@ tab_data %>%
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -641,7 +896,8 @@ tab_data %>% #BREAK
   display_type = "both", 
   left_assign = FALSE,
   platform = "quarto",
-  width = c(50, 50)
+  lcolw = "50",
+  rcolw = "50"
   )
 `
 
@@ -684,6 +940,7 @@ add_header_row(
 
 This code would insert a row where "3-column label" spans for three columns and "1-column label" spans for one column.
 
+<br>
 
 :::{.callout-note}
 You might want to use `footnote()` to create footnotes instead of `add_footer_rows`, as it allows you to generate reference symbols at the same time.
@@ -691,11 +948,8 @@ You might want to use `footnote()` to create footnotes instead of `add_footer_ro
   
 #### Example
 
-```{webr-r}
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+```{r}
+ft %>% 
   add_header_row(
     values = c("3-column label", "1-column label"),
     colwidths = c(3, 1)
@@ -713,9 +967,10 @@ tab_data %>%
 
 ### `footnote()`
 
-::: {.columns}
+::: {.panel-tabset}
 
-::: {.column width="50%"}
+#### Introduction
+
 **Explanation**
 
 `footnote()` lets you add footnotes with reference symbols for each of them. 
@@ -727,32 +982,61 @@ tab_data %>%
 ```{webr-r}
 ?footnote
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-**Example with an outcome table**
 
-```{r }
-tab_data %>%  flextable(col_keys = c("country_name", "region", "y_1995", "y_2005")) %>% 
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
   footnote(
     i = 1, j = 1:2, part = "header",
     value = as_paragraph(
-      c("This is footnote 1", "This is footnote 2")
+      c(
+        "This is footnote 1",
+        "This is footnote 2"
+      )
     ),
     ref_symbols = c("++", "**")
   )
 ```
-
-+ `n`th element in `value` is associated with `n`th value in `ref_symbols`
-+ use `as_paragraph(c())` for `value`
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  footnote(
+    i = 1, j = 1:2, part = "header",
+    value = as_paragraph(
+      c(
+        "This is footnote 1",
+        "This is footnote 2"
+      )
+    ),
+    ref_symbols = c("++", "**")
+  )
+```
 :::
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
 
+
++ `n`th element in `value` is associated with `n`th value in `ref_symbols`
++ use `as_paragraph(c())` for `value`
+
+:::
+<!--end of panel-->
+
+
 ### `set_header_labels()`
 
 `set_header_labels()` lets you re-label existing header labels using a named list.
+
+<br>
 
 **Syntax**
 
@@ -769,11 +1053,12 @@ set_header_labels(
 
 **Example**
 
-```{webr-r}
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>%
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
   set_header_labels(
     values = list(
       country_name = "Country Name",
@@ -782,12 +1067,30 @@ tab_data %>%
   ) %>% 
   autofit() 
 ```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  set_header_labels(
+    values = list(
+      country_name = "Country Name",
+      region = "Region"
+    )
+  ) %>% 
+  autofit() 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
 
 ### `delete_part()`
 
-::: {.columns}
+::: {.panel-tabset}
 
-::: {.column width="50%"}
+#### How
 
 **Syntax**
 
@@ -801,22 +1104,28 @@ The default is to delete the header.
 
 **Example**
 
-```{webr-r}
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
   delete_part()
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-
+```{r}
+#| echo: false
+ft %>% 
+  delete_part()
+```
 :::
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
 
+#### Note
 
 You can still (or have to) use the original variable names from the dataset for selectors even after you deleter the header:
 
@@ -833,6 +1142,9 @@ tab_data %>%
     ) 
   )  
 ```
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -877,10 +1189,7 @@ I have not encountered cases where I need to merge cells horizontally. It works 
 **Before**
 
 ```{r }
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) 
+ft 
 ```
 :::
 <!--end of the 1st column-->
@@ -888,10 +1197,7 @@ tab_data %>%
 **After**
 
 ```{r }
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>%  merge_v(j = ~ region)
+ft %>%  merge_v(j = ~ region)
 ```
 :::
 <!--end of the 2nd column-->
@@ -907,7 +1213,7 @@ tab_data %>%
 ::: {.column width="50%"}
 **Before**
 
-```{webr-r}
+```{r}
 tab_data %>%
   mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
   flextable(
@@ -935,11 +1241,6 @@ It adjusted the width of the 1st column so that more texts are displayed in a si
 :::
 <!--end of the columns-->
 
-
-
-:::
-<!--end of panel-->
-
 ### `width()`
 
 `width()` set the width of columns to the length you specify.
@@ -949,29 +1250,28 @@ It adjusted the width of the 1st column so that more texts are displayed in a si
 ::: {.column width="50%"}
 **Before**
 
-```{webr-r}
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  autofit() 
+```{r}
+ft %>%
+  autofit()
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
 **After**
 
-```{webr-r}
-tab_data %>%  
-  flextable(
-    col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  autofit() %>%  width(j = ~ country_name, width = 1)
+```{r}
+ft %>% 
+  autofit() %>% 
+  width(j = ~ country_name, width = 1)
 ```
 :::
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
+
+:::
+<!--end of panel-->
+
 
 ## Output 
 

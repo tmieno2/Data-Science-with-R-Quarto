@@ -1,0 +1,57 @@
+---
+title: A Quarto Live Document
+engine: knitr
+format:
+  revealjs:
+    theme: [default, ../custom.scss]
+webr:
+  packages: ['dplyr', 'ggplot2', 'gt', 'flextable', 'officer', 'tidyr', 'knitr', 'kableExtra']
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+{{< include ./../../_extensions/r-wasm/live/_knitr.qmd >}}
+
+```{webr-r}
+#| context: setup
+# define a method for objects of the class data.frame
+knit_print.data.frame = function(x, ...) {
+  res = paste(c('', '', kable(x)), collapse = '\n')
+  asis_output(res)
+}
+# register the method
+registerS3method("knit_print", "data.frame", knit_print.data.frame)
+```
+
+```{r}
+#| eval: false
+# define a method for objects of the class data.frame
+library("knitr")
+knit_print.data.frame = function(x, ...) {
+  res = paste(c('', '', kable(x)), collapse = '\n')
+  asis_output(res)
+}
+# register the method
+registerS3method("knit_print", "data.frame", knit_print.data.frame)
+```
+
+
+## Table
+
+```{r}
+library("kableExtra")
+kable(mtcars)
+```
+
+
+## fer
+
+:::{.scrolling}
+
+```{webr-r}
+kable(mtcars)
+```
+
+:::
