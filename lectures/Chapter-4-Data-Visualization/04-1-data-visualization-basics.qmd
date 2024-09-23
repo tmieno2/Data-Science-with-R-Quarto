@@ -492,19 +492,30 @@ premium
 Using `carat` and `price` variables from `premium`, generate the figure below:
 
 ```{webr-r}
-
+#| context: output
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price), color = "red")
 ```
+
 
 <br>
 
-**Answer**
+::: {.panel-tabset}
+### Work here
+```{webr-r}
 
+```
+
+### Answer
 ```{r}
 #| code-fold: true
 #| eval: false
 ggplot(data = premium) +
   geom_point(aes(x = carat, y = price), color = "red")
 ```
+
+:::
+
 
 ### Exercise 2
 
@@ -513,19 +524,27 @@ ggplot(data = premium) +
 Using `price` variables from `premium`, generate a histogram of `price` shown below:
 
 ```{webr-r}
+#| context: output
+ggplot(data = premium) +
+  geom_histogram(aes(x = price), fill = "white", color = "blue")
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
 
 ```
 
-<br>
-
-**Answer**
-
+### Answer
 ```{r}
 #| code-fold: true
 #| eval: false
 ggplot(data = premium) +
   geom_histogram(aes(x = price), fill = "white", color = "blue")
 ```
+
+:::
+
 
 :::
 <!--end of panel-->

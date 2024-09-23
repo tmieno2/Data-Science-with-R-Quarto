@@ -1,0 +1,1062 @@
+---
+title: "09-3: R as GIS: Creating maps from vector data"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss]
+    fontsize: 1em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf', 'ggspatial', 'tidyterra', 'terra', 'stars', 'viridis', 'ggrepel'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.8
+filters:
+  - webr
+---
+
+## Before you start
+
+```{r}
+#| include: false 
+#| cache: false 
+
+library(sf)
+library(patchwork)
+library(tigris)
+library(mapview)
+library(lubridate)
+library(tidyverse)
+library(ggspatial)
+library(RStoolbox)
+```
+
+```{webr-r}
+#| context: setup
+#--- install and library the data package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+
+library("r.spatial.workshop.datasets")
+
+#--- load datasets ---#
+data(wells_ne)
+data(ne_counties)
+data(railroads_ne)
+data(corn_acres_ne)
+```
+
+<br>
+
+### Learning objectives
+
+Learn how to create maps using the `ggplot2` package.
+
+<br>
+
+### Table of contents
+
+1. [Creating maps from `sf` objects](#fig-vector)
+2. [Tips to make maps look professional ](#tips)
+
+<br>
+
+### Pre-requisite
+
+Basic understanding of `ggplot2` is necessary. Here are some resources:
+
++ [ggplot2: Elegant Graphics for Data Analysis (book)](https://ggplot2-book.org/)
++ [Lecture slides](https://tmieno2.github.io/Data-Science-with-R/Chapter-4-DataVisualization/data_visualization_x.html)
+
+
+## Tips to make the most of the lecture notes
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+
+
+
+## Create maps from `sf` using the `ggplot2` package
+
+::: {.panel-tabset}
+
+### Introduction
+
++ Creating maps differs from creating non-spatial figures in some ways. However, the underlying principle and syntax under `ggplot2` to create maps and non-spatial figures are very similar. 
+
++ Indeed, you will find map making very intuitive and rather easy if you already have some knowledge of how `ggplot2` works even if you have not created maps using `ggplot2`. The only major difference between them is the choice of `geom_*()` types.
+
+To create a map from `sf`s, we use `geom_sf()`.
+
+### Create a map
+
+::: {.panel-tabset}
+
+
+
+#### Data preparation
+
+```{webr-r}
+#--- wells in Nebraska ---#
+data(wells_ne_sf)
+
+#--- counties in Nebraska ---#
+data(ne_counties)
+
+#--- railroads in Nebraska ---#
+data(railroads_ne)
+```
+
+<br>
+
+Check how each of them looks like using `plot()`:
+
+```{webr-r}
+plot(wells_ne_sf$geometry)
+```
+
+
+#### How
+
+**Instruction**
+
++ We can use `geom_sf()` to create maps from `sf` objects
+
++ `geom_sf()` <span style = "color: red;"> automatically detects the geometry type </span> of spatial objects stored in an `sf` object and draw maps accordingly 
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+ggplot() +
+  geom_sf(data = sf)
+```
+
+#### Try yourself
+
+Try to create a map using one of `wells_ne_sf`, `ne_counties`, and `railroads_ne`.
+
+```{webr-r}
+ggplot() +
+  geom_sf()
+```
+:::
+
+<!--end of panel-->
+
+### Labels on a map
+
+::: {.panel-tabset}
+
+#### Motivation
+
++ Sometime, you would like to print texts on a map like below
+
+```{webr-r}
+#| context: output
+#| warning: false
+ggplot(data = ne_counties) +
+  #--- draw county border ---#
+  geom_sf() +
+  #--- print county names ---#
+  geom_sf_text(aes(label = name), size = 2) +
+  theme_void()
+```
+
+#### How
+
+When you want to print labels on a map, you can use `geom_sf_text()`. `geom_sf()` cannot do it.  
+
+<br>
+
+**Syntax**
+```{r, eval = FALSE}
+geom_sf_text(aes(label = var_name)) 
+```
+
++ `var_name`: name of the label variable
+
+<br>
+
+**Example**
+
+```{webr-r}
+#| warning: false
+ggplot(data = ne_counties) +
+  #--- draw county border ---#
+  geom_sf() +
+  #--- print county names ---#
+  geom_sf_text(aes(label = name), size = 2) +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+### Faceting
+
++ We can do faceting just like we do with other types of figures you can create with `ggplot2`. 
++ Remember, map is just a special case of `ggplot2` figures. 
+
+::: {.panel-tabset}
+
+
+#### Understand the data
+
++ We use `corn_acres_ne` for demonstration. This is a county-level corn harvested acres data observed annually from 2020 through 2023.
+
++ Notice that a single county has multiple rows (one row for one year) with the identical geometry
+
+```{webr-r}
+dplyr::arrange(corn_acres_ne, county_code, year)
+```
+
+#### faceted map
+
+```{webr-r}
+ggplot(corn_acres_ne) +
+  geom_sf(aes(fill = acre)) +
+  facet_wrap(year ~ ., ncol = 2) +
+  scale_fill_viridis() +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+:::
+
+<!--end of panel-->
+
+## Specifying aesthetics
+
+::: {.panel-tabset}
+
++ Maps are just special kinds of figures and what you have learned about `ggplot2` directly applies here.
+
+### Points
+
+Here are some of the aesthetic variables for points:
+
++ `color`: color of the points
++ `fill`: available for some shapes (but likely useless)
++ `shape`: shape of the points
++ `size`: size of the points (rarely useful)
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: dependent on `gw_extracted` (the amount of groundwater extraction)
++ `size`: constant across the points (bigger than the default)
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    aes(color = gw_extracted),
+    size = 2
+  )
+```
+
+#### Example 2
+
++ `color`: constant across the points (blue)
++ `size`: dependent on `gw_extracted`
++ `shape`: constant at 2 across the points (square)
+
+```{webr-r}  
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    aes(size = gw_extracted),
+    color = "blue",
+    shape = 21
+  )
+```
+
+#### Example 3
+
++ `color`: constant across the points (blue)
++ `fill`: constant across the points (red)
++ `size`: constant at 1.5 across the points
++ `shape`: constant at 22 across the points (square)
+
+```{webr-r}  
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    size = 1.5,
+    color = "blue",
+    fill = "red",
+    shape = 22
+  )
+```
+
+:::
+
+### Polygons
+
+Here are some of the aesthetic variables for polygons:
+
++ `color`: color of the <span style = "color: blue;"> borders </span> of the polygons
++ `linewidth`: width of the <span style = "color: blue;"> borders </span> of the polygons
++ `fill`: color of the <span style = "color: blue;"> inside </span> of the polygons
++ `shape`: not available
++ `size`: not available
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: constant at "red" across the polygons
++ `fill`: constant at "darkgreen" across the polygons
++ `linewidth`: constant at 0.4 across the polygons
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    linewidth = 0.4,
+    color = "red",
+    fill = "darkgreen"
+  )
+```
+
+#### Example 2
+
++ `color`: depends on `name`
++ `fill`: constant at "darkgreen" across the polygons
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    aes(color = name),
+    fill = "darkgreen"
+  )
+```
+
+#### Example 3
+
++ `color`: constant at "red" across the polygons
++ `fill`: depends on "countyfp"
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    aes(fill = countyfp),
+    color = "red"
+  )
+```
+
+:::
+
+### Lines
+
+Here are some of the aesthetic variables for lines:
+
++ `color`: color of the lines
++ `linewidth`: width of the lines
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: constant at "blue" across the lines
++ `linewidth`: constant at 0.5 across the lines
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = railroads_ne,
+    linewidth = 0.5,
+    color = "blue"
+  )
+```
+
+:::
+
+:::
+
+## Plotting multiple spatial objects in one figure
+
+::: {.panel-tabset}
+
+### Motivation
+
+::: {.columns}
+
+::: {.column width="70%"}
++ It is often the case that you want to create a map using more than one spatial objects. 
+
++ For example, you want to have county boundary (`ne_counties`), railroads (`railroads_ne`), and wells (`wells_ne_sf`) all in one map.
+:::
+
+::: {.column width="30%"}
+:::
+
+:::
+
+
+### How
+
++ You can create layers with `geom_sf()` by setting different `sf` objects as the datasets individually, and then simply add them so they appear in a single map.
+
++ Remember that when you specify data in `ggplot()`, all subsequent `geom_*()` functions will use this data unless otherwise specified.
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| out-width: 100%
+ggplot(data = ne_counties) +
+  geom_sf() 
+  # geom_sf(aes(fill = "red"))
+```
+:::
+
+::: {.column width="50%"}
+```{webr-r}
+#| out-width: 100%
+ggplot() +
+  geom_sf(data = ne_counties)
+  # geom_sf(aes(fill = "red"))
+```
+:::
+
+:::
+
+<br>
+
+:::{.callout-note title="Instruction"}
++ Uncomment line 3 and add `+` add the end of line 2, run, and see what happens
++ Confirm the first one works fine because data is set globally to `ne_couties` in line 1.
++ Confirm the second one does not because global dataset is not set.
+:::
+
+
+### Example
+
+```{webr-r}
+ggplot() +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  ) +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  )
+
+```
+
+### Order matters
+
+`geom_sf()`s that are added later are <span style = "color: red;"> superimposed </span> on top of the existing layers 
+
+::: {.panel-tabset}
+
+#### Example
+
+Wells are hidden beneath the county layer:
+
+```{webr-r}
+ggplot()  +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  ) +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  )
+```
+
+#### Try yourself
+
+:::{.callout-note title="Instruction"}
+Hide the railroads beneath the county layer.
+:::
+
+<br>
+
+```{webr-r}
+ggplot()  +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  ) +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  )
+```
+
+:::
+
+### CRS I
+
+`ggplot()` uses the CRS of the `sf` to draw a map by default. 
+
+::: {.panel-tabset}
+
+#### Example (unprojected)
+
+Currently, `ne_counties` is unprojected:
+
+```{webr-r}
+st_crs(ne_counties)
+```
+
+<br>
+
+```{webr-r}
+ggplot()  +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  )
+```
+
+#### Example (projected)
+
+Let's project it to WGS 84, UTM zone 14.
+
+```{webr-r}
+ne_counties_projected <- st_transform(ne_counties, 32614)
+```
+
+<br>
+
++ Now, the map is drawn based on the new CRS of 32614
+
++ Notice that the major grid lines are no longer straight in figure at the bottom unlike the one at the top 
+
++ X-Y labels are still in longitude and latitude (we will see how we change this)
+
+```{webr-r}
+ggplot()  +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties_projected 
+  )
+```
+:::
+
+### CRS II
+
+::: {.panel-tabset}
+
+#### `coord_sf()`
+
+You can use `coord_sf()` to alter the CRS on the map on the go, but not the CRS of the `sf` object itself.
+
+```{webr-r}
+ggplot() +
+  #--- this is unprojected remember? ---#
+  geom_sf(data = ne_counties) +
+  coord_sf(crs = 32614)
+```
+
+<br>
+
++ pros: you do not have to change the CRS of the sf
++ cons: it takes time to change the CRS behind the scene every time you do this
+
+#### Change X, Y labels on the map
+
+In order to have `X` and `Y` values in the same units as that of the CRS in use on the map, you need to add `datum =` in `coord_sf()`.
+
+```{webr-r}
+ggplot() +
+  #--- this is unprojected remember? ---#
+  geom_sf(data = ne_counties) +
+  coord_sf(
+    crs = 32614,
+    datum = 32614
+  )
+```
+
+#### Multiple layers   
+
+When there are multiple `geom_sf()` layers, the CRS of the first layers is automatically applied for all the layers , reconciling the difference in CRS automatically.
+
+```{webr-r}
+ggplot() +
+  #--- epsg: 32614 ---#
+  geom_sf(
+    data = st_transform(
+      ne_counties,
+      32614
+    )
+  ) +
+  #--- epsg: 4269 ---#
+  geom_sf(
+    data = railroads_ne
+  )
+```
+
+#### `coord_sf()` with multiple layers
+
++ `coord_sf()` applies to all the layers. 
++ try the codes with and without `coord_sf(32614)` at the end
+
+```{webr-r}
+ggplot() +
+  #--- epsg: 4269 ---#
+  geom_sf(
+    data = railroads_ne
+  ) +
+  #--- epsg: 32614 ---#
+  geom_sf(
+    data = st_transform(
+      ne_counties,
+      32614
+    ),
+    fill = NA
+  ) +
+  #--- overwrite the CRS ---#
+  coord_sf(crs = 32614)
+```
+
+:::
+
+:::
+
+## Making maps look professional
+
+::: {.panel-tabset}
+
+### Theme
+
+`theme_void()` is a veery suitable pre-made theme for map that can get rid of many unnecessary components from default maps.
+
+<br>
+
+:::: {.columns}
+
+::: {.column}
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot() +
+  geom_sf(data = ne_counties)
+
+```
+:::
+
+::: {.column}
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot() +
+  geom_sf(data = ne_counties) +
+  theme_void()
+```
+:::
+
+::::
+
+### North arrow and scale bar
+
+The `ggspatial` package lets you put a north arrow and scale bar on a map using `annotation_scale()` and `annotation_north_arrow()`
+
+<br>
+
+::: {.panel-tabset}
+
+#### Preparation
+
+```{webr-r}
+#| autorun: true
+#--- load the package ---#
+library(ggspatial)
+
+#--- create a map to work with ---#
+g_county <- 
+  ggplot() +
+    geom_sf(data = ne_counties) +
+    theme_void()
+```
+
+
+#### Scale bar
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2
+  )
+```
+
++ `location`: determines where the scale bar is
+  * first letter is either `t` (top) or `b` (bottom)
+  * second letter is either `l` (left) or `r` (right).  
+
++ `width_hint`: determines the length of the scale bar relative to the plot
+
+:::{.callout-note title="Try yourself"}
+Play with `location` and `width_hint` and see what happens.
+:::
+
+#### Fine-tuning the location
+
+Use `pad_x` and `pad_y` options to fine-tune the location of the scale bar.
+
+A positive number means that the scale bar will be placed further away from closest border of the plot.
+
++ `pad_x`: since the second letter of `location` is `l`, the scale bar move an inch from the left border of the map
+
++ `pad_y`: since the first letter of `location` is `b`, the scale bar move 0.3 inches from the bottom border of the map
+
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2,
+    pad_x = unit(1, "in"),
+    pad_y = unit(0.3, "in")
+  )
+```
+
+:::{.callout-note title="Try yourself"}
+Play with `pad_x` and `pad_y` and see what happens.
+:::
+
+#### North arrow
+
++ Use `annotation_north_arrow()` to add north arrow
++ It works just like `annotation_scale()`
++ use `style` option to pick a different type of north arrow symbol
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2,
+    pad_x = unit(1, "in"),
+    pad_y = unit(0.3, "in")
+  ) +
+  #--- add north arrow ---#
+  annotation_north_arrow(
+    location = "tl",
+    pad_x = unit(0.2, "in"),
+    pad_y = unit(-0.1, "in"),
+    style = north_arrow_fancy_orienteering
+  )
+```
+:::
+
+:::
+
+## Inset map
+
+::: {.panel-tabset}
+
+### Motivation
+
+Inset map (like one below) provides a better sense of the geographic extent and the location of the area of interest relative to the larger geographic extent that the readers are more familiar with. 
+
+```{r, echo = FALSE, out.width = "80%"}
+knitr::include_graphics("assets/inset.jpg")
+```
+
+### Objective
+
+Create a map like this using `ne_counties` with the `ggmapinset` package. 
+
+```{webr-r}
+#| context: setup
+library(ggmapinset)
+
+three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
+
+inset_config <- 
+  configure_inset(
+    centre = st_centroid(st_union(three_counties)),
+    translation = c(300, -250),
+    radius = 80,
+    scale = 2,
+    units = "km"
+  )
+
+g_inset_example <- 
+  ggplot() +
+    #--- base map ---#
+    geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
+    #--- additional layers ---#
+    geom_sf(data = three_counties, fill = "red", alpha = 0.4) +
+    # geom_sf_text(data = three_counties, aes(label = name)) +
+    #--- inset ---#
+    geom_sf_inset(data = three_counties, map_base = "none") +
+    geom_sf_text_inset(data = three_counties, aes(label = name)) +
+    geom_inset_frame() +
+    coord_sf_inset(inset = inset_config) +
+    theme_void()
+```
+
+```{webr-r}
+#| context: output
+g_inset_example
+```
+
+:::{.callout-note}
+Visit the [`ggmapinset` website](https://cidm-ph.github.io/ggmapinset/index.html) for more examples and other functionalities beyond what is presented here, including multiple insets. 
+:::
+
+### Create the base layer
+
+The first step of making an inset map is to create the base map layer, a part of which is going to be expanded as an inset.
+
+We want to create a map of all the counties in Nebraska with only the three counties (Perkins, Chase, and Dundy) colored red.
+
+Let's first create an `sf` consisting of the three counties first:
+
+```{webr-r}
+three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
+``` 
+
+<br>
+
+We now create the base map. You use `geom_sf()` to create base map layers.
+
+```{webr-r}
+(
+g_base <- 
+  ggplot() +
+    geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
+    geom_sf(data = three_counties, fill = "red", alpha = 0.4) +
+    theme_void()
+)
+```
+
+### Configure the inset
+
+We now configure (specify) the inset using `configure_inset()`. Here is the list of parameters you want to provide:
+
++ `centre`: the geographic coordinates of the small circle from which you expand 
++ `translation`: how much you shift in x and y from the center to display the enlarged circle
++ `radius`: radius of the small circle at the origin
++ `scale`: how much to enlarge
++ `units`: length unit 
+
+```{webr-r}
+inset_config <- 
+  configure_inset(
+    #--- centroid of the three counties as the center ---#
+    centre = st_centroid(st_union(three_counties)),
+    #--- move 300 east and 250 south ---#
+    translation = c(300, -250),
+    #--- radius of 80 km ---#
+    radius = 80,
+    #--- scale up by 2 ---#
+    scale = 2,
+    units = "km"
+  )
+```
+
+### Add an inset
+
++ Use `geom_sf_inset()` and/or `geom_sf_text_inset()` to create layers to present as an inset.
++ Use `geom_inset_frame()` to add the inset frame (small circle, big circle, and the lines connecting them)
++ Use `coord_sf_inset(inset = inset_config)` to reflect the configuration you set up earlier.  
+
+<br> 
+
+```{webr-r}
+g_base +
+  geom_sf_inset(data = three_counties, map_base = "none") +
+  geom_sf_text_inset(data = three_counties, aes(label = name)) +
+  geom_inset_frame() +
+  coord_sf_inset(inset = inset_config)
+```
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ Comment out a line of codes above, run the code, and see what each of them do.
++ Go back to the previous slide and change the value of the parameters to see what happens.
+:::
+
+### `map_base`
+
++ By default, `geom_sf_inset()` creates two copies of the map layer: one for the base map and the other for the inset map. 
+
++ `map_base` option in `geom_sf_inset()` determines whether you create the copy for the base map or not.
+
+In the code below, `map_base` is not specified, meaning that `geom_sf_inset(data = three_counties, fill = "black")` will be applied for both the base and inset maps.
+
+```{webr-r}
+g_base +
+  geom_sf_inset(data = three_counties, fill = "black") +
+  # geom_sf_inset(data = three_counties, fill = "black", map_base = "none") +
+  geom_sf_text_inset(data = three_counties, aes(label = name)) +
+  geom_inset_frame() +
+  coord_sf_inset(inset = inset_config)
+```
+
+<br>
+
+:::{.callout-note title="Try yourself"}
+Comment out line 2 and comment in line 3 to see what happens.
+:::
+
+
+:::
+
+## Create maps using raster data
+
+```{webr-r}
+#| context: setup   
+data(NIR) 
+NIR <- terra::rast(NIR)
+data(RED) 
+RED <- terra::rast(RED)
+```
+
+::: {.panel-tabset}
+
+### Introduction
+
++ We will use the `gpplot2` and `tidyterra` package to create maps using raster data.
+
++ The `tidyterra` package provides `geom_spatraster()` that works specifically for `SpatRaster` object from the `terra` package.
+
++ There are other options like the `tmap` package. But, we do not talk about it in this course.
+
+### How
+
+It works very much like map creation with `sf`. We just use `SpatRaster` object and use `geom_spatraster()` in place of `geom_sf`.
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NIR) +
+  theme_void()
+```
+
+<br>
+
+:::{.callout-note}
+Notice that `geom_spatraster()` automatically based the fill color of the cells on the attribute values without you specifying so.
+:::
+
+### Multi-layer raster
+
+How does `geom_spatraster()` behave with a multi-layer `SpatRaster`?
+
+```{webr-r}
+nir_red <- c(NIR, RED)
+
+ggplot() +
+  geom_spatraster(data = nir_red)
+```
+
+<br>
+
+As the warning message suggests, both layers are plotted by default. You can specify which layer to use with `aes(fill = layer_name)` like below.
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = nir_red, aes(fill = NIR))
+```
+
+:::{.callout-note}
++ But, remember faceting is often not appropriate when you are plotting multiple variable of different scales (e.g., temperature and precipitation) as they share the same legend.
++ A good use case of faceting is displaying the same variable observed at different times (e.g., temperature on different days).
+:::
+
+### Faceting
+
+When you want to create maps for individual attributes at the same time, you can add `facet_wrap(~lyr)`. 
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = nir_red, aes(fill = NIR)) +
+  facet_wrap( ~ lyr)
+```
+
+:::
+
+## Create a map with both `sf` and `SpatRaster`
+
+It is very easy to achieve this. You just use `geom_sf()` for `sf` and `geom_spatraster()` for `SpatRaster`. You just add them as layers just like any figures you create with `ggplot2`.
+
+<br>
+
+```{webr-r}
+#| context: setup
+ 
+data(prism_2012_aug)
+prism_2012_aug <- terra::rast(prism_2012_aug)
+```
+
+```{webr-r}
+ggplot() +
+  #--- raster data ---#
+  geom_spatraster(data = prism_2012_aug) +
+  #--- vector data ---#
+  geom_sf(data = ne_counties, color = "orange", fill = NA, linewidth = 0.1) +
+  #--- facet by layer of the raster data ---#
+  facet_wrap(~lyr, ncol = 2) +
+  scale_fill_viridis(name = "Precipitation (inches)") +
+  theme_void() +
+  theme(legend.position = "bottom")
+
+```

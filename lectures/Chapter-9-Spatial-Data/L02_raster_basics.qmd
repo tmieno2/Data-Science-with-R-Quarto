@@ -1,0 +1,1045 @@
+---
+title: "09-2: R as GIS: Raster Data Basics"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss]
+    fontsize: 1em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'terra', 'stars', "raster", "tidyterra", "sf"] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.8
+filters:
+  - webr
+---
+
+```{r, include = FALSE}
+library(terra)
+library(dplyr)
+library(stars)
+library(data.table)
+```
+
+## Before you start
+
+<br>
+
+### Learning objectives
+
+Learn how to handle raster datasets using R.
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
++ [Raster data basics](#sec-basics)
+   - object type
+   - accessing metadata
+   - quick plotting
++ [Input an output](#sec-io)
+   - read raster data files
+   - write to raster data files
++ [raster operations](#sec-operations)
+   - arithmetic operations
+   - aggregate
+   - resample
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+### Related Contents (Links)
+
++ [Create maps from raster data using `ggplot2`](https://tmieno2.github.io/R-as-GIS-workshop/L03_create_map.html)
++ [Vector and raster data interactions](https://tmieno2.github.io/R-as-GIS-workshop/L05_vector_raster_interaction.html)
+  + cropping
+  + masking
+  + value extraction
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+```{webr-r}
+#| context: setup
+#| 
+#--- install and library the data package ---#
+install.packages("r.spatial.workshop.datasets", repos = "https://tmieno2.r-universe.dev")
+
+library("r.spatial.workshop.datasets")
+
+data(reflec_blue)
+reflec_blue <- terra::rast(reflec_blue)
+data(reflec_red)
+reflec_red <- terra::rast(reflec_red)
+data(reflec_green)
+reflec_green <- terra::rast(reflec_green)
+data(NIR)
+NIR <- terra::rast(NIR)
+data(RED)
+RED <- terra::rast(RED)
+reflec_all <- c(reflec_blue, reflec_red, reflec_green)
+prism_saunders <- terra::rast(prism_saunders)
+prism_douglas <- terra::rast(prism_douglas)
+```
+
+## Tips to make the most of the lecture notes
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+## The `terra` and `raster` packages: Basics {#sec-basics}
+
+::: {.panel-tabset}
+
+### `terra` and `raster`
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+
++ The most popular R packages to handle raster data is the `raster` and `terra` packages. They are authored by the same person and `terra` is the successor of `raster`. 
+
++ The `terra` package is now mature and does everything faster than `raster`
+
++ There are lots of packages that still depends on `raster` and do not work well with R object class defined by `terra`. 
+
++ We primarily learns how to use the `terra` package
+
+:::
+
+::: {.column width="50%"}
+
+:::
+
+:::
+
+### Object class
+
+::: {.columns}
+
+::: {.column width="50%"}
+The `terra` and `raster` packages use different R object class to represent raster data:
+
++ `terra`
+  + `SpatRaster`
++ `raster` (collectively referred to as `Raster`*)
+  + `RasterLayer`
+  + `RasterStack`
+  + `RasterBrick`
+:::
+
+:::{.callout-note}
++ We will learn how to covert `SpatRaster` to `Raster`* and vice versa.
++ This is important as there are (and will be) packages that accepts only `Raster`*, especially the ones that are old.
+:::
+
+::: {.column width="50%"}
+
+:::
+
+:::
+
+### `SpatRaster`
+
+Let's take a look at a `SpatRaster` object, `reflec_blue`.
+
+Check the class first:
+
+```{webr-r}
+class(reflec_blue)
+```
+
+<br>
+
+What is inside?
+
+```{webr-r}
+reflec_blue
+```
+
+<br>
+
+Here are the explanations of the information provided:
+
++ class
++ dimensions
+  + nrow: number of rows
+  + ncol: number of columns
+  + nlyr: number of layers
++ resolution:
+  + x: how long the top and bottom lines of the grid are
+  + y: how long the left and right lines of the grid are
++ extent: bounding box (just like what you get with `st_bbox(sf)`)
++ coord. ref.: CRS  
++ name: name of the attribute
+
+### Quick plotting
+
+You can use `plot()` to make a map quickly:
+
+```{webr-r}
+plot(reflec_blue)
+```
+
+It automatically color the grids by the value of the attribute (`blue`). 
+
+### Multi-layer `SpatRaster`
+
+You can simply use `c()` function to create a multi-layer `SpatRaster` just like you create a vector as long as all the layers have exactly the same dimensions, extent, and resolution.  
+
+```{webr-r}
+(
+reflec_all <- c(reflec_blue, reflec_red, reflec_green)
+)
+```
+
+Notice that `nlyr` is 3 now and you see three attribute names in `names`.
+
+<br>
+---
+
+`plot()` create maps for all the attributes.
+
+```{webr-r}
+plot(reflec_all)
+```
+
+### `Raster`*
+
+::: {.panel-tabset}
+
+#### Introduction
+
+The `raster` package differentiates single-layer and multi-layer raster data. 
+
++ `RasterLayer`: single-layer
++ `RasterStack`: multi-layer
++ `RasterBrick`: multi-layer
+
+#### Converting to `Raster`* 
+
+You can convert a `SpatRaster` to a `Raster`* object using `as(SpatRaster, "Raster")`. 
+
+```{webr-r}
+(
+reflec_blue_rl <- as(reflec_blue, "Raster")
+)
+```
+
+Since, `reflec_blue` is a single-layer `SpatRaster`, it was converted into a `RasterLayer`.
+
+<br>
+
+---
+
+```{webr-r}
+(
+reflec_all_rl <- as(reflec_all, "Raster")
+)
+```
+
+Since, `reflec_all` is a multi-layer `SpatRaster`, it was converted into a `RasterBrick`.
+
+<br>
+
+:::{.callout-note}
+You can convert a `RasterBrick` to a `RasterStack` by applying `stack()` to the `RasterBrick` if you want. But, you do not need to.
+:::
+
+#### Converting to `SpatRaster`
+
+You can convert an `Raster`* object to `SpatRaster` using `terra::rast()` function.
+
+```{webr-r}
+terra::rast(reflec_all_rl)
+```
+:::
+<!--end of panel-->
+
+
+
+
+:::
+
+## Basic operations
+
+::: {.panel-tabset}
+
+### Accessing the metadata
+
+::: {.panel-tabset}
+
+#### CRS
+
+```{webr-r}
+terra::crs(reflec_blue)
+```
+
+This is very useful. As we will see later, when interacting two spatial objects (e.g., extracting values from a raster data to `sf`) some functions require that the two spatial objects has the same CRS. You can use `terra::crs()` to get the CRS of the raster data and apply it to another spatial object.
+
+#### dimensions
+
+```{webr-r}
+#--- number of columns ---#
+terra::ncol(reflec_blue)
+
+#--- number of rows ---#
+terra::nrow(reflec_blue)
+
+#--- number of layers ---#
+terra::nlyr(reflec_blue)
+
+#--- number of cells ---#
+terra::ncell(reflec_blue)
+```
+
+#### resolution
+
+```{webr-r}
+terra::res(reflec_blue)
+```
+
+#### extent
+
+This is like `st_bbox()` for `sf`.
+
+```{webr-r}
+terra::ext(reflec_blue)
+```
+
+:::
+<!-- end of panel -->
+
+
+### Extract cell information
+
+::: {.panel-tabset}
+
+#### cell values
+
+You can access the cell values using `[]` just like a vector. Note that `head()` is there to avoid a very long vector presented on the console.
+
+```{webr-r}
+#--- first six values ---#
+reflec_blue[] %>% head()
+```
+
+<br>
+
+Yes, there are so many NAs in this raster data. Let's look at the value of 10100th through 10200th cells:
+
+```{webr-r}
+reflec_blue[10100:10120]
+```
+
+<br>
+
+:::{.callout-note title="Note"}
++ We use this function to check our arithmetic operations are successful.
++ I have never had to use this function before in practice.
+:::
+
+#### coordinates of the cell centers
+
+You can use `terra::xyFromCell()` to get the geographic coordinates of the cell centers.
+
+<br>
+
+**Syntax**
+
+```{r, eval = F}
+terra::xyFromCell(SpatRaster, cell)
+```
+
+<br>
+
++ `cell`: cell numbers
+
+<br>
+
+**Example**
+
+```{webr-r}
+terra::xyFromCell(reflec_blue, cell = 1:ncell(reflec_blue)) %>% head()
+```
+
+:::
+<!--end of panel-->
+
+### Subset
+
+You can access specific layers using `subset()`.
+
+<br>
+
+**Syntax**
+```{r, eval = F}
+subset(SpatRaster, subset)
+```
+
++ `subset`: layer names or corresponding integers 
+
+<br>
+
+**Examples**
+
+```{webr-r}
+#--- get the second and third layer ---#
+subset(reflec_all, c(2, 3))
+```
+
+<br>
+
+```{webr-r}
+#--- get the blue layer ---#
+subset(reflec_all, "blue")
+```
+
+
+:::
+<!--end of panel-->
+
+## Raster data input and output {#sec-io}
+
+::: {.panel-tabset}
+
+### Introduction
+
+::: {.columns}
+
+::: {.column width="70%"}
+Raster data files can come in numerous different formats. 
+
++ The most common format is GeoTiff (.tif as the file extension)
++ PRPISM weather data comes in the Band Interleaved by Line (BIL) format
++ Some of the Daymet data comes in netCDF format. 
++ Other popular formats include SAGA, ENVI, and many others. 
+
+You can read data of almost all the existing file formats with the `terra` package.
+:::
+::: {.column width="30%"}
+:::
+:::
+
+### Read with `terra`
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `terra::rast()` to read raster data files.
+
+<br>
+
+**single raster data file**
+
+```{r, eval = FALSE}
+drone_blue_sr <- terra::rast(path to the file)
+```
+
+<br>
+
+**multiple raster data files**
+
+```{r, eval = FALSE}
+drone_blue_sr <- terra::rast(c(path to the file 1, path to the file 1, ...))
+```
+
+#### Let's try (.tif)
+
+:::{.callout-note title="Instruction"}
++ download **reflec_blue.tif**, **reflec_red.tif**, and **reflec_green.tif** from this [link](https://www.dropbox.com/scl/fo/ljr76u5azr7u4zx7mk55p/AB1RtEs0KyWqL6rKsiJHRKk?rlkey=ogas3pbhuhhhy94kprbd2m553&st=oq35p7rx&dl=0).
++ find the path to the three files
+:::
+
+<br>
+
+**single file**
+
+It looks like this for me:
+
+```{r, eval = F}
+reflec_blue <- terra::rast("data-files-for-participants/reflec_blue.tif")
+```
+
+<br>
+
+**multiple files**
+
+It looks like this for me:
+
+```{r, eval = F}
+reflec_all <- 
+  terra::rast(
+    c(
+      "data-files-for-participants/reflec_blue.tif",
+      "data-files-for-participants/reflec_red.tif",
+      "data-files-for-participants/reflec_green.tif"
+    )
+  )
+```
+
+#### Let's try (.bil)
+
+:::{.callout-note title="Instruction"}
++ download the folder named **PRISM_ppt_stable_4kmD2_20120801_bil** from this [link](https://www.dropbox.com/scl/fo/ljr76u5azr7u4zx7mk55p/AB1RtEs0KyWqL6rKsiJHRKk?rlkey=ogas3pbhuhhhy94kprbd2m553&st=oq35p7rx&dl=0).
++ find the path to the file named **PRISM_ppt_stable_4kmD2_20120801_bil.bil**, which is PRISM precipitation data observed on 08-01-2012.
+:::
+
+<br>
+
+It has a different file extension of **.bil**. Well it does no matter. Just use `terra::rast()` with path to the file inside it just like you did with the GeoTiff files.
+
+<br>
+
+This is what the code looks like for me:
+
+```{r, eval = FALSE}
+prism_precip <- terra::rast("data-files-for-participants/PRISM_ppt_stable_4kmD2_20120801_bil/PRISM_ppt_stable_4kmD2_20120801_bil.bil")
+```
+
+#### Let's try (.nc)
+
+Many weather data comes in the netCDF format with the file extension of **.nc**. (e.g., [gridMET](https://www.climatologylab.org/))
+
+:::{.callout-note title="Instruction"}
++ download the file named **gm_precip_2018.nc** from this [link](https://www.dropbox.com/scl/fo/ljr76u5azr7u4zx7mk55p/AB1RtEs0KyWqL6rKsiJHRKk?rlkey=ogas3pbhuhhhy94kprbd2m553&st=oq35p7rx&dl=0).
++ find the path to the file
+:::
+
+<br>
+
+Let's read the data now. This is what the code looks like for me:
+
+```{r, eval = FALSE}
+prism_precip <- terra::rast("data-files-for-participants/gm_precip_2018.nc")
+```
+
+
+:::
+<!-- end of panel -->
+
+### Write with `terra`
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `terra::writeRaster()` to write raster data to a data file.
+
+<br>
+
+**Syntax**
+
+```{r, eval = FALSE}
+terra::writeRaster(SpatRaster, path to the file)
+```
+
+<br>
+
+**Example (does not run)**
+
+```{r, eval = FALSE}
+writeRaster(reflec_blue, "./data/reflec_blue.tif", overwrite = TRUE) 
+```
+
++ This code saves `reflec_blue` (a `SpatRaster` object) as a GeoTiff file. 
+
++ `writeRaster()` infers the correct format from the extension of the file name, which if **.tif** here. 
+
++ The `overwrite = TRUE` option is necessary if a file with the same name already exists and you are overwriting it. 
+
+<br>
+
+:::{.callout-note title="Note"}
+No distinction is necessary for single-layer and multi-layer `SpatRaster` objects.
+:::
+
+#### Let's try (.tif)
+
+**single-layer**
+
+Write `reflec_blue` on your computer. Mine looks like this:
+
+```{r, eval = FALSE}
+terra::writeRaster(reflec_blue, "data/reflec_blue.tif")
+```
+
+<br>
+
+Then read it back:
+
+```{r, eval = FALSE}
+reflec_blue_re_read <- terra::rast("data/reflec_blue.tif")
+```
+
+<br>
+
+Confirm that  `reflec_blue_re_read` is the same as `reflec_blue`.
+
+<br>
+
+---
+
+**multi-layer**
+
+Write `reflec_all` on your computer. Mine looks like this:
+
+```{r, eval = FALSE}
+terra::writeRaster(reflec_all, "data/reflec_all.tif")
+```
+
+<br>
+
+Then read it back:
+
+```{r, eval = FALSE}
+reflec_all_re_read <- terra::rast("data/reflec_all.tif")
+```
+
+<br>
+
+Confirm that  `reflec_all_re_read` is the same as `reflec_all`.
+
+#### Let's try (.nc)
+
+::: {.columns}
+
+::: {.column width="70%"}
+While you can use `terra::writeRaster()` to write to a netCDF file, you will get a note saying that you should consider using `terra::writeCDF()`. 
+
+Write `reflec_all` to a netCDF file. Mine looks like this.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+```{r, eval = FALSE}
+terra::writeCDF(reflec_all, "data/reflec_all.nc")
+```
+
+:::
+
+:::
+
+## Raster Data Operations {#sec-operations}
+
+::: {.panel-tabset}
+
+### Arithmetic operations
+
+::: {.panel-tabset}
+
+#### Introduction
+
+::: {.columns}
+
+::: {.column width="70%"}
++ You can do basic arithmetic operations (addition, subtraction, division, etc) using raster layers as long as they share the same spatial extent and resolution
+  
++ You can also apply a function like `log()` to transform the value of the cells
+
++ Raster arithmetic operations are done element-by-element (cell-by-cell) just like vector arithmetic operations.
+
+For example, when two `RasterLayer`s are added, then the two values associated with the same cell are added and the resulting value becomes the new value for the cell in the newly created `RasterLayer`.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+#### Example
+
+```{webr-r}
+reflec_b_plus_g <- reflec_blue + log(reflec_green)
+```
+
+<br>
+
+Did it work?
+
+```{webr-r}
+c(reflec_b_plus_g[10100], reflec_blue[10100], log(reflec_green[10100]))
+```
+
+<br>
+
+Yes, looks like it did. Look at different cells yourself. Note that the name of the attribute in `reflec_b_plus_g` inherited the name of the attribute in `reflec_blue` (first `SpatRaster` in the addition above).
+
+#### Exercise 1
+
+Multiply `reflec_blue` with `reflec_red` and add square root of `reflec_green`:
+
+```{webr-r}
+
+```
+
+<br>
+
+Look at several cells to confirm that multiplication was successful.
+
+```{webr-r}
+
+``` 
+
+
+<br>
+
+**Answer:**
+
+```{r, eval = FALSE}
+#| code-fold: true
+#| 
+reflect_temp <- reflec_blue * reflec_red + sqrt(reflec_green)
+
+#--- confirm if the calculations were done right ---#
+reflect_temp[10100] == reflec_blue[10100] * reflec_red[10100] + sqrt(reflec_green[10100])
+```
+
+#### Exercise 2
+
+Using `NIR` and `RED`,  calculate NDVI and name it `NDVI`.
+
+$NDVI = (NIR-RED)/(NIR+RED)$
+
+```{webr-r}
+NIR
+RED
+```
+
+<br>
+
+Then, plot it to see what it looks like.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer:**
+
+```{r, eval = FALSE}
+#| code-fold: true
+ 
+NDVI <- (NIR - RED) / (NIR + RED)
+
+#--- confirm if the calculations were done right ---#
+plot(NDVI)
+```
+
+:::
+
+### Aggregate
+
+::: {.panel-tabset}
+
+#### Motivation
+
+::: {.columns}
+
+::: {.column width="70%"}
+Sometimes, you want to make your raster data have a lower resolution. For example, satellite image is often very fine with spatial resolution of say 30cm. When trying to create a map using the data, it takes long time for R to render a plot and also the size of the figure can be very large.
+
+```{webr-r}
+reflec_blue
+```
+
+<br>
+
+:::
+
+::: {.column width="30%"}
+
+:::
+
+:::
+
+#### How and Example
+
+**Syntax**
+
+```{r, eval = FALSE}
+aggregate(SpatRaster, fact)
+```
+
++ `fact`: 
+
+**Example**
+
+```{webr-r}
+(
+reflec_blue_agg_5 <- aggregate(reflec_blue, fact = 5)
+)
+```
+
+<br>
+
+Let's compare before and after. After aggregating by factor of 5, the map is visibly more coarse. Maybe this was too much. 
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+```{webr-r}
+plot(reflec_blue)
+```
+:::
+
+::: {.column width="50%"}
+```{webr-r}
+plot(reflec_blue_agg_5)
+```
+:::
+
+:::
+
+#### Exercise 
+
+Aggregate `NIR` by factor of 2. 
+
+```{webr-r}
+NIR
+```
+
+<br>
+
+Then, check if its plot is acceptable or not.
+
+```{webr-r}
+```
+
+<br>
+
+**Answer:**
+
+```{r, eval = FALSE}
+#| code-fold: true
+NIR_ag_2 <- aggregate(NIR, fact = 2)
+
+plot(NIR_ag_2)
+```
+:::
+
+### Resample
+
+::: {.panel-tabset}
+
+#### Motivation
+
++ You have two raster layers that differ in any of the dimension and resolution. 
+
++ You want to assign a value from one layer to each of the cells in the other layer so that you have consistent observation units for the variables from the two layers.
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+Fake precipitation data:
+
+```{webr-r}
+#| out-width: 100%
+#| autorun: true 
+precip <- rast(xmin=1, xmax=11, ymin=1, ymax=11, nrows=10, ncols = 10, vals = rnorm(100), crs = "EPSG:4326")
+
+plot(precip)
+```
+:::
+
+::: {.column width="50%"}
+
+Fake soil data:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+soil <- rast(xmin=0, xmax=12, ymin=0, ymax=12, nrows=26, ncols = 26, vals = 100 * runif(26 * 26), crs = "EPSG:4326")
+
+plot(soil)
+```
+:::
+
+:::
+
+#### What does it do really?
+
++ Map below shows grids from `precip` (red border) and from `soil` (blue border). 
+
++ As you can see, the grids from the two layers are not nicely aligned. 
+
++ See the the top left grid with green fill color from the `precip` layer. Resampling will find a single value to the grid based on the value of the nearby grids from the `soil` layer.
+
++ Even though the name "resample" sounds like it is a random process, there is no randomness.
+
+
+```{webr-r}
+#| context: output 
+
+precip_sf <- 
+  st_as_stars(precip) %>%
+  st_as_sf()
+
+soil_sf <- 
+  st_as_stars(soil) %>%
+  st_as_sf()
+
+ggplot() +
+  geom_sf(data = precip_sf, fill = NA, col = "red", linewidth = 0.8) +
+  geom_sf(data = precip_sf[1, ], fill = "green", col = "red", alpha = 0.4) +
+  geom_sf(data = soil_sf, fill = NA, col = "blue") +
+  theme_void()
+```
+
+#### How
+
+**Syntax**
+```{r, eval = FALSE}
+resample(sr_1, sr_2, method)
+```
+
+<br>
+
++ `st_1`:	`SpatRaster` to be resampled
++ `st_2`:	`SpatRaster` with the geometry that `st_1` should be resampled to
++ `method`: method of assigning values  
+  + "near": nearest neighbor (Default)
+  + "cubicspline": cubic-spline interpolation
+  + "bilinear": bi-linear interpolation
+  + others (run `?terra::resample` to see all the `method` options)
+
+#### Example
+
+Since we are resampling values from the `soil` layer to the grids of `precip`,
+
+```{webr-r}
+soil_to_precip_grids <- resample(soil, precip, method = "cubicspline")
+
+plot(soil_to_precip_grids)
+```
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ Change the `method` and see how the resampling results change.
++ Many of the spatial datasets tend to exhibit a positive spatial correlation and the resampling outcomes are not as sensitive to `method` as you see here where cell values are completely independent.
+:::
+
+:::
+
+### Merge
+
+::: {.panel-tabset}
+
+#### Motivation
+
+Sometimes, you have two or more raster layers that have different spatial coverages. In such a case, you might want to merge them into a single raster layer.
+
+For demonstration purpose, we will use two `SpatRaster` objects: `prism_saunders` and `prism_douglas`. They are PRISM maximum temperature observed on 08/01/2012 in the Saunders and Douglas counties in Nebraska, which are adjacent to each other.
+
+```{webr-r}
+#| autorun: true
+ggplot() +
+  geom_spatraster(data = prism_saunders) +
+  geom_spatraster(data = prism_douglas)
+```
+
+:::{.callout-note}
+Note that this is different from combining multiple single-layer raster data of the same spatial extent and resolution into multi-layer raster data.
+:::
+
+#### How
+
+You can use the `terra::merge()` function to merge two raster datasets into one.
+
+```{webr-r}
+prism_merged <- terra::merge(prism_saunders, prism_douglas)
+```
+
+<br>
+
+You can check the result of the merging below:
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = prism_merged)
+```
+
+<br>
+
+:::{.callout-note}
+Remember that raster object has to be perfectly rectangular. The result of merging will construct a rectangle that encompasses both `prism_saunders` and `prism_douglas`. All the cells that are not covered by `prism_saunders` and `prism_douglas` will be assigned NA.
+:::
+
+
+#### Caveat
+
+When merging two `SpatRaster` objects and when they have spatial overlaps, the value of the first `SpatRaster` object will be respected.
+
+Let's run a little experiment. We will assign a high value to all the cells in `prism_saunders`. This will make this phenomenon easy to detect.
+
+```{webr-r}
+values(prism_saunders) <- 120
+```
+
+<br> 
+
+**`prism_saunders` first**
+
+```{webr-r}
+merge(prism_saunders, prism_douglas) %>% plot()
+```
+
+<br>
+
+**`prism_douglas` first**
+
+```{webr-r}
+merge(prism_douglas, prism_saunders) %>% plot()
+```
+
+:::
+<!--end of panel-->
+
+:::

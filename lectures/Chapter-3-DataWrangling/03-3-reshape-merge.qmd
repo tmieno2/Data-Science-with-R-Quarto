@@ -497,7 +497,7 @@ num_flights <-
 
 ### Exercise 2
 
-Reshape the data (`num_flights`) into a wide format so that you have number of flights per month in columns and assign it to an R object named `num_flights_wide`.
+Reshape the `num_flights` data into a wide format with the number of flights per month as columns, and assign the result to an R object named `num_flights_wide`.
 
 <br>
 
@@ -526,7 +526,8 @@ Here is the output you are supposed to get if done correctly:
 ```{webr-r}
 #| context: output
 (
-num_flights %>% 
+num_flights_wide <- 
+  num_flights %>% 
   tidyr::pivot_wider(
     names_from = month,
     names_prefix = "month_",
@@ -837,7 +838,7 @@ Let's expand the `yield_data` as follows:
 ```{webr-r}
 #| autorun: true
 (
-yield_data <- 
+yield_data_with_chase <- 
   data.frame(
     yield = runif(6, min = 180, max = 280),
     county = c("Lancaster", "Douglas", "Chase", "Lancaster", "Douglas", "Chase"),
@@ -848,18 +849,18 @@ yield_data <-
 
 #### Demo 2
 
-**`yield_data` on the right**:
+**`yield_data_with_chase` on the right**:
 
 ```{webr-r}
-left_join(price_data, yield_data, by = c("county", "year"))  
+left_join(price_data, yield_data_with_chase, by = c("county", "year"))  
 ```
 
 <br>
 
-**`yield_data` on the left**:
+**`yield_data_with_chase` on the left**:
 
 ```{webr-r}
-left_join(yield_data, price_data, by = c("county", "year"))  
+left_join(yield_data_with_chase, price_data, by = c("county", "year"))  
 ```
 
 <br>
@@ -871,13 +872,13 @@ left_join(yield_data, price_data, by = c("county", "year"))
 
 #### keeping all rows
 
-We saw in the previous slide having `price_data` (as `data_x`) and `yield_data` as (`data_y`), `left_join()` discarded rows in `yield_data` (`data_y`).
+We saw in the previous slide having `price_data` (as `data_x`) and `yield_data_with_chase` as (`data_y`), `left_join()` discarded rows in `yield_data_with_chase` (`data_y`).
 
 If you would like to keep unmatched rows in `data_y`, you can use `full_join()`.
 
 ```{webr-r}
 #| echo: true
-full_join(price_data, yield_data, by = c("county", "year"))  
+full_join(price_data, yield_data_with_chase, by = c("county", "year"))  
 ```
 
 :::

@@ -21,7 +21,7 @@ library(ggplot2)
 library(flextable)
 ```
 
-## Exercise 1: Create a Simple Flextable
+## Exercise 1
 
 **Dataset:** `mtcars`
 
@@ -78,15 +78,16 @@ ft <-
 :::
 
 
-## Exercise 2: Conditional Formatting
+## Exercise 2
 
 **Dataset:** `iris`
 
 1.  Load the `iris` dataset.
 2.  Create a `flextable` that displays the first 10 rows of the dataset.
 3.  Apply conditional formatting: 
-    1.  Highlight cells in the `Sepal.Length` column where their values are greater than 6.0 in blue using `color`.
-    2.  Draw borders around the paragraphs in the `Sepal.Width` column if their values are less than 3.0 using .
+    1.  Change the background color of the  cells in the `Sepal.Length` column where their values are greater than 5.0 in blue using `color` using `bg()`.
+    2.  Draw orange borders at the bottom of  the cells in the `Sepal.Width` column if their values are less than 3.0 using `border()`.
+    3.  Draw red borders at both sides of the cells in the `Sepal.Width` column if their corresponding values of `Petal.Width` are less than 1.5 using `border()`.
 
 Here is the finished table you are trying to make:
 
@@ -96,7 +97,8 @@ Here is the finished table you are trying to make:
 ft <- 
   flextable(iris[1:10,]) %>%
   # Apply conditional formatting to Sepal.Length column
-  bg(i = ~ Sepal.Length > 6, j = "Sepal.Length", bg = "#FFDDC1")
+  bg(i = ~ Sepal.Length > 5, j = "Sepal.Length", bg = "blue") %>%
+  border(i = ~ Sepal.Width > 3, j = ~ Sepal.Width, border.bottom = officer::fp_border(color = "orange"))
 )
 ```
 
@@ -115,10 +117,8 @@ data(iris)
 ft <- 
   flextable(iris[1:10,]) %>%
   # Apply conditional formatting to Sepal.Length column
-  bg(i = ~ Sepal.Length > 6, j = "Sepal.Length", bg = "#FFDDC1")
-
-# Display the table
-ft
+  bg(i = ~ Sepal.Length > 5, j = "Sepal.Length", bg = "blue") %>%
+  border(i = ~ Sepal.Width > 3, j = ~ Sepal.Width, border.bottom = officer::fp_border(color = "orange"))
 ```
 
 :::
@@ -128,10 +128,12 @@ ft
 
 **Dataset:** `airquality`
 
-1.  Load the `airquality` dataset.
+1.  Load the `airquality` dataset and filter the data so that you have only the first 10 days of May and June.
 2.  Create a flextable using selected columns: `Month`, `Day`, `Ozone`, `Wind`.
-3.  Group the table by the `Month` column and merge the cells of the `Month` column.
-4.  Add a caption to the table.
+3.  Group the table by the `Month` column and merge the cells of the `Month` column using `merge_v()`.
+4.  Draw a black border to separate May and June observations
+5.  Draw a black line at the bottom of the table which was somehow lost in step 3 using `fix_border_issues()`.
+6.  Add a caption to the table using `set_caption()`.
 
 Here is the finished table you are trying to make:
 
@@ -139,11 +141,15 @@ Here is the finished table you are trying to make:
 #| echo: false
 (
 ft <- 
-  airquality[, c("Month", "Day", "Ozone", "Wind")] %>%
+  airquality %>%
+  dplyr::filter(Month %in% c(5, 6) & Day <= 10) %>%
+  .[, c("Month", "Day", "Ozone", "Wind")] %>%
   # Create flextable
   flextable() %>%
   # Merge Month column
   merge_v(j = "Month") %>%
+  border(i = 10, border.bottom = officer::fp_border(color = "black")) %>%
+  fix_border_issues() %>%
   # Add a caption
   set_caption("Airquality Data Table with Grouped Month")
 ) 
@@ -161,11 +167,15 @@ data(airquality)
 #| code-fold: true
 # Select columns
 ft <- 
-  airquality[, c("Month", "Day", "Ozone", "Wind")] %>%
+  airquality %>%
+  dplyr::filter(Month %in% c(5, 6) & Day <= 10) %>%
+  .[, c("Month", "Day", "Ozone", "Wind")] %>%
   # Create flextable
   flextable() %>%
   # Merge Month column
   merge_v(j = "Month") %>%
+  border(i = 10, border.bottom = officer::fp_border(color = "black")) %>%
+  fix_border_issues() %>%
   # Add a caption
   set_caption("Airquality Data Table with Grouped Month")
 ```
@@ -177,7 +187,7 @@ ft <-
 **Dataset:** `iris`
 
 1.  Load the `iris` dataset.
-2.  Create a flextable with the first 15 rows of the dataset.
+2.  Create a table with the first 10 rows of the dataset.
 3.  Modify the header by renaming columns `Sepal.Length` and `Sepal.Width` to `Sepal Length` and `Sepal Width`, respectively.
 4.  Add a custom footer explaining what the dataset represents.
 
@@ -187,7 +197,7 @@ Here is the finished table you are trying to make:
 #| echo: false
 (
 ft <- 
-  flextable(iris[1:15,]) %>%
+  flextable(iris[1:10,]) %>%
   # Modify header labels
   set_header_labels(Sepal.Length = "Sepal Length", Sepal.Width = "Sepal Width") %>%
   # Add a footer

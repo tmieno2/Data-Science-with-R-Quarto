@@ -1,0 +1,784 @@
+---
+title: "09-5: R as GIS: Interaction of Vector and Raster Datasets"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss]
+    fontsize: 1em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf', 'terra', 'stars', 'tidyterra'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.8
+filters:
+  - webr
+---
+
+```{r, include = FALSE}
+library(sf)
+library(dplyr)
+library(data.table)
+```
+
+## Before you start
+
+<br>
+
+### Learning objectives
+
+Learn the spatial interactions of a vector and raster dataset. Specifically,
+
++ Crop (spatially subset) a raster dataset based on the geographic extent of a vector dataset. 
+
++ Extract values from raster data for points and polygons. 
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
+1. [Cropping raster datasets](#crop)
+2. [Extract values from raster datasets](#extract)
+3. [Basic speed comparison](#speed)
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+### Pre-requisite (Links)
+
++ [`ggplot2` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_1_ggplot2_primer.html)
++ [`dplyr` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_2_dplyr_primer.html)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{webr-r}
+#| context: setup
+#| 
+#--- install and library the data package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+
+library(r.spatial.workshop.datasets)
+data(wells_ne_sf)
+data(ne_counties)
+data(treatment_blocks)
+data(corn_yield)
+data(NDRE)
+NDRE <- terra::rast(NDRE)
+data(prism_us)
+prism_us <- terra::rast(prism_us)
+```
+
+## Tips to make the most of the lecture notes
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+## Cropping and masking raster data
+
+::: {.panel-tabset}
+
+### Story and Data
+
++ You have run on-farm nitrogen randomized experiment on a field to quantify the impact of nitrogen on corn yield. 
+
++ You have three datasets
+  + `corn_yield`: `sf` of corn yield (bu/acre) observations data represented by points
+  + `treatment_blocks`: `sf` of treatment blocks represented by polygons
+  + `NDRE`: `SpatRaster` of NDRE (roughly put, an indicator of how green the field is) taken by a drone
+
+```{webr-r}
+corn_yield
+treatment_blocks
+NDRE
+```
+
+<br>
+
+Here is what they look like on a map:
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NDRE, alpha = 0.4) +
+  geom_sf(data = corn_yield, aes(color = yield), size = 0.05) +
+  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
+  scale_fill_viridis_c(name = "NDRE") +
+  scale_color_continuous(name = "Corn Yield (bu/acre)") +
+  theme_void() 
+```
+
+### Objectives
+
+::: {.columns}
+
+::: {.column width="70%"}
+
+**Objective 1**
+
+<span style = "color: red;"> Crop </span> the NDRE raster data (`NDRE`) to the bounding box of `corn_yield`
+
++ We can create a map that is more focused on the area of interest rather than the entire field 
+
++ We can stop carrying around the unnecessary parts of the data, which would educe its size (This matters when your raster data is spatially very fine and large.)
+
++ Extracting value to an `sf` from a smaller raster data is faster (we will talk about this later in [this section](#sec-extract))
+
+<br>
+
+**Objective 2**
+
+<span style = "color: blue;"> Mask </span> the `NDRE` data to `treatment_blocks` (assign NA to all the cells that are not intersecting with `corn_yield`)
+
++ We can create a map without any unnecessary cells presented 
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Crop
+
+::: {.panel-tabset}
+
+#### How
+
+You can crop a raster layer by using `terra::crop()`.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+terra::crop(SpatRaster, sf)
+```
+
+<br>
+
+The resulting `SpatRaster` object is the original cropped to the <span style = "color: red;"> bounding box </span> of the `sf` object.
+
+#### Demonstration
+
+```{webr-r}
+NDRE_sub <- terra::crop(NDRE, corn_yield)
+```
+
+<br>
+
+If you run the code above, then you should see an error. This happened because they do not share the same CRS.
+
+```{webr-r}
+crs(NDRE)
+st_crs(corn_yield)
+```
+
+<br>
+
+:::{.callout-important title="Important!"}
++ Projecting (or re-projecting to a different CRS) a raster dataset is typically a bad idea as it is irreversible. 
++ Re-project the vector data to the CRS of the raster data.
+:::
+
+<br>
+
+Let's change the CRS of `corn_yield` to that of `NDRE` and then try to crop again.
+
+```{webr-r}
+NDRE_sub <- terra::crop(NDRE, st_transform(corn_yield, crs(NDRE)))
+```
+
+<br>
+
+Let's check visually.
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NDRE_sub, alpha = 0.4) +
+  geom_sf(data = corn_yield, aes(color = yield), size = 0.05) +
+  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
+  scale_fill_viridis_c(name = "NDRE") +
+  scale_color_continuous(name = "Corn Yield (bu/acre)") +
+  theme_void() 
+```
+:::
+<!--end of panel-->
+
+### Mask 
+
+::: {.panel-tabset}
+
+#### How
+
+**Syntax**
+
+```{r eval = F}
+terra::mask(SpatRaster, sf)
+```
+
+<br>
+
+The resulting `SpatRaster` object will have NA assigned to all the cells that are <span style = "color: red;"> not intersecting </span> with any of the geometries in the `sf` object.
+
+#### Demonstration
+
+```{webr-r}
+NDRE_sub_masked <- terra::mask(NDRE_sub, st_transform(treatment_blocks, terra::crs(NDRE_sub)))
+```
+
+<br>
+
+Let's check visually.
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NDRE_sub_masked, alpha = 0.4) +
+  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
+  scale_fill_viridis_c(name = "NDRE", na.value = "transparent") +
+  theme_void() 
+```
+
+<br>
+
+:::{.callout-note title="Note"}
++ adding `na.value = "transparent"` in `scale_fill_*()` will make the cells with NA value transparent (cannot be seen).
++ remove `na.value = "transparent"` and run the code again, you will that cells with NA are grey. 
+:::
+
+:::
+<!--end of panel-->
+
+### Exercise
+
+::: {.panel-tabset}
+
+#### Data
+
+We use 
+
++ `prism_us`: a coarser version of PRISM precipitation data on 08/01/2012 covering the entire contiguous U.S. (`SpatRaster`)
+
++ `ne_counties`: counties in Nebraska (`sf`)
+
+Here is what they look like:
+
+```{webr-r}
+#| context: setup
+ggplot() +
+  geom_spatraster(data = prism_us) +
+  geom_sf(data = ne_counties, color = "orange") +
+  theme_void()
+```
+
+#### Exercise 1
+
+Create the map you saw in the previous tab.
+
+```{webr-r}
+ggplot() +
+  geom_spatraster() +
+  geom_sf() +
+  theme_void()
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot() +
+  geom_spatraster(data = prism_us) +
+  geom_sf(data = ne_counties, color = "orange") +
+  theme_void()
+```
+
+#### Exercise 2
+
+Crop and then mask `prism_us` using `ne_counties`. 
+
+```{webr-r}
+
+```
+
+<br>
+
+Create a map using the cropped- and masked-`prism_us` and `ne_counties`.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+
+prism_us_cropped_masked <- 
+  prism_us %>%
+  terra::crop(ne_counties) %>%
+  terra::maske(ne_counties)
+ 
+ggplot() +
+  geom_spatraster(data = prism_us_cropped_masked) +
+  geom_sf(data = ne_counties, color = "orange") +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Extract values from raster layers to a vector data {#sec-extract}
+
+::: {.panel-tabset}
+
+### What is it?
+
+::: {.panel-tabset}
+
+#### to points
+
+**Definition**
+
+For each of the points, find which raster cell it is located within, and assign the value of the cell to the point.  
+
+<br>
+
+**Example**
+
+```{r echo = F}
+set.seed(378533)
+library(sf)
+library(stars)
+library(dplyr)
+library(ggplot2)
+
+#--- create polygons ---#
+polygon <- st_polygon(list(
+  rbind(c(0, 0), c(8, 0), c(8, 8), c(0, 8), c(0, 0))
+))
+
+raster_like_cells <- 
+  st_make_grid(polygon, n = c(8, 8)) %>%
+  st_as_sf() %>%
+  mutate(value = sample(1:64, 64))
+
+stars_cells <- st_rasterize(raster_like_cells, nx = 8, ny = 8)
+
+cell_centroids <- 
+  st_centroid(raster_like_cells) %>%
+  st_as_sf()
+```
+
+::: {.columns}
+
+
+::: {.column width="50%"}
+```{r, echo = F, out.width = "120%"}
+#--------------------------
+# Create points for which values are extracted
+#--------------------------
+#--- points ---#
+point_1 <- st_point(c(2.4, 2.2))
+point_2 <- st_point(c(6.7, 1.8))
+point_3 <- st_point(c(4.2, 7.1))
+
+#--- combine the points to make a single  sf of points ---#
+points <- 
+  list(point_1, point_2, point_3) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
+  mutate(point_name = c("Point 1", "Point 2", "Point 3"))
+
+#--------------------------
+# Create maps
+#--------------------------
+ggplot() +
+  geom_stars(data = stars_cells, alpha = 0.5) +
+  scale_fill_distiller(name = "Value", palette = "Spectral") +
+  geom_sf_text(data = raster_like_cells, aes(label = value)) +
+  geom_sf(data = points, aes(shape = point_name), size = 3) +
+  scale_shape(name = "Points") +
+  theme_void()
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
++ The numbers inside the cells are the values that the cells hold. 
+
++ After the extraction, 
+	* Point 1 will be assigned $50$
+	* Point 2 will be assigned $4$
+	* Point 3 will be assigned $54$.
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### to polygons
+
+**Definition**
+
+For each of the polygons, identify all the raster cells that intersect with the polygon, and assign a vector of the cell values to the polygon. 
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r, echo = FALSE}
+#--------------------------
+# Create a polygon for which values are extracted
+#--------------------------
+polygon_extract <- st_polygon(list(
+  rbind(c(1.5, 2), c(6, 2.3), c(7, 6.5), c(2, 5), c(1.5, 2))
+))
+
+polygons_extract_viz <- ggplot() +
+  geom_stars(data = stars_cells, alpha = 0.5) +
+  scale_fill_distiller(name = "Value", palette = "Spectral") +
+  geom_sf(data = polygon_extract, fill = NA) +
+  geom_sf(data = cell_centroids, color = "black", size = 0.8) +
+  geom_sf_text(data = raster_like_cells, aes(label = value), nudge_x = -0.25, nudge_y = 0.25) +
+  theme_void()
+
+polygons_extract_viz
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
++ Find all the raster cells each of the polygons "intersect with"
+
++ Assign the value of all the intersecting cells to the polygon (n-to-1). 
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### Story
+
+::: {.columns}
+
+::: {.column width="70%"}
++ Right now, corn yields (`corn_yield`), NDRE (`NDRE`), and treatment blocks (`treatment_blocks`) are separate R objects. 
+
++ We would like to conduct two kinds of analysis
+  + analysis based on data where yield points are the unit of observations
+  + analysis based on data where treatment blocks are the unit of observations
+ 
++ To achieve this, we would like to `join` them based on their locations
+  + extract values from 'NDRE' to `corn_yield`
+  + extract values from 'NDRE' to `treatment_blocks`
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### How (to points)
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `terra::extract()` with the following syntax. 
+
+**Syntax**
+
+```{r eval = F}
+terra::extract(SpatRaster, sf of points)
+```
+
+#### Demonstration
+
+Extract NDRE values to each of the yield points:
+
+```{webr-r}
+NDRE_extracted <- terra::extract(NDRE, corn_yield)
+```
+
+<br>
+
+Oops, we did it again.
+
+```{webr-r}
+(
+NDRE_extracted <- terra::extract(NDRE, st_transform(corn_yield, crs(NDRE)))
+)
+```
+
+:::{.callout-note title="Imporatant"}
++ `ID` variable represents the row number in the `sf` (here, `corn_yield`). For example, `ID == 3` in `NDRE_extracted` is for `corn_yield[3, ]`. 
++ This becomes more important when we we do extraction for polygons
+:::
+
+
+#### post-extraction processing
+
++ Just extracting the raster values to the points is not where we stop. 
+
++ We need to merge the extracted values back to the points data so that we can use them for further analysis.
+
+---
+
+Let's first check the class of `NDRE_extracted`.
+
+```{webr-r}
+class(NDRE_extracted)
+```
+
+<br>
+
+The **n**th row in `NDRE_extracted` is for the **n**th point in `yield`.
+
+So, you can simply do this:
+
+```{webr-r}
+corn_yield <- mutate(corn_yield, NDRE = NDRE_extracted$NDRE)
+
+#--- or ---#
+# corn_yield$NDRE <- NDRE_extracted$NDRE
+```
+
+#### Multiple layers
+
+You can extract values from multiple layers at the same time using `terra::extract()` just like you did with a single-layer raster data. 
+
+For demonstration, let's create a multi-layer raster data:
+
+```{webr-r}
+#| autorun: true
+#--- Create aother layer ---#
+NDRE_100 <- NDRE * 100
+names(NDRE_100) <- "NDRE_100" # change the attribute name 
+
+#--- combine to forma two-layer SpatRaster ---#
+(
+NDRE_two_layers <- c(NDRE, NDRE_100) 
+)
+```
+
+<br>
+
+```{webr-r}
+(
+NDRE_two_layers_extracted <- terra::extract(NDRE_two_layers, st_transform(corn_yield, crs(NDRE)))
+)
+```
+
+<br>
+
+The resulting object is a `data.frame` and the values from first (second) layer is the second (third) column. 
+
+```{webr-r}
+(
+corn_yield <- cbind(corn_yield, NDRE_two_layers_extracted[, -1])
+)
+```
+
+:::
+<!--end of panel-->
+
+### How (to polygons)
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `terra::extract()` with the following syntax. Yes, same as value extraction to points.
+
+**Syntax**
+
+```{r eval = F}
+terra::extract(SpatRaster, sf of polygons)
+```
+
+#### Demonstration
+
+Extract NDRE values to each of the treatment blocks:
+
+```{webr-r}
+#| warning: false
+NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDRE)))
+```
+
+<br>
+
+It's a `data.frame`.
+
+```{webr-r}
+class(NDRE_extracted_tb)
+```
+
+<br>
+
+As you can see below, there are more than one NDRE values for each of the treatment blocks, which is expected as there are many grid cells that are inside of them.
+
+```{webr-r}
+NDRE_extracted_tb[1:10, ]
+NDRE_extracted_tb[200:210, ]
+```
+
+
+#### Post-extraction processing
+
+Let's check the class of `NDRE_extracted_tb`.
+
+```{webr-r}
+class(NDRE_extracted_tb)
+```
+
+<br>
+
+We just want to one NDRE value for each of the treatment blocks. So, let's summarize them. In doing so, we summarize by `ID` as it indicates the row number of `treatment_blocks`. Here, we are getting the average.
+
+```{webr-r}
+avg_NDRE <- 
+  NDRE_extracted_tb %>%
+  dplyr::group_by(ID) %>%
+  dplyr::summarize(avg_NDRE = mean(NDRE))
+```
+
+<br>
+
+Now, we can assign the average NDRE values to `treatment_blocks` like below because `ID == n` is for **n**th row of `treatment_blocks`.
+
+```{webr-r}
+treatment_blocks <- mutate(treatment_blocks, NDRE = avg_NDRE)
+
+#--- or ---#
+# treatment_blocks$NDRE <- avg_NDRE
+```
+
+#### Extract and summarize
+
+You can actually extract and summarize both in `terra::extract()` using the `fun` option.
+
+```{webr-r}
+#| warning: false
+NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDRE)), fun = mean)
+```
+
+#### Area-weighted summarization
+
+::: {.columns}
+
+::: {.column width="70%"}
++ In the previous cases of extraction and summarization tasks, all the intersecting cells are given the same weight irrespective of the degree of spatial overlap. 
+
++ This is very much acceptable in the current application, because the resolution of the raster data is high (cells are so small) relative to the size of the polygons.
+
++ However, if the cells are relatively large, you might want to consider calculating area-weighted summary. 
+
+<br>
+
+---
+
+We can add `exact = TRUE` option, which returns `fraction` variable indicating the fraction of the cells intersecting with the polygon.
+
+<br>
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{webr-r}
+#| warning: false
+NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDRE)), exact = TRUE)
+```
+
+<br>
+
+```{webr-r}
+NDRE_extracted_tb %>%
+  dplyr::group_by(ID) %>%
+  dplyr::summarize(NDRE = sum(NDRE * fraction) / sum(fraction))
+```
+
+#### Multiple layers
+
+Just like the case with value extraction to points, we can extract values from multiple layers to polygons in a single call with `terra::extract()`.
+
+```{webr-r}
+NDRE_extracted_tb_twolayers <- terra::extract(NDRE_two_layers, st_transform(treatment_blocks, crs(NDRE)), exact = TRUE)
+
+head(NDRE_extracted_tb_twolayers)
+```
+
+<br>
+
+Let's get the weighted average for both variables:
+
+```{webr-r}
+NDRE_extracted_tb_twolayers %>%
+  dplyr::group_by(ID) %>%
+  dplyr::summarize(
+    NDRE = sum(NDRE * fraction) / sum(fraction),
+    NDRE_100 = sum(NDRE_100 * fraction) / sum(fraction)
+  )
+```
+
+:::
+<!--end of panel-->
+
+### Exercises
+
+
+:::
+<!--end of panel-->

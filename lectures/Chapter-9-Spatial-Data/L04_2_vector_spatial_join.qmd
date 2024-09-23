@@ -1,0 +1,947 @@
+---
+title: "09-4-2: R as GIS: Interaction of Vector Datasets II"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss]
+    fontsize: 1em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.8
+filters:
+  - webr
+---
+
+```{r, include = FALSE}
+library(sf)
+library(dplyr)
+library(data.table)
+```
+
+## Before you start
+
+<br>
+
+### Learning objectives
+
+The objectives of this chapter is to learn spatial interactive operations that involves two `sf` objects. Specifically,
+
++ overlay an `sf` object on another `sf` object to extract (or join) values from the `sf` object
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
+1. [Topological Relations](#top)
+2. [Spatial Subsetting](#subset)
+3. [Spatial Value Extraction](#extract)
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+### Pre-requisite (Links)
+
++ [`ggplot2` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_1_ggplot2_primer.html)
++ [`dplyr` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_2_dplyr_primer.html)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+```{webr-r}
+#| context: setup
+#| 
+#--- install and library the data package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+library(r.spatial.workshop.datasets)
+
+#--- Irrigation wells in Nebraska as sf ---#
+data(wells_ne)
+wells_ne <-
+  sf::st_as_sf(
+    wells_ne,
+    coords = c(
+      "longdd",
+      "latdd"
+    ),
+    crs = 4269
+  )
+
+#--- Nebraska county boundary ---# 
+data(ne_counties, package = "r.spatial.workshop.datasets")
+
+#--- Iowa corn acres ---#
+data(ia_nitrogen)
+
+#--- HUC units ---#
+data(huc_ia)
+```
+
+## Tips to make the most of the lecture notes
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+## Spatial join
+
+::: {.panel-tabset}
+
+### What is it?
+
+Spatial join involves all of the following:
+
++ overlay one spatial layer (target layer) onto another spatial layer (source layer) 
++ for each of the observation in the target layer
+  * identify which objects in the source layer it geographically intersects (or a different  topological relation) with  
+  * extract values associated with the intersecting objects in the source layer (and summarize if necessary), 
+  * assign the extracted value to the object in the target layer
+
+### Classification
+
+We can classify spatial join into four categories by the type of the underlying spatial objects:
+
++ <span style = "color: red;"> vector-vector: vector data (target) against vector data (source) </span>
++ vector-raster: vector data (target) against raster data (source)  
++ raster-vector: raster data (target) against vector data (source)  
++ raster-raster: raster data (target) against raster data (source)  
+
+Among the four, our focus here is the first case (the second case will be discussed later). 
+
+We will not cover the third and fourth cases in this course because it is almost always the case that our target data is a vector data (e.g., city or farm fields as points, political boundaries as polygons, etc).  
+
+### Sub-classification
+
+As noted earlier, we will look at vector-vector interactions in this lecture.
+
+This category can be further broken down into different sub categories depending on the type of spatial object (point, line, and polygon). 
+
+Here, we will ignore any spatial joins that involve lines. This is because objects represented by lines are rarely observation units in our analysis nor the source data from which we will extract values. 
+
+Here is the list of the types of spatial joins we will learn.  
+
+1. points (target) against polygons (source)
+2. polygons (target) against points (source)
+3. polygons (target) against polygons (source)
+:::
+
+
+## Spatial join: points (source) vs polygons (target)
+
+::: {.panel-tabset}
+
+### Introduction
+
+**What?**
+
+For each of the observations (points) in the source data,
+
++ finds which polygon in the target data it intersects with
++ assigns the value associated with the intersected polygon to the point
+
+**How?**
+
+In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:    
+
+```{r syntax_st_join, eval = FALSE}
+st_join(points_sf, polygons_sf)
+```
+
+<br>
+
+**Note**
+
+Similar to spatial subsetting, the default topological relation is `st_intersects()`
+
+### Data
+
+We use `wells_ne` (points) and `ne_counties` (polygons) data for illustration. Here is the map:
+
+```{webr-r}
+#| autorun: true
+ggplot() +
+  geom_sf(data = ne_counties) +
+  geom_sf(data = wells_ne) +
+  theme_void()
+```
+
+### Code
+
+For each of the points (wells) in `wells_ne`, the code below will find the polygon (county) in which the point (well) is located, and attach the value of the variables of the polygon (county) to the point (well).
+
+```{webr-r}
+wells_joined_with_county <- st_join(wells_ne, ne_counties)
+```
+
+### Inspect the results
+
+```{webr-r}
+wells_joined_with_county
+```
+
+Evaluate `wells_joined_with_county` and you will see that `statefp`, `countyfp`, and `name` variables are appended.
+
+Let's check if the two datasets are indeed joined based on their spatial locations.
+
+```{webr-r}
+#--- get wells in Adams county according to st_join() ---#
+wells_in_Adams <- dplyr::filter(wells_joined_with_county, name == "Adams")
+
+#--- get Adams county boundary ---#
+adams_county <- dplyr::filter(ne_counties, name == "Adams")
+
+#--- visualize ---#
+ggplot() +
+  geom_sf(data = adams_county) +
+  geom_sf(data = wells_in_Adams) +
+  theme_void()
+```
+
+:::
+
+## Spatial join: polygons (source) vs points (target) {#sec-polygon-point}
+
+::: {.panel-tabset}
+
+### Introduction
+
+**What?**
+
+For each of the observations (polygons) in the target data,
+
++ find which observations (points) in the source file it intersects
++ assign the values associated with the points to the polygon. 
+
+**How?**
+
+In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:    
+
+```{r syntax_st_join-2, eval = FALSE}
+st_join(polygons_sf, points_sf)
+```
+
+<br>
+
+**Note**
+
+Similar to spatial subsetting, the default topological relation is `st_intersects()`
+
+### Data
+
+We use `ne_counties` (polygons) and `wells_ne` (points) data for illustration. Here is the map:
+
+```{webr-r}
+#| autorun: true
+ggplot() +
+  geom_sf(data = ne_counties) +
+  geom_sf(data = wells_ne) +
+  theme_void()
+```
+
+<br>
+
+We create a fake variable that represents groundwater extraction (acre-feet) from the aquifer.
+
+```{webr-r}
+#| autorun: true
+wells_ne <- 
+  wells_ne %>%
+  dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))
+```
+
+<br>
+
+Our goal is to find average groundwater extraction by county.
+
+### Code
+
+For each of the polygons (counties) in `ne_counties`, the code below will find all the points (wells) that are located inside the county, and attach the value of the variables of the points (wells) to the polygon (county).
+
+```{webr-r}
+county_joined_with_wells <- st_join(ne_counties, wells_ne)
+```
+
+### Inspect the results
+
+Evaluate `county_joined_with_wells` and you will see that `wellid` and `gw_extraction` variables are appended.
+
+```{webr-r}
+county_joined_with_wells
+```
+
+<br>
+
+One thing that is different from the previous case is that 
+
++ For each of the polygons (counties), the resulting dataset has as many observations as the number of wells that intersect with the polygon (county).
+
++ If a polygon has no wells inside, then you will simply have a single row of data for that polygon.
+
+For example, `countyfp` of 039 and 109 (first two rows), there are no wells inside them. So, we only have a single row with `wellid`  and `gw_extraction` missing. But, for `countyfp` of 129, we have many wells inside it. 
+
+```{webr-r}
+(
+adams_county <- dplyr::filter(county_joined_with_wells, countyfp == "129") 
+)
+```
+
+<br>
+
+All the rows there have exactly the same geometry, which is the `MULTIPOLYGON` that represents the boundary of the Adams county.
+
+```{webr-r}
+identical(adams_county[1, "geometry"], adams_county[2, "geometry"])
+```
+
+### Post-join processing
+
+Since we joined the two layers, we can now do calculations that were not possible before. Here, we will calculate the average groundwater extraction by county.
+
+```{webr-r}
+county_joined_with_wells %>%
+  # as.data.frame() %>%
+  dplyr::group_by(countyfp) %>%
+  dplyr::summarize(sum(gw_extraction))
+```
+
+<br>
+
++ `dplyr::summarize()` takes a long time if it is applied to an `sf` object (this was not the case before).
++ `as.data.frame()` converts `county_joined_with_wells` into a `data.frame` and that saves lots of time in doing `dplyr::summarize()`.
+
+Of course, it is just as easy to get other types of statistics by simply modifying the `summarize()` part.
+
+:::
+
+
+## Spatial join: polygons (source) vs polygons (target)
+
+::: {.panel-tabset}
+
+### Introduction
+
+For each of the observations (polygons) in the source data,
+
++ find which observations (polygons) in the target data it intersects
++ then, assign the values associated with the intersecting polygons from the target data to the polygon from the source data. 
+
+### Data
+
+Nitrogen use (lb/acre) by county in Iowa (Note: this is a fake dataset that is generated using R):
+
+```{webr-r}
+ia_nitrogen
+
+ggplot() +
+  geom_sf(data = ia_nitrogen, aes(fill = nitrogen_rate))
+```
+
+<br>
+
+Hydrologic units that cover Iowa:
+
+```{webr-r}
+huc_ia
+
+ggplot() +
+  geom_sf(data = huc_ia)
+```
+
+### Story
+
+You are interested in understanding the impact of nitrogen use for agricultural production on water quality.
+
++ You observe water quality for each of the hydrologic units (`huc_ia`)
++ You observe nitrogen use (lb/acre) at the county level (`ia_nitrogen`)
+
+You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of corn production on water quality.
+
+```{webr-r}
+ggplot() + 
+  geom_sf(
+    data = ia_nitrogen,
+    alpha = 0.6,
+    aes(fill = nitrogen_rate)
+  ) +
+  geom_sf(
+    data = huc_ia,
+    alpha = 0
+  ) +
+  theme_void() +
+  theme(legend.position = "bottom") 
+```
+
+### Demonstration
+
+Let's join the two:
+
+```{webr-r}
+huc_joined_with_acres <- st_join(huc_ia, ia_nitrogen)
+```
+
+<br>
+
+Here, for each of the HUC units from `huc_ia`, all the intersecting counties from `ia_nitrogen` are matched. 
+
+For example, for `HUC_CODE == "07060004"`, seven counties intersect with it.
+
+```{webr-r}
+(
+  huc_07060004 <- dplyr::filter(huc_joined_with_acres, HUC_CODE == "07060004")
+)
+```
+
+<br>
+
+The geometry column of the four rows has exactly the same geometry, which represents the HUC unit with `HUC_CODE == 07060004`.
+
+We can now find average nitrogen use (lb/acre) by HUC unit:
+
+```{webr-r}
+huc_joined_with_acres %>%
+  as.data.frame()
+  dplyr::group_by(HUC_CODE) %>%
+  dplyr::summarize(total_corn_acres = mean(acres))
+```
+
+### But,
+
+:::{.callout-important}
+Note that the resulting dataset does not tell you the nature of intersections. The only thing we know from `huc_joined_with_acres` is which counties the HUC units are intersecting with no matter how small or large the overlapping area are.
+:::
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp)) +
+  geom_sf(data = huc_07060004)
+```
+
+<br>
+
+We simply take the average of the value of `nitrogen_rate` of the intersecting counties. But, this does not take into account the degree of the overlaps between the intersecting counties and the HUC unit. Later, we will talk about how to find area-weighted average of `nitrogen_rate` [this section](#sec-cropping-join).
+
+:::
+
+## Spatial Join: other topological relations {#sec-point-point-distance}
+
+::: {.panel-tabset}
+
+### Introduction
+
+Spatial join with `spatial_join()` uses `st_intersects()` as the default topological relationship for joining.
+
+**Syntax**
+
+```{r, eval = FALSE}
+st_join(sf_1, sf_2, join = \(x, y) st_*(x, y), dist = 5)
+```
+
+where `st_*` is the function that determines the topological relationships between `sf_1` and `sf_2`.
+
+### Data
+
+We use soy bean yield (points) data and as-applied seed rate (points) data.
+
+```{webr-r}
+#--- soybean yield ---#
+data(soy_yield)
+
+#--- seed rate ---#
+data(as_applied_s_rate)
+```
+
+### Story and Objective
+
+You have run on-farm field experiment to understand the impact of seed rate on soybean yield. They are available as points data. 
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = soy_yield,
+    size = 0.4,
+    color = "red"
+  ) +
+  geom_sf(
+    data = as_applied_s_rate,
+    size = 0.4,
+    color = "blue"
+  ) +
+  theme_void()
+```
+
+<br>
+
+You want to merge them together based on their proximity so that you can run statistical analysis. Specifically, for each of the yield points, we would like to link the seed rate points that are within 10-meter from the yield point.
+
+
+### Demonstration
+
+Let's join using `st_join()`:
+
+```{webr-r}
+soy_seed <- 
+  st_join(
+    soy_yield,
+    as_applied_s_rate, 
+    join = \(x, y) st_is_within_distance(x, y, dist = 10)
+  )
+```
+
+<br>
+
+We can now summarize the joined data like below:
+
+```{webr-r}
+soy_seed %>%
+  # st_drop_geometry() %>%
+  group_by(yield_id) %>%
+  summarize(avg_seed_rate = mean(seed_rate))
+```
+
+### Inspect and verify
+
+```{webr-r}
+soy_seed
+```
+
+<br>
+
++ According to the join, the 1st yield point from `soy_yield` did not have any seed rate data points from `as_applied_s_rate` within its 10 meter radius, so `NA` in `seed_rate`.n  
+
++ The second yield point from `soy_yield` are matched with two seed rate points from `as_applied_s_rate`: `seed_id` = 1 and `seed_id` = 558. Are they indeed less than 10 meter away from the second yield point?
+
+```{webr-r}
+#--- get all the points within 20 meter of the second yield point ---#
+seed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20), ]
+
+#--- visualize ---#
+ggplot() +
+  #--- second yield point ---#
+  geom_sf(data = soy_yield[2, ], color = "red") + 
+  #--- 10 meter buffer around the second yield point ---#
+  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = "blue", fill = NA) + 
+  #--- seed_id numer on whether they are located ---#
+  geom_sf_text(data = seed_rates_around_2nd, aes(label = seed_id), size = 6) +
+  theme_void()
+```
+
+:::
+
+## Spatial join and summary in one step with `aggregate()`
+
+::: {.panel-tabset}
+
+### What is it?
+
+In the example of finding average groundwater use by county (go [here](#sec-polygon-point) to remind yourself of this example), we took a two-step procedure to do so. 
+
++ spatial-join two layers with `st_join()`
++ apply `dplyr::summarize()` to the joined object
+
+However, this can actually be done in one step using `aggregate()`, in which you specify how you want to aggregate with the `FUN` option:
+
+**Syntax**
+
+```{r eval = F}
+aggregate(points_sf, polygons_sf, FUN = function)
+```
+
+Here, for each of the rows of the second `sf` (here, `polygons_sf`), all the intersecting points in `points_sf` are found and then the average of <span style = "color: blue;"> all </span> the columns of `points_sf` are calculated. Yes, `st_intersects()` is the default topological relationship just like spatial subsetting with `sf1[sf2, ]` and `st_join()`. 
+
+### Demonstration
+
+```{webr-r}
+aggregate(wells_ne, ne_counties, FUN = mean)
+```
+
+<br>
+
+Note that `wellid` was also averaged by county. We could just do this:
+
+```{webr-r}
+aggregate(dplyr::select(wells_ne, gw_extraction), ne_counties, FUN = mean)
+```
+
+### Another demonstration
+
+`aggregate()` is a fairly general procedure of spatial joining and summarization, and you can use it for many other cases including our example of soybean yield and seed rate (go [here](#sec-point-point-distance) for the example).
+
+Here is the code:
+
+```{webr-r}
+soy_seed <-
+  aggregate(
+    as_applied_s_rate, # what you are aggregating
+    soy_yield, # based on 
+    FUN = mean,
+    join = \(x, y) st_is_within_distance(x, y, dist = 10)
+  )
+```
+
+<br>
+
++ This looks almost identical with the code to spatial join the two `sf` layers. However, the order of the `sf` objects is flipped.
+
++ You are aggregating the columns of first `sf` for each of the geometry in the second `sf` (here yield point).   
+
+:::
+
+## Cropping Join {#sec-cropping-join}
+
+::: {.panel-tabset}
+
+### Motivation
+
+::: {.columns}
+
+::: {.column width="70%"}
++ In the example of finding total corn production acreage by HUC unit using `st_join()`, we had a problem of not knowing how much of each of the intersecting counties shares the same area with the HUC unit.
+
++ If we can get the geometry of the intersecting part of the HUC unit and the county, then we can calculate its area, which in turn allows us to find area-weighted averages of joined attributes.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### How
+
+::: {.columns}
+
+::: {.column width="70%"}
+For these purposes, we can use `sf::st_intersection()`.
+
++ While `st_intersects()` returns the indices of intersecting objects, `st_intersection()` returns intersecting spatial objects with the non-intersecting parts of the `sf` objects cut out. 
+
++ Moreover, attribute values of the source `sf` will be merged to its intersecting `sfg` in the target `sf`. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Illustration 1: lines vs polygons
+
+```{webr-r}
+#| context: setup 
+#--- create points ---#
+point_1 <- st_point(c(2, 2))
+point_2 <- st_point(c(1, 1))
+point_3 <- st_point(c(1, 3))
+
+#--- combine the points to make a single  sf of points ---#
+points <- list(point_1, point_2, point_3) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(point_name = c("point 1", "point 2", "point 3"))
+
+#--- create lines ---#
+line_1 <- st_linestring(rbind(c(0, 0), c(2.5, 0.5)))
+line_2 <- st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))
+
+#--- combine the points to make a single  sf of points ---#
+lines <- list(line_1, line_2) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(line_name = c("line 1", "line 2"))
+
+#--- create polygons ---#
+polygon_1 <- st_polygon(list(
+  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)) 
+))
+
+polygon_2 <- st_polygon(list(
+  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5)) 
+))
+
+polygon_3 <- st_polygon(list(
+  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5)) 
+))
+
+#--- combine the polygons to make an sf of polygons ---#
+polygons <- list(polygon_1, polygon_2, polygon_3) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(polygon_name = c("polygon 1", "polygon 2", "polygon 3"))
+```
+
+The following code gets the intersection of the lines and the polygons.
+
+```{webr-r}
+(
+intersections_lp <- st_intersection(lines, polygons) %>% 
+  mutate(int_name = paste0(line_name, "-", polygon_name))
+)
+```
+
+<br>
+
+:::: {.columns}
+::: {.column width="40%"}
+
+Here is how lines and polygons look like:
+
+```{webr-r}
+#| context: output
+#| out-width: 120%
+ggplot() +
+  geom_sf(
+    data = polygons,
+    aes(fill = polygon_name),
+    alpha = 0.3
+  ) +
+  scale_fill_discrete(name = "Polygons") +
+  geom_sf(
+    data = lines,
+    aes(color = line_name)
+  ) +
+  scale_color_discrete(name = "Lines") +
+  theme_void()
+```
+:::
+
+::: {.column width="60%"}
+Here is how the intersections and polygons look like.
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = intersections_lp,
+    aes(color = int_name),
+  ) +
+  geom_sf(
+    data = polygons,
+    aes(fill = polygon_name),
+    alpha = 0.3
+  ) +
+  theme_void()
+```
+
+:::
+::::
+
+### Illustration 2: polygons vs polygons
+
+::: {.columns}
+
+::: {.column width="70%"}
+The following code gets the intersection of polygon 1 and polygon 3 with polygon 2.
+
+```{webr-r}
+(
+intersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>% 
+  mutate(int_name = paste0(polygon_name, "-", polygon_name.1))
+)
+```
+
+Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (`polygon 1-polygon 2` and `polygon 3-polygon 2`).
+
+Just like the lines-polygons case, the non-intersecting part of polygons 1 and 3 are cut out and do not remain in the returned `sf`. 
+
+```{webr-r}
+ggplot() +
+  #--- here are all the original polygons  ---#
+  geom_sf(
+  	data = polygons, 
+  	aes(fill = polygon_name), 
+  	alpha = 0.3
+  ) +
+  #--- here is what is returned after st_intersection ---#
+  geom_sf(
+  	data = intersections_pp, 
+  	aes(color = int_name),
+  	linewidth = 1.5,
+  	alpha = 0
+  ) +
+  theme_void()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### area-weighted average
+
+::: {.columns}
+
+::: {.column width="70%"}
++ Let's now get back to the example of HUC units and county-level nitrogen use data.
+
++ We would like to find area-weighted average of nitrogen use instead of the simple average.
+
+Using `st_intersection()`, for each of the HUC polygons, we can find the intersecting counties, and then divide it into parts based on the boundary of the intersecting polygons. 
+
+```{webr-r}
+(
+HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>% 
+  mutate(huc_county = paste0(HUC_CODE, "-", county_code))
+)
+```
+
+<br>
+
+The key difference from the `st_join()` example is that each observation of the returned data is a unique HUC-county intersection. 
+
+The figure below is a map of all the intersections of the HUC unit with `HUC_CODE == 07060004` and the seven intersecting counties. 
+
+```{webr-r}
+HUC_intersections %>%
+  filter(HUC_CODE == "07060004") %>%
+  ggplot(data = .) +
+  geom_sf(aes(fill = huc_county)) +
+  theme_void()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Exercise
+
+::: {.panel-tabset}
+
+#### Data Preparation
+
+```{webr-r}
+#| context: setup
+polygon_1 <- 
+  st_sfc(
+    st_polygon(list(rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)))),
+    st_polygon(list(rbind(c(0, 2), c(2, 2), c(2, 4), c(0, 4), c(0, 2)))),
+    st_polygon(list(rbind(c(2, 2), c(4, 2), c(4, 4), c(2, 4), c(2, 2)))),
+    st_polygon(list(rbind(c(2, 0), c(4, 0), c(4, 2), c(2, 2), c(2, 0))))
+  ) %>%
+  st_sf(geometry = .) %>%
+  dplyr::mutate(value = 1:4)
+
+polygon_2 <- 
+  st_sfc(
+    st_polygon(list(rbind(c(1, 1), c(3, 1), c(3, 3), c(1, 3), c(1, 1))))
+  ) %>%
+  st_sf(geometry = .)
+```
+
+::: {.columns}
+
+::: {.column width="70%"}
+We use `poygon_1` and `polygon_2` in this exercise. Inspect them to familiarize yourself with them:
+
+```{webr-r}
+polygon_1
+polygon_2
+```
+
+<br>
+
+Here is what they look like:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot() +
+  geom_sf(data = polygon_1, aes(fill = factor(value)), alpha = 0.5) +
+  geom_sf(data = polygon_2, fill = "red", alpha = 0.5) +
+  theme_void()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+#### Problem 1
+
+Find the intersection of the two polygons using `st_intersection()`.
+
+```{webr-r}
+st_intersection()
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+intersection <- st_intersection(polygon_2, polygon_1)
+```
+
+#### Problem 2 
+
+Find the area-weighted average of `value` for `polygon_2` based on the area of overlaps with the polygons in `polygon_1`?
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+intersection %>%
+  dplyr::mutate(area = as.numeric(st_area(geometry))) %>%
+  dplyr::summarize(value = sum(value * area) / sum(area))
+``` 
+
+:::
+:::
+
