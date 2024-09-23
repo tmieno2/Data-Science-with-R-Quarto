@@ -189,19 +189,34 @@ county_yield %>%
 
 ::: {.panel-tabset}
 
+#### Instruction
+
+This exercise use the `diamonds` dataset from the `ggplot2()` package. First, load the dataset and extract observations with `Premium` cut whose color is one of `E`, `I`, and `F`:
+
+```{webr-r}
+#| autorun: true
+data("diamonds")
+premium <-
+  diamonds %>%
+  dplyr::filter(cut == "Premium" & color %in% c("E", "I", "F"))
+
+#--- take a look ---#
+premium
+```
+
 #### Exercise 1
 
 <br>
 
-Using `premium`, create a scatter plot of `price` (y-axis) against `depth` (x-axis) by `clarity` as shown below:
+Using `premium`, create a scatter plot of `price` (y-axis) against `depth` (x-axis) by `clarity`:
 
+::: {.panel-tabset}
+### Work here
 ```{webr-r}
 
 ```
 
-<br>
-
-**Answer**
+### Answer
 ```{r}
 #| eval: false
 #| code-fold: true
@@ -209,25 +224,30 @@ ggplot(data = premium) +
   geom_point(aes(y = price, x = depth, color = clarity))
 ```
 
+:::
+
+
 #### Exercise 2
 
 <br>
 
-Using `premium`, create density plots of `carat` by `color` as shown below (set `alpha` to 0.5):
+Using `premium`, create density plots of `carat` by `color` (set `alpha` to 0.5):
 
+::: {.panel-tabset}
+### Work here
 ```{webr-r}
 
 ```
 
-<br>
-
-**Answer**
+### Answer
 ```{r}
 #| eval: false
 #| code-fold: true
 ggplot(data = premium) +
   geom_density(aes(x = carat, fill = color), alpha = 0.5)
 ```
+
+:::
 
 :::
 <!--end of panel-->

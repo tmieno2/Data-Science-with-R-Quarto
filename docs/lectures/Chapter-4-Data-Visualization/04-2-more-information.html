@@ -675,7 +675,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"#--- install and library the data package ---#\ninstall.packages(\"r.spatial.workshop.datasets\", repos = c(\"https://tmieno2.r-universe.dev\", \"https://cran.r-project.org\"))\n\ndata(county_yield, package = \"r.spatial.workshop.datasets\")\n\ncounty_yield <- dplyr::select(county_yield, - geometry)\n\nmean_yield <-\n  county_yield %>%\n  group_by(year) %>%\n  summarize(\n    corn_yield = mean(corn_yield, na.rm = TRUE)\n  ) %>%\n  filter(!is.na(year))\n\ncounty_yield_mean <- \n  county_yield %>% \n  group_by(state_name, year) %>% \n  summarize(corn_yield = mean(corn_yield, na.rm = T))","id":1,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-1","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"setup","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(y = corn_yield, x = year, color = state_name)\n  )  ","id":2,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-2","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"output","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(y = corn_yield, x = year, color = state_name)\n  )   ","id":3,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-3","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"( \ncounty_yield_mean <- \n  county_yield %>% \n  group_by(state_name, year) %>% \n  summarize(corn_yield = mean(corn_yield, na.rm = T))\n)","id":4,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-4","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(\n      y = corn_yield, \n      x = year, \n      color = state_name \n    )\n  )","id":5,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-5","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_mean) + \n  geom_density(\n    aes(\n      x = corn_yield, \n      fill = state_name \n    ),\n    alpha = 0.3\n  )","id":6,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-6","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"county_yield %>% \n  filter(state_name %in% c(\"Nebraska\", \"Kansas\")) %>% \n  ggplot(data = .) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield,  \n      fill = state_name #BREAK2\n    )\n  )","id":7,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-7","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"county_yield %>% \n  filter(state_name %in% c(\"Nebraska\", \"Kansas\")) %>%\n  ggplot(data = .) + #BREAK\n  geom_point(\n    aes(\n      x = d3_5_9, \n      y = corn_yield, \n      color = state_name, #BREAK2 \n      shape = state_name #BREAK3 \n    ),\n    size = 0.7\n  )","id":8,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-8","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"","id":9,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-9","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"","id":10,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-10","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield, \n      fill = state_name\n    )\n  )","id":11,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-11","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"output","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield \n    )\n  ) +\n  facet_wrap(state_name ~ ., nrow = 3)","id":12,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-12","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"output","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(x = factor(year), y = corn_yield)\n  ) +\n  facet_wrap(state_name ~ .)","id":13,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-13","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield) + \n  geom_histogram(\n    aes(x = corn_yield)\n  ) +\n  facet_wrap(state_name ~ year) #<<","id":14,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-14","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"county_yield_s <- \n  county_yield %>% \n  filter(year %in% c(2017, 2018))","id":15,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-15","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(\n    aes(x = corn_yield)\n  ) +\n  facet_wrap(state_name ~ year)  ","id":16,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-16","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_wrap(state_name ~ year)  ","id":17,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-17","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)  ","id":18,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-18","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)","id":19,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-19","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)","id":20,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-20","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(year ~ state_name) ","id":21,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-21","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_x\"\n  )","id":22,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-22","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_y\" #<<\n  )  ","id":23,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-23","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free\" #<<\n  )  ","id":24,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-24","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"county_yield_s %>% \n  mutate(\n    year_text = paste0(\"Year = \", year) #<<\n  ) %>% \n  ggplot(data = .) + \n    geom_histogram(aes(x = corn_yield)) +\n    facet_grid(\n      state_name ~ year_text #<<\n    ) ","id":25,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-25","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"","id":26,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-26","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"","id":27,"options":{"read-only":"false","autorun":"false","editor-quick-suggestions":"false","label":"unnamed-chunk-27","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"data.table(county_yield)[, .(county_code, corn_yield, year, state_name)] %>% \n  filter(year %in% c(2000, 2001)) %>% \n  dcast(county_code + state_name ~ year, value.var = \"corn_yield\")  ","id":28,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-28","message":"true","warning":"true","out-width":"100%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"output","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot(data = county_yield) + \n  geom_point(aes(y = corn_yield, x = d3_5_9)) +\n  geom_smooth(aes(y = corn_yield, x = d3_5_9))","id":29,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-29","message":"true","warning":"true","out-width":"70%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot() + \n  geom_point(data = county_yield, aes(y = corn_yield, x = d3_5_9)) +\n  geom_smooth(aes(y = corn_yield, x = d3_5_9))","id":30,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-30","message":"true","warning":"true","out-width":"70%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}},{"code":"ggplot() +\n  geom_point(\n    data = county_yield, \n    aes(y = corn_yield, x = year)\n  ) +\n  geom_line(\n    data = mean_yield, \n    aes(y = corn_yield, x = year)\n  )","id":31,"options":{"read-only":"false","autorun":"true","editor-quick-suggestions":"false","label":"unnamed-chunk-31","message":"true","warning":"true","out-width":"70%","fig-cap":"","fig-width":7,"editor-word-wrap":"true","editor-max-height":"","results":"markup","comment":"","editor-font-scale":"0.7","context":"interactive","fig-height":5,"dpi":72,"out-height":"","classes":"","output":"true"}}];
+  globalThis.qwebrCellDetails = [{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-1","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"setup","out-height":""},"code":"#--- install and library the data package ---#\ninstall.packages(\"r.spatial.workshop.datasets\", repos = c(\"https://tmieno2.r-universe.dev\", \"https://cran.r-project.org\"))\n\ndata(county_yield, package = \"r.spatial.workshop.datasets\")\n\ncounty_yield <- dplyr::select(county_yield, - geometry)\n\nmean_yield <-\n  county_yield %>%\n  group_by(year) %>%\n  summarize(\n    corn_yield = mean(corn_yield, na.rm = TRUE)\n  ) %>%\n  filter(!is.na(year))\n\ncounty_yield_mean <- \n  county_yield %>% \n  group_by(state_name, year) %>% \n  summarize(corn_yield = mean(corn_yield, na.rm = T))","id":1},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-2","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"output","out-height":""},"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(y = corn_yield, x = year, color = state_name)\n  )  ","id":2},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-3","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(y = corn_yield, x = year, color = state_name)\n  )   ","id":3},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-4","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"( \ncounty_yield_mean <- \n  county_yield %>% \n  group_by(state_name, year) %>% \n  summarize(corn_yield = mean(corn_yield, na.rm = T))\n)","id":4},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-5","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_mean) +\n  geom_line(\n    aes(\n      y = corn_yield, \n      x = year, \n      color = state_name \n    )\n  )","id":5},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-6","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_mean) + \n  geom_density(\n    aes(\n      x = corn_yield, \n      fill = state_name \n    ),\n    alpha = 0.3\n  )","id":6},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-7","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"county_yield %>% \n  filter(state_name %in% c(\"Nebraska\", \"Kansas\")) %>% \n  ggplot(data = .) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield,  \n      fill = state_name #BREAK2\n    )\n  )","id":7},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-8","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"county_yield %>% \n  filter(state_name %in% c(\"Nebraska\", \"Kansas\")) %>%\n  ggplot(data = .) + #BREAK\n  geom_point(\n    aes(\n      x = d3_5_9, \n      y = corn_yield, \n      color = state_name, #BREAK2 \n      shape = state_name #BREAK3 \n    ),\n    size = 0.7\n  )","id":8},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-9","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"data(\"diamonds\")\npremium <-\n  diamonds %>%\n  dplyr::filter(cut == \"Premium\" & color %in% c(\"E\", \"I\", \"F\"))\n\n#--- take a look ---#\npremium","id":9},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-10","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"","id":10},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-11","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"","id":11},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-12","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"output","out-height":""},"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield, \n      fill = state_name\n    )\n  )","id":12},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-13","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"output","out-height":""},"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(\n      x = factor(year), \n      y = corn_yield \n    )\n  ) +\n  facet_wrap(state_name ~ ., nrow = 3)","id":13},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-14","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield) + \n  geom_boxplot(\n    aes(x = factor(year), y = corn_yield)\n  ) +\n  facet_wrap(state_name ~ .)","id":14},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-15","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield) + \n  geom_histogram(\n    aes(x = corn_yield)\n  ) +\n  facet_wrap(state_name ~ year) #<<","id":15},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-16","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"county_yield_s <- \n  county_yield %>% \n  filter(year %in% c(2017, 2018))","id":16},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-17","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(\n    aes(x = corn_yield)\n  ) +\n  facet_wrap(state_name ~ year)  ","id":17},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-18","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_wrap(state_name ~ year)  ","id":18},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-19","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)  ","id":19},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-20","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)","id":20},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-21","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(state_name ~ year)","id":21},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-22","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(year ~ state_name) ","id":22},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-23","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_x\"\n  )","id":23},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-24","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_y\" #<<\n  )  ","id":24},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-25","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield_s) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free\" #<<\n  )  ","id":25},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-26","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"county_yield_s %>% \n  mutate(\n    year_text = paste0(\"Year = \", year) #<<\n  ) %>% \n  ggplot(data = .) + \n    geom_histogram(aes(x = corn_yield)) +\n    facet_grid(\n      state_name ~ year_text #<<\n    ) ","id":26},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-27","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"","id":27},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-28","message":"true","fig-cap":"","comment":"","autorun":"false","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"","id":28},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"100%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-29","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"output","out-height":""},"code":"data.table(county_yield)[, .(county_code, corn_yield, year, state_name)] %>% \n  filter(year %in% c(2000, 2001)) %>% \n  dcast(county_code + state_name ~ year, value.var = \"corn_yield\")  ","id":29},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"70%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-30","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot(data = county_yield) + \n  geom_point(aes(y = corn_yield, x = d3_5_9)) +\n  geom_smooth(aes(y = corn_yield, x = d3_5_9))","id":30},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"70%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-31","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot() + \n  geom_point(data = county_yield, aes(y = corn_yield, x = d3_5_9)) +\n  geom_smooth(aes(y = corn_yield, x = d3_5_9))","id":31},{"options":{"editor-font-scale":"0.7","output":"true","editor-quick-suggestions":"false","out-width":"70%","fig-height":5,"results":"markup","warning":"true","editor-word-wrap":"true","label":"unnamed-chunk-32","message":"true","fig-cap":"","comment":"","autorun":"true","fig-width":7,"read-only":"false","dpi":72,"classes":"","editor-max-height":"","context":"interactive","out-height":""},"code":"ggplot() +\n  geom_point(\n    data = county_yield, \n    aes(y = corn_yield, x = year)\n  ) +\n  geom_line(\n    data = mean_yield, \n    aes(y = corn_yield, x = year)\n  )","id":32}];
 
   </script>
   <script type="module">
@@ -2210,15 +2210,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="placing-more-information-in-one-figure-1" class="slide level2">
 <h2>Placing more information in one figure</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Motivation</a></li><li><a href="#tabset-4-2">How</a></li><li><a href="#tabset-4-3">Examples</a></li><li><a href="#tabset-4-4">Exercises</a></li></ul>
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Motivation</a></li><li><a href="#tabset-6-2">How</a></li><li><a href="#tabset-6-3">Examples</a></li><li><a href="#tabset-6-4">Exercises</a></li></ul>
 <div class="tab-content">
-<div id="tabset-4-1">
+<div id="tabset-6-1">
 <p>So far, we have learned the basics of <code>ggplot2</code> and how to create popular types of figures. We can make a figure much more informative by making its aesthetics data-dependent.</p>
 <p>For example, suppose you are interested in comparing the history of irrigated corn yield by state in a line plot. So, you want to create a line for each state and make the lines distinguishable so the readers know which line is for which state like this:</p>
 <div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-4-2">
+<div id="tabset-6-2">
 <p>We can make the aesthetics of a figure data-dependent by specifying which variable you use for aesthetics differentiation <span style="color:red"> INSIDE </span><code>aes()</code>.</p>
 <p>Here is an example:</p>
 <div id="qwebr-insertion-location-3"></div>
@@ -2226,7 +2226,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>In this code, <code>color = state_name</code> is inside <code>aes()</code> and it tells R to divide the data into the groups of State and draw a line by <code>state_name</code> (by state) where the lines are color-differentiated.</p>
 <p>A legend is automatically generated.</p>
 </div>
-<div id="tabset-4-3">
+<div id="tabset-6-3">
 <div class="panel-tabset">
 <ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Data</a></li><li><a href="#tabset-2-2">Example 1</a></li><li><a href="#tabset-2-3">Example 2</a></li><li><a href="#tabset-2-4">Example 3</a></li><li><a href="#tabset-2-5">Example 4</a></li></ul>
 <div class="tab-content">
@@ -2255,17 +2255,26 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-4-4">
+<div id="tabset-6-4">
 <div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Exercise 1</a></li><li><a href="#tabset-3-2">Exercise 2</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Instruction</a></li><li><a href="#tabset-5-2">Exercise 1</a></li><li><a href="#tabset-5-3">Exercise 2</a></li></ul>
 <div class="tab-content">
-<div id="tabset-3-1">
-<p><br></p>
-<p>Using <code>premium</code>, create a scatter plot of <code>price</code> (y-axis) against <code>depth</code> (x-axis) by <code>clarity</code> as shown below:</p>
+<div id="tabset-5-1">
+<p>This exercise use the <code>diamonds</code> dataset from the <code>ggplot2()</code> package. First, load the dataset and extract observations with <code>Premium</code> cut whose color is one of <code>E</code>, <code>I</code>, and <code>F</code>:</p>
 <div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-5-2">
 <p><br></p>
-<p><strong>Answer</strong></p>
+<p>Using <code>premium</code>, create a scatter plot of <code>price</code> (y-axis) against <code>depth</code> (x-axis) by <code>clarity</code>:</p>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Work here</a></li><li><a href="#tabset-3-2">Answer</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<div id="qwebr-insertion-location-10"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-3-2">
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2274,19 +2283,29 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </details>
 </div>
 </div>
-<div id="tabset-3-2">
+</div>
+</div>
+</div>
+<div id="tabset-5-3">
 <p><br></p>
-<p>Using <code>premium</code>, create density plots of <code>carat</code> by <code>color</code> as shown below (set <code>alpha</code> to 0.5):</p>
-<div id="qwebr-insertion-location-10"></div>
+<p>Using <code>premium</code>, create density plots of <code>carat</code> by <code>color</code> (set <code>alpha</code> to 0.5):</p>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Work here</a></li><li><a href="#tabset-4-2">Answer</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<div id="qwebr-insertion-location-11"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p><strong>Answer</strong></p>
+</div>
+<div id="tabset-4-2">
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">ggplot</span>(<span class="at">data =</span> premium) <span class="sc">+</span></span>
 <span id="cb2-2"><a></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> carat, <span class="at">fill =</span> color), <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2310,27 +2329,27 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="faceting-1" class="slide level2">
 <h2>Faceting</h2>
 <div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Motivation</a></li><li><a href="#tabset-9-2">How</a></li><li><a href="#tabset-9-3">Two-way</a></li><li><a href="#tabset-9-4"><code>facet_grid()</code></a></li><li><a href="#tabset-9-5">Strip label</a></li><li><a href="#tabset-9-6">Exercises</a></li></ul>
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Motivation</a></li><li><a href="#tabset-11-2">How</a></li><li><a href="#tabset-11-3">Two-way</a></li><li><a href="#tabset-11-4"><code>facet_grid()</code></a></li><li><a href="#tabset-11-5">Strip label</a></li><li><a href="#tabset-11-6">Exercises</a></li></ul>
 <div class="tab-content">
-<div id="tabset-9-1">
+<div id="tabset-11-1">
 <p>Sometimes, you would like to visualize information across groups on separate panels.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Too much information in one panel?</p>
-<div id="qwebr-insertion-location-11"></div>
+<div id="qwebr-insertion-location-12"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 1st column--><div class="column" style="width:50%;">
 <p>On separate panels (faceting)?</p>
-<div id="qwebr-insertion-location-12"></div>
+<div id="qwebr-insertion-location-13"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 2nd column-->
 </div>
 <!--end of the columns-->
 </div>
-<div id="tabset-9-2">
+<div id="tabset-11-2">
 <p>We can make faceted figures by adding either <code>facet_wrap</code> or <code>facet_grid()</code> in which you specify which variable to use for faceting.</p>
 <p>Here is an example:</p>
-<div id="qwebr-insertion-location-13"></div>
+<div id="qwebr-insertion-location-14"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>In this code, <code>facet_wrap(state_name ~ .)</code> is added to a simple boxplot, which tells R to make a boxplot by <code>state_name</code> (state).</p>
@@ -2346,54 +2365,54 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 </div>
 </div>
-<div id="tabset-9-3">
+<div id="tabset-11-3">
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">What?</a></li><li><a href="#tabset-5-2">Another example</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">What?</a></li><li><a href="#tabset-7-2">Another example</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1">
+<div id="tabset-7-1">
 <p>Two-way faceting will</p>
 <ul>
 <li><p>divide the data into groups where each group has a unique combination of the two faceting variables</p></li>
 <li><p>create a plot for each group</p></li>
 </ul>
 <p><strong>Example</strong></p>
-<div id="qwebr-insertion-location-14"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-5-2">
-<p>Filter <code>county_yield</code> to those in 2017 and 2018.</p>
 <div id="qwebr-insertion-location-15"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Create a faceted density plots.</p>
+</div>
+<div id="tabset-7-2">
+<p>Filter <code>county_yield</code> to those in 2017 and 2018.</p>
 <div id="qwebr-insertion-location-16"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Create a faceted density plots.</p>
+<div id="qwebr-insertion-location-17"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-9-4">
+<div id="tabset-11-4">
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">compare</a></li><li><a href="#tabset-7-2">facet_grid()</a></li><li><a href="#tabset-7-3">order matters</a></li><li><a href="#tabset-7-4">scale</a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">compare</a></li><li><a href="#tabset-9-2">facet_grid()</a></li><li><a href="#tabset-9-3">order matters</a></li><li><a href="#tabset-9-4">scale</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
+<div id="tabset-9-1">
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><code>facet_wrap</code></p>
-<div id="qwebr-insertion-location-17"></div>
+<div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 1st column--><div class="column" style="width:50%;">
 <p><code>facet_grid</code></p>
-<div id="qwebr-insertion-location-18"></div>
+<div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 2nd column-->
 </div>
 <!--end of the columns-->
 </div>
-<div id="tabset-7-2">
+<div id="tabset-9-2">
 <div class="columns">
 <div class="column" style="width:70%;">
-<div id="qwebr-insertion-location-19"></div>
+<div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 1st column--><div class="column" style="width:30%;">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
@@ -2417,61 +2436,61 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of the columns-->
 </div>
-<div id="tabset-7-3">
+<div id="tabset-9-3">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="qwebr-insertion-location-20"></div>
+<div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 1st column--><div class="column" style="width:50%;">
-<div id="qwebr-insertion-location-21"></div>
+<div id="qwebr-insertion-location-22"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><!--end of the 2nd column-->
 </div>
 <!--end of the columns-->
 </div>
-<div id="tabset-7-4">
+<div id="tabset-9-4">
 <div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Guide</a></li><li><a href="#tabset-6-2">free x</a></li><li><a href="#tabset-6-3">free y</a></li><li><a href="#tabset-6-4">both free</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Guide</a></li><li><a href="#tabset-8-2">free x</a></li><li><a href="#tabset-8-3">free y</a></li><li><a href="#tabset-8-4">both free</a></li></ul>
 <div class="tab-content">
-<div id="tabset-6-1">
+<div id="tabset-8-1">
 <p><code>facet_grid()</code> allows</p>
 <ul>
 <li><p>the figures in different columns to have different scales for the x-axis (figures in the same column have the same scale for the x-axis)</p></li>
 <li><p>the figures in different rows to have different scales for the y-axis (figures in the same rows have the same scale for the x-axis)</p></li>
 </ul>
 </div>
-<div id="tabset-6-2">
-<div id="qwebr-insertion-location-22"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-6-3">
+<div id="tabset-8-2">
 <div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-6-4">
+<div id="tabset-8-3">
 <div id="qwebr-insertion-location-24"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-</div>
-</div>
-<!--end of panel-->
-</div>
-</div>
-</div>
-<!--end of panel-->
-</div>
-<div id="tabset-9-5">
-<p>Create a variable that has the values you want to use as labels and use it as a faceting variable:</p>
+<div id="tabset-8-4">
 <div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-9-6">
-<div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Exercise 1</a></li><li><a href="#tabset-8-2">Exercise 2</a></li></ul>
-<div class="tab-content">
-<div id="tabset-8-1">
-<p>Using <code>premium</code>, create scatter plots of <code>price</code> (y-axis) against <code>carat</code> (x-axis) by <code>color</code> on separate panels as shown below:</p>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-11-5">
+<p>Create a variable that has the values you want to use as labels and use it as a faceting variable:</p>
 <div id="qwebr-insertion-location-26"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-11-6">
+<div class="panel-tabset">
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Exercise 1</a></li><li><a href="#tabset-10-2">Exercise 2</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1">
+<p>Using <code>premium</code>, create scatter plots of <code>price</code> (y-axis) against <code>carat</code> (x-axis) by <code>color</code> on separate panels as shown below:</p>
+<div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <div class="cell">
 <details class="code-fold">
@@ -2482,9 +2501,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </details>
 </div>
 </div>
-<div id="tabset-8-2">
+<div id="tabset-10-2">
 <p>Using premium, create histogram of <code>carat</code> by <code>color</code> and <code>clarity</code> on separate panels as shown below:</p>
-<div id="qwebr-insertion-location-27"></div>
+<div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <div class="cell">
 <details class="code-fold">
@@ -2506,9 +2525,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="preparing-datasets-for-visualization" class="slide level2">
 <h2>Preparing datasets for visualization</h2>
 <div class="panel-tabset">
-<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Long-format needed</a></li><li><a href="#tabset-10-2">Wide v.s. Long</a></li></ul>
+<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">Long-format needed</a></li><li><a href="#tabset-12-2">Wide v.s. Long</a></li></ul>
 <div class="tab-content">
-<div id="tabset-10-1">
+<div id="tabset-12-1">
 <p>We have seen</p>
 <ul>
 <li>figures where its main elements (points, lines, boxes, etc) are made color differentiated (e.g., with <code>aes(color = var)</code> inside the <code>geom_*()</code> function)</li>
@@ -2526,9 +2545,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <p><br></p>
 </div>
-<div id="tabset-10-2">
+<div id="tabset-12-2">
 <p>For example consider the following dataset in a wide format:</p>
-<div id="qwebr-insertion-location-28"></div>
+<div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>This dataset has county-level yields for Nebraska, Colorado, and Kansas stored in variables named <code>2000</code> and <code>2001</code> (they themselves represent years).</p>
@@ -2552,9 +2571,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="multiple-datasets-in-one-figure-1" class="slide level2">
 <h2>Multiple datasets in one figure</h2>
 <div class="panel-tabset">
-<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Global v.s. local</a></li><li><a href="#tabset-11-2">Example 1</a></li><li><a href="#tabset-11-3">Example 2</a></li><li><a href="#tabset-11-4">Use multiple datasets</a></li></ul>
+<ul id="tabset-13" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-13-1">Global v.s. local</a></li><li><a href="#tabset-13-2">Example 1</a></li><li><a href="#tabset-13-3">Example 2</a></li><li><a href="#tabset-13-4">Use multiple datasets</a></li></ul>
 <div class="tab-content">
-<div id="tabset-11-1">
+<div id="tabset-13-1">
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -2569,19 +2588,19 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 </div>
 </div>
-<div id="tabset-11-2">
+<div id="tabset-13-2">
 <p>This works with <code>county_yield</code> used in both <code>geom_point()</code> and <code>geom_smooth()</code>.</p>
-<div id="qwebr-insertion-location-29"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-11-3">
-<p>This does not work because no global dataset is set inside <code>ggplot()</code> and no dataset is supplied to <code>geom_smooth()</code>.</p>
 <div id="qwebr-insertion-location-30"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-11-4">
-<p>To use multiple datasets inside a single <code>ggplot</code> object (or a figure), you just need to specify what dataset to use locally inside individual <code>geom_*()</code>s.</p>
+<div id="tabset-13-3">
+<p>This does not work because no global dataset is set inside <code>ggplot()</code> and no dataset is supplied to <code>geom_smooth()</code>.</p>
 <div id="qwebr-insertion-location-31"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-13-4">
+<p>To use multiple datasets inside a single <code>ggplot</code> object (or a figure), you just need to specify what dataset to use locally inside individual <code>geom_*()</code>s.</p>
+<div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
