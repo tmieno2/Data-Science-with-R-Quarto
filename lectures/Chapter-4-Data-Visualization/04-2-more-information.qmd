@@ -546,6 +546,7 @@ Using `premium`, create scatter plots of `price` (y-axis) against `carat` (x-axi
 ::: {.column width="50%"}
 ```{webr-r}
 #| context: output
+#| out-width: 80%
 ggplot(data = premium) +
   geom_point(aes(x = carat, y = price)) +
   facet_grid(color ~ .)
@@ -571,6 +572,7 @@ ggplot(data = premium) +
 ```{r}
 #| eval: false
 #| code-fold: true
+
 ggplot(data = premium) +
   geom_point(aes(x = carat, y = price)) +
   facet_grid(color ~ .)
@@ -590,6 +592,9 @@ Using premium, create histogram of `carat` by `color` and `clarity` on separate 
 ::: {.column width="50%"}
 ```{webr-r}
 #| context: output
+#| message: false
+#| warning: false
+#| out-width: 80%
 ggplot(data = premium) +
   geom_histogram(aes(x = carat)) +
   facet_grid(color ~ clarity)
