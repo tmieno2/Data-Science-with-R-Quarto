@@ -537,10 +537,27 @@ county_yield_s %>%
 
 #### Exercise 1
 
-Using `premium`, create scatter plots of `price` (y-axis) against `carat` (x-axis) by `color` on separate panels as shown below:
+::: {.columns}
+
+::: {.column width="50%"}
+Using `premium`, create scatter plots of `price` (y-axis) against `carat` (x-axis) by `color` on separate panels as shown on the right.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price)) +
+  facet_grid(color ~ .)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 ::: {.panel-tabset}
-### Work here
+##### Work here
 
 ```{webr-r}
 #--- write your code here ---#
@@ -549,14 +566,14 @@ Using `premium`, create scatter plots of `price` (y-axis) against `carat` (x-axi
 
 ```
 
-### Answer
+##### Answer
 
 ```{r}
 #| eval: false
 #| code-fold: true
-ggplot(data=premium) +
-  geom_point(aes(x=carat,y=price)) +
-  facet_grid(color~.)
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price)) +
+  facet_grid(color ~ .)
 ```
 :::
 <!--end of panel-->
@@ -564,10 +581,27 @@ ggplot(data=premium) +
 
 #### Exercise 2
 
-Using premium, create histogram of `carat` by `color` and `clarity` on separate panels as shown below:
+::: {.columns}
+
+::: {.column width="50%"}
+Using premium, create histogram of `carat` by `color` and `clarity` on separate panels as shown on the right.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+ggplot(data = premium) +
+  geom_histogram(aes(x = carat)) +
+  facet_grid(color ~ clarity)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
 
 ::: {.panel-tabset}
-### Work here
+##### Work here
 ```{webr-r}
 #--- write your code here ---#
 
@@ -576,15 +610,18 @@ Using premium, create histogram of `carat` by `color` and `clarity` on separate 
 
 ```
 
-### Answer
+##### Answer
 
 ```{r}
 #| eval: false
 #| code-fold: true
-ggplot(data=premium) +
-  geom_histogram(aes(x=carat)) +
-  facet_grid(color~clarity)
+ggplot(data = premium) +
+  geom_histogram(aes(x = carat)) +
+  facet_grid(color ~ clarity)
 ```
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
