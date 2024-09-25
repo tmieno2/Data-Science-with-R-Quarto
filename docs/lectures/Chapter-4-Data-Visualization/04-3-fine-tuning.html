@@ -675,7 +675,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"options":{"editor-font-scale":"0.7","autorun":"true","context":"setup","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-1","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"#--- install and library the data package ---#\ninstall.packages(\"r.spatial.workshop.datasets\", repos = c(\"https://tmieno2.r-universe.dev\", \"https://cran.r-project.org\"))\n\ndata(county_yield, package = \"r.spatial.workshop.datasets\")\n\ncounty_yield <- dplyr::select(county_yield, - geometry)","id":1},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"setup","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-2","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)\n\ng_box <- \n  ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))","id":2},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-3","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"g_box ","id":3},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-4","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"g_box +\n  xlab(\"Year\") +\n  ylab(\"Corn Yield (bu/acre)\") +\n  scale_fill_viridis_d()","id":4},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-5","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"g_box ","id":5},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-6","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"g_box +\n  theme(\n    axis.title = element_text(size = 20)\n  )","id":6},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-7","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)\n\n(\ng_box <- \n  ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))\n)","id":7},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-8","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_box + \n  scale_x_discrete(name = \"Year\") + \n  scale_y_continuous(name = \"Corn Yield (bu/acre)\") ","id":8},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-9","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_box + \n  xlab(\"Year\") +\n  ylab(\"Corn Yield (bu/acre)\") ","id":9},{"options":{"watning":"false","editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-10","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_box + \n  scale_x_discrete(\n    name = \"Year\" \n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    #--- first min, second max ---#\n    limit = c(100, 200)\n  ) ","id":10},{"options":{"editor-font-scale":"0.7","autorun":"false","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-11","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"g_box + \n  xlabel(\"Year\") +\n  ylabel(\"Corn Yield (bu/acre)\") +\n  ylim(100, 200)","id":11},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-12","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"false","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_box + \n  scale_x_discrete(\n    name = \"Year\",\n    label = gsub(\"20\", \"\", as.character(2000:2018))\n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    limit = c(100, 200),\n    breaks = seq(100, 200, by = 10)\n  ) ","id":12},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-13","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"(\ngg_delay <- \n  flights %>% \n  group_by(origin, month) %>% \n  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% \n  ggplot(.) +\n    geom_line(aes(y = mean_arr_delay, x = month, color = origin))\n)","id":13},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"output","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-14","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"false","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"gg_delay + \n  scale_x_continuous(\n    name = \"Month\",\n    limit = c(4, 8),\n    breaks = 4:8\n  ) +\n  scale_y_continuous(\n    name = \"Average Arrival Delay (minutes)\",\n    limit = c(0, 25)\n  ) ","id":14},{"options":{"editor-font-scale":"0.7","autorun":"false","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-15","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"#--- work here ---#\n\n\n\n\n","id":15},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"output","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-16","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"false","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"gg_delay + \n  scale_x_continuous(\n    name = \"Month\",\n    limit = c(4, 8),\n    breaks = 4:8\n  ) +\n  scale_y_continuous(\n    name = \"Average Arrival Delay (minutes)\",\n    limit = c(0, 25)\n  ) ","id":16},{"options":{"editor-font-scale":"0.7","autorun":"false","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-17","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"#--- work here ---#\n\n\n\n","id":17},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-18","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"( \ng_axis <-\n  g_box +\n  scale_x_discrete(\n    name = \"Year\",\n    label = gsub(\"20\", \"\", as.character(2000:2018))\n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    limit = c(100, 200),\n    breaks = seq(100, 200, by = 10)\n  )\n)","id":18},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-19","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + scale_fill_brewer(name = \"State\")","id":19},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-20","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + scale_fill_brewer(name = \"state\", palette = \"Set1\")","id":20},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-21","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + \n  scale_fill_brewer(\n    name = \"state\", \n    palette = \"Set1\",\n    guide = guide_legend(title.position = \"left\")\n  )","id":21},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-22","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + \n  scale_fill_brewer(\n    name = \"state\", \n    palette = \"Set1\",\n    guide = guide_legend(title.position = \"left\", nrow = 2)\n  )","id":22},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-23","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"(\ngg_delay <- \n  flights %>% \n  group_by(origin, month) %>% \n  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% \n  ggplot(.) +\n    geom_line(aes(y = mean_arr_delay, x = month, color = origin))\n)","id":23},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"output","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-24","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"gg_delay + \n  scale_color_brewer(\n    name = \"Airports in NY\",\n    palette = \"Set2\",\n    guide = guide_legend(\n      title.position = \"bottom\",\n      ncol = 3\n    )\n  ) ","id":24},{"options":{"editor-font-scale":"0.7","autorun":"false","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-25","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"","id":25},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-26","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis","id":26},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-27","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\")\n  )","id":27},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-28","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\"),\n    axis.line.y = element_line(size = 2, color = \"blue\")\n  )","id":28},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-29","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\"),\n    axis.line.y = element_line(size = 2, color = \"blue\"),\n    axis.ticks.length.x = unit(2, \"cm\") #<<\n  )","id":29},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-30","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"(  \ng_l <- \n  g_axis +\n  scale_fill_brewer(\n    palette = \"Paired\",\n    guide = guide_legend(title.position = \"left\", nrow = 2)\n  )\n)","id":30},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-31","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(legend.position = \"bottom\")","id":31},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-32","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\")\n  ) ","id":32},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-33","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\"),\n    legend.text = element_text(size = 16, family = \"Times\"), \n    legend.title = element_text(size = 6, family = \"Courier\", color = \"red\"), \n  ) ","id":33},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-34","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\"),\n    legend.text = element_text(size = 16, family = \"Times\"),\n    legend.title = element_text(size = 6, family = \"Courier\", color = \"red\"),\n    legend.background = element_rect(fill = \"lightblue\", linetype = \"solid\")\n  ) ","id":34},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-35","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_bw()","id":35},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-36","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_void()","id":36},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-37","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_stata()","id":37},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-38","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_gdocs()","id":38},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-39","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_economist()","id":39},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-40","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis + theme_excel()","id":40},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-41","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis_bw <- g_axis + theme_bw()","id":41},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-42","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis_bw + theme(panel.grid.minor = element_blank())","id":42},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-43","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_axis +\n  theme_bw() +\n  theme(\n    panel.grid.minor = element_blank(),\n    panel.grid.major.x = element_blank(),\n    panel.grid.major.y = element_line(size = 1, color = \"blue\", linetype = \"dotted\")\n  )","id":43},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-44","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"my_theme <- \n  theme_economist() +\n  theme(\n    axis.title = element_blank(),\n    panel.grid.major = element_blank()  \n  )","id":44},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-45","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = weather) +\n  geom_boxplot(aes(y = temp, x = factor(month))) +\n  theme_economist()","id":45},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-46","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = weather) +\n  geom_boxplot(aes(y = temp, x = factor(month))) +\n  my_theme","id":46},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-47","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"county_yield_f <- \n  county_yield %>%\n  filter(state_name %in% c(\"Nebraska\", \"Colorado\", \"Kansas\")) %>%\n  filter(year %in% c(2005, 2006))","id":47},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-48","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"(\ng_f <-\n  ggplot(data = county_yield_f) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_x\"\n  )\n)","id":48},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-49","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\")\n  )","id":49},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-50","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\"),\n    strip.background.x = element_rect(color = \"blue\"),\n    strip.background.y = element_blank()\n  ) ","id":50},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-51","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\"),\n    strip.background.x = element_rect(color = \"blue\"),\n    strip.background.y = element_blank(),\n    panel.spacing.x = unit(2, \"cm\"),\n    panel.spacing.y = unit(0.01, \"cm\")\n  ) ","id":51},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-52","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = county_yield) +\n  geom_point(aes(y = corn_yield, x = d3_5_9), color = \"#824283\") ","id":52},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"output","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-53","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"data(\"geyser\", package = \"MASS\")\n\nggplot(geyser, aes(x = duration, y = waiting)) +\n  xlim(0.5, 6) + ylim(40, 110) +\n  stat_density2d(aes(fill = ..level..), geom=\"polygon\") +\n  theme_bw() +\n  theme(panel.grid=element_blank()) -> gg\n\n((gg + scale_fill_viridis_c(option=\"A\") + labs(x=\"magma (option A)\", y=NULL)) |\n(gg + scale_fill_viridis_c(option=\"B\") + labs(x=\"inferno (option B)\", y=NULL)))/ \n((gg + scale_fill_viridis_c(option=\"C\") + labs(x=\"plasma (option C)\", y=NULL)) |\n(gg + scale_fill_viridis_c(option=\"D\") + labs(x=\"viridis (default)\", y=NULL)))","id":53},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-54","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c()","id":54},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-55","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c(option = 2)","id":55},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-56","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c(option = 2, direction = - 1)","id":56},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-57","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"display.brewer.all(type = \"seq\")  ","id":57},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-58","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"display.brewer.all(type = \"div\")  ","id":58},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-59","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"display.brewer.all(type = \"qual\")  ","id":59},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-60","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)","id":60},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-61","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +\n  scale_fill_brewer(palette = \"Set2\")","id":61},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-62","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_distiller(palette = \"RdYlGn\")","id":62},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-63","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"cols <- c(\"Colorado\" = \"red\", \"Nebraska\" = \"blue\", \"Kansas\" = \"orange\", \"South Dakota\" = \"#ff0080\")","id":63},{"options":{"editor-font-scale":"0.7","autorun":"true","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-64","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"70%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +\n  scale_fill_manual(values = cols)","id":64},{"options":{"editor-font-scale":"0.7","autorun":"false","context":"interactive","message":"true","results":"markup","editor-max-height":"","editor-quick-suggestions":"false","classes":"","fig-cap":"","comment":"","label":"unnamed-chunk-65","fig-width":7,"read-only":"false","editor-word-wrap":"true","warning":"true","dpi":72,"out-width":"100%","out-height":"","output":"true","fig-height":5},"code":"ggplot(data = county_yield) + \n  geom_point(\n    aes(x = d1_5_9, y = corn_yield,color = corn_yield),\n    size = 0.3\n  ) +\n  scale_color_gradientn(\n    colors = c(\"red\", \"orange\", \"green\", \"blue\"),\n    values = c(0, 0.1, 0.2, 0.9, 1),\n    limits = c(100, 250)\n  ) ","id":65}];
+  globalThis.qwebrCellDetails = [{"id":1,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"setup","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-1","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"#--- install and library the data package ---#\ninstall.packages(\"r.spatial.workshop.datasets\", repos = c(\"https://tmieno2.r-universe.dev\", \"https://cran.r-project.org\"))\n\ndata(county_yield, package = \"r.spatial.workshop.datasets\")\n\ncounty_yield <- dplyr::select(county_yield, - geometry)"},{"id":2,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"setup","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-2","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)\n\ng_box <- \n  ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))"},{"id":3,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-3","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box "},{"id":4,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-4","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box +\n  xlab(\"Year\") +\n  ylab(\"Corn Yield (bu/acre)\") +\n  scale_fill_viridis_d()"},{"id":5,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-5","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box "},{"id":6,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-6","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box +\n  theme(\n    axis.title = element_text(size = 20)\n  )"},{"id":7,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-7","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)\n\n(\ng_box <- \n  ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))\n)"},{"id":8,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-8","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box + \n  scale_x_discrete(name = \"Year\") + \n  scale_y_continuous(name = \"Corn Yield (bu/acre)\") "},{"id":9,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-9","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box + \n  xlab(\"Year\") +\n  ylab(\"Corn Yield (bu/acre)\") "},{"id":10,"options":{"comment":"","watning":"false","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-10","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box + \n  scale_x_discrete(\n    name = \"Year\" \n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    #--- first min, second max ---#\n    limit = c(100, 200)\n  ) "},{"id":11,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-11","autorun":"false","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box + \n  xlabel(\"Year\") +\n  ylabel(\"Corn Yield (bu/acre)\") +\n  ylim(100, 200)"},{"id":12,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-12","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"false","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_box + \n  scale_x_discrete(\n    name = \"Year\",\n    label = gsub(\"20\", \"\", as.character(2000:2018))\n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    limit = c(100, 200),\n    breaks = seq(100, 200, by = 10)\n  ) "},{"id":13,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-13","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"(\ngg_delay <- \n  flights %>% \n  group_by(origin, month) %>% \n  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% \n  ggplot(.) +\n    geom_line(aes(y = mean_arr_delay, x = month, color = origin))\n)"},{"id":14,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"output","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-14","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"false","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"gg_delay + \n  scale_x_continuous(\n    name = \"Month\",\n    limit = c(4, 8),\n    breaks = 4:8\n  ) +\n  scale_y_continuous(\n    name = \"Average Arrival Delay (minutes)\",\n    limit = c(0, 25)\n  ) "},{"id":15,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-15","autorun":"false","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"#--- work here ---#\n\n\n\n\n"},{"id":16,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"output","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-16","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"false","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"gg_delay + \n  scale_x_continuous(\n    name = \"Month\",\n    limit = c(4, 8),\n    breaks = 4:8\n  ) +\n  scale_y_continuous(\n    name = \"Average Arrival Delay (minutes)\",\n    limit = c(0, 25)\n  ) "},{"id":17,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-17","autorun":"false","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"#--- work here ---#\n\n\n\n"},{"id":18,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-18","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"( \ng_axis <-\n  g_box +\n  scale_x_discrete(\n    name = \"Year\",\n    label = gsub(\"20\", \"\", as.character(2000:2018))\n  ) +\n  scale_y_continuous(\n    name = \"Corn Yield (bu/acre)\",\n    limit = c(100, 200),\n    breaks = seq(100, 200, by = 10)\n  )\n)"},{"id":19,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-19","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + scale_fill_brewer(name = \"State\")"},{"id":20,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-20","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + scale_fill_brewer(name = \"state\", palette = \"Set1\")"},{"id":21,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-21","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + \n  scale_fill_brewer(\n    name = \"state\", \n    palette = \"Set1\",\n    guide = guide_legend(title.position = \"left\")\n  )"},{"id":22,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-22","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + \n  scale_fill_brewer(\n    name = \"state\", \n    palette = \"Set1\",\n    guide = guide_legend(title.position = \"left\", nrow = 2)\n  )"},{"id":23,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-23","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"(\ngg_delay <- \n  flights %>% \n  group_by(origin, month) %>% \n  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% \n  ggplot(.) +\n    geom_line(aes(y = mean_arr_delay, x = month, color = origin))\n)"},{"id":24,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"output","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-24","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"gg_delay + \n  scale_color_brewer(\n    name = \"Airports in NY\",\n    palette = \"Set2\",\n    guide = guide_legend(\n      title.position = \"bottom\",\n      ncol = 3\n    )\n  ) "},{"id":25,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-25","autorun":"false","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":""},{"id":26,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-26","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis"},{"id":27,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-27","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\")\n  )"},{"id":28,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-28","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\"),\n    axis.line.y = element_line(size = 2, color = \"blue\")\n  )"},{"id":29,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-29","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis +\n  theme(\n    axis.title.x = element_text(size = 8, color = \"red\"),\n    axis.text = element_text(size = 14, family = \"Times\"),\n    axis.line.y = element_line(size = 2, color = \"blue\"),\n    axis.ticks.length.x = unit(2, \"cm\") #<<\n  )"},{"id":30,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-30","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"(  \ng_l <- \n  g_axis +\n  scale_fill_brewer(\n    palette = \"Paired\",\n    guide = guide_legend(title.position = \"left\", nrow = 2)\n  )\n)"},{"id":31,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-31","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(legend.position = \"bottom\")"},{"id":32,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-32","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\")\n  ) "},{"id":33,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-33","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\"),\n    legend.text = element_text(size = 16, family = \"Times\"), \n    legend.title = element_text(size = 6, family = \"Courier\", color = \"red\"), \n  ) "},{"id":34,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-34","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_l +\n  labs(fill = \"State\") +\n  theme(\n    legend.position = \"bottom\",\n    legend.key.height = unit(0.5, \"cm\"),\n    legend.key.width = unit(2, \"cm\"),\n    legend.text = element_text(size = 16, family = \"Times\"),\n    legend.title = element_text(size = 6, family = \"Courier\", color = \"red\"),\n    legend.background = element_rect(fill = \"lightblue\", linetype = \"solid\")\n  ) "},{"id":35,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-35","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_bw()"},{"id":36,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-36","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_void()"},{"id":37,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-37","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_stata()"},{"id":38,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-38","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_gdocs()"},{"id":39,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-39","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_economist()"},{"id":40,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-40","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis + theme_excel()"},{"id":41,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-41","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis_bw <- g_axis + theme_bw()"},{"id":42,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-42","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis_bw + theme(panel.grid.minor = element_blank())"},{"id":43,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-43","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_axis +\n  theme_bw() +\n  theme(\n    panel.grid.minor = element_blank(),\n    panel.grid.major.x = element_blank(),\n    panel.grid.major.y = element_line(size = 1, color = \"blue\", linetype = \"dotted\")\n  )"},{"id":44,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-44","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"my_theme <- \n  theme_economist() +\n  theme(\n    axis.title = element_blank(),\n    panel.grid.major = element_blank()  \n  )"},{"id":45,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-45","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = weather) +\n  geom_boxplot(aes(y = temp, x = factor(month))) +\n  theme_economist()"},{"id":46,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-46","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = weather) +\n  geom_boxplot(aes(y = temp, x = factor(month))) +\n  my_theme"},{"id":47,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-47","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"county_yield_f <- \n  county_yield %>%\n  filter(state_name %in% c(\"Nebraska\", \"Colorado\", \"Kansas\")) %>%\n  filter(year %in% c(2005, 2006))"},{"id":48,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-48","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"(\ng_f <-\n  ggplot(data = county_yield_f) + \n  geom_histogram(aes(x = corn_yield)) +\n  facet_grid(\n    state_name ~ year, \n    scales = \"free_x\"\n  )\n)"},{"id":49,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-49","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\")\n  )"},{"id":50,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-50","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\"),\n    strip.background.x = element_rect(color = \"blue\"),\n    strip.background.y = element_blank()\n  ) "},{"id":51,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-51","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"g_f +\n  theme(\n    strip.text.x = element_text(size = 12, family = \"Times\", color = \"red\"),\n    strip.text.y = element_text(angle = 0, size = 6, color = \"blue\"),\n    strip.background.x = element_rect(color = \"blue\"),\n    strip.background.y = element_blank(),\n    panel.spacing.x = unit(2, \"cm\"),\n    panel.spacing.y = unit(0.01, \"cm\")\n  ) "},{"id":52,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-52","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = county_yield) +\n  geom_point(aes(y = corn_yield, x = d3_5_9), color = \"#824283\") "},{"id":53,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"output","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-53","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"data(\"geyser\", package = \"MASS\")\n\nggplot(geyser, aes(x = duration, y = waiting)) +\n  xlim(0.5, 6) + ylim(40, 110) +\n  stat_density2d(aes(fill = ..level..), geom=\"polygon\") +\n  theme_bw() +\n  theme(panel.grid=element_blank()) -> gg\n\n((gg + scale_fill_viridis_c(option=\"A\") + labs(x=\"magma (option A)\", y=NULL)) |\n(gg + scale_fill_viridis_c(option=\"B\") + labs(x=\"inferno (option B)\", y=NULL)))/ \n((gg + scale_fill_viridis_c(option=\"C\") + labs(x=\"plasma (option C)\", y=NULL)) |\n(gg + scale_fill_viridis_c(option=\"D\") + labs(x=\"viridis (default)\", y=NULL)))"},{"id":54,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-54","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c()"},{"id":55,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-55","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c(option = 2)"},{"id":56,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-56","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_viridis_c(option = 2, direction = - 1)"},{"id":57,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-57","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"display.brewer.all(type = \"seq\")  "},{"id":58,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-58","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"display.brewer.all(type = \"div\")  "},{"id":59,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-59","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"display.brewer.all(type = \"qual\")  "},{"id":60,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-60","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"county_yield_s_b2010 <- \n  county_yield %>% \n  filter(year >= 2005, year <= 2010)"},{"id":61,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-61","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +\n  scale_fill_brewer(palette = \"Set2\")"},{"id":62,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-62","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = filter(county_yield, corn_yield > 50)) +\n  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +\n  scale_color_distiller(palette = \"RdYlGn\")"},{"id":63,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-63","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"cols <- c(\"Colorado\" = \"red\", \"Nebraska\" = \"blue\", \"Kansas\" = \"orange\", \"South Dakota\" = \"#ff0080\")"},{"id":64,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"70%","editor-quick-suggestions":"false","label":"unnamed-chunk-64","autorun":"true","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = county_yield_s_b2010) + \n  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +\n  scale_fill_manual(values = cols)"},{"id":65,"options":{"comment":"","classes":"","fig-cap":"","fig-width":7,"results":"markup","output":"true","context":"interactive","message":"true","out-width":"100%","editor-quick-suggestions":"false","label":"unnamed-chunk-65","autorun":"false","fig-height":5,"read-only":"false","editor-font-scale":"0.7","warning":"true","dpi":72,"out-height":"","editor-max-height":"","editor-word-wrap":"true"},"code":"ggplot(data = county_yield) + \n  geom_point(\n    aes(x = d1_5_9, y = corn_yield,color = corn_yield),\n    size = 0.3\n  ) +\n  scale_color_gradientn(\n    colors = c(\"red\", \"orange\", \"green\", \"blue\"),\n    values = c(0, 0.1, 0.2, 0.9, 1),\n    limits = c(100, 250)\n  ) "}];
 
   </script>
   <script type="module">
@@ -2481,39 +2481,39 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="legends-content" class="slide level2">
 <h2>Legends content</h2>
 <div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Preparation</a></li><li><a href="#tabset-8-2">Title</a></li><li><a href="#tabset-8-3">Fill color</a></li><li><a href="#tabset-8-4">Title position</a></li><li><a href="#tabset-8-5">wrapping</a></li><li><a href="#tabset-8-6">Exercise</a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Preparation</a></li><li><a href="#tabset-9-2">Title</a></li><li><a href="#tabset-9-3">Fill color</a></li><li><a href="#tabset-9-4">Title position</a></li><li><a href="#tabset-9-5">wrapping</a></li><li><a href="#tabset-9-6">Exercise</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1">
+<div id="tabset-9-1">
 <p>We are going to build on this figure in this section:</p>
 <div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-2">
+<div id="tabset-9-2">
 <div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-3">
+<div id="tabset-9-3">
 <div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-4">
+<div id="tabset-9-4">
 <div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-5">
+<div id="tabset-9-5">
 <div id="qwebr-insertion-location-22"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-6">
+<div id="tabset-9-6">
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Instruction</a></li><li><a href="#tabset-7-2">Exercise</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Instruction</a></li><li><a href="#tabset-8-2">Exercise</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
+<div id="tabset-8-1">
 <p>Run the following code to create <code>gg_delay</code>, which you will build on.</p>
 <div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-7-2">
+<div id="tabset-8-2">
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Change the legend contents to create the figure on the right. Using <code>scale_*_brewer()</code>. You need to identify what goes into <code>*</code> in <code>scale_*_brewer()</code>.</p>
@@ -2529,13 +2529,17 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div><!--end of the 2nd column-->
 </div>
 <!--end of the columns-->
-<p><br></p>
-<p><strong>Work here</strong></p>
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Work here</a></li><li><a href="#tabset-7-2">Answer</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
 <div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p><strong>Answer</strong></p>
+</div>
+<div id="tabset-7-2">
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>gg_delay <span class="sc">+</span> </span>
 <span id="cb3-2"><a></a>  <span class="fu">scale_color_brewer</span>(</span>
 <span id="cb3-3"><a></a>    <span class="at">name =</span> <span class="st">"Airports in NY"</span>,</span>
@@ -2545,6 +2549,10 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <span id="cb3-7"><a></a>      <span class="at">ncol =</span> <span class="dv">3</span></span>
 <span id="cb3-8"><a></a>    )</span>
 <span id="cb3-9"><a></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2558,9 +2566,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="theme" class="slide level2">
 <h2>Theme</h2>
 <div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Naming rules</a></li><li><a href="#tabset-9-2">Common functions</a></li></ul>
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Naming rules</a></li><li><a href="#tabset-10-2">Common functions</a></li></ul>
 <div class="tab-content">
-<div id="tabset-9-1">
+<div id="tabset-10-1">
 <p>When specifying the theme of figure elements, it is good to know the naming convention of figure elements:</p>
 <p>For example:</p>
 <ul>
@@ -2573,7 +2581,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>This refers to the title of only x-axis. Any aesthetic theme you apply to this element will be reflected on the title of only x-axis.</p>
 <p>So, basically appending <code>.name</code> narrows down the scope of the figure elements the element name refers to.</p>
 </div>
-<div id="tabset-9-2">
+<div id="tabset-10-2">
 <p>There are common functions we use to specify the aesthetic nature of figure elements based on the type of the elements:</p>
 <p><br></p>
 <ul>
@@ -2603,22 +2611,22 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="axis-theme" class="slide level2">
 <h2>Axis theme</h2>
 <div class="panel-tabset">
-<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Preparation</a></li><li><a href="#tabset-10-2">title and text</a></li><li><a href="#tabset-10-3">line</a></li><li><a href="#tabset-10-4">ticks</a></li></ul>
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Preparation</a></li><li><a href="#tabset-11-2">title and text</a></li><li><a href="#tabset-11-3">line</a></li><li><a href="#tabset-11-4">ticks</a></li></ul>
 <div class="tab-content">
-<div id="tabset-10-1">
+<div id="tabset-11-1">
 <p>We are going to build on this figure in this section:</p>
 <div id="qwebr-insertion-location-26"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-10-2">
+<div id="tabset-11-2">
 <div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-10-3">
+<div id="tabset-11-3">
 <div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-10-4">
+<div id="tabset-11-4">
 <div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2629,9 +2637,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="legends-theme" class="slide level2">
 <h2>Legends theme</h2>
 <div class="panel-tabset">
-<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">How</a></li><li><a href="#tabset-11-2">Preparation</a></li><li><a href="#tabset-11-3">position</a></li><li><a href="#tabset-11-4">key</a></li><li><a href="#tabset-11-5">font</a></li><li><a href="#tabset-11-6">background</a></li></ul>
+<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">How</a></li><li><a href="#tabset-12-2">Preparation</a></li><li><a href="#tabset-12-3">position</a></li><li><a href="#tabset-12-4">key</a></li><li><a href="#tabset-12-5">font</a></li><li><a href="#tabset-12-6">background</a></li></ul>
 <div class="tab-content">
-<div id="tabset-11-1">
+<div id="tabset-12-1">
 <p>We can use <code>them()</code> to change the aesthetics of legends. Some of the elements include</p>
 <ul>
 <li>title</li>
@@ -2644,24 +2652,24 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>See <a href="https://ggplot2.tidyverse.org/reference/theme.html">here</a> for the full list of options related to legends.</p>
 <p>We will discuss how to change the color scheme of legends later in much detail.</p>
 </div>
-<div id="tabset-11-2">
+<div id="tabset-12-2">
 <p>This is what we will build on:</p>
 <div id="qwebr-insertion-location-30"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-11-3">
+<div id="tabset-12-3">
 <div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-11-4">
+<div id="tabset-12-4">
 <div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-11-5">
+<div id="tabset-12-5">
 <div id="qwebr-insertion-location-33"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-11-6">
+<div id="tabset-12-6">
 <div id="qwebr-insertion-location-34"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2672,9 +2680,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="pre-made-and-customized-themes" class="slide level2">
 <h2>Pre-made and customized themes</h2>
 <div class="panel-tabset">
-<ul id="tabset-15" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-15-1">Instruction</a></li><li><a href="#tabset-15-2">Examples</a></li><li><a href="#tabset-15-3">Build on a pre-made theme</a></li><li><a href="#tabset-15-4">Custom theme</a></li></ul>
+<ul id="tabset-16" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-16-1">Instruction</a></li><li><a href="#tabset-16-2">Examples</a></li><li><a href="#tabset-16-3">Build on a pre-made theme</a></li><li><a href="#tabset-16-4">Custom theme</a></li></ul>
 <div class="tab-content">
-<div id="tabset-15-1">
+<div id="tabset-16-1">
 <p>There are a bunch of pre-made themes from the <code>ggplot2</code> and <code>ggtheme</code> packages that can quickly change how figures look.</p>
 <p>Install and library <code>ggtheme</code> package first:</p>
 <div class="cell">
@@ -2687,31 +2695,31 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p><br></p>
 <p>See the full list of pre-made themes <a href="https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/">here</a>.</p>
 </div>
-<div id="tabset-15-2">
+<div id="tabset-16-2">
 <div class="panel-tabset">
-<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">bw</a></li><li><a href="#tabset-12-2">void</a></li><li><a href="#tabset-12-3">stata</a></li><li><a href="#tabset-12-4">gdocs</a></li><li><a href="#tabset-12-5">economist</a></li><li><a href="#tabset-12-6">excel</a></li></ul>
+<ul id="tabset-13" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-13-1">bw</a></li><li><a href="#tabset-13-2">void</a></li><li><a href="#tabset-13-3">stata</a></li><li><a href="#tabset-13-4">gdocs</a></li><li><a href="#tabset-13-5">economist</a></li><li><a href="#tabset-13-6">excel</a></li></ul>
 <div class="tab-content">
-<div id="tabset-12-1">
+<div id="tabset-13-1">
 <div id="qwebr-insertion-location-35"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-12-2">
+<div id="tabset-13-2">
 <div id="qwebr-insertion-location-36"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-12-3">
+<div id="tabset-13-3">
 <div id="qwebr-insertion-location-37"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-12-4">
+<div id="tabset-13-4">
 <div id="qwebr-insertion-location-38"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-12-5">
+<div id="tabset-13-5">
 <div id="qwebr-insertion-location-39"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-12-6">
+<div id="tabset-13-6">
 <div id="qwebr-insertion-location-40"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2719,11 +2727,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-15-3">
+<div id="tabset-16-3">
 <div class="panel-tabset">
-<ul id="tabset-13" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-13-1">How</a></li><li><a href="#tabset-13-2">Preparation</a></li><li><a href="#tabset-13-3">minor grid</a></li><li><a href="#tabset-13-4">major grid</a></li></ul>
+<ul id="tabset-14" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-14-1">How</a></li><li><a href="#tabset-14-2">Preparation</a></li><li><a href="#tabset-14-3">minor grid</a></li><li><a href="#tabset-14-4">major grid</a></li></ul>
 <div class="tab-content">
-<div id="tabset-13-1">
+<div id="tabset-14-1">
 <p>You can simply override parts of the pre-made theme by adding theme options like this (see more on this <a href="#/custom-theme">here</a>):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>g_axis <span class="sc">+</span></span>
@@ -2735,16 +2743,16 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p><br></p>
 <p>So, you can pick the pre-made theme that looks the closest to what you would like, and then add on theme elements to the part you do not like.</p>
 </div>
-<div id="tabset-13-2">
+<div id="tabset-14-2">
 <p>We will build from this figure:</p>
 <div id="qwebr-insertion-location-41"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-13-3">
+<div id="tabset-14-3">
 <div id="qwebr-insertion-location-42"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-13-4">
+<div id="tabset-14-4">
 <div id="qwebr-insertion-location-43"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>See <a href="http://sape.inf.usi.ch/quick-reference/ggplot2/linetype">here</a> for the line types available.</p>
@@ -2753,11 +2761,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-15-4">
+<div id="tabset-16-4">
 <div class="panel-tabset">
-<ul id="tabset-14" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-14-1">Introduction</a></li><li><a href="#tabset-14-2">Compare</a></li><li><a href="#tabset-14-3"><code>theme_set()</code></a></li></ul>
+<ul id="tabset-15" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-15-1">Introduction</a></li><li><a href="#tabset-15-2">Compare</a></li><li><a href="#tabset-15-3"><code>theme_set()</code></a></li></ul>
 <div class="tab-content">
-<div id="tabset-14-1">
+<div id="tabset-15-1">
 <p>You can create your own theme, save it, and then use it later.</p>
 <p>Here, I am creating my own theme off of <code>theme_economist()</code>, where axis titles and major panel grids are absent.</p>
 <div id="qwebr-insertion-location-44"></div>
@@ -2771,7 +2779,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <span id="cb6-5"><a></a>  my_theme</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-14-2">
+<div id="tabset-15-2">
 <div class="columns">
 <div class="column" style="width:50%;">
 <div id="qwebr-insertion-location-45"></div>
@@ -2783,7 +2791,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of the columns-->
 </div>
-<div id="tabset-14-3">
+<div id="tabset-15-3">
 <p>If you would like to apply your theme to all the figures you generate, then use <code>theme_set()</code> like below:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="fu">theme_set</span>(my_theme)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2801,9 +2809,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="faceted-figure-theme" class="slide level2">
 <h2>Faceted figure theme</h2>
 <div class="panel-tabset">
-<ul id="tabset-16" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-16-1">Instruction</a></li><li><a href="#tabset-16-2">Preparation</a></li><li><a href="#tabset-16-3">text</a></li><li><a href="#tabset-16-4">background</a></li><li><a href="#tabset-16-5">panel spacing</a></li></ul>
+<ul id="tabset-17" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-17-1">Instruction</a></li><li><a href="#tabset-17-2">Preparation</a></li><li><a href="#tabset-17-3">text</a></li><li><a href="#tabset-17-4">background</a></li><li><a href="#tabset-17-5">panel spacing</a></li></ul>
 <div class="tab-content">
-<div id="tabset-16-1">
+<div id="tabset-17-1">
 <p>Faceted figures have <code>strip</code> elements that do no exist for non-faceted figures like</p>
 <ul>
 <li><code>strip.background</code></li>
@@ -2813,7 +2821,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </ul>
 <p>We learn how to modify these elements.</p>
 </div>
-<div id="tabset-16-2">
+<div id="tabset-17-2">
 <p>Create a dataset for this section:</p>
 <div id="qwebr-insertion-location-47"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -2822,15 +2830,15 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div id="qwebr-insertion-location-48"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-16-3">
+<div id="tabset-17-3">
 <div id="qwebr-insertion-location-49"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-16-4">
+<div id="tabset-17-4">
 <div id="qwebr-insertion-location-50"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-16-5">
+<div id="tabset-17-5">
 <div id="qwebr-insertion-location-51"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2851,9 +2859,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="more-flexible-color-options-with-hex" class="slide level2">
 <h2>More flexible color options with HEX</h2>
 <div class="panel-tabset">
-<ul id="tabset-17" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-17-1">Instruction</a></li><li><a href="#tabset-17-2">Example</a></li></ul>
+<ul id="tabset-18" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-18-1">Instruction</a></li><li><a href="#tabset-18-2">Example</a></li></ul>
 <div class="tab-content">
-<div id="tabset-17-1">
+<div id="tabset-18-1">
 <p>Instead of naming the color you want to use, you can use <strong>HEX color codes</strong> instead.</p>
 <div title="Direction">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
@@ -2874,7 +2882,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <p>You could alternatively use the RGB codes, but I do not see any reasons to do so because the use of HEX codes is sufficient.</p>
 </div>
-<div id="tabset-17-2">
+<div id="tabset-18-2">
 <p>You can use HEX color codes for any color-related elements in a figure.</p>
 <div id="qwebr-insertion-location-52"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -2898,9 +2906,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="color-scale" class="slide level2">
 <h2>Color scale</h2>
 <div class="panel-tabset">
-<ul id="tabset-18" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-18-1">Intro 1</a></li><li><a href="#tabset-18-2">Intro 2</a></li></ul>
+<ul id="tabset-19" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-19-1">Intro 1</a></li><li><a href="#tabset-19-2">Intro 2</a></li></ul>
 <div class="tab-content">
-<div id="tabset-18-1">
+<div id="tabset-19-1">
 <p>The choice of color schemes for your figures are very important (not so much for academic journals …)</p>
 <p>We use <code>scale_A_B()</code> functions to for color specification:</p>
 <ul>
@@ -2908,7 +2916,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <li><strong>B</strong> is the type of color specification method</li>
 </ul>
 </div>
-<div id="tabset-18-2">
+<div id="tabset-19-2">
 <p>For example, consider the following code:</p>
 <p>Since it is the <code>color</code> aesthetic that we want to work on, <strong>A</strong> = <code>color</code>.</p>
 <p>There are many options for <strong>B</strong>. Indeed, there are so many that, it gets confusing!</p>
@@ -2930,9 +2938,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="viridis" class="slide level2">
 <h2>Viridis</h2>
 <div class="panel-tabset">
-<ul id="tabset-19" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-19-1">Instruction</a></li><li><a href="#tabset-19-2">types</a></li><li><a href="#tabset-19-3">Example 1</a></li><li><a href="#tabset-19-4">Example 2</a></li><li><a href="#tabset-19-5">reverse</a></li></ul>
+<ul id="tabset-20" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-20-1">Instruction</a></li><li><a href="#tabset-20-2">types</a></li><li><a href="#tabset-20-3">Example 1</a></li><li><a href="#tabset-20-4">Example 2</a></li><li><a href="#tabset-20-5">reverse</a></li></ul>
 <div class="tab-content">
-<div id="tabset-19-1">
+<div id="tabset-20-1">
 <p>We have four <code>scale</code> functions for Viridis color map:</p>
 <ul>
 <li><code>scale_color_viridis_c()</code>: for <code>color</code> aesthetic with a continuous variable</li>
@@ -2951,19 +2959,19 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <p>You can use <code>option</code> to specify which one of them you want to use inside the <code>scale</code> functions.</p>
 <p>These color schemes are color-blind sage.</p>
 </div>
-<div id="tabset-19-2">
+<div id="tabset-20-2">
 <div id="qwebr-insertion-location-53"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-19-3">
+<div id="tabset-20-3">
 <div id="qwebr-insertion-location-54"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-19-4">
+<div id="tabset-20-4">
 <div id="qwebr-insertion-location-55"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-19-5">
+<div id="tabset-20-5">
 <div id="qwebr-insertion-location-56"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2974,9 +2982,9 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="rcolorbrewer" class="slide level2">
 <h2>RColorBrewer</h2>
 <div class="panel-tabset">
-<ul id="tabset-21" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-21-1">Instruction</a></li><li><a href="#tabset-21-2">different types of sets</a></li><li><a href="#tabset-21-3">Example 1</a></li><li><a href="#tabset-21-4">Example 2</a></li></ul>
+<ul id="tabset-22" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-22-1">Instruction</a></li><li><a href="#tabset-22-2">different types of sets</a></li><li><a href="#tabset-22-3">Example 1</a></li><li><a href="#tabset-22-4">Example 2</a></li></ul>
 <div class="tab-content">
-<div id="tabset-21-1">
+<div id="tabset-22-1">
 <p><code>RColorBrewer</code> package provides a number of color palettes of three types:</p>
 <ul>
 <li><strong>sequential</strong>: suitable for a variable that has ordinal meaning (e.g., temperature, precipitation)</li>
@@ -2989,19 +2997,19 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <li><code>scale_A_distiller()</code>: for continuous aesthetic variable</li>
 </ul>
 </div>
-<div id="tabset-21-2">
+<div id="tabset-22-2">
 <div class="panel-tabset">
-<ul id="tabset-20" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-20-1">sequential</a></li><li><a href="#tabset-20-2">diverging</a></li><li><a href="#tabset-20-3">qualitative</a></li></ul>
+<ul id="tabset-21" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-21-1">sequential</a></li><li><a href="#tabset-21-2">diverging</a></li><li><a href="#tabset-21-3">qualitative</a></li></ul>
 <div class="tab-content">
-<div id="tabset-20-1">
+<div id="tabset-21-1">
 <div id="qwebr-insertion-location-57"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-20-2">
+<div id="tabset-21-2">
 <div id="qwebr-insertion-location-58"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-20-3">
+<div id="tabset-21-3">
 <div id="qwebr-insertion-location-59"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -3009,7 +3017,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-21-3">
+<div id="tabset-22-3">
 <p>Generate a dataset for visualization:</p>
 <div id="qwebr-insertion-location-60"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3018,7 +3026,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div id="qwebr-insertion-location-61"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-21-4">
+<div id="tabset-22-4">
 <div id="qwebr-insertion-location-62"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -3029,13 +3037,13 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <section id="set-color-scale-manually" class="slide level2">
 <h2>Set color scale manually</h2>
 <div class="panel-tabset">
-<ul id="tabset-24" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-24-1">discrete</a></li><li><a href="#tabset-24-2">continuous</a></li></ul>
+<ul id="tabset-25" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-25-1">discrete</a></li><li><a href="#tabset-25-2">continuous</a></li></ul>
 <div class="tab-content">
-<div id="tabset-24-1">
+<div id="tabset-25-1">
 <div class="panel-tabset">
-<ul id="tabset-22" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-22-1">Instruction</a></li><li><a href="#tabset-22-2">Example</a></li></ul>
+<ul id="tabset-23" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-23-1">Instruction</a></li><li><a href="#tabset-23-2">Example</a></li></ul>
 <div class="tab-content">
-<div id="tabset-22-1">
+<div id="tabset-23-1">
 <p>Sometimes, you just want to pick colors yourself. In that case, you can use</p>
 <ul>
 <li><code>scale_color_manual()</code></li>
@@ -3054,7 +3062,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">scale_fill_manual</span>(<span class="at">values =</span> cols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div id="tabset-22-2">
+<div id="tabset-23-2">
 <p>Define a named color vector:</p>
 <div id="qwebr-insertion-location-63"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3067,11 +3075,11 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-24-2">
+<div id="tabset-25-2">
 <div class="panel-tabset">
-<ul id="tabset-23" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-23-1">Instruction</a></li><li><a href="#tabset-23-2">Example</a></li></ul>
+<ul id="tabset-24" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-24-1">Instruction</a></li><li><a href="#tabset-24-2">Example</a></li></ul>
 <div class="tab-content">
-<div id="tabset-23-1">
+<div id="tabset-24-1">
 <p><strong>How</strong></p>
 <p>You can use <code>scale_*_gradientn()</code> to create your own continuous color scale.</p>
 <p><br></p>
@@ -3086,7 +3094,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </ul>
 <p><code>n</code>th value of <code>colors</code> is used for the interval defined by <code>n</code>th and <code>n+1</code>th values in <code>values</code>.</p>
 </div>
-<div id="tabset-23-2">
+<div id="tabset-24-2">
 <p>Create a figure:</p>
 <div id="qwebr-insertion-location-65"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
