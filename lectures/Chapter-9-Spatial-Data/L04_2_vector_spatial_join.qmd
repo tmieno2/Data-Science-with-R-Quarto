@@ -5,7 +5,7 @@ format:
   revealjs: 
     footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
     theme: [default, ./../custom.scss]
-    fontsize: 1em
+    fontsize: 1.2em
     callout-icon: false
     scrollable: true
     echo: true
@@ -577,6 +577,8 @@ In the example of finding average groundwater use by county (go [here](#sec-poly
 
 However, this can actually be done in one step using `aggregate()`, in which you specify how you want to aggregate with the `FUN` option:
 
+<br>
+
 **Syntax**
 
 ```{r eval = F}
@@ -665,7 +667,7 @@ For these purposes, we can use `sf::st_intersection()`.
 <!--end of the columns-->
 
 
-### Illustration 1: lines vs polygons
+### lines vs polygons
 
 ```{webr-r}
 #| context: setup 
@@ -749,6 +751,7 @@ ggplot() +
 Here is how the intersections and polygons look like.
 
 ```{webr-r}
+#| context: output
 ggplot() +
   geom_sf(
     data = intersections_lp,
@@ -765,7 +768,7 @@ ggplot() +
 :::
 ::::
 
-### Illustration 2: polygons vs polygons
+### polygons vs polygons
 
 ::: {.columns}
 
