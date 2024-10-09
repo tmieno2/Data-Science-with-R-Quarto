@@ -293,10 +293,7 @@ Write a function that takes a nitrogen rate as an argument, calculate the estima
 **Work here**
 
 ```{webr-r}
-n_to_yield <- function(N) {
-  yield <- 120 + 25 * log(N)
-  return(yield)
-}
+
 ```
 
 <br>
@@ -304,12 +301,21 @@ n_to_yield <- function(N) {
 **Answer**
 ```{r, eval = FALSE}
 #| code-fold: true
-
+n_to_yield <- function(N) {
+  yield <- 120 + 25 * log(N)
+  return(yield)
+}
 ```
 
 #### Exercise 3
 
-You would like to calculate the expected revenue as a function of nitrogen rate based on the yield response function.
+You would like to calculate the revenue of corn production (defined below) as a function of nitrogen rate based on the yield response function.
+
+```{=tex}
+\begin{align*}
+P_{corn} * \mbox{corn yield}
+\end{align*}
+```
 
 Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function your created in Exercise 2.
 
@@ -387,7 +393,7 @@ for (x in a_list_of_values){
 
 ### Example
 
-```{r for-loop-square}
+```{webr-r}
 for (x in 1:5){
   print(x^2)
 }  
@@ -397,7 +403,7 @@ for (x in 1:5){
 
 This does the same:
 
-```{r for-loop-square-duh}
+```{webr-r}
 for (bluh_bluh_bluh in 1:5){
   print(bluh_bluh_bluh^2)
 }  
@@ -445,10 +451,12 @@ lapply(A, B)
 
 + `A` is the list of values 
 + `B` is the function you would like to apply to each of the values in `A` 
+  + You can use an existing function (e.g., `mean()`) 
+  + You can also write a function on the spot
 
 <br>
 
-**Note**:  
+**Note**:
 
 + `A` is a vector, `lapply()` works on each of the vector elements
 + `A` is a list, `lapply()` works on each of the list elements whatever they may be 
@@ -458,9 +466,11 @@ lapply(A, B)
 
 This does the same thing as the for loop example we looked at earlier:
 
-```{r lapply-square}
-lapply(1:5, \(x){x^2})  
+```{webr-r}
+lapply(1:5, \(x){x^2})
 ```
+
++ `\(x)`: shorthand for `function(x)`
 
 <br>
 

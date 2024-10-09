@@ -3,6 +3,7 @@ title: "Assignment 1"
 author: "Your Name Here"
 format:
   html:
+    embed-resources: true
     number-sections: true
     number-depth: 1
     theme: flatly
@@ -16,6 +17,7 @@ execute:
 ```{r setup, echo = F}
 library(knitr)
 opts_knit$set(root.dir = here::here("Assignments/Assignment_1"))
+# setwd(here::here("Assignments/Assignment_1"))
 ```
 
 ```{r packages, echo = F}
@@ -227,6 +229,9 @@ Using `ir_data`, create a map of groundwater use where
 + put the legend below the figure
 + add `fig.height = 15` as an R chunk option so that the figure is sufficiently large in the output html file
 
+
+[<span style = "color: blue;"> Hint </span>: use `geom_point()`]
+
 ```{r echo = F, fig.height = 15}
 ggplot(data = ir_data) +
   geom_point(aes(x = longdecdeg, y = latdecdeg, color = pumpingAF)) +
@@ -265,7 +270,8 @@ Find the mean of saturated thickness (`sat_thickness`) by year.
 
 ```{r echo = F}
 (
-  sat_mean_data <- sat_data %>%
+  sat_mean_data <- 
+    sat_data %>%
     group_by(year) %>%
     summarize(sat_mean = mean(sat_thickness))
 )
@@ -358,7 +364,8 @@ daymet_data <- mutate(daymet_data, daily_gdd = (max_temp + min_temp) / 2 - 10)
 For each well-year, calculate the sum of daily GDD during the irrigation season, name it `GDD`, and assign it to an R object called `GDD_data`
 
 ```{r echo = F}
-GDD_data <- daymet_data %>%
+GDD_data <- 
+  daymet_data %>%
   group_by(year, wdid) %>%
   summarize(GDD = sum(daily_gdd))
 ```
@@ -367,7 +374,7 @@ GDD_data <- daymet_data %>%
 
 Create a boxplot of `GDD` where the y-axis is `GDD` and the x-axis is `year`.
 
-```{r include = F}
+```{r echo = F}
 ggplot(data = GDD_data) +
   geom_boxplot(aes(y = GDD, x = factor(year)))
 ```

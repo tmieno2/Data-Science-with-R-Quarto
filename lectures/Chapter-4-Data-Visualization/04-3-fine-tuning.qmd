@@ -10,7 +10,7 @@ format:
     scrollable: true
     echo: true
 webr:
-  packages: ['dplyr', 'ggplot2', 'nycflights13', 'ggtheme', 'RColorBrewer', 'MASS']
+  packages: ['dplyr', 'ggplot2', 'nycflights13', 'ggthemes', 'RColorBrewer', 'MASS', 'patchwork']
   cell-options:
     editor-font-scale: 0.7
     out-width: 100%
@@ -1238,6 +1238,7 @@ These color schemes are color-blind sage.
 
 ```{webr-r}
 #| context: output
+#| warning: false
 data("geyser", package = "MASS")
 
 ggplot(geyser, aes(x = duration, y = waiting)) +
@@ -1465,6 +1466,8 @@ ggplot(data = county_yield) +
     limits = c(100, 250)
   ) 
 ```
+
+<br>
 
 In this example, green is dominant in the color bar because the interval [0.2, 0.9] is for `"green"` in `colors`, where the interval represents [`r 100 + (250-100)*0.2`, `r 100 + (250-100)*0.9`] 
 ([100 + (250-100)\times 0.2, 100 + (250-100)\times 0.9]).
