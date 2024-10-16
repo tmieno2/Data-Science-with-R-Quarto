@@ -973,7 +973,7 @@ microbenchmark(
 
 ```{r eval = F}
 #--- install the package ---#
-install.packages(future.apply) 
+install.packages("future.apply") 
 
 #--- load packages ---#
 library(future.apply)
@@ -994,10 +994,10 @@ library(tictoc)
 You can simply replace `lapply()` with `future_lapply()`!
 
 ```{r eval = F}
-#--- parallelized ---#
+#--- not parallelized ---#
 sq_ls <- lapply(1:1000, function(x) x^2) 
 
-#--- not parallelized ---#
+#--- parallelized ---#
 sq_ls_par <- future_lapply(1:1000, function(x) x^2) 
 ```
 
@@ -1183,7 +1183,7 @@ MC_results <- pbmclapply(1:1000, MC_sim, mc.cores = detectCores() - 1)
 
 ::: {.panel-tabset}
 
-### setup
+### Setup
 
 Suppose you have ran an randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
 
@@ -1204,7 +1204,7 @@ $$
 
 Here, `N` is a decision variable, and `P_C` and `P_N` are parameters.
 
-### grid search
+### Grid search
 
 Grid search is a very inefficient yet effective tool for finding solutions to optimization problems as long as the dimension of the optimization problem is low (1 or 2 variables).
 
@@ -1215,12 +1215,13 @@ Grid search basically evaluates the objective function (profit here) at many lev
 **Example**
 
 ```{webr-r}
+#| context: output
 data.table(N = seq(0.1, 300, by = 0.1)) %>% 
   mutate(yield = 120 + 25 * log(N)) %>% 
   mutate(profit = 3.5 * yield - 0.4 * N)  
 ```
 
-### example
+### Example
 
 Let's define a function that takes `N`, `P_C`, and `P_N` values and returns profits.
 
@@ -1248,40 +1249,35 @@ data_main <-
 )
 ```
 
-### profit-N
+### Profit-N
 
 Here is the visualization of profit-N relationship:
 
 ```{webr-r}
-#| autorun: true
+#| context: output
 opt_N <- filter(data_main, profit == max(profit))$N
-```
 
-<br>
-
-```{webr-r}
-#| autorun: true
 ggplot(data_main) +
   geom_line(aes(y = profit, x = N)) +
   geom_vline(xintercept = opt_N, linetype = 2, color = "red") +
   annotate('text', x = opt_N - 40, y = 450, label = "Optimal N rate", size = 3)
 ```
 
-### best N
+### Best N
 
-Once the profit-N relationship is found, we can use `filter()` combined with `max()` to identify the optimal N rate.
+Once the profit-N relationship is found, we can use `dplyr::filter()` combined with `max()` to identify the optimal N rate.
 
 ```{webr-r}
-filter(data_main, profit == max(profit))
+dplyr::filter(data_main, profit == max(profit))
 ```
 
 <br>
 
-Alternatively, you can sort the data by profit in the ascending order (default) and pick the last row using `slice(n())`.
+Alternatively, you can sort the data by profit in the ascending order (default) and pick the last row using `dplyr::slice(n())`.
 
 ```{webr-r}
-arrange(data_main, profit) %>% 
-  slice(n())
+dplyr::arrange(data_main, profit) %>% 
+  dplyr::slice(n())
 ```
 
 <br>
