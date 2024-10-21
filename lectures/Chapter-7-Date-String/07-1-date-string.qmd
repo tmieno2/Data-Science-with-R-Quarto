@@ -1,5 +1,5 @@
 ---
-title: "07-1: Miscellaneous Useful Functions and Tips"
+title: "07-1: Date and String Management"
 abstract: "Chapter 7: Date and String"
 format: 
   revealjs:
@@ -60,9 +60,7 @@ pizzaplace
 
 # Date
 
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
----
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
 
 ## `Date`
 
@@ -119,12 +117,12 @@ as.Date(date in character, format)
 
 In `format` you specify how day, month, and year are represented in the date characters you intend to convert using special symbols including:
 
-+ **%d**: day as a number (0-31)
-+ **%m**: month (00, 01, 02, $\dots$, 12)
-+ **%b**: abbreviated month (Jan, $\dots$, Dec)
-+ **%B**: unabbreviated month (January, $\dots$, December)
-+ **%y**: 2-digit year (96 for 1996, 02 for 2002)
-+ **%Y**: 4-digit year (1996, 2012)
++ `%d`: day as a number (0-31)
++ `%m`: month (00, 01, 02, $\dots$, 12)
++ `%b`: abbreviated month (Jan, $\dots$, Dec)
++ `%B`: unabbreviated month (January, $\dots$, December)
++ `%y`: 2-digit year (96 for 1996, 02 for 2002)
++ `%Y`: 4-digit year (1996, 2012)
 
 **Example**
 
@@ -278,7 +276,7 @@ pizzaplace %>%
 
 # Strings manipulation
 
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
 
 ## String manipulation 
 
@@ -325,7 +323,6 @@ Here are the select functions we learn in this lecture:
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
-
 
 
 ### Concatenate
@@ -577,9 +574,6 @@ pizzaplace %>%
 
 ::: {.panel-tabset}
 
-:::
-<!--end of panel-->
-
 #### Introduction
 
 You can use `stringr::str_detect()` to check if a user-specified texts are part of strings.
@@ -600,7 +594,7 @@ stringr::str_detect(fruit, "apple")
 
 ::: {.panel-tabset}
 
-#### get the list of file names 
+##### get the list of file names 
 
 First clone [this repository](https://github.com/tmieno2/quarto-examples). 
 
@@ -613,13 +607,15 @@ First, let's get the name of the whole list of files in the working directory:
 ```{r}
 all_files <- 
   list.files(
-    "supplementary-material/data/data-for-loop-demo",
+    here::here("supplementary-material/data/data-for-loop-demo"),
     full.names = TRUE
   )
 
-head(all_files)
-tail(all_files) 
+head(all_files, 2)
+tail(all_files, 2)
 ```
+
+<br>
 
 Now use `stringr::str_detect()` to find which elements of `all_files` include "soy."
 
@@ -627,11 +623,15 @@ Now use `stringr::str_detect()` to find which elements of `all_files` include "s
 is_soy <- stringr::str_detect(all_files, "soy")  
 ```
 
+<br>
+
 Okay so, here is the list of all the "soy" files:
 
 ```{r }
 all_files[is_soy]
 ```
+
+<br>
 
 Now, you can loop to read all the files.
 
@@ -643,7 +643,7 @@ soy_data <-
 )
 ```
 
-#### Define a group from a variable 
+##### Define a group from a variable 
 
 Consider the following dataset of plant genes.
 
@@ -657,6 +657,8 @@ gene_data <- expand.grid(
 ```{r echo = F}
 gene_data 
 ```
+
+<br>
 
 There are three different types of genes: those that have `_BL_`,`_ML_`, and `_TL_`. The objective here is to make a variable that indicates gene group from the `gene` variable.
 
@@ -672,9 +674,14 @@ gene_data %>%
 :::
 <!--end of panel-->
 
+:::
+<!--end of panel-->
+
 ### letter case 
 
 Here are the collection of functions that let you change the letter case of strings.
+
+<br>
 
 **To upper case**
 
@@ -729,9 +736,6 @@ stringr::str_pad("I am sick of R", 30, side = "both", pad = "?")
 ```{webr-r}
 stringr::str_pad("I am sick of R", 20, side = "right", pad = "-") 
 ```
-
-:::
-<!--end of panel-->
 
 :::
 <!--end of panel-->
