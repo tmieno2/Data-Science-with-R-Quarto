@@ -14,6 +14,7 @@ gen_student_version <- function(qmd_instructor, qmd_student_path) {
 }
 
 strip_answers <- function(file) {
+  # file <- qmd_instructor
   qmd <- readLines(file)
 
   #* detect where the instruction ends
@@ -34,7 +35,7 @@ strip_answers <- function(file) {
   end_cc_all_lines <-
     which(str_detect(qmd_body, "```")) %>%
     .[!(. %in% start_cc_lines_all)]
-  
+
   #++++++++++++++++++++++++++++++++++++
   #+ line numbers where R code chunks start
   #++++++++++++++++++++++++++++++++++++
@@ -68,17 +69,24 @@ strip_answers <- function(file) {
 
   num_pairs <- length(start_cc_lines_all)
 
-  remove_lines <-
-    lapply(
-      1:num_pairs,
-      function(x) start_cc_lines_all[x]:end_cc_all_lines[x]
-    ) %>%
-    unlist()
+  if (num_pairs == 0) {
+    qmd_body <- qmd_no_rchunks
+  } else {
+    remove_lines <-
+      lapply(
+        1:num_pairs,
+        function(x) start_cc_lines_all[x]:end_cc_all_lines[x]
+      ) %>%
+      unlist()
+
+    qmd_body <- qmd_no_rchunks[-remove_lines]
+  }
+
 
   if (!is.na(qmd_instruction)) {
-    qmd_out <- c(qmd_instruction, qmd_no_rchunks[-remove_lines])
+    qmd_out <- c(qmd_instruction, qmd_body)
   } else {
-    qmd_out <- qmd_no_rchunks
+    qmd_out <- qmd_body
   }
 
   return(qmd_out)
@@ -107,10 +115,21 @@ strip_span <- function(file) {
 
 # Conversion
 
+## Assignment 1
+
 ```{r}
 gen_student_version(
-  qmd_instructor = here::here("assignments/Assignment_1/Assignment-1-gen.qmd"), 
+  qmd_instructor = here::here("assignments/Assignment_1/Assignment-1-gen.qmd"),
   qmd_student = here::here("assignments/Assignment_1_student/Assignment-1-student.qmd")
+)
+```
+
+## Assignment 2
+
+```{r}
+gen_student_version(
+  qmd_instructor = here::here("assignments/Assignment_2/Assignment-2-gen.qmd"),
+  qmd_student = here::here("assignments/Assignment_2_student/Assignment-2-student.qmd")
 )
 ```
 

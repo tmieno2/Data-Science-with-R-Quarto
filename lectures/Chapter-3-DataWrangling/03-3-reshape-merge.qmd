@@ -40,7 +40,7 @@ A single column representing a single variable
 ```{webr-r}
 #| context: output
 (
-yield_data_long <- 
+yield_data_long <-
   data.frame(
     state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
     year = c(2019, 2020) %>% rep(4),
@@ -353,7 +353,8 @@ yield_data_wide <-
 )
 ```
 
-.red[Objective]: We would like to convert the wide data back to the original long data.
+
+<span style = "color: red;"> Objective </span>: We would like to convert the wide data back to the original long data.
 :::
 <!--end of the 2nd column-->
 
@@ -746,9 +747,9 @@ left_join(data_x, data_y, by = keys)
 
 **Rules to be aware of**
 
-+ .blue[Rule 1]: It returns all rows from `data_x`, and all columns from `data_x` and `data_y`
-+ .blue[Rule 2]: Rows in `data_x` with no match in `data_y` will have NA values in the new columns 
-+ .blue[Rule 3]: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned
++ <span style = "color: blue;">Rule 1</span>: It returns all rows from `data_x`, and all columns from `data_x` and `data_y`
++ <span style = "color: blue;">Rule 2</span>: Rows in `data_x` with no match in `data_y` will have NA values in the new columns 
++ <span style = "color: blue;">Rule 3</span>: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned
 
 :::{.callout-note title="Note"}
 The order of datasets matter.
@@ -827,8 +828,10 @@ left_join(price_data, yield_data, by = c("county", "year"))
 
 <br>
 
+
+
 :::{.callout-note}
-In this instance, .red[which comes first does not matter] because all the individual rows in `yield_data` (left data) have exactly one match in `price_data` (right data) without fail, and vice versa.
+In this instance, <span style = "color: red;"> which comes first does not matter </span> because all the individual rows in `yield_data` (left data) have exactly one match in `price_data` (right data) without fail, and vice versa.
 :::
 
 #### Data prep 2
