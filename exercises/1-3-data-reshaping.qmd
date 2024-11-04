@@ -1,0 +1,243 @@
+---
+title: "Ex-1-3: Reshape Datasets"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+    callout-icon: false
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'tibble', 'tidyr']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 80%
+filters:
+  - webr
+---
+
+
+```{r}
+#| include: false 
+library(dplyr) 
+library(tidyr) 
+```
+
+# Exercise 1
+
+## Problem 1
+
+**Datasets:** `data_long` synthetically generated withint R below.
+
+**Task:** Reshape the `data_long` dataset to wide format, where each year becomes a separate column. using `tidyr::pivor_wider()`.
+
+**Load and Create Dataset:**
+
+```{webr-r}
+# create the dataset
+#| autorun: true
+set.seed(123)
+
+data_long <- 
+  data.frame(
+    id = rep(1:5, each = 3),
+    year = rep(2021:2023, times = 5),
+    value = sample(50:100, 15, replace = TRUE)
+  )
+```
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+```
+
+Here is the output of successfully reshaped data:
+
+```{webr-r}
+#| context: output
+(
+  data_wide <-
+    data_long %>%
+    tidyr::pivot_wider(names_from = "year", values_from = "value")
+)
+```
+
+### Answer
+
+```{webr-r}
+# Pivot data from wide to long
+#| autorun: true
+data_long %>%
+    tidyr::pivot_wider(names_from = "year", values_from = "value")
+```
+:::
+<!--end of panel-->
+
+## Problem 2
+
+**Datasets:** `data_wide` (`data_long` converted to wide format)
+
+**Task:** Reshape the `data_wide` dataset to long format using `tidyr::pivor_longer()`. In the new dataset, 
+
++ name the column that will hold the current column names `year`.
++ name the column that will hold the values `value`.
+
+**Load and Create Dataset:**
+```{webr-r}
+# create the dataset
+#| autorun: true
+data_long
+```
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+```
+
+Here is the output of successfully reshaped data:
+
+```{webr-r}
+#| context: output
+data_long %>%
+  tidyr::pivot_longer(
+    cols = - id, 
+    names_to = "year", 
+    values_to = "value"
+  )
+```
+
+### Answer
+
+```{webr-r}
+# Pivot data from wide to long
+data_long %>%
+  tidyr::pivot_longer(
+    cols = - id, 
+    names_to = "year", 
+    values_to = "value"
+  )
+```
+:::
+<!--end of panel-->
+
+# Exercise 2
+
+## Problem 1
+
+**Datasets:** `crop_data` synthetically generated within R.
+
+**Task:** Reshape the `economics` dataset to wide format using `tidyr::pivor_wider()`. In doing so, append `yield_` to the new column names using the `names_prefix` option.
+
+**Load and Create Dataset:**
+```{webr-r}
+# create the dataset
+#| autorun: true
+(
+crop_data <-
+  tibble(
+    year = rep(2020:2022, each = 3),
+    crop = rep(c("Wheat", "Corn", "Soybean"), times = 3),
+    yield = c(3.1, 3.5, 2.8, 3.2, 3.6, 2.9, 3.0, 3.7, 3.1)
+  )
+)
+```
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+```
+
+Here is the output of successfully reshaped data:
+
+```{webr-r}
+#| context: output
+( 
+crop_data_wide <-  
+  crop_data %>%
+  tidyr::pivot_wider(names_from = "crop", values_from = "yield", names_prefix = "yield_")
+)
+```
+
+### Answer
+
+```{webr-r}
+# Pivot data from wide to long
+#| autorun: true
+crop_data %>%
+  tidyr::pivot_wider(names_from = "crop", values_from = "yield", names_prefix = "yield_")
+```
+:::
+<!--end of panel-->
+
+
+## Problem 2
+
+**Datasets:** the `crop_data_wide` (`crop_data` in wide format)
+
+**Task:** Reshape the `economics` dataset to long format using `tidyr::pivor_longer()`. In doing so, remove `yield_` from the column names using the `names_prefix` option.
+
+**Load and Create Dataset:**
+```{webr-r}
+# create the dataset
+#| autorun: true
+crop_data_wide
+```
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+```
+
+Here is the output of successfully reshaped data:
+
+```{webr-r}
+#| context: output
+crop_data_wide %>%
+  tidyr::pivot_longer(cols = -year, names_to = "crop", values_to = "yield", names_prefix = "yield_")
+```
+
+### Answer
+
+```{webr-r}
+# Pivot data from wide to long
+crop_data_wide %>%
+  tidyr::pivot_longer(
+    cols = -year, 
+    names_to = "crop", 
+    values_to = "yield", 
+    names_prefix = "yield_"
+  )
+```
+:::
+<!--end of panel-->
+
+

@@ -11,7 +11,7 @@ format:
     echo: true
     fig-dpi: 400
 webr:
-  packages: ['dplyr', 'gt', 'flextable', 'nycflights13', 'modelsummary', 'sandwitch']
+  # packages: ['dplyr', 'gt', 'flextable', 'nycflights13', 'modelsummary', 'sandwitch']
   cell-options:
     editor-font-scale: 0.7
 filters:
@@ -27,6 +27,7 @@ library(sandwich)
 library(modelsummary)
 library(flextable)
 library(dplyr)
+library(gt)
 ```
 
 ::: {.panel-tabset}
@@ -48,7 +49,7 @@ library(dplyr)
 :::
 <!--end of panel-->
 
-# Create regression tables with the `modelsummary` package 
+# Create regression tables
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
 
@@ -57,6 +58,10 @@ library(dplyr)
 ::: {.panel-tabset}
 
 ### Dataset
+
+::: {.panel-tabset}
+
+#### Get the data
 
 ```{webr-r}
 #| context: setup
@@ -71,10 +76,32 @@ county_yield <- dplyr::select(county_yield, - geometry)
 
 We use `county_yield` throughout this lecture.
 
-```{webr-r}
-#| autorun: true
+First install the `r.spatial.workshop.datasets` package.
+
+```{r}
+#| eval: false
+#--- install the r.spatial.workshop.datasets package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+```
+
+<br>
+
+Then, get the data:
+
+```{r}
+#--- get the data ---#
+data(county_yield, package = "r.spatial.workshop.datasets")
+
+county_yield <- dplyr::select(county_yield, - geometry)
+```
+
+#### Look at the data
+
+```{r}
 county_yield
 ```
+
+<br>
 
 **Variable Definitions**
 
@@ -87,9 +114,9 @@ county_yield
 + `d4_5_9`: ~ drought severity of 4 from May to September   
 
 :::
-<!--end of panel-->
+<!--end of panel--> 
 
-### Create a regression table 
+### Initiate a regression table 
 
 ::: {.panel-tabset}
 #### Prepare regression results
@@ -103,6 +130,8 @@ model_1_soy <- lm(soy_yield ~ d1_5_9 + d2_5_9, data = county_yield)
 model_2_soy <- lm(soy_yield ~ d1_5_9 + d2_5_9 + d3_5_9 + d4_5_9, data = county_yield)
 ```
 
+<br> 
+
 Get White-Huber robust variance-covariance matrix for the regressions:
 
 ```{r}
@@ -114,10 +143,10 @@ vcov_2_soy <- vcovHC(model_2_soy)
 
 #### default table
 
-You can supply a list of regression results to `msummary()` to create a default regression table.
+You can supply a list of regression results to `modelsummary::msummary()` to create a default regression table.
 
 ```{r}
-msummary(
+modelsummary::msummary(
   list(
     model_1_corn,
     model_2_corn,
@@ -127,9 +156,16 @@ msummary(
 )
 ```
 
-#### modify
+:::
+<!--end of panel-->
 
-`msummary()` offers multiple options to modify the default regression table to your liking:
+### Modify
+
+::: {.panel-tabset}
+
+#### How
+
+`modelsummary::msummary()` offers multiple options to modify the default regression table to your liking:
 
 + `title`: put a title to the table
 + `stars`: place significance symbols (and modify the symbol placement rules)
@@ -141,14 +177,16 @@ msummary(
 + `gof_omit`: define which model statistics to omit from the default selection of model statistics
 + `add_rows`: add rows of arbitrary contents to the table
 
-#### stars
+#### `stars`
 
 ::: {.columns}
 
 ::: {.column width="50%"}
-Add `stars = TRUE` in `msummary()` to add significance markers.
+Add `stars = TRUE` in `modelsummary::msummary()` to add significance markers.
 
 You can modify significance levels and markers by supplying a named vector with its elements being the significance levels and their corresponding names being the significance markers.
+
+<br>
 
 **Example**:
 
@@ -159,7 +197,7 @@ You can modify significance levels and markers by supplying a named vector with 
 stars_label <- c("+" = 0.1, "&+" = 0.05, "+*+" = 0.01)
 
 #--- create a table ---#
-msummary(model_1_corn, stars = stars_label)
+modelsummary::msummary(model_1_corn, stars = stars_label)
 ```
 :::
 <!--end of the 1st column-->
@@ -171,7 +209,7 @@ msummary(model_1_corn, stars = stars_label)
 stars_label <- c("+" = 0.1, "&+" = 0.05, "+*+" = 0.01)
 
 #--- create a table ---#
-msummary(model_1_corn, stars = stars_label)
+modelsummary::msummary(model_1_corn, stars = stars_label)
 ```
 :::
 <!--end of the 2nd column-->
@@ -187,7 +225,9 @@ msummary(model_1_corn, stars = stars_label)
 
 Similarly with the `stars` option, you supply a named vector where its names are the existing labels and their corresponding elements are the new labels. 
 
-In the table, the coefficient rows are placed in the order they are ordered in the named vector.     
+In the table, the coefficient rows are placed in the order they are ordered in the named vector.
+
+<br>
 
 ```{r coef, eval = F}
 #| eval: false
@@ -202,7 +242,7 @@ coef_map_vec <- c(
 ) 
 
 #--- create a table ---#
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   coef_map = coef_map_vec
 )
@@ -224,7 +264,7 @@ coef_map_vec <- c(
 ) 
 
 #--- create a table ---#
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   coef_map = coef_map_vec
 )
@@ -237,23 +277,27 @@ msummary(
 
 #### `coef_omit`
 
+::: {.columns}
+
+::: {.column width="50%"}
+
 `coef_omit()` lets you omit coefficient rows from the default selections.
 
 You supply a vector of strings (and/or regular expressions), and coefficient rows that match the string pattern will be omitted.
 
-::: {.columns}
-
-::: {.column width="50%"}
+<br>
 
 **Example**
 
 ```{r}
 #| eval: false
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   coef_omit ="d2"
 )
 ```
+
+<br>
 
 `d2` matches with `d2_5_9`, and rows associated with the coefficients on `d2_5_9` are removed.
 :::
@@ -262,7 +306,7 @@ msummary(
 
 ```{r}  
 #| echo: false
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   coef_omit ="d2"
 )
@@ -274,18 +318,22 @@ msummary(
 
 #### `gof_omit`
 
-`gof_omit()` lets you omit model statistics like $R^2$ from the default selections.
-
-You supply a vector of strings (and/or regular expressions), and statistics that match the string pattern will be omitted.
 
 ::: {.columns}
 
 ::: {.column width="50%"}
+
+`gof_omit()` lets you omit model statistics like $R^2$ from the default selections.
+
+You supply a vector of strings (and/or regular expressions), and statistics that match the string pattern will be omitted.
+
+<br>
+
 **Example**
 
 ```{r}
 #| eval: false
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   gof_omit ="IC|Adj"
 )
@@ -298,7 +346,7 @@ msummary(
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-msummary(
+modelsummary::msummary(
   list(model_2_corn, model_2_soy), 
   gof_omit ="IC|Adj"
 )
@@ -310,71 +358,40 @@ msummary(
 
 #### `add_rows`
 
-`add_rows()` can be used to insert arbitrary rows into a table. 
-
-Adding rows using `add_rows()` involves:
+`add_rows()` can be used to insert arbitrary rows into a table. Adding rows using `add_rows()` is a two-step process:
 
 + Creating a `data.frame` (or `tibble`) to insert
 
+```{r}
+#--- create a table (data.frame) to insert ---#
+(
+rows <- data.frame(
+  c1 = c("FE: County", "FE: Year"),
+  c2 = c("Yes", "Yes"),
+  c3 = c("No", "Now")
+  )
+)
+```
+
+<br>
+
 + Tell which rows you will inset the `data.frame` by `attr(data.frame, "position") <- row number`. 
 
-::: {.columns}
-
-::: {.column width="50%"}
-
 ```{r}
-#| eval: false
-#--- create a table (data.frame) to insert ---#
-(
-rows <- data.frame(
-  c1 = c("FE: County", "FE: Year"),
-  c2 = c("Yes", "Yes"),
-  c3 = c("No", "Now")
-  )
-)
-
 #--- tell where to insert ---#
 attr(rows, "position") <- c(3, 4)
 
 #--- create a table with rows inserted ---#
-msummary(
+modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
   gof_omit ="IC|Adj",
   coef_omit = "d",
   add_row = rows #<<
 )
-
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-```{r}
-#| echo: false
-#--- create a table (data.frame) to insert ---#
-(
-rows <- data.frame(
-  c1 = c("FE: County", "FE: Year"),
-  c2 = c("Yes", "Yes"),
-  c3 = c("No", "Now")
-  )
-)
 
-#--- tell where to insert ---#
-attr(rows, "position") <- c(3, 4)
-
-#--- create a table with rows inserted ---#
-msummary(
-  list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
-  gof_omit ="IC|Adj",
-  coef_omit = "d",
-  add_row = rows #<<
-)
-
-```
 :::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
+<!--end of panel-->
 
 ### Swapping VCOV
 
@@ -385,6 +402,8 @@ msummary(
 It is often the case that we replace the default variance-covariance matrix with a robust one for valid statistical testing.
 
 You can achieve this using the `statistic_override` option. You will give a list of variance-covariance matrices in the order their corresponding regression results appear on the table.
+
+<br>
 
 **Syntax:**
 ```{r eval = F}
@@ -399,7 +418,7 @@ statistic_override = list(vcov_1, vcov_2, ...)
 Default: 
 
 ```{r }
-msummary(
+modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
   gof_omit = "IC|R",
   coef_omit = "d3|d4",
@@ -412,7 +431,7 @@ msummary(
 VCOV swapped:
 
 ```{r }
-msummary(
+modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
   gof_omit = "IC|R",
   coef_omit = "d3|d4",
@@ -448,7 +467,7 @@ The supported file types are:
 The `docx` option may be particularly useful for those who want to put finishing touches on the table manually on WORD:
 
 ```{r eval = F}
-msummary(
+modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy),
   output = "reg_results_table.docx" #<<
 )
@@ -463,18 +482,7 @@ msummary(
 
 ### output type
 
-Using the `output` option in `msummary()`, you can turn the regression table into R objects that are readily modifiable by the `gt`, `kableExtra`, and `flextable` packages.
-
-**Example: gt**
-
-```{r }
-#--- create a regression table and turn it into a gt_tbl ---#
-reg_table_gt <- list(model_1_corn, model_1_soy)%>% 
-  msummary(output = "gt")
-
-#--- check the class ---#
-class(reg_table_gt)
-```
+Using the `output` option in `modelsummary::msummary()`, you can turn the regression table into R objects that are readily modifiable by the `gt`, `kableExtra`, and `flextable` packages.
 
 <br>
 
@@ -483,21 +491,49 @@ class(reg_table_gt)
 ```{r }
 #--- create a regression table and turn it into a gt_tbl ---#
 reg_table_ft <- list(model_1_corn, model_1_soy)%>% 
-  msummary(output = "flextable")
+  modelsummary::msummary(output = "flextable")
 
 #--- check the class ---#
 class(reg_table_ft)
 ```
 
+<br>
+
+**Example: `gt`**
+
+```{r }
+#--- create a regression table and turn it into a gt_tbl ---#
+reg_table_gt <- list(model_1_corn, model_1_soy)%>% 
+  modelsummary::msummary(output = "gt")
+
+#--- check the class ---#
+class(reg_table_gt)
+```
+
+
 ### edit with `flextable`
 
-Now that the regression table created using `msummary()` with `output = "flextable"` is a `flextable` object. 
+::: {.columns}
+
+::: {.column width="70%"}
+Now that the regression table created using `modelsummary::msummary()` with `output = "flextable"` is a `flextable` object. 
+
 
 So, we can use our knowledge of the `flextable` package to further modify the regression table if you would like. 
 
 For the details of how to use the `flextable` package visit the `flextable` lecture notes. 
 
 Here I will just given you an example of the use of `flextable` operations.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
 
 ::: {.columns}
 
@@ -512,7 +548,7 @@ list(
   "Soy 1" = model_1_soy, 
   "Soy 2" = model_2_soy
 ) %>% 
-msummary(
+modelsummary::msummary(
   output = "flextable",
   gof_omit ="IC|Adj",
 ) %>%  
@@ -522,7 +558,7 @@ color(i = 3, j = 2, color = "red")
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
-```{r edit-ft, eval = F}  
+```{r edit-ft}  
 #| echo: false
 list(
   "Corn 1" = model_1_corn, 
@@ -530,7 +566,7 @@ list(
   "Soy 1" = model_1_soy, 
   "Soy 2" = model_2_soy
 ) %>% 
-msummary(
+modelsummary::msummary(
   output = "flextable",
   gof_omit ="IC|Adj",
 ) %>%  
@@ -560,15 +596,15 @@ list(
   "Soy 1" = model_1_soy, 
   "Soy 2" = model_2_soy
 ) %>% 
-  msummary(
+  modelsummary::msummary(
     output = "gt",
     gof_omit ="IC|Adj",
   ) %>%  
-  tab_spanner( #<<
+  gt::tab_spanner( #<<
     label = "Corn", #<<
     columns = vars("Corn 1", "Corn 2") #<<
   ) %>% #<<
-  tab_style( #<<
+  gt::tab_style( #<<
     style = cell_text(color = 'red'), #<<
     locations = cells_body(rows = 7:8) #<<
   ) #<<
@@ -584,15 +620,15 @@ list(
   "Soy 1" = model_1_soy, 
   "Soy 2" = model_2_soy
 ) %>% 
-  msummary(
+  modelsummary::msummary(
     output = "gt",
     gof_omit ="IC|Adj",
   ) %>%  
-  tab_spanner( #<<
+  gt::tab_spanner( #<<
     label = "Corn", #<<
     columns = vars("Corn 1", "Corn 2") #<<
   ) %>% #<<
-  tab_style( #<<
+  gt::tab_style( #<<
     style = cell_text(color = 'red'), #<<
     locations = cells_body(rows = 7:8) #<<
   ) #<<
@@ -605,17 +641,16 @@ list(
 :::
 <!--end of panel-->
 
-# Create summary tables 
+# Create summary tables
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
 
-# Example table with `tablesummary()` 
+## Example table
 
-.left-code[
-```{r exmaple-table, eval = F}  
+```{r exmaple-table}
 county_yield %>% 
-  filter(year %in% 2010:2012) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2010:2012) %>% 
+  modelsummary::datasummary(
     (Year = factor(year)) * (
       (`Corn Yield (bu/acre)` = corn_yield) + 
       (`Soy Yield (bu/acre)` = soy_yield) + 
@@ -625,15 +660,8 @@ county_yield %>%
     data = .
   )  
 ```
-]
 
-.right-plot[
-```{r exmaple-table-f, ref.label = "exmaple-table", echo = F}  
-```
-]
-
-
-## `datasummary()`
+## `modelsummary::datasummary()`
 
 ::: {.panel-tabset}
 
@@ -645,7 +673,7 @@ county_yield %>%
 **Syntax**:
 
 ```{r eval = F}
-datasummary(formula, data = dataset)
+modelsummary::datasummary(formula, data = dataset)
 ```
 
 `formula` has two sides separated by `~` just like formula for regression. 
@@ -657,7 +685,7 @@ Variables/statistics on the left-hand side (right-hand side) comprise rows (colu
 **Example**
 
 ```{r }
-datasummary(
+modelsummary::datasummary(
   corn_yield ~ Mean, #<<
   data = county_yield
 )
@@ -668,7 +696,7 @@ datasummary(
 Switching the order changes the structure of the resulting table:
 
 ```{r }
-datasummary(
+modelsummary::datasummary(
   Mean ~ corn_yield, #<<
   data = county_yield
 )
@@ -701,7 +729,7 @@ These functions have `na.rm = NA` hidden inside it, so they avoid having NA when
 For example, compare these two:
 
 ```{r }
-datasummary(
+modelsummary::datasummary(
   corn_yield ~ Mean, #<<
   data = county_yield
 )
@@ -710,7 +738,7 @@ datasummary(
 <br>
 
 ```{r }
-datasummary(
+modelsummary::datasummary(
   #--- mean from the base package ---#
   corn_yield ~ mean, #<<
   data = county_yield
@@ -735,8 +763,9 @@ MinMax <- function(x){
 } 
 
 #--- use it ---#
-datasummary(corn_yield ~ MinMax, data = county_yield) 
+modelsummary::datasummary(corn_yield ~ MinMax, data = county_yield) 
 ```
+
 
 ### add stats/variables
 
@@ -745,7 +774,7 @@ You can add more variables and statistics using `+`.
 **Example**:
 
 ```{r plus}  
-datasummary(
+modelsummary::datasummary(
   corn_yield + soy_yield + d0_5_9 + d1_5_9
   ~ Mean + SD+ MinMax + Histogram, 
   data = county_yield
@@ -763,7 +792,7 @@ At the moment, `All()` does not work on `tibble`. So, if your dataset is `tibble
 **Example**:
 
 ```{r all, cache = F}  
-datasummary(
+modelsummary::datasummary(
   All(data.frame(county_yield)) 
   ~ Mean + SD, 
   data = county_yield
@@ -774,15 +803,15 @@ datasummary(
 <!--end of panel-->
 
 
-# `datasummary()` (cont.) 
+## More on `tablesummary()`
 
-.panelset[ 
+::: {.panel-tabset}
 
-.panel[.panel-name[nesting]
-
-.left-code[
+### Nesting by group
 
 You can nest categorical variables with `*`, meaning you can get summary statistics for each value of the categorical variable (like `group_by() %>% summarize()`).
+
+<br>
 
 **Syntax**
 
@@ -794,14 +823,12 @@ variable ~ category_variable * stat
 variable ~ category_variable * (stat 1 + stat 2 + ...)  
 ```
 
-]
-
-.right-plot[
+<br>
 
 **Examples**:
 
 ```{r nesting-f}  
-datasummary(
+modelsummary::datasummary(
   corn_yield + soy_yield + d0_5_9 + d1_5_9
   ~ state_name * (Mean + SD) + MinMax, #<< 
   data = county_yield
@@ -810,13 +837,7 @@ datasummary(
 
 For each value of `state_name` (`Nebraska`, `Colorado`, `Kansas`), `Mean` and `SD` are shown for each of the variables on the left-hand side. But, `MinMax` is for the entire sample.
 
-]
-
-  ] 
-
-.panel[.panel-name[deeper]
-
-.left-full[
+### deeper
 
 You can nest with multiple categorical variables by multiplying stats with multiple categorical variables. 
 
@@ -824,9 +845,9 @@ You can nest with multiple categorical variables by multiplying stats with multi
 
 ```{r deeper}  
 county_yield %>% 
-  filter(year %in% 2011:2012) %>% 
-  filter(state_name %in% c("Kansas", "Nebraska")) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
     corn_yield + soy_yield + d0_5_9 + d1_5_9
     ~ factor(year) * state_name * (Mean + SD) + MinMax, #<< 
     data = .
@@ -835,27 +856,22 @@ county_yield %>%
 
 For each of the unique combinations of `state_name` (`Nebraska`, `Kansas`) and `year` (2011, 2012), `Mean` and `SD` are shown for each of the variables on the left-hand side. But, `MinMax` is for the entire sample.
 
-]
 
-  ] 
-
-  <!-- panel ends here -->
-
-.panel[.panel-name[renaming]
-
-.left-full[
+### renaming
 
 By default variable and statistics names are used as the labels in the table.
 
 You can provide labels by the following syntax: `(label = variable/stat)`
 
+<br>
+
 **Example**:
 
 ```{r renaming}  
 county_yield %>% 
-  filter(year %in% 2011:2012) %>% 
-  filter(state_name %in% c("Kansas", "Nebraska")) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
     (`Corn Yield (bu/acre)` = corn_yield) #<<
     ~ state_name * (Mean + (Std.Dev. = SD)), #<< 
     data = .
@@ -869,15 +885,8 @@ county_yield %>%
 
 If you do not like this way of changing labels, you can always use `gt` package.
 
-]
 
-  ] 
-
-  <!-- panel ends here -->
-
-.panel[.panel-name[function arguments]
-
-.left-full[
+### function arguments
 
 You can pass option arguments to the stats function by: `stat * Argument(options)`
 
@@ -887,9 +896,9 @@ You can pass option arguments to the stats function by: `stat * Argument(options
 
 ```{r arguments}  
 county_yield %>% 
-  filter(year %in% 2011:2012) %>% 
-  filter(state_name %in% c("Kansas", "Nebraska")) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
     corn_yield 
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + #<<
       quantile * Arguments(prob = 0.1, na.rm = TRUE), #<< 
@@ -902,24 +911,15 @@ county_yield %>%
 + `(mean + sd) * Arguments(na.rm = TRUE)` adds `na.rm = TRUE` option to `mean()` and `sd()`
 + `quantile * Arguments(prob = 0.1, na.rm = TRUE)` adds `prob = 0.1` and `na.rm = TRUE` to `quantileo()`
 
-]
+### title and notes
 
-  ] 
-
-  <!-- panel ends here -->
-
-.panel[.panel-name[title and notes]
-
-See the example below:
-
-.left-full[
-**Example**:
+**Example**
 
 ```{r title}  
 county_yield %>% 
-  filter(year %in% 2011:2012) %>% 
-  filter(state_name %in% c("Kansas", "Nebraska")) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
     corn_yield 
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + 
       quantile * Arguments(prob = 0.1, na.rm = TRUE),  
@@ -928,12 +928,8 @@ county_yield %>%
     notes = c("first note", "second note") #<<
   )
 ```
-]
-  ] 
 
-  <!-- panel ends here -->
-
-.panel[.panel-name[align columns]
+### align columns
 
 You can use `align` to align columns. Available alignment are:
 
@@ -945,14 +941,13 @@ Inside `align()`, you provide a sequence of the option letters (e.g., `"lrcle"`)
 
 The `n`th letter corresponds to `n`th column.
 
-.left-full[
 **Example**:
 
 ```{r align}  
 county_yield %>% 
-  filter(year %in% 2011:2012) %>% 
-  filter(state_name %in% c("Kansas", "Nebraska")) %>% 
-  datasummary(
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
     corn_yield 
     ~ state_name * (`This is M E A N` = mean) * Arguments(na.rm = TRUE) + 
       (`This is Q U A N T I L E` = quantile) * Arguments(prob = 0.1, na.rm = TRUE),  
@@ -960,121 +955,90 @@ county_yield %>%
     align = "lrlc" #<<
   )
 ```
-]
 
-  ] 
-
-  <!-- panel ends here -->
-
-.panel[.panel-name[Output]
+### Output
 
 You can use the `output` option to either export the table as a file or save it as R objects which you can further modify. 
 
-This works exactly the same way as the `msummary()` function. 
+This works exactly the same way as the `modelsummary::msummary()` function. 
 
-+ Go [here](#save-table) for exporting the table as a file in various format 
-+ Go [here](#save-R) for saving the table as an R object for further modifications
+:::
+<!--end of panel-->
 
-  ] 
+## Convenience functions
 
-  <!-- panel ends here -->
-]
+::: {.panel-tabset}
 
-<!-- panel set ends here -->
-
----
-
-# Convenience functions
-
-.panelset[ 
-
-.panel[.panel-name[categorical variables]
-
-.left-full[
+### categorical variables
 
 You can use `datasummary_skim()` with 'categorical' option to quickly generate a summary table for categorical variables:
 
+<br>
+
 **Syntax**:
 ```{r eval = F}
-datasummary_skim(dataset, 'categorical')
+modelsummary::datasummary_skim(dataset, 'categorical')
 ```
+
+<br>
 
 **Example**:
 ```{r }
 county_yield %>% 
-  select(- county_code) %>% 
+  dplyr::select(- county_code) %>% 
   data.frame() %>% 
-  datasummary_skim(., 'categorical') 
+  modelsummary::datasummary_skim(., 'categorical') 
 ```
 
 Note: `datasummary_skim()` does work well on a `tibble` object.
 
-]
-
-  ] 
-
-  <!-- panel ends here -->
-
-.panel[.panel-name[balance table]
+### balance table
 
 If your data was generated through randomized experiments (or you are using natural experiments), then `datasummary_balance()` can be very useful as it can generate a variable balance table.
 
+<br>
+
 **Syntax**:
 ```{r eval = F}
-datasummary_balance(variables to summarize ~ treatment dummy)
+modelsummary::datasummary_balance(variables to summarize ~ treatment dummy)
 ```
 
 + `variables to summarize`: list of variables to summarize
 + `treatment dummy`: a dummy variable that indicates whether in the treated or control group
 
-.left-code[
+<br>
 
 **Example**:
 
 ```{r balance-tab, eval = F}  
 county_yield %>% 
-  filter(state_name %in% c("Nebraska", "Kansas")) %>% 
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
   dplyr::select(c(state_name, where(is.numeric))) %>% 
   dplyr::select(- year) %>% 
-  datasummary_balance(
+  modelsummary::datasummary_balance(
     All (data.frame(.))~ state_name, #<<
     data = .
   )
 ```
-]
 
-.right-plot[
+
 ```{r balance-tab-f, ref.label = "balance-tab", echo = F}  
 
 ```
-]
 
-  ]
+### correlation table
 
-<!-- panel ends here -->
-
-.panel[.panel-name[correlation table]
-
-.left-full[
 
 You can create a correlation table with `datasummary_correlation()`.
 
 ```{r }
 county_yield %>% 
-  filter(state_name %in% c("Nebraska", "Kansas")) %>% 
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
   dplyr::select(c(state_name, where(is.numeric))) %>% 
   dplyr::select(- year) %>% 
-  datasummary_correlation()
+  modelsummary::datasummary_correlation()
 ```
 
-]
-
-  ]
-
-<!-- panel ends here -->
-
-]
-
-<!-- panel set ends here -->
-
+:::
+<!--end of panel-->
 

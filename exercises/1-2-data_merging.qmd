@@ -5,17 +5,18 @@ format:
     toc: true
     toc-location: left
     number-sections: true
+    callout-icon: false
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'tibble']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 80%
 filters:
   - webr
 ---
 
-# Load Required Packages:
-```{r}
-#| message: false 
-#| warning: false 
-library(dplyr)
-library(ggplot2) # For some datasets
-```
 
 # Merging with a single key
 
@@ -36,18 +37,21 @@ financial_events <- tibble(
 )
 ```
 
-**Answer Here**
-
 ::: {.panel-tabset}
 
-### Answer here
+### Work here
 
 ```{webr-r}
+#--- work here ---#
+
+
+
 
 ```
 
-### Solution
-```{wrbr-r}
+### Answer
+
+```{webr-r}
 economics_with_events <- left_join(economics, financial_events, by = "date")
 ```
 :::
@@ -61,7 +65,7 @@ economics_with_events <- left_join(economics, financial_events, by = "date")
 **Task:** The `chickwts` dataset contains the weight of chicks alongside feed type. Create a fictitious dataset that provides pricing information for each feed type. Join these datasets based on the `feed` type.
 
 **Load Dataset:**
-```{r, class.source = 'fold-show'}
+```{webr-r}
 data(chickwts)
 
 # Creating a fictitious dataset for feed pricing
@@ -71,10 +75,24 @@ feed_prices <- tibble(
 )
 ```
 
-**Solution:**
-```{r}
+::: {.panel-tabset}
+
+### Work here
+```{webr-r}
+#--- work here ---#
+
+
+
+
+```
+
+### Answer
+```{webr-r}
 chicks_with_prices <- left_join(chickwts, feed_prices, by = "feed")
 ```
+
+:::
+
 
 ## Exercise 3
 
@@ -94,19 +112,25 @@ teams <- tibble(
 ```
 
 ::: {.panel-tabset}
-### Answer here
+
+### Work here
 
 ```{webr-r}
+#--- work here ---#
+
+
+
 
 ```
 
-### Solution
+### Answer
 
 ```{webr-r}
 plants_with_teams <- left_join(PlantGrowth, teams, by = "group")
 ```
 :::
 <!--end of panel-->
+
 
 
 # Merging with multiple keys
@@ -133,17 +157,20 @@ grades <- tibble(
 )
 ```
 
-**Answer Here**
 
 ::: {.panel-tabset}
 
-### Answer here
+### Work here
 
 ```{webr-r}
+#--- work here ---#
+
+
+
 
 ```
 
-### Solution
+### Answer
 
 ```{webr-r}
 student_grades <- left_join(enrollment, grades, by = c("student_id", "semester", "course_code"))
@@ -175,17 +202,20 @@ projects <- tibble(
 )
 ```
 
-**Answer Here**
 
 ::: {.panel-tabset}
 
-### Answer here
+### Work here
 
 ```{webr-r}
+#--- work here ---#
+
+
+
 
 ```
 
-### Solution
+### Answer
 
 ```{webr-r}
 employee_projects <- left_join(employees, projects, by = c("department", "role"))
@@ -215,17 +245,19 @@ pricing <- tibble(
 )
 ```
 
-**Answer Here**
-
 ::: {.panel-tabset}
 
-### Answer here
+### Work here
 
 ```{webr-r}
+#--- work here ---#
+
+
+
 
 ```
 
-### Solution
+### Answer
 
 ```{webr-r}
 transaction_pricing <- left_join(transactions, pricing, by = c("transaction_date" = "price_date", "product_code"))
