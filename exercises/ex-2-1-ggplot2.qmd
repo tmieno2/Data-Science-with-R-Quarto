@@ -1,0 +1,572 @@
+---
+title: "Ex-2-1: Data Visualization"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'datasets']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+# Basics
+
+```{r}
+#| include: false
+library(dplyr)
+library(ggplot2)
+library(datasets)
+```
+
+## Exercise 1
+
+**Objective:** Create a scatter plot of miles-per-gallon (`mpg`) against horsepower (`hp`), colored by the number of cylinders (`cyl`). Make the size of the points larger than the default (you can pick any value as long as it is larger than the default).
+
+::: {.panel-tabset}
+
+### Work here
+```{webr-r}
+data(mtcars)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg, color = as.factor(cyl)), size = 2) 
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg, color = as.factor(cyl)), size = 2)
+```
+
+:::
+
+
+## Exercise 2
+
+**Objective:** Create a boxplot showing the distribution of petal lengths (`Petal.Length`) for each species (`Species`). Make the color of the borders of the boxes red.
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(iris)
+
+#--- work here ---#
+
+
+
+```
+
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = iris) +
+  geom_boxplot(aes(x = Species, y = Petal.Length, fill = Species), color = "red")
+```
+
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = iris) +
+  geom_boxplot(aes(x = Species, y = Petal.Length, fill = Species), color = "red") 
+```
+
+:::
+
+
+## Exercise 3
+
+**Objective:** Create a histogram of diamond prices (`price`) by `cut` (the fill color of the histogram differs by `cut`). Use `alpha = 0.6` so that the histograms are slightly transparent.
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(diamonds)
+
+#--- work here ---#
+
+
+
+```
+
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false
+ggplot(data = diamonds) +
+  geom_histogram(
+    aes(x = price, fill = cut),
+    alpha = 0.6,
+    bins = 50
+  )
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = diamonds) +
+  geom_histogram(
+    aes(x = price, fill = cut),
+    alpha = 0.6,
+    bins = 50
+  )
+```
+
+:::
+
+## Exercise 4
+
+**Objective:** Create a line plot that shows the progression of weight (`weight`) over time (`Time`) for each of the chicks that were fed Diet 1 (Hint: you first need to filter the data so that you only have the observations that has `Diet == 1`). Make the line color dependent on `Chick`.
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(ChickWeight)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false
+ggplot(data = ChickWeight %>% filter(Diet == 1)) +
+  geom_line(aes(x = Time, y = weight, color = Chick))
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = ChickWeight %>% filter(Diet == 1)) +
+  geom_line(aes(x = Time, y = weight, color = Chick))
+```
+
+:::
+
+
+# Faceted figures
+
+## Exercise 1
+
+**Objective:** Create a scatter plot of miles-per-gallon (`mpg`) against weight (`wt`), colored by the number of gears (`gear`). Facet the plot by the number of cylinders (`cyl`).
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(mtcars)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = mtcars) +
+  geom_point(aes(x = wt, y = mpg, color = as.factor(gear)))  +
+  facet_wrap(~cyl)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = mtcars) +
+  geom_point(aes(x = wt, y = mpg, color = as.factor(gear))) +
+  facet_wrap(~cyl)
+```
+
+:::
+
+## Exercise 2
+
+**Objective:** Create a boxplot of diamond prices (`price`) for each diamond cut (`cut`). Facet the plot by diamond color (`color`).
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(diamonds)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false
+ggplot(data = diamonds) +
+  geom_boxplot(aes(x = cut, y = price, fill = cut)) +
+  facet_wrap(~color)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = diamonds) +
+  geom_boxplot(aes(x = cut, y = price, fill = cut)) +
+  facet_wrap(~color)
+```
+
+:::
+
+
+## Exercise 3
+
+**Objective:** Plot the progression of weight (`weight`) over time (`Time`) for each chick using a line plot. Facet the visualization by the diet type (`Diet`).
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(ChickWeight)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = ChickWeight) +
+  geom_line(aes(x = Time, y = weight, group = Chick)) +
+  facet_wrap(~Diet) 
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = ChickWeight) +
+  geom_line(aes(x = Time, y = weight, group = Chick)) +
+  facet_wrap(~Diet)
+```
+
+:::
+
+## Exercise 4
+
+**Objective:** Create a scatter plot of highway miles-per-gallon (`hwy`) against engine displacement (`displ`). Facet the plot by the drive type (`drv`), with different panels for each type of drive (front-wheel drive, rear-wheel drive, and four-wheel drive).
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(mpg)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, color = class)) +
+  facet_wrap(~drv)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, color = class)) +
+  facet_wrap(~drv)
+```
+
+:::
+
+## Exercise 5
+
+**Objective:** Plot a boxplot showing the count of insects (`count`) for each spray type (`spray`). Facet the plot by spray type (`spary`).
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(InsectSprays)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting: 
+
+```{r}
+#| echo: false 
+ggplot(data = InsectSprays) +
+  geom_boxplot(aes(x = spray, y = count, fill = spray)) +
+  facet_wrap(~spray)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = InsectSprays) +
+  geom_boxplot(aes(x = spray, y = count, fill = spray)) +
+  facet_wrap(~spray)
+```
+
+:::
+
+
+# More exercises with emphasis on adjusting figure appearence
+
+## Exercise 1
+
+**Objective:** 
+- Create a scatter plot of miles-per-gallon (`mpg`) against horsepower (`hp`).
+- Use a color scheme that displays a gradient based on `hp`.
+- Adjust the title text size and color.
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(mtcars)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg, color = hp)) +
+  scale_color_gradient(low = "blue", high = "red") +
+  theme(plot.title = element_text(size = 24, color = "darkgreen"))
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg, color = hp)) +
+  scale_color_gradient(low = "blue", high = "red") +
+  theme(plot.title = element_text(size = 24, color = "darkgreen"))
+```
+
+:::
+
+
+## Exercise 2
+
+**Objective:** 
+- Generate a boxplot of sepal lengths (`Sepal.Length`) for each species (`Species`).
+- Choose custom colors for the boxplot fills.
+- Remove the legend entirely.
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(iris)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = iris) +
+  geom_boxplot(aes(x = Species, y = Sepal.Length, fill = Species)) +
+  scale_fill_manual(values = c("Setosa" = "purple", "Versicolor" = "orange", "Virginica" = "green")) +
+  theme(legend.position = "none")
+```
+
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = iris) +
+  geom_boxplot(aes(x = Species, y = Sepal.Length, fill = Species)) +
+  scale_fill_manual(values = c("Setosa" = "purple", "Versicolor" = "orange", "Virginica" = "green")) +
+  theme(legend.position = "none")
+```
+
+:::
+
+
+## Exercise 3
+
+**Objective:** 
+- Design a histogram for diamond prices (`price`).
+- Set bin colors to a specified hue, and the fill to another.
+- Increase the x-axis and y-axis label text size.
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(diamonds)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = diamonds) +
+  geom_histogram(aes(x = price), color = "navy", fill = "lightpink", bins = 30) +
+  theme(
+    axis.title.x = element_text(size = 18),
+    axis.title.y = element_text(size = 18)
+  )
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = diamonds) +
+  geom_histogram(aes(x = price), color = "navy", fill = "lightpink", bins = 30) +
+  theme(
+    axis.title.x = element_text(size = 18),
+    axis.title.y = element_text(size = 18)
+  )
+```
+
+:::
+
+## Exercise 4
+
+**Objective:** 
+- Produce a scatter plot of highway miles-per-gallon (`hwy`) against engine displacement (`displ`).
+- Modify the point shape based on drive type (`drv`).
+- Rename the legend title and entries.
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(mpg)
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, shape = drv, color = class), size = 3) +
+  scale_shape_manual(
+    name = "Drive Type",
+    values = c("f" = 16, "r" = 17, "4" = 18),
+    labels = c("Front", "Rear", "Four-wheel")
+  )
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot(data = mpg) +
+  geom_point(aes(x = displ, y = hwy, shape = drv, color = class), size = 3) +
+  scale_shape_manual(
+    name = "Drive Type",
+    values = c("f" = 16, "r" = 17, "4" = 18),
+    labels = c("Front", "Rear", "Four-wheel")
+  )
+```
+
+:::
+
+
+## Exercise 5
+
+**Objective:** 
+- Create a bar chart showing average tooth growth (`len`) by supplement type (`supp`).
+- Change bar fill color based on dose (`dose`) using a bespoke palette.
+- Position the legend at the bottom of the figure.
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+data(ToothGrowth)
+
+#--- work here ---#
+
+
+
+```
+
+Here is the output you should be getting:
+
+```{r}
+#| echo: false 
+tooth_avg <- ToothGrowth %>%
+  group_by(supp, dose) %>%
+  summarize(average_len = mean(len))
+
+ggplot(data = tooth_avg, ) +
+  geom_bar(
+    aes(x = supp, y = average_len, fill = as.factor(dose)),
+    stat = "identity",
+    position = "dodge"
+  ) +
+  scale_fill_manual(values = c("0.5" = "lightblue", "1.0" = "pink", "2.0" = "yellow")) +
+  theme(legend.position = "bottom")
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+tooth_avg <- ToothGrowth %>%
+  group_by(supp, dose) %>%
+  summarize(average_len = mean(len))
+
+ggplot(data = tooth_avg, ) +
+  geom_bar(
+    aes(x = supp, y = average_len, fill = as.factor(dose)),
+    stat = "identity",
+    position = "dodge"
+  ) +
+  scale_fill_manual(values = c("0.5" = "lightblue", "1.0" = "pink", "2.0" = "yellow")) +
+  theme(legend.position = "bottom")
+
+```
+
+:::
