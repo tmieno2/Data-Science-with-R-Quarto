@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Ex-2-1: Data Visualization – Data Science with R (AECN 896-05)</title>
+<title>Ex-2-2: Fine tuning figures – Data Science with R (AECN 896-05)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -368,7 +368,7 @@ body.reveal.quarto-dark div.qwebr-console-area {
 // Document level settings ----
 
 // Determine if we need to install R packages
-globalThis.qwebrInstallRPackagesList = ['dplyr', 'ggplot2', 'datasets'];
+globalThis.qwebrInstallRPackagesList = ['dplyr', 'ggplot2', 'datasets', 'ggthemes'];
 
 // Specify possible locations to search for the repository
 globalThis.qwebrPackageRepoURLS = ['https://repo.r-wasm.org/'];
@@ -390,7 +390,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"data(mtcars)\n\n#--- work here ---#\n\n","id":1,"options":{"label":"unnamed-chunk-1","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(iris)\n\n#--- work here ---#\n\n","id":2,"options":{"label":"unnamed-chunk-2","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(diamonds)\n\n#--- work here ---#\n\n","id":3,"options":{"label":"unnamed-chunk-3","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(ChickWeight)\n\n#--- work here ---#\n\n","id":4,"options":{"label":"unnamed-chunk-4","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(mtcars)\n\n#--- work here ---#\n\n","id":5,"options":{"label":"unnamed-chunk-5","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(diamonds)\n\n#--- work here ---#\n\n","id":6,"options":{"label":"unnamed-chunk-6","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(ChickWeight)\n\n#--- work here ---#\n\n","id":7,"options":{"label":"unnamed-chunk-7","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(mpg)\n\n#--- work here ---#\n\n","id":8,"options":{"label":"unnamed-chunk-8","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(InsectSprays)\n\n#--- work here ---#\n\n","id":9,"options":{"label":"unnamed-chunk-9","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(mtcars)\n\n#--- work here ---#\n\n","id":10,"options":{"label":"unnamed-chunk-10","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(iris)\n\n#--- work here ---#\n\n","id":11,"options":{"label":"unnamed-chunk-11","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(diamonds)\n\n#--- work here ---#\n\n","id":12,"options":{"label":"unnamed-chunk-12","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(mpg)\n#--- work here ---#\n\n","id":13,"options":{"label":"unnamed-chunk-13","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}},{"code":"data(ToothGrowth)\n\n#--- work here ---#\n\n","id":14,"options":{"label":"unnamed-chunk-14","context":"interactive","comment":"","fig-cap":"","warning":"true","autorun":"false","out-width":"100%","output":"true","editor-font-scale":"0.7","fig-height":5,"dpi":72,"editor-quick-suggestions":"false","message":"true","fig-width":7,"editor-word-wrap":"true","out-height":"","editor-max-height":"","read-only":"false","classes":"","results":"markup"}}];
+globalThis.qwebrCellDetails = [{"code":"install.packages(\"r.spatial.workshop.datasets\", repos = c(\"https://tmieno2.r-universe.dev\", \"https://cran.r-project.org\"))","id":1,"options":{"context":"setup","label":"unnamed-chunk-1","read-only":"false","editor-quick-suggestions":"false","autorun":"true","warning":"true","editor-font-scale":"0.7","out-width":"100%","comment":"","message":"true","results":"markup","editor-word-wrap":"true","fig-width":7,"classes":"","output":"true","dpi":72,"fig-cap":"","out-height":"","editor-max-height":"","fig-height":5}},{"code":"data(diamonds)\n\n#--- work here ---#\n\n","id":2,"options":{"context":"interactive","label":"unnamed-chunk-2","read-only":"false","editor-quick-suggestions":"false","autorun":"false","warning":"true","editor-font-scale":"0.7","out-width":"100%","comment":"","message":"true","results":"markup","editor-word-wrap":"true","fig-width":7,"classes":"","output":"true","dpi":72,"fig-cap":"","out-height":"","editor-max-height":"","fig-height":5}},{"code":"data(iris)\n\n#--- work here ---#\n\n","id":3,"options":{"context":"interactive","label":"unnamed-chunk-3","read-only":"false","editor-quick-suggestions":"false","autorun":"false","warning":"true","editor-font-scale":"0.7","out-width":"100%","comment":"","message":"true","results":"markup","editor-word-wrap":"true","fig-width":7,"classes":"","output":"true","dpi":72,"fig-cap":"","out-height":"","editor-max-height":"","fig-height":5}},{"code":"data(mpg)\n#--- work here ---#\n\n","id":4,"options":{"context":"interactive","label":"unnamed-chunk-4","read-only":"false","editor-quick-suggestions":"false","autorun":"false","warning":"true","editor-font-scale":"0.7","out-width":"100%","comment":"","message":"true","results":"markup","editor-word-wrap":"true","fig-width":7,"classes":"","output":"true","dpi":72,"fig-cap":"","out-height":"","editor-max-height":"","fig-height":5}},{"code":"data(county_yield, package = \"r.spatial.workshop.datasets\")\n\ncounty_yield_y <- \n  dplyr::select(county_yield, -geometry) %>%\n  dplyr::group_by(year, state_name) %>%\n  dplyr::summarise(corn_yield = mean(corn_yield))\n\n#--- work here ---#\n\n","id":5,"options":{"context":"interactive","label":"unnamed-chunk-5","read-only":"false","editor-quick-suggestions":"false","autorun":"false","warning":"true","editor-font-scale":"0.7","out-width":"100%","comment":"","message":"true","results":"markup","editor-word-wrap":"true","fig-width":7,"classes":"","output":"true","dpi":72,"fig-cap":"","out-height":"","editor-max-height":"","fig-height":5}}];
 
 </script>
 <script type="module">
@@ -1589,7 +1589,8 @@ globalThis.qwebrExecuteCode = async function (
 </script>
 
 
-<meta property="og:title" content="Ex-2-1: Data Visualization – Data Science with R (AECN 896-05)">
+<meta property="og:title" content="Ex-2-2: Fine tuning figures – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Data Visualization">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 
@@ -1641,29 +1642,10 @@ globalThis.qwebrExecuteCode = async function (
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#basics" id="toc-basics" class="nav-link active" data-scroll-target="#basics"><span class="header-section-number">1</span> Basics</a>
-  <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">1.1</span> Exercise 1</a></li>
-  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2"><span class="header-section-number">1.2</span> Exercise 2</a></li>
-  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3"><span class="header-section-number">1.3</span> Exercise 3</a></li>
-  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4"><span class="header-section-number">1.4</span> Exercise 4</a></li>
-  </ul></li>
-  <li><a href="#faceted-figures" id="toc-faceted-figures" class="nav-link" data-scroll-target="#faceted-figures"><span class="header-section-number">2</span> Faceted figures</a>
-  <ul class="collapse">
-  <li><a href="#exercise-1-1" id="toc-exercise-1-1" class="nav-link" data-scroll-target="#exercise-1-1"><span class="header-section-number">2.1</span> Exercise 1</a></li>
-  <li><a href="#exercise-2-1" id="toc-exercise-2-1" class="nav-link" data-scroll-target="#exercise-2-1"><span class="header-section-number">2.2</span> Exercise 2</a></li>
-  <li><a href="#exercise-3-1" id="toc-exercise-3-1" class="nav-link" data-scroll-target="#exercise-3-1"><span class="header-section-number">2.3</span> Exercise 3</a></li>
-  <li><a href="#exercise-4-1" id="toc-exercise-4-1" class="nav-link" data-scroll-target="#exercise-4-1"><span class="header-section-number">2.4</span> Exercise 4</a></li>
-  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5"><span class="header-section-number">2.5</span> Exercise 5</a></li>
-  </ul></li>
-  <li><a href="#more-exercises-with-emphasis-on-adjusting-figure-appearence" id="toc-more-exercises-with-emphasis-on-adjusting-figure-appearence" class="nav-link" data-scroll-target="#more-exercises-with-emphasis-on-adjusting-figure-appearence"><span class="header-section-number">3</span> More exercises with emphasis on adjusting figure appearence</a>
-  <ul class="collapse">
-  <li><a href="#exercise-1-2" id="toc-exercise-1-2" class="nav-link" data-scroll-target="#exercise-1-2"><span class="header-section-number">3.1</span> Exercise 1</a></li>
-  <li><a href="#exercise-2-2" id="toc-exercise-2-2" class="nav-link" data-scroll-target="#exercise-2-2"><span class="header-section-number">3.2</span> Exercise 2</a></li>
-  <li><a href="#exercise-3-2" id="toc-exercise-3-2" class="nav-link" data-scroll-target="#exercise-3-2"><span class="header-section-number">3.3</span> Exercise 3</a></li>
-  <li><a href="#exercise-4-2" id="toc-exercise-4-2" class="nav-link" data-scroll-target="#exercise-4-2"><span class="header-section-number">3.4</span> Exercise 4</a></li>
-  <li><a href="#exercise-5-1" id="toc-exercise-5-1" class="nav-link" data-scroll-target="#exercise-5-1"><span class="header-section-number">3.5</span> Exercise 5</a></li>
-  </ul></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link active" data-scroll-target="#exercise-1"><span class="header-section-number">1</span> Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2"><span class="header-section-number">2</span> Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3"><span class="header-section-number">3</span> Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4"><span class="header-section-number">4</span> Exercise 4</a></li>
   </ul>
 </nav>
 </nav>
@@ -1960,7 +1942,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Ex-2-1: Data Visualization</h1>
+<h1 class="title">Ex-2-2: Fine tuning figures</h1>
 </div>
 
 
@@ -1972,47 +1954,48 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
     
   </div>
   
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    Data Visualization
+  </div>
+</div>
 
 
 </header>
 
 
-<section id="basics" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Basics</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(datasets)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="exercise-1" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">1.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> Create a scatter plot of miles-per-gallon (<code>mpg</code>) against horsepower (<code>hp</code>), colored by the number of cylinders (<code>cyl</code>). Make the size of the points larger than the default (you can pick any value as long as it is larger than the default).</p>
+<div id="qwebr-insertion-location-1"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<section id="exercise-1" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">1</span> Exercise 1</h2>
+<p>Using the <code>diamonds</code> data,</p>
+<ul>
+<li>Create a histogram for diamond prices (<code>price</code>).
+<ul>
+<li>Set bin fill color to a color you like using its Hex code</li>
+<li>Set bin border color to a color you like using its Hex code</li>
+<li>Set <code>bins = 30</code></li>
+</ul></li>
+<li>Change the panel background color to <code>#6f6f6f</code> using the panel.background option inside <code>theme()</code>.</li>
+<li>Increase the x-axis and y-axis label text size to 12</li>
+<li>Change the y-axis breaks to <code>seq(0, 15000, by = 1000)</code></li>
+<li>Change the color and size of x-axis title to “blue” and 16, respectively</li>
+<li>Change the color and size of y-axis title to “red” and 16, respectively</li>
+<li>Remove the minor grid lines of the y-axis</li>
+</ul>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div id="qwebr-insertion-location-1"></div>
+<div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Here is the output you should be getting:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ex-2-2-ggplot2-fine-tune_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2022,29 +2005,60 @@ Attaching package: 'dplyr'</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> hp, <span class="at">y =</span> mpg, <span class="at">color =</span> <span class="fu">as.factor</span>(cyl)), <span class="at">size =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> price),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"#000000"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#c90076"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">bins =</span> <span class="dv">30</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">color =</span> <span class="st">"blue"</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">color =</span> <span class="st">"red"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#6f6f6f"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">15000</span>, <span class="at">by =</span> <span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="exercise-2" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="exercise-2"><span class="header-section-number">1.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> Create a boxplot showing the distribution of petal lengths (<code>Petal.Length</code>) for each species (<code>Species</code>). Make the color of the borders of the boxes red.</p>
+<section id="exercise-2" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="exercise-2"><span class="header-section-number">2</span> Exercise 2</h2>
+<p>Using the <code>iris</code> data,</p>
+<ul>
+<li>Generate a boxplot of sepal lengths (<code>Sepal.Length</code>) for each species (<code>Species</code>)</li>
+<li>Apply one of the pre-made themes by the <code>ggthemes</code> package</li>
+<li>Pick one palette from the list of “qualitative” palettes by the <code>RColorBrewer</code> package (You can see the list by running <code>display.brewer.all(type = "qual")</code>.)</li>
+<li>Use the palette you picked in scale_A_B() to change the color scheme from the default
+<ul>
+<li>A: <code>fill</code> or <code>color</code></li>
+<li>B: <code>brewer</code> or <code>distiller</code></li>
+</ul></li>
+<li>Place the legend title at the top of the legend keys</li>
+<li>Change the y-axis title to “Sepal Length”</li>
+<li>Change the breaks of the y-axis to <code>seq(4, 8, by = 0.5)</code></li>
+<li>Make the font size of x-axis text 12</li>
+<li>Change the color x-axis title to a color you like using the Hex code</li>
+<li>Place the legend at the bottom of the figure</li>
+<li>Change the width of the legend keys to 1cm.</li>
+<li>Remove the minor grid lines of the y-axis</li>
+</ul>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<div id="qwebr-insertion-location-2"></div>
+<div id="qwebr-insertion-location-3"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Here is the output you should be getting:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ex-2-2-ggplot2-fine-tune_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2054,29 +2068,70 @@ Attaching package: 'dplyr'</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> iris) <span class="sc">+</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Petal.Length, <span class="at">fill =</span> Species), <span class="at">color =</span> <span class="st">"red"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> iris) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Sepal.Length, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">"Set2"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">guide =</span> <span class="fu">guide_legend</span>(<span class="at">title.position =</span> <span class="st">"top"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Sepal Length"</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#cc0000"</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="dv">1</span>, <span class="st">"cm"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="at">by =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="exercise-3" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="exercise-3"><span class="header-section-number">1.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> Create a histogram of diamond prices (<code>price</code>) by <code>cut</code> (the fill color of the histogram differs by <code>cut</code>). Use <code>alpha = 0.6</code> so that the histograms are slightly transparent.</p>
+<section id="exercise-3" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="exercise-3"><span class="header-section-number">3</span> Exercise 3</h2>
+<p>Using the <code>mpg</code> data,</p>
+<ul>
+<li>Create a scatter plot of highway miles-per-gallon (<code>hwy</code>) against engine displacement (<code>displ</code>).
+<ul>
+<li>Modify the point color based on drive type (<code>drv</code>).</li>
+<li>Set the size of the points to 3</li>
+</ul></li>
+<li>Use scale_<code>A</code><em>viridis</em><code>B</code>() to apply the Viridis color scale
+<ul>
+<li><code>A</code>: <code>color</code> or <code>fill</code></li>
+<li><code>B</code>: <code>c</code> (continuous) or <code>d</code> (discrete)</li>
+</ul></li>
+<li>Legend:
+<ul>
+<li>Rename the legend title to “Drive Type”.</li>
+<li>Place the legend at the bottom of the figure</li>
+</ul></li>
+<li>Axis
+<ul>
+<li>Change the y-axis and x-xis titles to “Miles per gallon” and “Displacement”, respectively</li>
+<li>Change the font size of y-axis and x-axis titles to 16</li>
+<li>Change the font size of y-axis and x-axis texts to 12</li>
+</ul></li>
+<li>Others:
+<ul>
+<li>Make the background color of the panel to <code>#f3fbf5</code> using the <code>panel.background</code> option inside <code>theme()</code>.</li>
+</ul></li>
+</ul>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div id="qwebr-insertion-location-3"></div>
+<div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Here is the output you should be getting:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ex-2-2-ggplot2-fine-tune_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2086,33 +2141,51 @@ Attaching package: 'dplyr'</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> price, <span class="at">fill =</span> cut),</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">bins =</span> <span class="dv">50</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mpg) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> displ, <span class="at">y =</span> hwy, <span class="at">shape =</span> drv, <span class="at">color =</span> class), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Drive Type"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"f"</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">"r"</span> <span class="ot">=</span> <span class="dv">17</span>, <span class="st">"4"</span> <span class="ot">=</span> <span class="dv">18</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Front"</span>, <span class="st">"Rear"</span>, <span class="st">"Four-wheel"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="exercise-4" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="exercise-4"><span class="header-section-number">1.4</span> Exercise 4</h2>
-<p><strong>Objective:</strong> Create a line plot that shows the progression of weight (<code>weight</code>) over time (<code>Time</code>) for each of the chicks that were fed Diet 1 (Hint: you first need to filter the data so that you only have the observations that has <code>Diet == 1</code>). Make the line color dependent on <code>Chick</code>.</p>
+<section id="exercise-4" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="exercise-4"><span class="header-section-number">4</span> Exercise 4</h2>
+<p>Using <code>county_yield_y</code>,</p>
+<ul>
+<li>Create a line plot of corn yield (<code>corn_yield</code>) against year (<code>year</code>) faceted by State (<code>state_name</code>)</li>
+<li>Apply <code>theme_wsj()</code></li>
+<li>Axis
+<ul>
+<li>Change the y-axis and x-axis titles to “Corn Yield (bu/acre)” and “Year”, respectively</li>
+<li>Change the breaks of x-axis to <code>2000:2018</code></li>
+</ul></li>
+<li>Theme
+<ul>
+<li>Change the font size of x-axis and y-axis titles to 16</li>
+<li>Change the font size of x-axis and y-axis texts to 12</li>
+<li>Change the background color of the strips to #fbf3f9</li>
+<li>Change the background border color of the strips to blue</li>
+<li>Change the strip text size to 12 and set its angle to 0</li>
+</ul></li>
+</ul>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div id="qwebr-insertion-location-4"></div>
+<div id="qwebr-insertion-location-5"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Here is the output you should be getting:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="ex-2-2-ggplot2-fine-tune_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2122,380 +2195,26 @@ Attaching package: 'dplyr'</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ChickWeight <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Diet <span class="sc">==</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Time, <span class="at">y =</span> weight, <span class="at">color =</span> Chick))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> county_yield_y) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> corn_yield)) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(state_name <span class="sc">~</span> .) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_wsj</span>() <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Corn Yield (bu/acre)"</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Year"</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">2000</span><span class="sc">:</span><span class="dv">2018</span>) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#fbf3f9"</span>, <span class="at">color =</span> <span class="st">"blue"</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">angle =</span> <span class="dv">0</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
 </div>
-</div>
-</section>
-</section>
-<section id="faceted-figures" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Faceted figures</h1>
-<section id="exercise-1-1" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="exercise-1-1"><span class="header-section-number">2.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> Create a scatter plot of miles-per-gallon (<code>mpg</code>) against weight (<code>wt</code>), colored by the number of gears (<code>gear</code>). Facet the plot by the number of cylinders (<code>cyl</code>).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
-<div id="qwebr-insertion-location-5"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> wt, <span class="at">y =</span> mpg, <span class="at">color =</span> <span class="fu">as.factor</span>(gear))) <span class="sc">+</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>cyl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-2-1" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="exercise-2-1"><span class="header-section-number">2.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> Create a boxplot of diamond prices (<code>price</code>) for each diamond cut (<code>cut</code>). Facet the plot by diamond color (<code>color</code>).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
-<div id="qwebr-insertion-location-6"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> cut, <span class="at">y =</span> price, <span class="at">fill =</span> cut)) <span class="sc">+</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>color)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-3-1" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="exercise-3-1"><span class="header-section-number">2.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> Plot the progression of weight (<code>weight</code>) over time (<code>Time</code>) for each chick using a line plot. Facet the visualization by the diet type (<code>Diet</code>).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
-<div id="qwebr-insertion-location-7"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ChickWeight) <span class="sc">+</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Time, <span class="at">y =</span> weight, <span class="at">group =</span> Chick)) <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Diet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-4-1" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="exercise-4-1"><span class="header-section-number">2.4</span> Exercise 4</h2>
-<p><strong>Objective:</strong> Create a scatter plot of highway miles-per-gallon (<code>hwy</code>) against engine displacement (<code>displ</code>). Facet the plot by the drive type (<code>drv</code>), with different panels for each type of drive (front-wheel drive, rear-wheel drive, and four-wheel drive).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
-<div id="qwebr-insertion-location-8"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mpg) <span class="sc">+</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> displ, <span class="at">y =</span> hwy, <span class="at">color =</span> class)) <span class="sc">+</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>drv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-5" class="level2" data-number="2.5">
-<h2 data-number="2.5" class="anchored" data-anchor-id="exercise-5"><span class="header-section-number">2.5</span> Exercise 5</h2>
-<p><strong>Objective:</strong> Plot a boxplot showing the count of insects (<code>count</code>) for each spray type (<code>spray</code>). Facet the plot by spray type (<code>spary</code>).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
-<div id="qwebr-insertion-location-9"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> InsectSprays) <span class="sc">+</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> spray, <span class="at">y =</span> count, <span class="at">fill =</span> spray)) <span class="sc">+</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>spray)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="more-exercises-with-emphasis-on-adjusting-figure-appearence" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> More exercises with emphasis on adjusting figure appearence</h1>
-<section id="exercise-1-2" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="exercise-1-2"><span class="header-section-number">3.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> - Create a scatter plot of miles-per-gallon (<code>mpg</code>) against horsepower (<code>hp</code>). - Use a color scheme that displays a gradient based on <code>hp</code>. - Adjust the title text size and color.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
-<div id="qwebr-insertion-location-10"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> hp, <span class="at">y =</span> mpg, <span class="at">color =</span> hp)) <span class="sc">+</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">24</span>, <span class="at">color =</span> <span class="st">"darkgreen"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-2-2" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="exercise-2-2"><span class="header-section-number">3.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> - Generate a boxplot of sepal lengths (<code>Sepal.Length</code>) for each species (<code>Species</code>). - Choose custom colors for the boxplot fills. - Remove the legend entirely.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
-<div id="qwebr-insertion-location-11"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: No shared levels found between `names(values)` of the manual scale and the
-data's fill values.
-No shared levels found between `names(values)` of the manual scale and the
-data's fill values.</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> iris) <span class="sc">+</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Sepal.Length, <span class="at">fill =</span> Species)) <span class="sc">+</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Setosa"</span> <span class="ot">=</span> <span class="st">"purple"</span>, <span class="st">"Versicolor"</span> <span class="ot">=</span> <span class="st">"orange"</span>, <span class="st">"Virginica"</span> <span class="ot">=</span> <span class="st">"green"</span>)) <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-3-2" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="exercise-3-2"><span class="header-section-number">3.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> - Design a histogram for diamond prices (<code>price</code>). - Set bin colors to a specified hue, and the fill to another. - Increase the x-axis and y-axis label text size.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-12-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-1" role="tab" aria-controls="tabset-12-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-2" role="tab" aria-controls="tabset-12-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
-<div id="qwebr-insertion-location-12"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> price), <span class="at">color =</span> <span class="st">"navy"</span>, <span class="at">fill =</span> <span class="st">"lightpink"</span>, <span class="at">bins =</span> <span class="dv">30</span>) <span class="sc">+</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>),</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-4-2" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="exercise-4-2"><span class="header-section-number">3.4</span> Exercise 4</h2>
-<p><strong>Objective:</strong> - Produce a scatter plot of highway miles-per-gallon (<code>hwy</code>) against engine displacement (<code>displ</code>). - Modify the point shape based on drive type (<code>drv</code>). - Rename the legend title and entries.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-13-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-1" role="tab" aria-controls="tabset-13-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-2" role="tab" aria-controls="tabset-13-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
-<div id="qwebr-insertion-location-13"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mpg) <span class="sc">+</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> displ, <span class="at">y =</span> hwy, <span class="at">shape =</span> drv, <span class="at">color =</span> class), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Drive Type"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"f"</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">"r"</span> <span class="ot">=</span> <span class="dv">17</span>, <span class="st">"4"</span> <span class="ot">=</span> <span class="dv">18</span>),</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Front"</span>, <span class="st">"Rear"</span>, <span class="st">"Four-wheel"</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-5-1" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="exercise-5-1"><span class="header-section-number">3.5</span> Exercise 5</h2>
-<p><strong>Objective:</strong> - Create a bar chart showing average tooth growth (<code>len</code>) by supplement type (<code>supp</code>). - Change bar fill color based on dose (<code>dose</code>) using a bespoke palette. - Position the legend at the bottom of the figure.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
-<div id="qwebr-insertion-location-14"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p>Here is the output you should be getting:</p>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'supp'. You can override using the
-`.groups` argument.</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="ggplot2_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-14-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-2-tab">
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tooth_avg <span class="ot">&lt;-</span> ToothGrowth <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supp, dose) <span class="sc">%&gt;%</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">average_len =</span> <span class="fu">mean</span>(len))</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> tooth_avg, ) <span class="sc">+</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> supp, <span class="at">y =</span> average_len, <span class="at">fill =</span> <span class="fu">as.factor</span>(dose)),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">"identity"</span>,</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"dodge"</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0.5"</span> <span class="ot">=</span> <span class="st">"lightblue"</span>, <span class="st">"1.0"</span> <span class="ot">=</span> <span class="st">"pink"</span>, <span class="st">"2.0"</span> <span class="ot">=</span> <span class="st">"yellow"</span>)) <span class="sc">+</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 
 
-</div>
-</div>
-</div>
-</section>
 </section>
 
 </main> <!-- /main -->

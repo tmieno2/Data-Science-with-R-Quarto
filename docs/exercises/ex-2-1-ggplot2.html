@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Ex-1-1: Data Wrangling – Data Science with R (AECN 896-05)</title>
+<title>Ex-2-1: Data Visualization – Data Science with R (AECN 896-05)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -356,7 +390,7 @@ globalThis.qwebrCustomizedWebROptions = {
 };
 
 // Store cell data
-globalThis.qwebrCellDetails = [{"code":"data(mtcars)\n\n\n","id":1,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-1","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nfiltered_mtcars <- \n  mtcars %>%\n  filter(am == 1 & wt > 3)\n)","id":2,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-2","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(iris)\n\n\n\n","id":3,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-3","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"( \nfiltered_iris <- \n  iris %>%\n  filter(Species == \"setosa\" & Sepal.Length > 5)\n)","id":4,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-4","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(diamonds)\n\n\n\n","id":5,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-5","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nfiltered_diamonds <- \n  diamonds %>%\n  filter(cut == \"Premium\" & carat >= 1 & carat <= 2)\n)","id":6,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-6","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(airquality)\n\n\n","id":7,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-7","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nfiltered_airquality <- \n  airquality %>%\n  filter(Month == 6 & Ozone > 100, !is.na(Ozone))\n)","id":8,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-8","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(ChickWeight)\n\n\n","id":9,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-9","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nfiltered_chickweight <-\n  ChickWeight %>%\n  filter(Chick %in% c(1:5) & Time <= 10)\n)","id":10,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-10","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(mtcars)\n\n\n\n","id":11,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-11","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nmutated_mtcars <- \n  mtcars %>%\n  mutate(efficiency = mpg/cyl)\n)","id":12,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-12","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(iris)\n\n\n","id":13,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-13","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nmutated_iris <- \n  iris %>%\n  mutate(area = Sepal.Length * Sepal.Width)\n)","id":14,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-14","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(diamonds)\n\n\n","id":15,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-15","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nmutated_diamonds <- \n  diamonds %>%\n  mutate(price_per_carat = price/carat)\n)","id":16,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-16","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(airquality)\n\n\n","id":17,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-17","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nmutated_airquality <- \n  airquality %>%\n  mutate(TempC = (Temp - 32) * 5/9)\n)","id":18,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-18","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(mtcars)\n\n\n","id":19,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-19","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nmtcars_grouped1 <- \n  mtcars %>%\n  group_by(cyl) %>%\n  summarize(avg_mpg = mean(mpg))\n)","id":20,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-20","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(iris)\n\n\n\n","id":21,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-21","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\niris_grouped <- \n  iris %>%\n  group_by(Species) %>%\n  summarize(\n    avg_sepal_length = mean(Sepal.Length),\n    avg_sepal_width = mean(Sepal.Width)\n  )\n)","id":22,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-22","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(diamonds)\n\n\n","id":23,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-23","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\ndiamonds_grouped <- \n  diamonds %>%\n  group_by(cut, color) %>%\n  summarize(median_price = median(price))\n)","id":24,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-24","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(airquality)\n\n\n","id":25,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-25","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nairquality_grouped <- \n  airquality %>%\n  group_by(Month) %>%\n  summarize(\n    max_temp = max(Temp),\n    avg_ozone = mean(Ozone, na.rm = TRUE)\n  )\n)","id":26,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-26","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(ChickWeight)\n\n\n","id":27,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-27","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"(\nchickweight_grouped <- \n  ChickWeight %>%\n  group_by(Diet, Chick) %>%\n  summarize(final_weight = weight[which.max(Time)])\n)","id":28,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-28","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(mtcars)\n\n\n","id":29,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-29","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"mtcars %>%\n  filter(hp > 100) %>%\n  group_by(cyl) %>%\n  summarize(avg_mpg = mean(mpg))","id":30,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-30","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(diamonds)\n\n\n","id":31,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-31","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"diamonds %>%\n  filter(cut == \"Ideal\", carat < 1) %>%\n  mutate(adjusted_price = price * 0.9) %>%\n  group_by(clarity) %>%\n  summarize(avg_adjusted_price = mean(adjusted_price))","id":32,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-32","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"data(mtcars)\n\n\n","id":33,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-33","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}},{"code":"mtcars %>%\n  filter(cyl %in% c(4, 6)) %>%\n  mutate(disp_per_cyl = disp / cyl) %>%\n  group_by(gear) %>%\n  summarize(avg_disp_per_cyl = mean(disp_per_cyl))","id":34,"options":{"editor-font-scale":"0.7","fig-height":5,"comment":"","dpi":72,"context":"interactive","editor-quick-suggestions":"false","fig-width":7,"label":"unnamed-chunk-34","message":"true","warning":"true","editor-word-wrap":"true","output":"true","editor-max-height":"","fig-cap":"","classes":"","out-height":"","read-only":"false","autorun":"false","results":"markup","out-width":"100%"}}];
+globalThis.qwebrCellDetails = [{"id":1,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-1"},"code":"data(mtcars)\n\n#--- work here ---#\n\n"},{"id":2,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-2"},"code":"data(iris)\n\n#--- work here ---#\n\n"},{"id":3,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-3"},"code":"data(diamonds)\n\n#--- work here ---#\n\n"},{"id":4,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-4"},"code":"data(ChickWeight)\n\n#--- work here ---#\n\n"},{"id":5,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-5"},"code":"data(mtcars)\n\n#--- work here ---#\n\n"},{"id":6,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-6"},"code":"data(diamonds)\n\n#--- work here ---#\n\n"},{"id":7,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-7"},"code":"data(ChickWeight)\n\n#--- work here ---#\n\n"},{"id":8,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-8"},"code":"data(mpg)\n\n#--- work here ---#\n\n"},{"id":9,"options":{"context":"interactive","read-only":"false","message":"true","out-height":"","dpi":72,"autorun":"false","fig-height":5,"out-width":"100%","classes":"","warning":"true","editor-font-scale":"0.7","comment":"","fig-width":7,"editor-word-wrap":"true","output":"true","editor-quick-suggestions":"false","fig-cap":"","editor-max-height":"","results":"markup","label":"unnamed-chunk-9"},"code":"data(InsectSprays)\n\n#--- work here ---#\n\n"}];
 
 </script>
 <script type="module">
@@ -1555,8 +1589,8 @@ globalThis.qwebrExecuteCode = async function (
 </script>
 
 
-<meta property="og:title" content="Ex-1-1: Data Wrangling – Data Science with R (AECN 896-05)">
-<meta property="og:description" content="Data Wrangling">
+<meta property="og:title" content="Ex-2-1: Data Visualization – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Data Visualization">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 
@@ -1608,34 +1642,20 @@ globalThis.qwebrExecuteCode = async function (
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#filter" id="toc-filter" class="nav-link active" data-scroll-target="#filter"><span class="header-section-number">1</span> Filter</a>
+  <li><a href="#basics" id="toc-basics" class="nav-link active" data-scroll-target="#basics"><span class="header-section-number">1</span> Basics</a>
   <ul class="collapse">
   <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">1.1</span> Exercise 1</a></li>
   <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2"><span class="header-section-number">1.2</span> Exercise 2</a></li>
   <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3"><span class="header-section-number">1.3</span> Exercise 3</a></li>
-  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4"><span class="header-section-number">1.4</span> Exercise 4:</a></li>
-  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5"><span class="header-section-number">1.5</span> Exercise 5:</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4"><span class="header-section-number">1.4</span> Exercise 4</a></li>
   </ul></li>
-  <li><a href="#mutate" id="toc-mutate" class="nav-link" data-scroll-target="#mutate"><span class="header-section-number">2</span> Mutate</a>
+  <li><a href="#faceted-figures" id="toc-faceted-figures" class="nav-link" data-scroll-target="#faceted-figures"><span class="header-section-number">2</span> Faceted figures</a>
   <ul class="collapse">
   <li><a href="#exercise-1-1" id="toc-exercise-1-1" class="nav-link" data-scroll-target="#exercise-1-1"><span class="header-section-number">2.1</span> Exercise 1</a></li>
   <li><a href="#exercise-2-1" id="toc-exercise-2-1" class="nav-link" data-scroll-target="#exercise-2-1"><span class="header-section-number">2.2</span> Exercise 2</a></li>
   <li><a href="#exercise-3-1" id="toc-exercise-3-1" class="nav-link" data-scroll-target="#exercise-3-1"><span class="header-section-number">2.3</span> Exercise 3</a></li>
   <li><a href="#exercise-4-1" id="toc-exercise-4-1" class="nav-link" data-scroll-target="#exercise-4-1"><span class="header-section-number">2.4</span> Exercise 4</a></li>
-  </ul></li>
-  <li><a href="#group-summary" id="toc-group-summary" class="nav-link" data-scroll-target="#group-summary"><span class="header-section-number">3</span> Group summary</a>
-  <ul class="collapse">
-  <li><a href="#exercise-1-2" id="toc-exercise-1-2" class="nav-link" data-scroll-target="#exercise-1-2"><span class="header-section-number">3.1</span> Exercise 1</a></li>
-  <li><a href="#exercise-2-2" id="toc-exercise-2-2" class="nav-link" data-scroll-target="#exercise-2-2"><span class="header-section-number">3.2</span> Exercise 2</a></li>
-  <li><a href="#exercise-3-2" id="toc-exercise-3-2" class="nav-link" data-scroll-target="#exercise-3-2"><span class="header-section-number">3.3</span> Exercise 3</a></li>
-  <li><a href="#exercise-4-2" id="toc-exercise-4-2" class="nav-link" data-scroll-target="#exercise-4-2"><span class="header-section-number">3.4</span> Exercise 4</a></li>
-  <li><a href="#exercise-5-1" id="toc-exercise-5-1" class="nav-link" data-scroll-target="#exercise-5-1"><span class="header-section-number">3.5</span> Exercise 5</a></li>
-  </ul></li>
-  <li><a href="#use-all" id="toc-use-all" class="nav-link" data-scroll-target="#use-all"><span class="header-section-number">4</span> Use all</a>
-  <ul class="collapse">
-  <li><a href="#exercise-1-calculate-average-mpg-by-cylinder" id="toc-exercise-1-calculate-average-mpg-by-cylinder" class="nav-link" data-scroll-target="#exercise-1-calculate-average-mpg-by-cylinder"><span class="header-section-number">4.1</span> Exercise 1: Calculate Average MPG by Cylinder</a></li>
-  <li><a href="#exercise-2-adjusted-price-calculation" id="toc-exercise-2-adjusted-price-calculation" class="nav-link" data-scroll-target="#exercise-2-adjusted-price-calculation"><span class="header-section-number">4.2</span> Exercise 2: Adjusted Price Calculation</a></li>
-  <li><a href="#exercise-3-compute-average-dispersion-by-gear" id="toc-exercise-3-compute-average-dispersion-by-gear" class="nav-link" data-scroll-target="#exercise-3-compute-average-dispersion-by-gear"><span class="header-section-number">4.3</span> Exercise 3: Compute Average Dispersion by Gear</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5"><span class="header-section-number">2.5</span> Exercise 5</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1933,7 +1953,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Ex-1-1: Data Wrangling</h1>
+<h1 class="title">Ex-2-1: Data Visualization</h1>
 </div>
 
 
@@ -1948,7 +1968,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    Data Wrangling
+    Data Visualization
   </div>
 </div>
 
@@ -1956,306 +1976,304 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </header>
 
 
-<section id="filter" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Filter</h1>
+<section id="basics" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Basics</h1>
 <section id="exercise-1" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">1.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> Filter the <code>mtcars</code> dataset for cars that have an automatic transmission (<code>am == 1</code>) and weigh more than 3,000 lbs (<code>wt &gt; 3</code>).</p>
+<p><strong>Objective:</strong> Create a scatter plot of miles-per-gallon (<code>mpg</code>) against horsepower (<code>hp</code>), colored by the number of cylinders (<code>cyl</code>). Make the size of the points larger than the default (you can pick any value as long as it is larger than the default).</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div id="qwebr-insertion-location-1"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div id="qwebr-insertion-location-2"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> hp, <span class="at">y =</span> mpg, <span class="at">color =</span> <span class="fu">as.factor</span>(cyl)), <span class="at">size =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </div>
 </div>
-<!--end of panel-->
+</div>
 </section>
 <section id="exercise-2" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="exercise-2"><span class="header-section-number">1.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> Filter the <code>iris</code> dataset for flowers of the species <code>setosa</code> where the sepal length (<code>Sepal.Length</code>) exceeds 5 cm.</p>
+<p><strong>Objective:</strong> Create a boxplot showing the distribution of petal lengths (<code>Petal.Length</code>) for each species (<code>Species</code>). Make the color of the borders of the boxes red.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<div id="qwebr-insertion-location-3"></div>
+<div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
-<div id="qwebr-insertion-location-4"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> iris) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Petal.Length, <span class="at">fill =</span> Species), <span class="at">color =</span> <span class="st">"red"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </div>
 </section>
 <section id="exercise-3" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="exercise-3"><span class="header-section-number">1.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> Filter the dataset for diamonds with a <code>cut</code> of “Premium” and a <code>carat</code> size between 1 and 2.</p>
+<p><strong>Objective:</strong> Create a histogram of diamond prices (<code>price</code>) by <code>cut</code> (the fill color of the histogram differs by <code>cut</code>). Use <code>alpha = 0.6</code> so that the histograms are slightly transparent.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div id="qwebr-insertion-location-5"></div>
+<div id="qwebr-insertion-location-3"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<div id="qwebr-insertion-location-6"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> price, <span class="at">fill =</span> cut),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">bins =</span> <span class="dv">50</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </div>
 </section>
 <section id="exercise-4" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="exercise-4"><span class="header-section-number">1.4</span> Exercise 4:</h2>
-<p><strong>Objective:</strong> Filter the data for days in June (<code>Month == 6</code>) where the ozone level (<code>Ozone</code>) exceeded 100 (ignoring NA values).</p>
+<h2 data-number="1.4" class="anchored" data-anchor-id="exercise-4"><span class="header-section-number">1.4</span> Exercise 4</h2>
+<p><strong>Objective:</strong> Create a line plot that shows the progression of weight (<code>weight</code>) over time (<code>Time</code>) for each of the chicks that were fed Diet 1 (Hint: you first need to filter the data so that you only have the observations that has <code>Diet == 1</code>). Make the line color dependent on <code>Chick</code>.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div id="qwebr-insertion-location-7"></div>
+<div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
-<div id="qwebr-insertion-location-8"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ChickWeight <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Diet <span class="sc">==</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Time, <span class="at">y =</span> weight, <span class="at">color =</span> Chick))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </div>
 </section>
-<section id="exercise-5" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="exercise-5"><span class="header-section-number">1.5</span> Exercise 5:</h2>
-<p><strong>Objective:</strong> Filter for records of chicks (<code>Chick</code>) number 1 to 5 (inclusive) and for times (<code>Time</code>) less than or equal to 10 days.</p>
+</section>
+<section id="faceted-figures" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Faceted figures</h1>
+<section id="exercise-1-1" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="exercise-1-1"><span class="header-section-number">2.1</span> Exercise 1</h2>
+<p><strong>Objective:</strong> Create a scatter plot of miles-per-gallon (<code>mpg</code>) against weight (<code>wt</code>), colored by the number of gears (<code>gear</code>). Facet the plot by the number of cylinders (<code>cyl</code>).</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
-<div id="qwebr-insertion-location-9"></div>
+<div id="qwebr-insertion-location-5"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
-<div id="qwebr-insertion-location-10"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mtcars) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> wt, <span class="at">y =</span> mpg, <span class="at">color =</span> <span class="fu">as.factor</span>(gear))) <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>cyl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-</div>
-</div>
-</section>
-</section>
-<section id="mutate" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Mutate</h1>
-<section id="exercise-1-1" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="exercise-1-1"><span class="header-section-number">2.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> Add a column named <code>efficiency</code> that calculates miles-per-gallon (<code>mpg</code>) divided by the number of cylinders (<code>cyl</code>).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
-<div id="qwebr-insertion-location-11"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
-<div id="qwebr-insertion-location-12"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
 </section>
 <section id="exercise-2-1" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="exercise-2-1"><span class="header-section-number">2.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> Create a new column named <code>area</code> which multiplies sepal length (<code>Sepal.Length</code>) by sepal width (<code>Sepal.Width</code>).</p>
+<p><strong>Objective:</strong> Create a boxplot of diamond prices (<code>price</code>) for each diamond cut (<code>cut</code>). Facet the plot by diamond color (<code>color</code>).</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Answer</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
-<div id="qwebr-insertion-location-13"></div>
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div id="qwebr-insertion-location-6"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
-<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
-<div id="qwebr-insertion-location-14"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> diamonds) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> cut, <span class="at">y =</span> price, <span class="at">fill =</span> cut)) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>color)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </div>
 </section>
 <section id="exercise-3-1" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="exercise-3-1"><span class="header-section-number">2.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> Calculate the price per carat and name the new column <code>price_per_carat</code>.</p>
+<p><strong>Objective:</strong> Plot the progression of weight (<code>weight</code>) over time (<code>Time</code>) for each chick using a line plot. Facet the visualization by the diet type (<code>Diet</code>).</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Answer</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
-<div id="qwebr-insertion-location-15"></div>
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div id="qwebr-insertion-location-7"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
-<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
-<div id="qwebr-insertion-location-16"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ChickWeight) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> Time, <span class="at">y =</span> weight, <span class="at">group =</span> Chick)) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Diet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </div>
 </div>
 </div>
 </section>
 <section id="exercise-4-1" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="exercise-4-1"><span class="header-section-number">2.4</span> Exercise 4</h2>
-<p><strong>Objective:</strong> Convert the temperature from Fahrenheit (<code>Temp</code>) to Celsius and name the new column <code>TempC</code>. The formula is <code>C = (F - 32) * 5/9</code>.</p>
+<p><strong>Objective:</strong> Create a scatter plot of highway miles-per-gallon (<code>hwy</code>) against engine displacement (<code>displ</code>). Facet the plot by the drive type (<code>drv</code>), with different panels for each type of drive (front-wheel drive, rear-wheel drive, and four-wheel drive).</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Answer</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div id="qwebr-insertion-location-8"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mpg) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> displ, <span class="at">y =</span> hwy, <span class="at">color =</span> class)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>drv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-5" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="exercise-5"><span class="header-section-number">2.5</span> Exercise 5</h2>
+<p><strong>Objective:</strong> Plot a boxplot showing the count of insects (<code>count</code>) for each spray type (<code>spray</code>). Facet the plot by spray type (<code>spary</code>).</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">Answer</a></li></ul>
 <div class="tab-content">
 <div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
-<div id="qwebr-insertion-location-17"></div>
+<div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Here is the output you should be getting:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex-2-1-ggplot2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
-<div id="qwebr-insertion-location-18"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> InsectSprays) <span class="sc">+</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> spray, <span class="at">y =</span> count, <span class="at">fill =</span> spray)) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>spray)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-</div>
-</div>
-</section>
-</section>
-<section id="group-summary" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Group summary</h1>
-<section id="exercise-1-2" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="exercise-1-2"><span class="header-section-number">3.1</span> Exercise 1</h2>
-<p><strong>Objective:</strong> Group by the number of cylinders (<code>cyl</code>) and compute the average miles-per-gallon (<code>mpg</code>) for each group.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
-<div id="qwebr-insertion-location-19"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
-<div id="qwebr-insertion-location-20"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-2-2" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="exercise-2-2"><span class="header-section-number">3.2</span> Exercise 2</h2>
-<p><strong>Objective:</strong> Group by flower species (<code>Species</code>) and calculate the average sepal length (<code>Sepal.Length</code>) and sepal width (<code>Sepal.Width</code>) for each species.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
-<div id="qwebr-insertion-location-21"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
-<div id="qwebr-insertion-location-22"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-3-2" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="exercise-3-2"><span class="header-section-number">3.3</span> Exercise 3</h2>
-<p><strong>Objective:</strong> Group by <code>cut</code> and <code>color</code> and compute the median price for each combination.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-12-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-1" role="tab" aria-controls="tabset-12-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-12-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-12-2" role="tab" aria-controls="tabset-12-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-12-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-12-1-tab">
-<div id="qwebr-insertion-location-23"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-12-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-12-2-tab">
-<div id="qwebr-insertion-location-24"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-4-2" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="exercise-4-2"><span class="header-section-number">3.4</span> Exercise 4</h2>
-<p><strong>Objective:</strong> Group by month (<code>Month</code>) and compute the maximum temperature (<code>Temp</code>) and average ozone level (<code>Ozone</code>, omitting <code>NA</code> values) for each month.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-13-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-1" role="tab" aria-controls="tabset-13-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-13-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-13-2" role="tab" aria-controls="tabset-13-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-13-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-13-1-tab">
-<div id="qwebr-insertion-location-25"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-13-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-13-2-tab">
-<div id="qwebr-insertion-location-26"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-5-1" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="exercise-5-1"><span class="header-section-number">3.5</span> Exercise 5</h2>
-<p><strong>Objective:</strong> Group by diet (<code>Diet</code>) and chick number (<code>Chick</code>). For each combination, compute the final weight (i.e., weight at the maximum time).</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
-<div id="qwebr-insertion-location-27"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-14-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-2-tab">
-<div id="qwebr-insertion-location-28"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="use-all" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Use all</h1>
-<section id="exercise-1-calculate-average-mpg-by-cylinder" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="exercise-1-calculate-average-mpg-by-cylinder"><span class="header-section-number">4.1</span> Exercise 1: Calculate Average MPG by Cylinder</h2>
-<p><strong>Task:</strong> Filter the dataset to cars with more than 100 horsepower. Then, for these cars, calculate the average miles per gallon (<code>mpg</code>) for each number of cylinders (<code>cyl</code>).</p>
-<p><strong>Functions to use:</strong> <code>filter()</code>, <code>mutate()</code>, <code>group_by()</code>, <code>summarize()</code></p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-15-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-1" role="tab" aria-controls="tabset-15-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-15-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-15-2" role="tab" aria-controls="tabset-15-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-15-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-15-1-tab">
-<div id="qwebr-insertion-location-29"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-15-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-15-2-tab">
-<div id="qwebr-insertion-location-30"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-2-adjusted-price-calculation" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="exercise-2-adjusted-price-calculation"><span class="header-section-number">4.2</span> Exercise 2: Adjusted Price Calculation</h2>
-<p><strong>Task:</strong> Filter diamonds that are “Ideal” in <code>cut</code> and have <code>carat</code> less than 1. Calculate an adjusted price which is 90% of the original <code>price</code>. Finally, calculate the average adjusted price for each clarity level.</p>
-<p><strong>Functions to use:</strong> <code>filter()</code>, <code>mutate()</code>, <code>group_by()</code>, <code>summarize()</code></p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-16-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-16-1" role="tab" aria-controls="tabset-16-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-16-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-16-2" role="tab" aria-controls="tabset-16-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-16-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-16-1-tab">
-<div id="qwebr-insertion-location-31"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-16-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-16-2-tab">
-<div id="qwebr-insertion-location-32"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-3-compute-average-dispersion-by-gear" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="exercise-3-compute-average-dispersion-by-gear"><span class="header-section-number">4.3</span> Exercise 3: Compute Average Dispersion by Gear</h2>
-<p><strong>Task:</strong> Filter cars with 4 or 6 cylinders. Create a new column named <code>disp_per_cyl</code> that calculates the dispersion (<code>disp</code>) per cylinder (<code>cyl</code>). Then compute the average <code>disp_per_cyl</code> for each gear (<code>gear</code>) level.</p>
-<p><strong>Functions to use:</strong> <code>filter()</code>, <code>mutate()</code>, <code>group_by()</code>, <code>summarize()</code></p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-17-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-17-1" role="tab" aria-controls="tabset-17-1" aria-selected="true">Work here</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-17-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-17-2" role="tab" aria-controls="tabset-17-2" aria-selected="false">Answer</a></li></ul>
-<div class="tab-content">
-<div id="tabset-17-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-17-1-tab">
-<div id="qwebr-insertion-location-33"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-17-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-17-2-tab">
-<div id="qwebr-insertion-location-34"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>

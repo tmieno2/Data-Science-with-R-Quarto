@@ -995,6 +995,17 @@ ggplot() +
 Notice that `geom_spatraster()` automatically based the fill color of the cells on the attribute values without you specifying so.
 :::
 
+### NA values
+
+By default, the cells with NA values are colored grey. You can set the color for such cells using the `na.value` option inside `scale_*()` function. For example, the following code makes the cells with NA values transparent (invisible).
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NIR) +
+  scale_fill_continuous(na.value = "transparent")
+  theme_void()
+```
+
 ### Multi-layer raster
 
 How does `geom_spatraster()` behave with a multi-layer `SpatRaster`?

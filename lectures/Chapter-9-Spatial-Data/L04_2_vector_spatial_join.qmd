@@ -44,7 +44,7 @@ The objectives of this chapter is to learn spatial interactive operations that i
 ### Table of contents
 
 1. [Topological Relations](#top)
-2. [Spatial Subsetting](#subset)
+2. [Spatial Sub-setting](#subset)
 3. [Spatial Value Extraction](#extract)
 :::
 <!--end of the 1st column-->
@@ -132,6 +132,14 @@ Spatial join involves all of the following:
   * extract values associated with the intersecting objects in the source layer (and summarize if necessary), 
   * assign the extracted value to the object in the target layer
 
+:::{.callout-note title="Definitions: target layer"}
+The `sf` layer that has `sfg`s <span style = "color: blue;"> to </span> which you would like to assign the values of attributes from the source layer. 
+:::
+
+:::{.callout-note title="Definitions: source layer"}
+The `sf` layer that has `sfg`s <span style = "color: blue;"> from </span> which you would like to assign the values of its attributes to the target layer. 
+:::
+
 ### Classification
 
 We can classify spatial join into four categories by the type of the underlying spatial objects:
@@ -161,7 +169,7 @@ Here is the list of the types of spatial joins we will learn.
 :::
 
 
-## Spatial join: points (source) vs polygons (target)
+## Spatial join: points (target) vs polygons (source)
 
 ::: {.panel-tabset}
 
@@ -169,14 +177,14 @@ Here is the list of the types of spatial joins we will learn.
 
 **What?**
 
-For each of the observations (points) in the source data,
+For each of the observations (points) in the target points data,
 
-+ finds which polygon in the target data it intersects with
++ finds which polygon in the source polygons data it intersects with
 + assigns the value associated with the intersected polygon to the point
 
 **How?**
 
-In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:    
+In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:
 
 ```{r syntax_st_join, eval = FALSE}
 st_join(points_sf, polygons_sf)
@@ -186,7 +194,7 @@ st_join(points_sf, polygons_sf)
 
 **Note**
 
-Similar to spatial subsetting, the default topological relation is `st_intersects()`
+Similar to spatial sub-setting, the default topological relation is `st_intersects()`
 
 ### Data
 
@@ -234,7 +242,7 @@ ggplot() +
 
 :::
 
-## Spatial join: polygons (source) vs points (target) {#sec-polygon-point}
+## Spatial join: polygons (target) vs points (source) {#sec-polygon-point}
 
 ::: {.panel-tabset}
 
@@ -244,7 +252,7 @@ ggplot() +
 
 For each of the observations (polygons) in the target data,
 
-+ find which observations (points) in the source file it intersects
++ find which points in the source file it intersects
 + assign the values associated with the points to the polygon. 
 
 **How?**
@@ -259,7 +267,7 @@ st_join(polygons_sf, points_sf)
 
 **Note**
 
-Similar to spatial subsetting, the default topological relation is `st_intersects()`
+Similar to spatial sub-setting, the default topological relation is `st_intersects()`
 
 ### Data
 
@@ -349,16 +357,16 @@ Of course, it is just as easy to get other types of statistics by simply modifyi
 :::
 
 
-## Spatial join: polygons (source) vs polygons (target)
+## Spatial join: polygons (target) vs polygons (source)
 
 ::: {.panel-tabset}
 
 ### Introduction
 
-For each of the observations (polygons) in the source data,
+For each of the observations (polygons) in the target data,
 
-+ find which observations (polygons) in the target data it intersects
-+ then, assign the values associated with the intersecting polygons from the target data to the polygon from the source data. 
++ find which observations (polygons) in the source data it intersects
++ then, assign the values associated with the intersecting polygons from the source data to the polygon 
 
 ### Data
 
@@ -547,6 +555,8 @@ soy_seed
 
 + The second yield point from `soy_yield` are matched with two seed rate points from `as_applied_s_rate`: `seed_id` = 1 and `seed_id` = 558. Are they indeed less than 10 meter away from the second yield point?
 
+<br>
+
 ```{webr-r}
 #--- get all the points within 20 meter of the second yield point ---#
 seed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20), ]
@@ -585,7 +595,9 @@ However, this can actually be done in one step using `aggregate()`, in which you
 aggregate(points_sf, polygons_sf, FUN = function)
 ```
 
-Here, for each of the rows of the second `sf` (here, `polygons_sf`), all the intersecting points in `points_sf` are found and then the average of <span style = "color: blue;"> all </span> the columns of `points_sf` are calculated. Yes, `st_intersects()` is the default topological relationship just like spatial subsetting with `sf1[sf2, ]` and `st_join()`. 
+<br>
+
+Here, for each of the rows of the second `sf` (here, `polygons_sf`), all the intersecting points in `points_sf` are found and then the average of <span style = "color: blue;"> all </span> the columns of `points_sf` are calculated. Yes, `st_intersects()` is the default topological relationship just like spatial sub-setting with `sf1[sf2, ]` and `st_join()`. 
 
 ### Demonstration
 
@@ -715,6 +727,7 @@ polygons <- list(polygon_1, polygon_2, polygon_3) %>%
 The following code gets the intersection of the lines and the polygons.
 
 ```{webr-r}
+#| autorun: true
 (
 intersections_lp <- st_intersection(lines, polygons) %>% 
   mutate(int_name = paste0(line_name, "-", polygon_name))
@@ -724,9 +737,9 @@ intersections_lp <- st_intersection(lines, polygons) %>%
 <br>
 
 :::: {.columns}
-::: {.column width="40%"}
+::: {.column width="50%"}
 
-Here is how lines and polygons look like:
+Here is how the lines and polygons look like:
 
 ```{webr-r}
 #| context: output
@@ -747,11 +760,12 @@ ggplot() +
 ```
 :::
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 Here is how the intersections and polygons look like.
 
 ```{webr-r}
 #| context: output
+#| out-width: 120%
 ggplot() +
   geom_sf(
     data = intersections_lp,
@@ -770,10 +784,7 @@ ggplot() +
 
 ### polygons vs polygons
 
-::: {.columns}
-
-::: {.column width="70%"}
-The following code gets the intersection of polygon 1 and polygon 3 with polygon 2.
+The following code gets the intersection of polygon 1 and polygon 3 with polygon 2. Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (`polygon 1-polygon 2` and `polygon 3-polygon 2`).
 
 ```{webr-r}
 (
@@ -782,7 +793,7 @@ intersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>%
 )
 ```
 
-Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (`polygon 1-polygon 2` and `polygon 3-polygon 2`).
+<br>
 
 Just like the lines-polygons case, the non-intersecting part of polygons 1 and 3 are cut out and do not remain in the returned `sf`. 
 
@@ -803,31 +814,17 @@ ggplot() +
   ) +
   theme_void()
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
 
 ### area-weighted average
 
-::: {.columns}
-
-::: {.column width="70%"}
-+ Let's now get back to the example of HUC units and county-level nitrogen use data.
-
-+ We would like to find area-weighted average of nitrogen use instead of the simple average.
+Let's now get back to the example of HUC units and county-level nitrogen use data. We would like to find <span style = "color: blue;"> area-weighted </span> average of nitrogen use instead of the simple average.
 
 Using `st_intersection()`, for each of the HUC polygons, we can find the intersecting counties, and then divide it into parts based on the boundary of the intersecting polygons. 
 
 ```{webr-r}
 (
 HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>% 
-  mutate(huc_county = paste0(HUC_CODE, "-", county_code))
+  mutate(huc_county = paste0(HUC_CODE, "-", countyfp))
 )
 ```
 
@@ -844,14 +841,6 @@ HUC_intersections %>%
   geom_sf(aes(fill = huc_county)) +
   theme_void()
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ### Exercise
 
@@ -878,9 +867,6 @@ polygon_2 <-
   st_sf(geometry = .)
 ```
 
-::: {.columns}
-
-::: {.column width="70%"}
 We use `poygon_1` and `polygon_2` in this exercise. Inspect them to familiarize yourself with them:
 
 ```{webr-r}
@@ -900,16 +886,6 @@ ggplot() +
   geom_sf(data = polygon_2, fill = "red", alpha = 0.5) +
   theme_void()
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
-
 
 #### Problem 1
 

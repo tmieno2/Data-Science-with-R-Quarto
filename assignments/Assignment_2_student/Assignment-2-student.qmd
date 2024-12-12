@@ -136,6 +136,9 @@ Using a for loop, find the predicted yield values for all the subplots at the se
 
 In writing a for loop, create a storage of predicted yield values you will be calculating like below:
 
+```{r not_remove_2}
+yield_store <- rep(0, nrow(data))
+```
 
 Then, within the loop, assign the calculated yield value to `yield_store` for each iteration. 
 
@@ -145,7 +148,7 @@ Here is the predicted yield values for the first six subplots:
 
 ---
 
-**Q7**
+**Q8**
 
 Using `lapply()` and `gen_yield()` find the predicted yield values for all the subplots at the seed rate of 100 (Hint: loop over the row numbers of `data`.).
 
@@ -154,29 +157,29 @@ Apply `unlist()` to the resulting list of values so you have a vector of yield v
 
 ---
 
-**Q8**
+**Q9**
 
 Calculating yields for all the subplots can be easily vectorized. Use a vectorized operation to calculate yields using `gen_yield()` at the seed rate of 100. In doing so, do this calculation inside `data` and name the predicted yield variable `pred_yield`. After the calculation, relocate `pred_yield` to the front and use `head()` to print the first 6 observations.
 
 
 ---
 
-**Q9**
+**Q10**
 
 We would like to find the optimal seed rate for each subplot at
 
 + soybean price: $9/bu
-+ seed price: $0.35/1000 seeds
++ seed price: $0.35 per 1000 seeds
 
 
 We will use a grid search method. That is, we will create a sequence of seed rates, find profits, and then select the seed rate that yield the highest profit. 
 
-Create the sequence of seed rates that ranges from the minimum and maximum experimental seed rates with the incremental step of 0.2. Name the sequence `seed_seq`.
+Create the sequence of seed rates that ranges from the minimum and maximum experimental seed rates (the `seed_rate` variable in the dataset) with the incremental step of 0.2. Name the sequence `seed_seq`.
 
 
 ---
 
-**Q10**
+**Q11**
 
 We will work on a single plot first instead of working on the entire observations at the same time. 
 
@@ -188,7 +191,7 @@ We will work on a single plot first instead of working on the entire observation
 
 ---
 
-**Q11** 
+**Q12** 
 
 Now that you have created a dataset with all possible values of seed rates you want to look at. You can use vectorized operations (like you did in **Q8**) to calculate profit and identify the economically optimal seed rate. Go through the following steps:
 
@@ -204,14 +207,14 @@ You can do this by first sort the data by profit in the descending order and the
 
 ---
 
-**Q12**
+**Q13**
 
 Now, we would like to find the economically optimal seed rate for all the subplots. To do this, first create a function that takes a single `subplot_id` value and then return the optimal seed rate. This can be done by simply combining your answers to **Q10** and **Q11**. Then, confirm that function works when `subplot_id` is 100.
 
 
 ---
 
-**Q13**
+**Q14**
 
 We would like to find the optimal seed rate for each of the subplots by looping over `subplot_id`. Use `future_lapply()` to parallelize this process. Use `bind_rows()` at the end to have a single dataset that shows the optimal seed rates for all the subplots.
 

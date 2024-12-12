@@ -969,29 +969,6 @@ This works exactly the same way as the `modelsummary::msummary()` function.
 
 ::: {.panel-tabset}
 
-### categorical variables
-
-You can use `datasummary_skim()` with 'categorical' option to quickly generate a summary table for categorical variables:
-
-<br>
-
-**Syntax**:
-```{r eval = F}
-modelsummary::datasummary_skim(dataset, 'categorical')
-```
-
-<br>
-
-**Example**:
-```{r }
-county_yield %>% 
-  dplyr::select(- county_code) %>% 
-  data.frame() %>% 
-  modelsummary::datasummary_skim(., 'categorical') 
-```
-
-Note: `datasummary_skim()` does work well on a `tibble` object.
-
 ### balance table
 
 If your data was generated through randomized experiments (or you are using natural experiments), then `datasummary_balance()` can be very useful as it can generate a variable balance table.
