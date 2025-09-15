@@ -23,11 +23,11 @@ filters:
 ```{r}
 #| include: false
 library(gt)
-library(dplyr)
 library(tidyr)
 library(flextable)
 library(officer)
 library(flipbookr)
+library(tidyverse)
 ```
 
 ::: {.panel-tabset}
@@ -57,7 +57,7 @@ library(flipbookr)
 #| cache: false
 #| include: false 
 head(mtcars, 20) %>% #BREAK
-  select(am, carb, gear, mpg, drat) %>% #BREAK
+  dplyr::select(am, carb, gear, mpg, drat) %>% #BREAK
   flextable() %>% #BREAK
   theme_vanilla() %>% #BREAK 
   set_header_labels(mpg = "miles per gallon") %>% #BREAK 
@@ -77,17 +77,14 @@ head(mtcars, 20) %>% #BREAK
   theme_tron()
 ```
 
-`r chunk_reveal(
+<!-- `r chunk_reveal(
   chunk_name = "taste-flextable", 
   title = "Taste of the flextable package",
   break_type = "user", 
   display_type = "both", 
-  left_assign = FALSE,
-  platform = "quarto",
-  lcolw = "50",
-  rcolw = "50"
+  left_assign = FALSE
   )
-`
+` -->
 
 ## Create table and modify Parts
 
@@ -97,7 +94,8 @@ head(mtcars, 20) %>% #BREAK
 
 Install the following packages and library them.
 
-```{r eval = F}
+```{r}
+#| eval: false
 #--- install if you have not ---#
 install.packages("flextable")
 install.packages("officer")
@@ -121,10 +119,10 @@ library(gt)
 (
 tab_data <- 
   countrypops %>%
-  filter(country_code_2 %in% c(
+  dplyr::filter(country_code_2 %in% c(
     Australasia, Melanesia, Polynesia
   )) %>%
-  filter(year %in% c(1995, 2005, 2015)) %>%
+  dplyr::filter(year %in% c(1995, 2005, 2015)) %>%
   mutate(region = case_when(
     country_code_2 %in% Australasia ~ "Australasia",
     country_code_2 %in% Melanesia ~ "Melanesia",
@@ -135,8 +133,8 @@ tab_data <-
     names_from = year,
     names_prefix = "y_"
   ) %>%
-  arrange(region, desc(y_2015)) %>%
-  select(-starts_with("country_code")) %>%
+  dplyr::arrange(region, desc(y_2015)) %>%
+  dplyr::select(-starts_with("country_code")) %>%
   mutate(
     pop_ratio_10_15 = y_2015 / y_2005,
     date = "2013-11-14"
@@ -756,20 +754,16 @@ tab_data %>% #BREAK
   valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% #BREAK 
   #--- text direction ---#
   rotate(i = 1, j = 2, rotation = "tbrl") 
-
 ```
 
-`r chunk_reveal(
+<!-- `r chunk_reveal(
   chunk_name = "format-flip", 
   title = "Demonstration: Formatting",
   break_type = "user", 
   display_type = "both", 
-  left_assign = FALSE,
-  platform = "quarto",
-  lcolw = "50",
-  rcolw = "50"
+  left_assign = FALSE
   )
-`
+` -->
 
 ## Borders: convenience functions  
 
@@ -911,17 +905,14 @@ tab_data %>% #BREAK
   border_outer(border = fp_border(color = "red", width = 4)) 
 ```
 
-`r chunk_reveal(
+<!-- `r chunk_reveal(
   chunk_name = "borders-f", 
   title = "Demonstration: Borders",
   break_type = "user", 
   display_type = "both", 
-  left_assign = FALSE,
-  platform = "quarto",
-  lcolw = "50",
-  rcolw = "50"
+  left_assign = FALSE
   )
-`
+` -->
 
 ## Headers and footers 
 
@@ -1309,12 +1300,11 @@ We can save the table in various formats.
 
 Let's create a table for demonstration:
 
-```{webr-r}
-#| autorun: true
+```{r}
 table_tmep <- 
   tab_data %>%  
   flextable(col_keys = c("country_name", "region", "y_1995", "y_2005")) 
-```+i
+```
 
 ### Word or Power Point
 

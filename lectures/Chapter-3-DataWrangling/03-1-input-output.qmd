@@ -301,7 +301,8 @@ library(haven)
 
 **Syntax** 
 
-```{r eval = F}
+```{r}
+#| eval: false
 #--- Syntax (NOT RUN) ---#
 haven::read_dta(file path)
 ```
@@ -310,13 +311,15 @@ haven::read_dta(file path)
 
 **Examples** 
 
-```{r read_dta, eval = FALSE}
+```{r read_dta}
+#| eval: false
 #--- import the data ---#
 corn_yields <- haven::read_dta("corn_yields.dta")
 ```
 
-```{r, echo = F}
-corn_yields <- haven::read_dta("/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/Chapter-3-DataWrangling/corn_yields.dta")
+```{r}
+#| echo: false
+corn_yields <- haven::read_dta(here::here("lectures/Chapter-3-DataWrangling/corn_yields.dta"))
 ```
 
 ### Note
@@ -360,7 +363,7 @@ corn_yields <- readRDS("corn_yields.rds")
 ```
 
 ```{r, echo = F}
-corn_yields <- readRDS("/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/Chapter-3-DataWrangling/corn_yields.rds")
+corn_yields <- readRDS(here::here("lectures/Chapter-3-DataWrangling/corn_yields.rds"))
 ```
 
 ### Note
@@ -401,7 +404,8 @@ export_function(obeject name, file name)
 
 **Examples** 
 
-```{r exp, eval=FALSE}
+```{r exp}
+#| eval: false
 #--- export as csv ---#
 readr::write_csv(corn_yields, "corn_yields_exp_rownames.csv")
 

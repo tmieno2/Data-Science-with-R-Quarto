@@ -553,7 +553,7 @@ ggplot() +
 #   keepZip = FALSE
 # )
 
-prism_temp <- terra::rast("/Users/tmieno2/Dropbox/TeachingUNL/R-spatial-micro-credit/Lectures/Data/PRISM/PRISM_tmax_stable_4kmD2_20120801_bil/PRISM_tmax_stable_4kmD2_20120801_bil.bil")
+prism_temp <- terra::rast(here::here("lectures/Chapter-9-Spatial-Data/Data/PRISM/PRISM_tmax_stable_4kmD2_20120801_bil/PRISM_tmax_stable_4kmD2_20120801_bil.bil"))
 
 ggplot() +
   geom_spatraster(data = prism_temp) +
@@ -599,16 +599,18 @@ options(prism.path = "path")
 
 First set the path:
 
-```{r, eval = FALSE}
+```{r}
+#| eval: false
 library(prism)
-options(prism.path = "Lectures/Data/PRISM")
+options(prism.path = "lectures/Data/PRISM")
 ```
 
 <br>
 
 Now, download:
 
-```{r, eval = FALSE}
+```{r}
+#| eval: false
 prism::get_prism_dailys(
   type = "ppt",
   minDate = "2024-01-01",
