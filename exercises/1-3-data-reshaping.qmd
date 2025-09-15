@@ -29,9 +29,9 @@ library(tidyr)
 
 ## Problem 1
 
-**Datasets:** `data_long` synthetically generated withint R below.
+**Datasets:** `data_long` synthetically generated within R below.
 
-**Task:** Reshape the `data_long` dataset to wide format, where each year becomes a separate column. using `tidyr::pivor_wider()`.
+**Task:** Reshape the `data_long` dataset to wide format, where each year becomes a separate column. using `tidyr::pivot_wider()`.
 
 **Load and Create Dataset:**
 
@@ -86,7 +86,7 @@ data_long %>%
 
 **Datasets:** `data_wide` (`data_long` converted to wide format)
 
-**Task:** Reshape the `data_wide` dataset to long format using `tidyr::pivor_longer()`. In the new dataset, 
+**Task:** Reshape the `data_wide` dataset to long format using `tidyr::pivot_longer()`. In the new dataset, 
 
 + name the column that will hold the current column names `year`.
 + name the column that will hold the values `value`.
@@ -142,7 +142,7 @@ data_long %>%
 
 **Datasets:** `crop_data` synthetically generated within R.
 
-**Task:** Reshape the `economics` dataset to wide format using `tidyr::pivor_wider()`. In doing so, append `yield_` to the new column names using the `names_prefix` option.
+**Task:** Reshape the `economics` dataset to wide format using `tidyr::pivot_wider()`. In doing so, append `yield_` to the new column names using the `names_prefix` option.
 
 **Load and Create Dataset:**
 ```{webr-r}
@@ -197,9 +197,10 @@ crop_data %>%
 
 **Datasets:** the `crop_data_wide` (`crop_data` in wide format)
 
-**Task:** Reshape the `economics` dataset to long format using `tidyr::pivor_longer()`. In doing so, remove `yield_` from the column names using the `names_prefix` option.
+**Task:** Reshape the `economics` dataset to long format using `tidyr::pivot_longer()`. In doing so, remove `yield_` from the column names using the `names_prefix` option.
 
 **Load and Create Dataset:**
+
 ```{webr-r}
 # create the dataset
 #| autorun: true

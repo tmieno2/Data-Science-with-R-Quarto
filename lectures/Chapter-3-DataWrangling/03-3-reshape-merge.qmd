@@ -20,6 +20,14 @@ filters:
   - webr
 ---
 
+```{r}
+#| include: false
+library(dplyr)
+library(ggplot2)
+library(nycflights13)
+library(tidyr)
+```
+
 # Reshaping
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
@@ -150,8 +158,9 @@ yield_data_long <-
 
 To convert a long-formatted `data.frame` into a wide-formatted `data.frame`, you can use `tidyr::pivot_wider()` function from the `tidyr` package.
 
-```{r eval = F}
+```{r}
 #| echo: true
+#| eval: false
 #--- NOT RUN ---#
 tidyr::pivot_wider(
   data,
@@ -255,8 +264,9 @@ yield_data_long %>%
 
 To convert a long-formatted `data.frame` into a wide-formatted `data.frame`, you can use `tidyr::pivot_longer()` function from the `tidyr` package.
 
-```{r eval = F}
+```{r}
 #| echo: true
+#| eval: false
 #--- NOT RUN ---#
 tidyr::pivot_longer(
   data, 
@@ -378,7 +388,8 @@ yield_data_wide %>%
 
 However, you take advantage of `dplyr::separate()` function, which separate a variable of type character by a user-specified separator into two variables in the dataset.
 
-```{r eval = F}
+```{r}
+#| eval: false
 #--- NOT RUN ---#
 separate(data, variable name, the name of variables, separator)
 ```
@@ -476,8 +487,9 @@ Using `flights` data, calculate the total number of flights by carrier-month, wh
 
 **Answer**
 
-```{r, eval = FALSE}
+```{r}
 #| code-fold: true
+#| eval: false
 num_flights <-
   flights %>% 
   group_by(carrier, month) %>% 
@@ -512,8 +524,9 @@ Reshape the `num_flights` data into a wide format with the number of flights per
 
 **Answer**
 
-```{r, eval = FALSE}
+```{r}
 #| code-fold: true
+#| eval: false
 num_flights %>% 
   tidyr::pivot_wider(
     names_from = month,
@@ -552,8 +565,9 @@ Reshape the data (`num_flights_wide`) back into the long format so that a single
 <br>
 
 **Answer**
-```{r, eval = FALSE}
+```{r}
 #| code-fold: true
+#| eval: false
 num_flights_wide %>% 
   tidyr::pivot_longer(
     starts_with("month_"),
@@ -738,7 +752,8 @@ Can you merge the two now?
 
 **Syntax**
 
-```{r eval = F}
+```{r}
+#| eval: false
 #--- Syntax (NOT RUN) ---#
 left_join(data_x, data_y, by = keys)  
 ```
@@ -922,6 +937,36 @@ left_join(yield_data, weather_data, by = c("county", "year"))
 :::
 <!--end of panel-->
 
+### demonstration: m to m
+
+::: {.panel-tabset}
+
+#### Data prep
+
+Let's create an expanded crop yield dataset for multiple crops:
+
+```{webr-r}
+#| autorun: true
+yield_data <- 
+  data.frame(
+    yield = c(runif(4, min = 180, max = 280), runif(4, min = 40, max = 80)),
+    county = rep(c('Lancaster','Douglas','Lancaster','Douglas'), 2),
+    year = rep(c(2015, 2015, 2016, 2016), 2),
+    crop = c(rep("Corn", 4), rep("Soybean", 4))
+  )
+```
+
+#### Demo
+
+```{webr-r}
+#| autorun: true
+left_join(yield_data, weather_data, by = c("county", "year"))
+# left_join(yield_data, weather_data, by = c("county", "year"), relationship = "many-to-many")
+```
+
+:::
+<!--end of panel-->
+
 ### Exercises
 
 ::: {.panel-tabset}
@@ -973,7 +1018,7 @@ Create the following datasets and take a look at them to understand what's in th
 
 + You are interested in learning the impact of **daily** temperature on departure delay for the flights in January. To do so, you need to have the variables in a single dataset.  
 
-+ Is this going to be a 1-to-1 matching or 1-to-m matching?
++ Is this going to be a 1-to-1 matching, 1-to-m, or m-to-m matching?
 
 + Merge `daily_temp_Jan` to `flights_Jan` using `left_join()`
 
@@ -1006,7 +1051,7 @@ left_join(flights_Jan, daily_temp_Jan, by = c("origin", "month", "day"))
 
 + You are interested in learning the impact of **hourly** temperature on departure delay for the flights in January. To do so, you need to have them in a single dataset.  
 
-+ Is this going to be a 1-to-1 matching or 1-to-m matching?
++ Is this going to be a 1-to-1 matching, 1-to-m, or m-to-m matching?
 
 + Merge `hourly_temp_Jan` to `flights_Jan` using `left_join()`
 
@@ -1024,7 +1069,7 @@ Here is the output you are supposed to get if done correctly:
 
 ```{webr-r}
 #| context: output
-left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"))
+left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"), relationship = "many-to-many")
 ```
 
 <br>
@@ -1035,7 +1080,6 @@ left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"))
 #| code-fold: true
 left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"))
 ``` 
-
 
 :::
 <!--end of panel-->
