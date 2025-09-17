@@ -9,12 +9,12 @@ format:
     callout-icon: false
     scrollable: true
     echo: true
-    fig-dpi: 400
+fig-dpi: 400
 webr:
   packages: ['dplyr', 'ggplot2', 'data.table', 'nycflights13']
   cell-options:
     editor-font-scale: 0.7
-    out-width: 100%
+    out-width: 70%
 filters:
   - webr
 ---
@@ -385,7 +385,8 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-ggplot(data = county_yield_s) + 
+#| out-width: 100%
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_wrap(state_name ~ year)  
 ```
@@ -397,6 +398,7 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
+#| out-width: 100%| 
 ggplot(data = county_yield_s) + 
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(state_name ~ year)  
