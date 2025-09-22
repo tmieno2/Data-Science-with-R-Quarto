@@ -265,8 +265,8 @@ Or just,
 
 ```{webr-r}
 g_box + 
-  xlabel("Year") +
-  ylabel("Corn Yield (bu/acre)") +
+  xlab("Year") +
+  ylab("Corn Yield (bu/acre)") +
   ylim(100, 200)
 ```
 
@@ -318,7 +318,7 @@ gg_delay <-
 )
 ```
 
-#### Exercise 1
+#### Exercise
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -388,79 +388,6 @@ gg_delay +
 ```
 
 :::
-
-#### Exercise 2
-
-::: {.columns}
-
-::: {.column width="50%"}
-Change the axes content to create the figure on the right. But, use `scale_x_continuous()` only for changing the x-axis breaks. 
-
-Here are the list of changes you need to make:
-
-+ x-axis 
-  * change the x-axis title to "Month"
-  * change the limit of the x-axis title to 4 through 8
-  * change the the breaks and their labels of the x-axis ticks (breaks) to 4 through 8 
-+ y-axis 
-  * change the y-axis title to "Average Arrival Delay (minutes)"
-  * change the limit of the y-axis title to 0 through 25
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-```{webr-r}
-#| context: output
-#| out-width: 100%
-#| warning: false
-gg_delay + 
-  scale_x_continuous(
-    name = "Month",
-    limit = c(4, 8),
-    breaks = 4:8
-  ) +
-  scale_y_continuous(
-    name = "Average Arrival Delay (minutes)",
-    limit = c(0, 25)
-  ) 
-```
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
-::: {.panel-tabset}
-
-##### Work here
-
-```{webr-r}
-#--- work here ---#
-
-
-
-
-
-```
-
-##### Answer
-
-```{r, eval = FALSE}
-#| code-fold: true
-#| eval: false
-gg_delay +
-  scale_x_continuous(
-    name = "Month",
-    limit = c(4, 8),
-    breaks = 4:8
-  ) +
-  scale_y_continuous(
-    name = "Average Arrival Delay (minutes)",
-    limit = c(0, 25)
-  )
-```
-
-:::
-<!--end of panel-->
 
 :::
 <!--end of panel-->
