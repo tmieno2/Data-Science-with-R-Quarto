@@ -9,12 +9,12 @@ format:
     callout-icon: false
     scrollable: true
     echo: true
+fig-dpi: 400
 webr:
   packages: ['dplyr', 'ggplot2', 'nycflights13', 'ggthemes', 'RColorBrewer', 'MASS', 'patchwork']
   cell-options:
     editor-font-scale: 0.7
-    out-width: 100%
-    # dpi: 144
+    out-width: 70%
 filters:
   - webr
 ---
@@ -1000,6 +1000,7 @@ ggplot(data = weather) +
 ::: {.column width="50%"}
 ```{webr-r}
 #| autorun: true
+#| out-width: 100%
 ggplot(data = weather) +
   geom_boxplot(aes(y = temp, x = factor(month))) +
   theme_economist()
@@ -1009,6 +1010,7 @@ ggplot(data = weather) +
 ::: {.column width="50%"}
 ```{webr-r}
 #| autorun: true
+#| out-width: 100%
 ggplot(data = weather) +
   geom_boxplot(aes(y = temp, x = factor(month))) +
   my_theme
