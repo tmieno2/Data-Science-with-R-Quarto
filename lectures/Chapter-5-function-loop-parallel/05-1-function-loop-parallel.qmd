@@ -10,7 +10,7 @@ format:
     scrollable: true
     echo: true
 webr:
-  packages: ['dplyr', 'parallel', 'microbenchmark', 'future.apply', 'ggplot2', 'reshape']
+  packages: ['dplyr', 'parallel', 'microbenchmark', 'future.apply', 'ggplot2', 'reshape', 'data.table']
   cell-options:
     editor-font-scale: 0.7
     out-width: 100%
@@ -128,7 +128,7 @@ ten_squared
 
 ### Scope 1
 
-Any objects that are defined within a function are not created on the global environment.  
+Any objects that are defined within a function are not registered (created) to the global environment.  
 
 For example, `squared_a` and `original_a` are defined only internally, and are not registered on the global environment. 
 
@@ -372,15 +372,15 @@ calc_rev <- function(corn_price, N) {
 
 + Yes, you don’t want to write each one of them one by one as that would occupy 1000 lines of your code, and it would be time-consuming. 
 
-+ Things will be even worse if you need to repeat much more complicated processes like Monte Carlo simulations. So, let’s learn how to write a program to do repetitive jobs effectively using loop.
++ Things become even more challenging when you need to repeat far more complex processes, such as Monte Carlo simulations. To handle such repetitive tasks efficiently, it is important to learn how to write programs that automate these jobs using loops.
 
 ### What is it?
 
-+ Looping is repeatedly evaluating the same (except parameters) process over and over again. 
++ **Looping** means repeatedly executing the same process, with only the parameters changing.
 
-+ In the example above, 
-  * the same repeated process is the action of squaring 
-  * what you square (parameter) changes 
++ In the example above:
+  + The repeated process is the **action of squaring**.
+  + The parameter that changes is **what number gets squared**.
 
 **Syntax** 
 
@@ -411,7 +411,7 @@ for (bluh_bluh_bluh in 1:5){
 
 ### Exercise
 
-Write a for loop that cubes each element of the sequence of numbers that starts from 5 and increases up to 50 with the incremental step of 5.
+Write a for loop that cubes each element of a sequence starting at 5, increasing by 5, and ending at 50.
 
 **Work here**
 
@@ -458,9 +458,9 @@ lapply(A, B)
 
 **Note**:
 
-+ `A` is a vector, `lapply()` works on each of the vector elements
-+ `A` is a list, `lapply()` works on each of the list elements whatever they may be 
-+ `A` is a `data.frame`, `lapply()` works on each of the columns (`data.frame` is a list of columns of equal length)
++ When` `A` is a vector, `lapply()` works on each of the vector elements
++ When` `A` is a list, `lapply()` works on each of the list elements whatever they may be 
++ When `A` is a `data.frame`, `lapply()` works on each of the columns (`data.frame` is a list of columns of equal length)
 
 ### Example
 
@@ -534,7 +534,7 @@ As you can see, this function try each of `1:10` (called internally `x`), give i
 
 #### Exercise 1
 
-Use `lapply()` to cube each element of the sequence of numbers that starts from 5 and increases up to 50 with the incremental step of 5.
+Use`lapply()` to cube each element of a sequence starting at 5, increasing by 5, and ending at 50.
 
 <br>
 
@@ -647,16 +647,14 @@ nitrogen_vec <- seq(0, 300, by = 100)
 
 <br>
 
-We then create a complete combination of the values using the `expand.grid()` function, and then convert it to a `data.frame` object (this is not strictly necessary).
+We then create a complete combination of the values using the `expand.grid()` function. The resulting object is a `data.frame`.
 
 ```{webr-r}
 #| autorun: true
 #--- crate a data.frame that holds parameter sets to loop over ---#
 (
 parameters_data <- 
-  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec) %>% 
-  #--- convert the matrix to a data.frame ---#
-  data.frame()
+  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)
 )
 
 ```
@@ -805,7 +803,7 @@ $$
 
 ### Why not?
 
-+ Actually, we should not have used a for loop or `lapply()` in any of the examples above in practice1
++ Actually, we should not have used a for loop or `lapply()` in any of the examples above in practice.
 
 + This is because they can be easily **vectorized**. 
 
@@ -1194,15 +1192,15 @@ $$
 Your are interested in finding the best nitrogen rates that maximize profit at different combinations of corn and nitrogen prices for this field.
 
 $$
-Max_{N} P_C \times Y(N) - P_N \times N
+Max_{N}\;\; P_C \times Y(N) - P_N \times N
 $$
 
-+ `N`: nitrogen rate (lb/acre)
-+ `Y(N)`: corn yield (bu/acre) as a function of `N` as described above
-+ `P_C`: corn price ($/bu)
-+ `P_N`: nitrogen price ($/lb)
++ $N$: nitrogen rate (lb/acre)
++ $Y(N)$: corn yield (bu/acre) as a function of $N$ as described above
++ $P_C$: corn price ($/bu)
++ $P_N$: nitrogen price ($/lb)
 
-Here, `N` is a decision variable, and `P_C` and `P_N` are parameters.
+Here, $N$ is a decision variable, and $P_C$ and $P_N$ are parameters.
 
 ### Grid search
 
@@ -1238,7 +1236,7 @@ get_profit <- function(N, P_C, P_N) {
 
 <br>
 
-Let's create a sequence of `N` values at which we evaluate the profit, and then calculate profit at each level of `N`.
+Let's create a sequence of `N` values and then calculate profit at each level of `N`.
 
 ```{webr-r}
 #| autorun: true
@@ -1301,13 +1299,13 @@ Here is the coding strategy:
 
 1. Define a set of all the combinations of corn and nitrogen prices you want to analyze as a `data.frame`.
 
-2. Define a function that extract corn and nitrogen prices from the parameter `data.frame` and find the optimal N rate at the given combination of price and nitrogen combination.
-
-3. Loop over the set of parameters.
+2. Define a function that extract corn and nitrogen prices from the parameter `data.frame` and find the optimal N rate at the given combination of prices.
+   
+3. Loop over the price combinations (loop over the rows of the `data.frame` created in step 1).
 
 ### Step 1
 
-Here, we define a `data.frame` of parameters to be explored. We will be looping over the rows of the parameter `data.frame`.
+Here, we define a `data.frame` of parameters to be explored. We will be looping over the rows of the `data.frame`.
 
 ```{webr-r}
 P_C_seq <- seq(2.5, 4.5, by = 1)
@@ -1353,6 +1351,8 @@ get_opt_N(1)
 ```
 
 ### Step 3
+
+Loop:
 
 ```{webr-r}
 opt_N_all_ls <- future_lapply(1:nrow(price_parameters), get_opt_N)
@@ -1511,12 +1511,12 @@ eval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_s
 
 <br>
 
-+ You only need the highlighted rows because no plots in this dataset has `slope`-`ec` combinations of `c(0, 30)` and `c(0.2, 40)`
++ You only need some of the rows in this dataset because no plots have `slope`-`ec` combinations of `c(0, 30)` and `c(0.2, 40)`
 + You created unnecessary rows with this approach
 
 ### Strategy 2
 
-Instead of using expand on all the three vectors using `expand.grid()`, we can use `expand.grid.df()` from the `reshape` package as follows.
+Instead of applying `expand.grid()` on all the three vectors using `expand.grid()`, we can use `expand.grid.df()` from the `reshape` package as follows.
 
 ```{webr-r}
 #| autorun: true
@@ -1525,7 +1525,7 @@ reshape::expand.grid.df(field_data, data.frame(N_seq))
 
 <br>
 
-As you can see, it creates unique complete comninations of the rows from the fisrt and second `data.frame`s. Consequently, it does not create any observations that do not exist in reality. 
+This generates all unique combinations of **rows** from the two data frames, without creating any observations that are not possible in reality.
 :::
 <!--end of panel-->
 
