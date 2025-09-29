@@ -1,0 +1,692 @@
+---
+title: "02-4: Writing a Journal Article Using Quarto"
+abstract: "Chapter 2: Quarto"
+format:
+  revealjs:
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+filters:
+  - webr
+draft: true
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+library(dplyr)
+```
+
+## Output format
+
+There are four output options available from a Quarto (.qmd) file, each with distinct pros and cons.
+
+```{r}
+#| echo: false
+library(flextable)
+library(dplyr)
+
+(
+  data.frame(
+    Format = c("PDF (LaTeX)", "PDF (Typst)", "HTML", "Word"),
+    Pros = c(
+      "Extremely flexible; professional output",
+      "Fast; modern alternative",
+      "Fast; highly flexible for web sharing",
+      "Fast; widely used; simple for editors"
+    ),
+    Cons = c(
+      "Slow compilation; requires LaTeX skills",
+      "Still developing; limited ecosystem",
+      "Not designed for journals",
+      "Limited support for complex math"
+    ),
+    Status = c(
+      "Accepted (but journals require LaTeX source files",
+      "Not accepted",
+      "Not accepted",
+      "Accepted"
+    )
+  ) %>%
+    flextable() %>%
+    autofit() %>%
+    theme_vanilla() %>%
+    set_header_labels(
+      Format = "Format",
+      Pros = "Pros",
+      Cons = "Cons",
+      Status = "Journal Submission Status"
+    )
+)
+```
+
+## Title page
+
+::: {.panel-tabset}
+
+### Title, date, and abstract 
+
+You can set title, date, and abstract like below in the YAML header:
+
+![](title-date-abstract.png)
+
+
+:::{.callout-note}
+````{verbatim}
+date: "`r Sys.Date()`"
+````
+
+Finds the current date and prints it.
+:::
+
+
+### Author information
+
+You can place author information under `author:` like below:
+
+![](author-info.png){width="60%"}
+
+:::
+<!--end of panel-->
+
+## Style
+
+## Figures
+
+::: {.panel-tabset}
+
+### Place a figure
+
+**A plot as an R object** 
+
+Suppose you have created a plot using R which is called `figure_sample` within the same qmd file. Then, you can print the plot by simply referring to it within an R code chunk like below: 
+
+````{verbatim}
+```{r}
+figure_sample 
+```
+````
+
+<br>
+
+**A plot saved as an image**
+
+Suppose you have created a plot using R and saved it as an image file called `figure_sample.png`. Then, you can print the plot using `knitr::include_graphics(path_to_the_image)` within an R code chunk like below: 
+
+````{verbatim}
+```{r }
+knitr::include_graphics("path_to_your_image.png")
+```
+````
+
+<br>
+
+:::{.callout-note title="Important"}
+html output does not accept an image saved as a pdf file. I would suggest that you save images as png file, which are accepted for any output format. 
+:::
+
+### Cross-reference
+
+In order to cross-reference a figure with captions, you can use the `label` and `fig-cap` options like below:
+
+
+````{verbatim}
+```{r}
+#| label: fig-sample-label
+#| fig-cap: "Sample figure title"
+figure_sample 
+```
+````
+
++ `fig-cap: "Sample figure title"` adds `Sample figure title` as the caption of the figure 
++ `fig-sample-label` is the figure id used for cross-referencing
+
+You can then type `@fig-sample-label` in the qmd file to cross-reference the figure.
+
+
+:::{.callout-note}
++ Figure numbering in the output file is done automatically.
++ `@fig-sample` will append "Figure" automatically in the output. So, if you have `Figure @fig-sample` in your qmd file, then you will see "Figure Figure figure-number" in the output file.
+:::
+
+:::{.callout-important}
++ Do not forget to have `fig-` at the beginning of the chunk label as in `label: fig-sample-label` in the R code chunk option. Otherwise, the plot will not be recognized as a figure in the output file and cross-referencing will not work even though the figure will be displayed. 
++ You cannot use `_` in the chunk label (`-` is allowed). Cross-referencing would not work if the label includes `_`.
+:::
+
+### Figure placement
+
+### Change the size of the figure
+
+:::
+<!--end of panel-->
+
+## Tables
+
+::: {.panel-tabset}
+
+### Place a table
+
+**A table as an R object** 
+
+Suppose you have created a table using R which is called `table_sample` within the same qmd file. Then, you can print the plot by simply referring to it within an R code chunk like below: 
+
+````{verbatim}
+```{r}
+table_sample 
+```
+````
+
+<br>
+
+**A table saved as an image**
+
+Suppose you have created a table using R and saved it as an image file called `table_sample.png`. Then, you can print the plot using `knitr::include_graphics("table_sample.png")` within an R code chunk like below: 
+
+````{verbatim}
+```{r }
+knitr::include_graphics("table_sample.png")
+```
+````
+
+<br>
+
+:::{.callout-note title="Important"}
+html output does not accept an image saved as a pdf file. I would suggest that you save images as png file, which are accepted for any output format. 
+:::
+
+### Which package to create tables?
+
++ Some of the most powerful table-creation packages (e.g., `gt`, `flextable`) do not support direct output in a LaTeX-accepted format. However, they do provide the option to export tables as image files.
+
++ Packages that support LaTeX output include `xtable`, `huxtable`, and `kableExtra`.
+
++ Since LaTeX can accept tables as images, there is no drawback to investing time in learning a package that is not inherently LaTeX-friendly.
+
+
+### Cross-reference
+
+In order to cross-reference a table with captions, you can use the `label` and `tab-cap` options like below:
+
+
+````{verbatim}
+```{r}
+#| label: fig-sample-label
+#| tab-cap: "Sample table title"
+table_sample 
+```
+````
+
++ `tab-cap: "Sample table title"` adds `Sample table title` as the caption of the table 
++ `tab-sample-label` is the table id used for cross-referencing
+
+You can then type `@tab-sample-label` in the qmd file to cross-reference the table.
+
+
+:::{.callout-note}
++ Table numbering in the output file is done automatically.
++ `@tab-sample` will append "Table" automatically in the output. So, if you have `Table @tab-sample` in your qmd file, then you will see "Table Table figure-number" in the output file.
+:::
+
+:::{.callout-important}
++ Do not forget to have `tab-` at the beginning of `label: tab-sample-label`. Otherwise, the table will not be recognized as a table in the output file and cross-referencing will not work even though the table will be displayed. 
++ You cannot use `_` in the chunk label (`-` is allowed). Cross-referencing would not work if the label includes `_`.
+:::
+
+:::
+<!--end of panel-->
+
+
+## Mathematical expressions
+
+::: {.panel-tabset}
+
+### Single-line math
+
+::: {.panel-tabset}
+
+#### pdf (latex) and html 
+
+To type mathematical equations, you can enclose the math expressions with a special syntax for printing tex expressions like below.
+
+````markdown
+```{=tex}
+Math using Latex syntax
+```
+````
+
+<br>
+
+For example, 
+
+
+````markdown
+```{=tex}
+\begin{align}
+y = \alpha + \beta x + v
+\end{align}
+```
+````
+
+would print the following:
+
+```{=tex}
+\begin{align}
+y = \alpha + \beta x + v
+\end{align}
+```
+
+<br>
+
+:::{.callout-note}
++ This syntax automatically move to a new line and then prints the math
++ Since the above syntax prints whatever inside the `=tex` environment in the tex file, which is then compiled to produce a pdf file, you can use *any* Latex math-writing tools.
+:::
+
+#### html and Word
+
+To type a mathematical equation that spans only a single line, you can enclose the math expressions with `$$` like below:
+
+````markdown
+$$
+y = \alpha + \beta x + v
+$$
+````
+
+, which would print the following:
+
+```{=tex}
+\begin{align}
+y = \alpha + \beta x + v
+\end{align}
+```
+
+You can actually use some of the Latex environments (e.g., `equation`, `align`) like below:
+
+````markdown
+$$
+\begin{align}
+y = \alpha + \beta x + v
+\end{align}
+$$
+````
+
+:::{.callout-note}
++ This syntax automatically move to a new line and then prints the math
++ Not all of Latex math syntaxes work.  
+:::
+
+
+
+:::
+<!--end of panel-->
+
+### In-line math
+
+For math expressions in line, write math expressions in Latex syntax enclosed by `$` (not `$$`) as in
+
+````markdown
+Here is the math $\alpha$.
+````
+
+<br>
+
+This would print like this in the output:
+
+Here is the math $\alpha$.
+
+### More complex equations
+
+::: {.panel-tabset}
+
+#### Multiple lines with alignment
+
+Use the **align** environment like below:
+
+::: {.columns}
+
+::: {.column width="50%"}
+**pdf (latex) and html**
+````markdown
+```{=tex}
+\begin{align}
+y & = \alpha + \beta x + v \\
+v & = \rho Wv + \mu
+\end{align}
+```
+````
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+**html and WORD**
+````markdown
+$$
+\begin{align}
+y & = \alpha + \beta x + v \\
+v & = \rho Wv + \mu
+\end{align}
+$$
+````
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+It will print like below:
+
+```{=tex}
+\begin{align}
+y & = \alpha + \beta x + v \\
+v & = \rho Wv + \mu
+\end{align}
+```
+
+#### Cases
+
+Use the **case** environment like below:
+
+::: {.columns}
+
+::: {.column width="50%"}
+**pdf (latex) and html**
+````markdown
+```{=tex}
+\begin{align}
+y_{j,i} =
+  \begin{cases}
+  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,& N < \tau_{j,i} \\
+  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,& N \ge \tau_{j,i}
+  \end{cases}
+\end{align}
+```
+````
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+**html and WORD**
+````markdown
+$$
+\begin{align}
+y_{j,i} =
+  \begin{cases}
+  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,& N < \tau_{j,i} \\
+  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,& N \ge \tau_{j,i}
+  \end{cases}
+\end{align}
+$$
+````
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+<br>
+
+It will print like below:
+
+```{=tex}
+\begin{align}
+y_{j,i} =
+  \begin{cases}
+  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,& N < \tau_{j,i} \\
+  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,& N \ge \tau_{j,i}
+  \end{cases}
+\end{align}
+```
+
+:::
+<!--end of panel-->
+
+### Cross-reference
+
+::: {.panel-tabset}
+
+#### Latex
+
+You can take advantage of the original latex syntax like this:
+
+````markdown
+```{=tex}
+\begin{align}
+y & = \alpha + \beta x + v \label{eq-model}
+\end{align}
+```
+````
+
+Then refer to it with `\ref{eq-model}`. 
+
+<br>
+
+:::{.callout-note title="Note"}
++ This way of cross-referencing an equation works only for pdf, but not for html even though the equation would be printed for html.
+:::
+
+:::{.callout-note title="Instruction"}
+See lines 99-105 of **sample_qmd_article.qmd** to confirm this works.
+:::
+
+#### html and WORD
+
+You can tag an equation by placing `{eq-eqution-name}` after closing the equation with `$$` like below:
+
+````markdown
+$$
+\begin{align}
+y & = \alpha + \beta x + v \label{eq-model}
+\end{align}
+$$ {eq-model}
+````
+
+Then you can refer to it by `@eq-model`.
+
+<br>
+
+:::{.callout-note title="Note"}
++ An equation label needs to start with `eq-`.
+:::
+
+:::{.callout-note title="Instruction"}
+See lines 103-109 of **sample_qmd_article.qmd** to confirm this works.
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Citation and References
+
+::: {.panel-tabset}
+
+### Set up with a bib file
+
+::: {.panel-tabset}
+
+#### Declare 
+
+Begin by preparing a file that contains all your references. In your document's YAML header, specify the bibliography file:
+
+```{code}
+bibliography: bibliography file name
+```
+
+There are multiple formats and systems available for bibliographies, such as 
+
++ BibLaTeX/BibTex (.bib)
++ CSL-JSON (.json)
++ EndNote (.enl)
+
+Here, we use a **.bib** file. If our bibliography file is titled `bibliography.bib`, the YAML header would look like:
+
+```{r  echo = F, out.width = "100%"}
+knitr::include_graphics("assets/pictures/yaml-bib-quarto.png")
+```
+
+:::{.callout-note title="Instruction"}
+Take a look at the bottom of the YAML header of **sample_qmd_acrticle.qmd** in the templates folder.
+:::
+
+#### .bib file
+
+Here is what an bib entry looks like:
+
+````markdown
+@manual{R,
+  title        = {R: A Language and Environment for Statistical Computing},
+  author       = {{R Core Team}},
+  organization = {R Foundation for Statistical Computing},
+  address      = {Vienna, Austria},
+  year         = {2022},
+  url          = {https://www.R-project.org/}
+}
+````
+
+.bib file consists of many of these bib entries.
+
+:::{.callout-note title="Instruction"}
+Take a look at **bibliography.bib** in the templates folder.
+:::
+
+#### How to get bib entries
+
+::: {.panel-tabset}
+
+##### Journal website (recommended)
+
+The website of the journal in which the article published typically has a tool to export its bib file.
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+**American Economic Review**
+
+![](aer-get-bib.png)
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+
+**Proceeding of National Academy of Science**
+
+![](pnas-get-bib.png)
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+::: {.columns}
+
+
+::: {.column width="50%"}
+
+**Water Resources Research**
+
+![](wrr-get-bib.png)
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+
+**American Journal of Agricultural Economics**
+
+![](ajae-get-bib.png)
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+##### Google scholar
+
+1. You can google an article for which you want a bib entry:
+
+![](article-gs.png){width="60%"}
+
+2. Click on `Cite` and then click `BibTex` in the pop-up window.
+
+![](bib-entry.png){width="50%"}
+
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+### How
+
+To cite, use the following syntax:
+
++ `@reference_name` to print "author names (year)"
++ `[@reference_name]` to print "(author names, year)" 
++ `[@reference_name_1; @reference_name_2]` to print "(author names, year; author names, year)" 
++ `[-@reference_name]` to print just year
+
+
+`reference_name` is the very first entry of a **.bib** file as in 
+
+```{r  echo = F, out.width = "70%"}
+knitr::include_graphics("assets/pictures/bib-example.png")
+```
+
+:::{.callout-note}
+The reference of all the cited articles will be automatically placed in the Reference section.
+:::
+
+
+:::{.callout-note title="Instruction"}
++ See the Introduction and Reference sections in the sample qmd and PDF files to confirm this rule.
++ Comment out `bibliography: bibliography.bib` and uncomment `bibliography: bibliography.json`, render again, and check citations and references are still there. This is just an illustration of using a different bibliography file (CSL-json file). 
+:::
+
+
+### Citation and Reference Style
+
+You can change the citation and reference style using [Citation Style Language](https://citationstyles.org/). Citation style files have **.csl** extension.
+
+1. Obtain the csl file you would like to use from the [Zotero citation style repository](https://www.zotero.org/styles).
+
+2. Place the following in the YAML header:
+
+```{r eval = F}
+csl: csl file name 
+```
+
+3. Then, citations and references styles will reflect the style specified by the csl file
+
+Currently, the csl style is set to **qje.csl** (citation style language for The Quarterly Journal of Economics) as below
+
+```{r  echo = F, out.width = "100%"}
+knitr::include_graphics("assets/pictures/yaml-bib-quarto.png")
+```
+
+:::{.callout-note title="Instruction"}
++ Comment `csl: qje.csl` and uncomment `csl: pnas.csl` so that the CSL for the Proceedings of the National Academy of Sciences (PNAS) is used
++ Render the **sample_qmd_article.qmd** file to observe the changes in style
+:::
+ 
+### Reference position
+
++ When knitting to PDF, the references will be positioned at the conclusion of the document, as documented (see [here](https://quarto.org/docs/authoring/footnotes-and-citations.html#bibliography-generation)). 
+
++ Append `# References {-}` to the tail end of your `.qmd` file. This creates a "References" section heading where all the citations will be listed. 
+
++ Including `{-}` adjacent to the section header ensures the `References` section remains unnumbered. This is particularly useful if you have activated section numbering in the YAML header with `number-sections: true`. 
+
++ Without `{-}`, the "References" section would be automatically numbered, which is often not desired in academic and professional documents.
+
+:::
+<!--end of panel-->
+

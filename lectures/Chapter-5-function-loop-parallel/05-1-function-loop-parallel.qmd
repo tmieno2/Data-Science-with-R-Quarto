@@ -317,7 +317,7 @@ P_{corn} * \mbox{corn yield}
 \end{align*}
 ```
 
-Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function your created in Exercise 2.
+Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function you created in Exercise 2.
 
 **Work here**
 
@@ -458,8 +458,8 @@ lapply(A, B)
 
 **Note**:
 
-+ When` `A` is a vector, `lapply()` works on each of the vector elements
-+ When` `A` is a list, `lapply()` works on each of the list elements whatever they may be 
++ When `A` is a vector, `lapply()` works on each of the vector elements
++ When `A` is a list, `lapply()` works on each of the list elements whatever they may be 
 + When `A` is a `data.frame`, `lapply()` works on each of the columns (`data.frame` is a list of columns of equal length)
 
 ### Example
@@ -534,7 +534,7 @@ As you can see, this function try each of `1:10` (called internally `x`), give i
 
 #### Exercise 1
 
-Use`lapply()` to cube each element of a sequence starting at 5, increasing by 5, and ending at 50.
+Use `lapply()` to cube each element of a sequence starting at 5, increasing by 5, and ending at 50.
 
 <br>
 
@@ -789,6 +789,44 @@ $$
 
 
 
+```
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+
+corn_price_vec <- seq(2.5, 4.0, by = 0.05)
+n_price_vec <- seq(0.2, 0.6, by = 0.02)
+
+cases_data <- 
+  expand.grid(
+    corn_price = corn_price_vec, 
+    n_price = n_price_vec
+  )
+
+get_profit <- function(i) {
+  corn_price <- cases_data[i, "corn_price"]
+  n_price <- cases_data[i, "n_price"]
+
+  corn_yield <- 120 + 25 * log(200)
+  profit <- corn_price * corn_yield - n_price * 200
+
+  data_to_return <-
+    data.frame(
+      corn_price = corn_price,
+      n_price = n_price,
+      profit = profit
+    )
+    
+  return(data_to_return)
+}
+
+lapply(
+  1:nrow(cases_data),
+  \(i) get_profit(i)
+) %>%
+  bind_rows()
 ```
 
 :::

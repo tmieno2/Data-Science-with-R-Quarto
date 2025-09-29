@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <title>Data Science with R (AECN 896-05) – 02-4: Writing a Journal Article Using Quarto</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-d4cae744f8a56a0e1ba38aaba5322a9a.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link href="../../site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+  <script src="../../site_libs/tabwid-1.1.3/tabwid.js"></script>
+<meta property="og:title" content="02-4: Writing a Journal Article Using Quarto – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Chapter 2: Quarto">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">02-4: Writing a Journal Article Using Quarto</h1>
+
+<div class="quarto-title-authors">
+</div>
+
+</section>
+<section id="output-format" class="slide level2">
+<h2>Output format</h2>
+<p>There are four output options available from a Quarto (.qmd) file, each with distinct pros and cons.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-98f4ecc6{}.cl-98f1d572{font-family:'Helvetica';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-98f1d57c{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-98f36b62{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-98f37508{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37509{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3750a{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37512{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37513{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37514{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37515{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37516{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3751c{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3751d{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3751e{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3751f{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37520{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37521{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37526{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37527{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37528{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f37529{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3752a{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-98f3752b{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-98f4ecc6"><thead><tr style="overflow-wrap:break-word;"><th class="cl-98f37508"><p class="cl-98f36b62"><span class="cl-98f1d572">Format</span></p></th><th class="cl-98f37509"><p class="cl-98f36b62"><span class="cl-98f1d572">Pros</span></p></th><th class="cl-98f3750a"><p class="cl-98f36b62"><span class="cl-98f1d572">Cons</span></p></th><th class="cl-98f37512"><p class="cl-98f36b62"><span class="cl-98f1d572">Journal Submission Status</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-98f37513"><p class="cl-98f36b62"><span class="cl-98f1d57c">PDF (LaTeX)</span></p></td><td class="cl-98f37514"><p class="cl-98f36b62"><span class="cl-98f1d57c">Extremely flexible; professional output</span></p></td><td class="cl-98f37515"><p class="cl-98f36b62"><span class="cl-98f1d57c">Slow compilation; requires LaTeX skills</span></p></td><td class="cl-98f37516"><p class="cl-98f36b62"><span class="cl-98f1d57c">Accepted (but journals require LaTeX source files</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-98f3751c"><p class="cl-98f36b62"><span class="cl-98f1d57c">PDF (Typst)</span></p></td><td class="cl-98f3751d"><p class="cl-98f36b62"><span class="cl-98f1d57c">Fast; modern alternative</span></p></td><td class="cl-98f3751e"><p class="cl-98f36b62"><span class="cl-98f1d57c">Still developing; limited ecosystem</span></p></td><td class="cl-98f3751f"><p class="cl-98f36b62"><span class="cl-98f1d57c">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-98f37520"><p class="cl-98f36b62"><span class="cl-98f1d57c">HTML</span></p></td><td class="cl-98f37521"><p class="cl-98f36b62"><span class="cl-98f1d57c">Fast; highly flexible for web sharing</span></p></td><td class="cl-98f37526"><p class="cl-98f36b62"><span class="cl-98f1d57c">Not designed for journals</span></p></td><td class="cl-98f37527"><p class="cl-98f36b62"><span class="cl-98f1d57c">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-98f37528"><p class="cl-98f36b62"><span class="cl-98f1d57c">Word</span></p></td><td class="cl-98f37529"><p class="cl-98f36b62"><span class="cl-98f1d57c">Fast; widely used; simple for editors</span></p></td><td class="cl-98f3752a"><p class="cl-98f36b62"><span class="cl-98f1d57c">Limited support for complex math</span></p></td><td class="cl-98f3752b"><p class="cl-98f36b62"><span class="cl-98f1d57c">Accepted</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="title-page" class="slide level2">
+<h2>Title page</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Title, date, and abstract</a></li><li><a href="#tabset-1-2">Author information</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<p>You can set title, date, and abstract like below in the YAML header:</p>
+<p><img data-src="title-date-abstract.png"></p>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>date: "`r Sys.Date()`"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finds the current date and prints it.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2">
+<p>You can place author information under <code>author:</code> like below:</p>
+<p><img data-src="author-info.png" style="width:60.0%"></p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="style" class="slide level2">
+<h2>Style</h2>
+</section>
+<section id="figures" class="slide level2">
+<h2>Figures</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Place a figure</a></li><li><a href="#tabset-2-2">Cross-reference</a></li><li><a href="#tabset-2-3">Figure placement</a></li><li><a href="#tabset-2-4">Change the size of the figure</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<p><strong>A plot as an R object</strong></p>
+<p>Suppose you have created a plot using R which is called <code>figure_sample</code> within the same qmd file. Then, you can print the plot by simply referring to it within an R code chunk like below:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a>```{r}</span>
+<span id="cb2-2"><a></a>figure_sample </span>
+<span id="cb2-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p><strong>A plot saved as an image</strong></p>
+<p>Suppose you have created a plot using R and saved it as an image file called <code>figure_sample.png</code>. Then, you can print the plot using <code>knitr::include_graphics(path_to_the_image)</code> within an R code chunk like below:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a></a>```{r }</span>
+<span id="cb3-2"><a></a>knitr::include_graphics("path_to_your_image.png")</span>
+<span id="cb3-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<div title="Important">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>html output does not accept an image saved as a pdf file. I would suggest that you save images as png file, which are accepted for any output format.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2">
+<p>In order to cross-reference a figure with captions, you can use the <code>label</code> and <code>fig-cap</code> options like below:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a></a>```{r}</span>
+<span id="cb4-2"><a></a>#| label: fig-sample-label</span>
+<span id="cb4-3"><a></a>#| fig-cap: "Sample figure title"</span>
+<span id="cb4-4"><a></a>figure_sample </span>
+<span id="cb4-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>fig-cap: "Sample figure title"</code> adds <code>Sample figure title</code> as the caption of the figure</li>
+<li><code>fig-sample-label</code> is the figure id used for cross-referencing</li>
+</ul>
+<p>You can then type <code>@fig-sample-label</code> in the qmd file to cross-reference the figure.</p>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Figure numbering in the output file is done automatically.</li>
+<li><code>@fig-sample</code> will append “Figure” automatically in the output. So, if you have <code>Figure @fig-sample</code> in your qmd file, then you will see “Figure Figure figure-number” in the output file.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Do not forget to have <code>fig-</code> at the beginning of the chunk label as in <code>label: fig-sample-label</code> in the R code chunk option. Otherwise, the plot will not be recognized as a figure in the output file and cross-referencing will not work even though the figure will be displayed.</li>
+<li>You cannot use <code>_</code> in the chunk label (<code>-</code> is allowed). Cross-referencing would not work if the label includes <code>_</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3">
+
+</div>
+<div id="tabset-2-4">
+
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="tables" class="slide level2">
+<h2>Tables</h2>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Place a table</a></li><li><a href="#tabset-3-2">Which package to create tables?</a></li><li><a href="#tabset-3-3">Cross-reference</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<p><strong>A table as an R object</strong></p>
+<p>Suppose you have created a table using R which is called <code>table_sample</code> within the same qmd file. Then, you can print the plot by simply referring to it within an R code chunk like below:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>```{r}</span>
+<span id="cb5-2"><a></a>table_sample </span>
+<span id="cb5-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p><strong>A table saved as an image</strong></p>
+<p>Suppose you have created a table using R and saved it as an image file called <code>table_sample.png</code>. Then, you can print the plot using <code>knitr::include_graphics("table_sample.png")</code> within an R code chunk like below:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>```{r }</span>
+<span id="cb6-2"><a></a>knitr::include_graphics("table_sample.png")</span>
+<span id="cb6-3"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<div title="Important">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>html output does not accept an image saved as a pdf file. I would suggest that you save images as png file, which are accepted for any output format.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-2">
+<ul>
+<li><p>Some of the most powerful table-creation packages (e.g., <code>gt</code>, <code>flextable</code>) do not support direct output in a LaTeX-accepted format. However, they do provide the option to export tables as image files.</p></li>
+<li><p>Packages that support LaTeX output include <code>xtable</code>, <code>huxtable</code>, and <code>kableExtra</code>.</p></li>
+<li><p>Since LaTeX can accept tables as images, there is no drawback to investing time in learning a package that is not inherently LaTeX-friendly.</p></li>
+</ul>
+</div>
+<div id="tabset-3-3">
+<p>In order to cross-reference a table with captions, you can use the <code>label</code> and <code>tab-cap</code> options like below:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>```{r}</span>
+<span id="cb7-2"><a></a>#| label: fig-sample-label</span>
+<span id="cb7-3"><a></a>#| tab-cap: "Sample table title"</span>
+<span id="cb7-4"><a></a>table_sample </span>
+<span id="cb7-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>tab-cap: "Sample table title"</code> adds <code>Sample table title</code> as the caption of the table</li>
+<li><code>tab-sample-label</code> is the table id used for cross-referencing</li>
+</ul>
+<p>You can then type <code>@tab-sample-label</code> in the qmd file to cross-reference the table.</p>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Table numbering in the output file is done automatically.</li>
+<li><code>@tab-sample</code> will append “Table” automatically in the output. So, if you have <code>Table @tab-sample</code> in your qmd file, then you will see “Table Table figure-number” in the output file.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Do not forget to have <code>tab-</code> at the beginning of <code>label: tab-sample-label</code>. Otherwise, the table will not be recognized as a table in the output file and cross-referencing will not work even though the table will be displayed.</li>
+<li>You cannot use <code>_</code> in the chunk label (<code>-</code> is allowed). Cross-referencing would not work if the label includes <code>_</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="mathematical-expressions" class="slide level2">
+<h2>Mathematical expressions</h2>
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Single-line math</a></li><li><a href="#tabset-7-2">In-line math</a></li><li><a href="#tabset-7-3">More complex equations</a></li><li><a href="#tabset-7-4">Cross-reference</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">pdf (latex) and html</a></li><li><a href="#tabset-4-2">html and Word</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<p>To type mathematical equations, you can enclose the math expressions with a special syntax for printing tex expressions like below.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a></a><span class="in">```{=tex}</span></span>
+<span id="cb8-2"><a></a><span class="in">Math using Latex syntax</span></span>
+<span id="cb8-3"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>For example,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a></a><span class="in">```{=tex}</span></span>
+<span id="cb9-2"><a></a><span class="in">\begin{align}</span></span>
+<span id="cb9-3"><a></a><span class="in">y = \alpha + \beta x + v</span></span>
+<span id="cb9-4"><a></a><span class="in">\end{align}</span></span>
+<span id="cb9-5"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>would print the following:</p>
+<span class="math display">\[\begin{align}
+y = \alpha + \beta x + v
+\end{align}\]</span>
+<p><br></p>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>This syntax automatically move to a new line and then prints the math</li>
+<li>Since the above syntax prints whatever inside the <code>=tex</code> environment in the tex file, which is then compiled to produce a pdf file, you can use <em>any</em> Latex math-writing tools.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-4-2">
+<p>To type a mathematical equation that spans only a single line, you can enclose the math expressions with <code>$$</code> like below:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a></a>$$</span>
+<span id="cb10-2"><a></a>y = \alpha + \beta x + v</span>
+<span id="cb10-3"><a></a>$$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>, which would print the following:</p>
+<span class="math display">\[\begin{align}
+y = \alpha + \beta x + v
+\end{align}\]</span>
+<p>You can actually use some of the Latex environments (e.g., <code>equation</code>, <code>align</code>) like below:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a></a>$$</span>
+<span id="cb11-2"><a></a>\begin{align}</span>
+<span id="cb11-3"><a></a>y = \alpha + \beta x + v</span>
+<span id="cb11-4"><a></a>\end{align}</span>
+<span id="cb11-5"><a></a>$$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>This syntax automatically move to a new line and then prints the math</li>
+<li>Not all of Latex math syntaxes work.<br>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-7-2">
+<p>For math expressions in line, write math expressions in Latex syntax enclosed by <code>$</code> (not <code>$$</code>) as in</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a></a>Here is the math $\alpha$.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>This would print like this in the output:</p>
+<p>Here is the math <span class="math inline">\(\alpha\)</span>.</p>
+</div>
+<div id="tabset-7-3">
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Multiple lines with alignment</a></li><li><a href="#tabset-5-2">Cases</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<p>Use the <strong>align</strong> environment like below:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>pdf (latex) and html</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a></a><span class="in">```{=tex}</span></span>
+<span id="cb13-2"><a></a><span class="in">\begin{align}</span></span>
+<span id="cb13-3"><a></a><span class="in">y &amp; = \alpha + \beta x + v \\</span></span>
+<span id="cb13-4"><a></a><span class="in">v &amp; = \rho Wv + \mu</span></span>
+<span id="cb13-5"><a></a><span class="in">\end{align}</span></span>
+<span id="cb13-6"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><strong>html and WORD</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a></a>$$</span>
+<span id="cb14-2"><a></a>\begin{align}</span>
+<span id="cb14-3"><a></a>y &amp; = \alpha + \beta x + v <span class="sc">\\</span></span>
+<span id="cb14-4"><a></a>v &amp; = \rho Wv + \mu</span>
+<span id="cb14-5"><a></a>\end{align}</span>
+<span id="cb14-6"><a></a>$$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+<p><br></p>
+<p>It will print like below:</p>
+<span class="math display">\[\begin{align}
+y &amp; = \alpha + \beta x + v \\
+v &amp; = \rho Wv + \mu
+\end{align}\]</span>
+</div>
+<div id="tabset-5-2">
+<p>Use the <strong>case</strong> environment like below:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>pdf (latex) and html</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a></a><span class="in">```{=tex}</span></span>
+<span id="cb15-2"><a></a><span class="in">\begin{align}</span></span>
+<span id="cb15-3"><a></a><span class="in">y_{j,i} =</span></span>
+<span id="cb15-4"><a></a><span class="in">  \begin{cases}</span></span>
+<span id="cb15-5"><a></a><span class="in">  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,&amp; N &lt; \tau_{j,i} \\</span></span>
+<span id="cb15-6"><a></a><span class="in">  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,&amp; N \ge \tau_{j,i}</span></span>
+<span id="cb15-7"><a></a><span class="in">  \end{cases}</span></span>
+<span id="cb15-8"><a></a><span class="in">\end{align}</span></span>
+<span id="cb15-9"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><strong>html and WORD</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb16-1"><a></a>$$</span>
+<span id="cb16-2"><a></a>\begin{align}</span>
+<span id="cb16-3"><a></a>y_{j,i} =</span>
+<span id="cb16-4"><a></a>  \begin{cases}</span>
+<span id="cb16-5"><a></a>  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,&amp; N &lt; \tau_{j,i} <span class="sc">\\</span></span>
+<span id="cb16-6"><a></a>  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,&amp; N \ge \tau_{j,i}</span>
+<span id="cb16-7"><a></a>  \end{cases}</span>
+<span id="cb16-8"><a></a>\end{align}</span>
+<span id="cb16-9"><a></a>$$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+<p><br></p>
+<p>It will print like below:</p>
+<span class="math display">\[\begin{align}
+y_{j,i} =
+  \begin{cases}
+  \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,&amp; N &lt; \tau_{j,i} \\
+  \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,&amp; N \ge \tau_{j,i}
+  \end{cases}
+\end{align}\]</span>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-7-4">
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Latex</a></li><li><a href="#tabset-6-2">html and WORD</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<p>You can take advantage of the original latex syntax like this:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb17-1"><a></a><span class="in">```{=tex}</span></span>
+<span id="cb17-2"><a></a><span class="in">\begin{align}</span></span>
+<span id="cb17-3"><a></a><span class="in">y &amp; = \alpha + \beta x + v \label{eq-model}</span></span>
+<span id="cb17-4"><a></a><span class="in">\end{align}</span></span>
+<span id="cb17-5"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then refer to it with <code>\ref{eq-model}</code>.</p>
+<p><br></p>
+<div title="Note">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>This way of cross-referencing an equation works only for pdf, but not for html even though the equation would be printed for html.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<p>See lines 99-105 of <strong>sample_qmd_article.qmd</strong> to confirm this works.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-2">
+<p>You can tag an equation by placing <code>{eq-eqution-name}</code> after closing the equation with <code>$$</code> like below:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a></a>$$</span>
+<span id="cb18-2"><a></a>\begin{align}</span>
+<span id="cb18-3"><a></a>y &amp; = \alpha + \beta x + v \label{eq-model}</span>
+<span id="cb18-4"><a></a>\end{align}</span>
+<span id="cb18-5"><a></a>$$ {eq-model}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then you can refer to it by <code>@eq-model</code>.</p>
+<p><br></p>
+<div title="Note">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>An equation label needs to start with <code>eq-</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<p>See lines 103-109 of <strong>sample_qmd_article.qmd</strong> to confirm this works.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="citation-and-references" class="slide level2 scrollable">
+<h2>Citation and References</h2>
+<div class="panel-tabset">
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Set up with a bib file</a></li><li><a href="#tabset-10-2">How</a></li><li><a href="#tabset-10-3">Citation and Reference Style</a></li><li><a href="#tabset-10-4">Reference position</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1">
+<div class="panel-tabset">
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Declare</a></li><li><a href="#tabset-9-2">.bib file</a></li><li><a href="#tabset-9-3">How to get bib entries</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<p>Begin by preparing a file that contains all your references. In your document’s YAML header, specify the bibliography file:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource code number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a></a>bibliography: bibliography file name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are multiple formats and systems available for bibliographies, such as</p>
+<ul>
+<li>BibLaTeX/BibTex (.bib)</li>
+<li>CSL-JSON (.json)</li>
+<li>EndNote (.enl)</li>
+</ul>
+<p>Here, we use a <strong>.bib</strong> file. If our bibliography file is titled <code>bibliography.bib</code>, the YAML header would look like:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="assets/pictures/yaml-bib-quarto.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<p>Take a look at the bottom of the YAML header of <strong>sample_qmd_acrticle.qmd</strong> in the templates folder.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-9-2">
+<p>Here is what an bib entry looks like:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a></a>@manual{R,</span>
+<span id="cb20-2"><a></a>  title        = {R: A Language and Environment for Statistical Computing},</span>
+<span id="cb20-3"><a></a>  author       = {{R Core Team}},</span>
+<span id="cb20-4"><a></a>  organization = {R Foundation for Statistical Computing},</span>
+<span id="cb20-5"><a></a>  address      = {Vienna, Austria},</span>
+<span id="cb20-6"><a></a>  year         = {2022},</span>
+<span id="cb20-7"><a></a>  url          = {https://www.R-project.org/}</span>
+<span id="cb20-8"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>.bib file consists of many of these bib entries.</p>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<p>Take a look at <strong>bibliography.bib</strong> in the templates folder.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-9-3">
+<div class="panel-tabset">
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Journal website (recommended)</a></li><li><a href="#tabset-8-2">Google scholar</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1">
+<p>The website of the journal in which the article published typically has a tool to export its bib file.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>American Economic Review</strong></p>
+<p><img data-src="aer-get-bib.png"></p>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><strong>Proceeding of National Academy of Science</strong></p>
+<p><img data-src="pnas-get-bib.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Water Resources Research</strong></p>
+<p><img data-src="wrr-get-bib.png"></p>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><strong>American Journal of Agricultural Economics</strong></p>
+<p><img data-src="ajae-get-bib.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-8-2">
+<ol type="1">
+<li>You can google an article for which you want a bib entry:</li>
+</ol>
+<p><img data-src="article-gs.png" style="width:60.0%"></p>
+<ol start="2" type="1">
+<li>Click on <code>Cite</code> and then click <code>BibTex</code> in the pop-up window.</li>
+</ol>
+<p><img data-src="bib-entry.png" style="width:50.0%"></p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-10-2">
+<p>To cite, use the following syntax:</p>
+<ul>
+<li><code>@reference_name</code> to print “author names (year)”</li>
+<li><code>[@reference_name]</code> to print “(author names, year)”</li>
+<li><code>[@reference_name_1; @reference_name_2]</code> to print “(author names, year; author names, year)”</li>
+<li><code>[-@reference_name]</code> to print just year</li>
+</ul>
+<p><code>reference_name</code> is the very first entry of a <strong>.bib</strong> file as in</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="assets/pictures/bib-example.png" style="width:70.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The reference of all the cited articles will be automatically placed in the Reference section.</p>
+</div>
+</div>
+</div>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>See the Introduction and Reference sections in the sample qmd and PDF files to confirm this rule.</li>
+<li>Comment out <code>bibliography: bibliography.bib</code> and uncomment <code>bibliography: bibliography.json</code>, render again, and check citations and references are still there. This is just an illustration of using a different bibliography file (CSL-json file).</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-10-3">
+<p>You can change the citation and reference style using <a href="https://citationstyles.org/">Citation Style Language</a>. Citation style files have <strong>.csl</strong> extension.</p>
+<ol type="1">
+<li><p>Obtain the csl file you would like to use from the <a href="https://www.zotero.org/styles">Zotero citation style repository</a>.</p></li>
+<li><p>Place the following in the YAML header:</p></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>csl<span class="sc">:</span> csl file name </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="3" type="1">
+<li>Then, citations and references styles will reflect the style specified by the csl file</li>
+</ol>
+<p>Currently, the csl style is set to <strong>qje.csl</strong> (citation style language for The Quarterly Journal of Economics) as below</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="assets/pictures/yaml-bib-quarto.png" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div title="Instruction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Instruction</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Comment <code>csl: qje.csl</code> and uncomment <code>csl: pnas.csl</code> so that the CSL for the Proceedings of the National Academy of Sciences (PNAS) is used</li>
+<li>Render the <strong>sample_qmd_article.qmd</strong> file to observe the changes in style</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-10-4">
+<ul>
+<li><p>When knitting to PDF, the references will be positioned at the conclusion of the document, as documented (see <a href="https://quarto.org/docs/authoring/footnotes-and-citations.html#bibliography-generation">here</a>).</p></li>
+<li><p>Append <code># References {-}</code> to the tail end of your <code>.qmd</code> file. This creates a “References” section heading where all the citations will be listed.</p></li>
+<li><p>Including <code>{-}</code> adjacent to the section header ensures the <code>References</code> section remains unnumbered. This is particularly useful if you have activated section numbering in the YAML header with <code>number-sections: true</code>.</p></li>
+<li><p>Without <code>{-}</code>, the “References” section would be automatically numbered, which is often not desired in academic and professional documents.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<!--end of panel-->
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/">back to the lecture slides on the course website</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
