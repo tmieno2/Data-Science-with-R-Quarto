@@ -210,30 +210,30 @@ html output does not accept an image saved as a pdf file. I would suggest that y
 
 ### Cross-reference
 
-In order to cross-reference a table with captions, you can use the `label` and `tab-cap` options like below:
+In order to cross-reference a table with captions, you can use the `label` and `tbl-cap` options like below:
 
 
 ````{verbatim}
 ```{r}
 #| label: fig-sample-label
-#| tab-cap: "Sample table title"
+#| tbl-cap: "Sample table title"
 table_sample 
 ```
 ````
 
-+ `tab-cap: "Sample table title"` adds `Sample table title` as the caption of the table 
-+ `tab-sample-label` is the table id used for cross-referencing
++ `tbl-cap: "Sample table title"` adds `Sample table title` as the caption of the table 
++ `tbl-sample-label` is the table id used for cross-referencing
 
-You can then type `@tab-sample-label` in the qmd file to cross-reference the table.
+You can then type `@tbl-sample-label` in the qmd file to cross-reference the table.
 
 
 :::{.callout-note}
 + Table numbering in the output file is done automatically.
-+ `@tab-sample` will append "Table" automatically in the output. So, if you have `Table @tab-sample` in your qmd file, then you will see "Table Table figure-number" in the output file.
++ `@tbl-sample` will append "Table" automatically in the output. So, if you have `Table @tbl-sample` in your qmd file, then you will see "Table Table figure-number" in the output file.
 :::
 
 :::{.callout-important}
-+ Do not forget to have `tab-` at the beginning of `label: tab-sample-label`. Otherwise, the table will not be recognized as a table in the output file and cross-referencing will not work even though the table will be displayed. 
++ Do not forget to have `tbl-` at the beginning of `label: tbl-sample-label`. Otherwise, the table will not be recognized as a table in the output file and cross-referencing will not work even though the table will be displayed. 
 + You cannot use `_` in the chunk label (`-` is allowed). Cross-referencing would not work if the label includes `_`.
 :::
 

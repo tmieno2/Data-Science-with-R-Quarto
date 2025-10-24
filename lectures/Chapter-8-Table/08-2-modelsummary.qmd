@@ -10,19 +10,12 @@ format:
     scrollable: true
     echo: true
     fig-dpi: 400
-webr:
-  # packages: ['dplyr', 'gt', 'flextable', 'nycflights13', 'modelsummary', 'sandwitch']
-  cell-options:
-    editor-font-scale: 0.7
-filters:
-  - webr
 ---
 
 ## Tips to make the most of the lecture notes
 
 ```{r}
 #| include: false
-library(nycflights13)
 library(sandwich)
 library(modelsummary)
 library(flextable)
@@ -62,16 +55,6 @@ library(gt)
 ::: {.panel-tabset}
 
 #### Get the data
-
-```{webr-r}
-#| context: setup
-
-webr::install("r.spatial.workshop.datasets", repos = "https://tmieno2.github.io/rwasm-package/repo")
-
-data(county_yield, package = "r.spatial.workshop.datasets")
-
-county_yield <- dplyr::select(county_yield, -geometry)
-```
 
 We use `county_yield` throughout this lecture.
 
@@ -134,10 +117,10 @@ model_2_soy <- lm(soy_yield ~ d1_5_9 + d2_5_9 + d3_5_9 + d4_5_9, data = county_y
 Get White-Huber robust variance-covariance matrix for the regressions:
 
 ```{r}
-vcov_1_corn <- vcovHC(model_1_corn)
-vcov_2_corn <- vcovHC(model_2_corn)
-vcov_1_soy <- vcovHC(model_1_soy)
-vcov_2_soy <- vcovHC(model_2_soy)
+vcov_1_corn <- sandwich::vcovHC(model_1_corn)
+vcov_2_corn <- sandwich::vcovHC(model_2_corn)
+vcov_1_soy <- sandwich::vcovHC(model_1_soy)
+vcov_2_soy <- sandwich::vcovHC(model_2_soy)
 ```
 
 #### default table
@@ -200,6 +183,7 @@ modelsummary::msummary(model_1_corn, stars = stars_label)
 ```
 :::
 <!--end of the 1st column-->
+
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
@@ -420,7 +404,7 @@ Default:
 modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
   gof_omit = "IC|R",
-  coef_omit = "d3|d4",
+  coef_omit = "d3|d4"
   #--- no statistical override ---#
 )  
 ```
@@ -434,7 +418,7 @@ modelsummary::msummary(
   list(Moddel1 = model_2_corn, Model2 = model_2_soy), 
   gof_omit = "IC|R",
   coef_omit = "d3|d4",
-  statistic_override = list(vcov_2_corn, vcov_2_soy) #<<
+  statistic_override = list(vcov_2_corn, vcov_2_soy)
 )  
 ```
 :::
@@ -487,7 +471,7 @@ Using the `output` option in `modelsummary::msummary()`, you can turn the regres
 
 **Example: flextable**
 
-```{r }
+```{r}
 #--- create a regression table and turn it into a gt_tbl ---#
 reg_table_ft <- list(model_1_corn, model_1_soy)%>% 
   modelsummary::msummary(output = "flextable")
@@ -685,7 +669,7 @@ Variables/statistics on the left-hand side (right-hand side) comprise rows (colu
 
 ```{r }
 modelsummary::datasummary(
-  corn_yield ~ Mean, #<<
+  corn_yield ~ Mean,
   data = county_yield
 )
 ```
@@ -696,7 +680,7 @@ Switching the order changes the structure of the resulting table:
 
 ```{r }
 modelsummary::datasummary(
-  Mean ~ corn_yield, #<<
+  Mean ~ corn_yield,
   data = county_yield
 )
 ```
@@ -729,7 +713,7 @@ For example, compare these two:
 
 ```{r }
 modelsummary::datasummary(
-  corn_yield ~ Mean, #<<
+  soy_yield ~ Mean,
   data = county_yield
 )
 ```
@@ -739,7 +723,7 @@ modelsummary::datasummary(
 ```{r }
 modelsummary::datasummary(
   #--- mean from the base package ---#
-  corn_yield ~ mean, #<<
+  soy_yield ~ mean,
   data = county_yield
 )
 ```
@@ -829,7 +813,7 @@ variable ~ category_variable * (stat 1 + stat 2 + ...)
 ```{r nesting-f}  
 modelsummary::datasummary(
   corn_yield + soy_yield + d0_5_9 + d1_5_9
-  ~ state_name * (Mean + SD) + MinMax, #<< 
+  ~ state_name * (Mean + SD) + MinMax,
   data = county_yield
 )
 ```
@@ -848,7 +832,7 @@ county_yield %>%
   dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
   modelsummary::datasummary(
     corn_yield + soy_yield + d0_5_9 + d1_5_9
-    ~ factor(year) * state_name * (Mean + SD) + MinMax, #<< 
+    ~ factor(year) * state_name * (Mean + SD) + MinMax, 
     data = .
   )
 ```
@@ -871,8 +855,8 @@ county_yield %>%
   dplyr::filter(year %in% 2011:2012) %>% 
   dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
   modelsummary::datasummary(
-    (`Corn Yield (bu/acre)` = corn_yield) #<<
-    ~ state_name * (Mean + (Std.Dev. = SD)), #<< 
+    (`Corn Yield (bu/acre)` = corn_yield)
+    ~ state_name * (Mean + (Std.Dev. = SD)), 
     data = .
   )
 ```
@@ -899,8 +883,8 @@ county_yield %>%
   dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
   modelsummary::datasummary(
     corn_yield 
-    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + #<<
-      quantile * Arguments(prob = 0.1, na.rm = TRUE), #<< 
+    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) +
+      quantile * Arguments(prob = 0.1, na.rm = TRUE), 
     data = .
   )
 ```
@@ -923,8 +907,8 @@ county_yield %>%
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + 
       quantile * Arguments(prob = 0.1, na.rm = TRUE),  
     data = .,
-    title = "A title", #<<
-    notes = c("first note", "second note") #<<
+    title = "A title",
+    notes = c("first note", "second note")
   )
 ```
 
@@ -949,9 +933,9 @@ county_yield %>%
   modelsummary::datasummary(
     corn_yield 
     ~ state_name * (`This is M E A N` = mean) * Arguments(na.rm = TRUE) + 
-      (`This is Q U A N T I L E` = quantile) * Arguments(prob = 0.1, na.rm = TRUE),  
+      (`This is Q U A N T I L E` = quantile) * Arguments(prob = 0.1, na.rm = TRUE),
     data = .,
-    align = "lrlc" #<<
+    align = "lrlc"
   )
 ```
 
@@ -992,7 +976,7 @@ county_yield %>%
   dplyr::select(c(state_name, where(is.numeric))) %>% 
   dplyr::select(- year) %>% 
   modelsummary::datasummary_balance(
-    All (data.frame(.))~ state_name, #<<
+    All (data.frame(.))~ state_name,
     data = .
   )
 ```
