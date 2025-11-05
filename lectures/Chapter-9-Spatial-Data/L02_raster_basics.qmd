@@ -70,7 +70,7 @@ Learn how to handle raster datasets using R.
 
 ```{webr-r}
 #| context: setup
-#| 
+ 
 #--- install and library the data package ---#
 webr::install("r.spatial.workshop.datasets", repos = "https://tmieno2.github.io/rwasm-package/repo")
 
@@ -113,12 +113,14 @@ prism_douglas <- terra::rast(prism_douglas)
 + You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
 + If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
-
-
 :::
+<!--end of the 1st column-->
 ::: {.column width="30%"}
+
 :::
+<!--end of the 2nd column-->
 :::
+<!--end of the columns-->
 
 ## The `terra` and `raster` packages: Basics {#sec-basics}
 
@@ -126,11 +128,9 @@ prism_douglas <- terra::rast(prism_douglas)
 
 ### `terra` and `raster`
 
-
 ::: {.columns}
 
 ::: {.column width="50%"}
-
 + The most popular R packages to handle raster data is the `raster` and `terra` packages. They are authored by the same person and `terra` is the successor of `raster`. 
 
 + The `terra` package is now mature and does everything faster than `raster`
@@ -138,14 +138,14 @@ prism_douglas <- terra::rast(prism_douglas)
 + There are lots of packages that still depends on `raster` and do not work well with R object class defined by `terra`. 
 
 + We primarily learns how to use the `terra` package
-
 :::
-
+<!--end of the 1st column-->
 ::: {.column width="50%"}
 
 :::
-
+<!--end of the 2nd column-->
 :::
+<!--end of the columns-->
 
 ### Object class
 
@@ -230,7 +230,6 @@ reflec_all <- c(reflec_blue, reflec_red, reflec_green)
 Notice that `nlyr` is 3 now and you see three attribute names in `names`.
 
 <br>
----
 
 `plot()` create maps for all the attributes.
 
@@ -287,13 +286,12 @@ You can convert an `Raster`* object to `SpatRaster` using `terra::rast()` functi
 ```{webr-r}
 terra::rast(reflec_all_rl)
 ```
+
 :::
 <!--end of panel-->
 
-
-
-
 :::
+
 
 ## Basic operations
 
