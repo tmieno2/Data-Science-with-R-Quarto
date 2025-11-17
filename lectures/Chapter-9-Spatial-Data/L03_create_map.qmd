@@ -12,7 +12,7 @@ format:
     fig-dpi: 400
     chalkboard: true
 webr:
-  packages: ['ggplot2', 'dplyr', 'sf', 'ggspatial', 'tidyterra', 'terra', 'stars', 'viridis', 'ggrepel'] # Install R packages on document open
+  packages: ['ggplot2', 'dplyr', 'sf', 'ggspatial', 'tidyterra', 'terra', 'stars', 'viridis', 'ggrepel', 'ggmapinset'] # Install R packages on document open
 # autoload-packages: false       # Disable automatic loading of packages
 # show-startup-message: false    # Disable displaying status of webR initialization
   cell-options:
@@ -821,20 +821,19 @@ knitr::include_graphics("assets/inset.jpg")
 Create a map like this using `ne_counties` with the `ggmapinset` package. 
 
 ```{webr-r}
-#| context: setup
-library(ggmapinset)
+#| context: output
 
 three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
 
 inset_config <- 
   configure_inset(
-    centre = st_centroid(st_union(three_counties)),
+    shape = shape_circle(st_centroid(st_union(three_counties)), 80),
     translation = c(300, -250),
-    radius = 80,
     scale = 2,
     units = "km"
   )
 
+(
 g_inset_example <- 
   ggplot() +
     #--- base map ---#
@@ -848,11 +847,8 @@ g_inset_example <-
     geom_inset_frame() +
     coord_sf_inset(inset = inset_config) +
     theme_void()
-```
+)
 
-```{webr-r}
-#| context: output
-g_inset_example
 ```
 
 :::{.callout-note}
@@ -889,21 +885,21 @@ g_base <-
 
 We now configure (specify) the inset using `configure_inset()`. Here is the list of parameters you want to provide:
 
-+ `centre`: the geographic coordinates of the small circle from which you expand 
++ `shape`: the shape and size of the inset
+  + `shape_circle`: `centre` and `radius`
+  + `shape_rectangle`: `centre` and `hwidth`
 + `translation`: how much you shift in x and y from the center to display the enlarged circle
-+ `radius`: radius of the small circle at the origin
 + `scale`: how much to enlarge
 + `units`: length unit 
 
 ```{webr-r}
 inset_config <- 
   configure_inset(
-    #--- centroid of the three counties as the center ---#
-    centre = st_centroid(st_union(three_counties)),
+    #--- centroid of the three counties as the center, and the radius ---#
+    shape = shape_circle(st_centroid(st_union(three_counties)), 80),
+    # shape = shape_rectangle(st_centroid(st_union(three_counties)), 80),
     #--- move 300 east and 250 south ---#
     translation = c(300, -250),
-    #--- radius of 80 km ---#
-    radius = 80,
     #--- scale up by 2 ---#
     scale = 2,
     units = "km"
@@ -962,8 +958,8 @@ Comment out line 2 and comment in line 3 to see what happens.
 ## Create maps using raster data
 
 ```{webr-r}
-#| context: setup   
-data(NIR) 
+library(stars) 
+data(NIR)
 NIR <- terra::rast(NIR)
 data(RED) 
 RED <- terra::rast(RED)

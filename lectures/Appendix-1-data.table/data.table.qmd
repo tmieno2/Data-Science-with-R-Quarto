@@ -1,0 +1,915 @@
+---
+title: "A-1: `data.table` package for data wrangling"
+abstract: "Appendix 1: Data Wrangling with `data.table` Package"
+format: 
+  revealjs: 
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'microbenchmark', 'data.table']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+    # dpi: 144
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+
+## Learning objectives
+
+The objectives of this chapter is to learn how to use the `data.table` package to 
+
++ manipulate data 
++ reshape a dataset
++ merge multiple datasets 
+
+##  `data.table` package
+
+::: {.panel-tabset}
+
+### What is it?
+
++ The `data.table` package is a popular alternative to `dplyr` that is **much faster** than `dplyr` for most data operations particularly when the dataset is large.
+  * See [here](https://github.com/Rdatatable/data.table/wiki/Benchmarks-%3A-Grouping) for the speed comparison of `dplyr` and `data.table`.
+  * [This website](https://atrebas.github.io/post/2019-03-03-datatable-dplyr/) compares `dply` vs `data.table` side by side.
+
++ `data.table` has its own class of "`data.frame`" called `data.table`
+
+### preparation
+
+**Package**
+
+Install the package if you have not and library it.
+
+```{r}
+#| eval: false
+#--- install ---# 
+install.packages("data.table")
+
+#--- library ---#
+library(data.table)
+```
+
+**Dataset**
+
+We use the following `weather` dataset.
+
+```{webr-r}
+#| autorun: true
+(
+  flights <- fread("https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")
+)
+```
+
+### how
+
+Here is the general form of `data.table` operation.
+
+```{r}
+#| eval: false
+data.table[i, j, by]
+```
+
++ `i`: specify which rows (like `dplyr::filter`)  
++ `j`: specify the operations on selected columns   
++ `by`: specify the variable to be used as groups by which operations specified in `j` are implemented
+
+### To a `data.able` object
+
+
+### key difference from `dplyr`
+
+You can implement all the three main actions in a single statement unlike `dplyr`:
+
+For example, the following set of codes below will give the same results (the number of flights by American Airline by origin-month):
+
+
+**`data.table`** way:
+
+```{webr-r}
+flights[carrier == "AA", .(.N), by = .(origin, month)] %>% head()
+```
+
+<br>
+
+**`dplyr`** way :
+
+```{webr-r}
+flights %>% 
+  filter(carrier == "AA") %>% 
+  group_by(origin, month) %>% 
+  summarize(n()) %>% head()
+```
+
+:::
+<!--end of panel-->
+
+## Key actions
+
+::: {.panel-tabset}
+
+### Filter rows
+
+You can filter rows that satisfy certain conditions like below:
+
+```{webr-r}
+flights[origin == "JFK" & month == 6L, ] %>% head()
+```
+
++ `i`: `origin == "JFK" & month == 6L` 
++ `j`: no action (all columns)
++ `by`: non
+
+### Select columns
+
+::: {.panel-tabset}
+
+#### Single column
+
+**single column as a vector**
+
+```{webr-r}
+flights[, arr_delay] %>% head()
+```
+
++ `i`: no action (all rows) 
++ `j`: get `arr_delay` itself as it is
++ `by`: non 
+
+**single column as a data.table**
+
+```{webr-r}
+flights[, .(arr_delay)] %>% head()
+```
+
+`.` here is a short hand for `list`
+
+#### Multiple columns
+
+**multiple column as a data.table**
+
+```{webr-r}
+flights[, .(arr_delay, dep_delay)] %>% head()
+```
+
+<br>
+
+**select and rename multiple column as a data.table**
+
+```{webr-r}
+flights[, .(a = arr_delay, b = dep_delay)] %>% head()
+```
+
+
+:::{.callout-note}
+As long as j-expression returns a list, each element of the list will be converted to a column in the resulting data.table.
+:::
+
+#### Like a `data.frame`
+
+**Select variables (like `data.frame`)**
+
+Another way to select particular columns is to provide a concatenated list of variable names in double quotes (just like a `data.frame`):   
+
+```{webr-r}
+flights[, c("arr_delay", "dep_delay")] %>% head(3)
+```
+
+<br>
+
+**Dropping variables**
+
+You can drop variables by using `-` or `!` in front of the list of the variables to drop:
+
+```{webr-r}
+flights[, !c("arr_delay", "dep_delay")] %>% head(3)
+flights[, -c("arr_delay", "dep_delay")] %>% head(3)
+```
+
+:::
+<!--end of panel-->
+
+### Operations in `j`
+
+**An operation in `j`**
+
+```{webr-r}
+
+flights[, (arr_delay + dep_delay) < 0] %>% head()
+```
+
+<br>
+
+**Row-wise subset and operation in `j` at the same time**  
+
+```{webr-r}
+flights[
+  origin == "JFK" & month == 6L, # i
+  .(m_arr = mean(arr_delay), m_dep = mean(dep_delay)) # j
+  ]
+```
+
+Remember the rule? `.(m_arr = mean(arr_delay), m_dep = mean(dep_delay))` is a list, so the output is a `data.table`.
+
+<br>
+
+**`dplyr` way**:
+
+```{webr-r}
+filter(flights, origin == "JFK" & month == 6L) %>% 
+  summarize(m_arr = mean(arr_delay), m_dep = mean(dep_delay))
+```
+
+### Create new (or update) variables
+
+::: {.panel-tabset}
+
+#### preparation
+
+Create the following dataset we are going to use in this slide:
+
+```{webr-r}
+#| autorun: true
+(
+flights_mini <- flights[month <= 4,head(.SD, 2), by = month] %>% 
+  .[, .(year, month, day, dep_delay, arr_delay, distance, air_time)] 
+)
+```
+
+<br>
+
+`flights_mini` has two observations per month.
+
+```{webr-r}
+#| context: output 
+#| autorun: true
+flights_mini_no_change <- copy(flights_mini)
+```
+
+#### a variable
+
+In `data.table`, you use `:=` to create a new variable instead of `=`.
+
+```{webr-r}
+#--- example ---#
+flights_mini[, speed := distance / air_time]
+
+#--- see what's inside now ---#
+flights_mini
+```
+
+:::{.callout-important}
++ `:=` operator updates data.table columns in-place (by reference), meaning the original data is altered. 
++ Evaluate `flights` and confirm that `speed` is indeed in `flights_mini`.
++ This holds true for any operations involving `:=`. 
++ This is different from `dply.r::mutate()` which does not alter the original dataset
+:::
+
+#### copy
+
+If you have a reason to not wanting the original data to be altered after `:=` operations. You can create a `deep copy` of the dataset using `data.table::copy()` function.
+
+The object created by `copy()` is independent of the original dataset in the sense that actions on one of them do not affect the other.
+
+```{webr-r}
+#--- create a copy ---#
+flights_mini_copy <- copy(flights_mini)
+
+#--- create a variable ---#
+flights_mini[, constant := 1]
+
+#--- see what's inside of the copy ---#
+flights_mini_copy
+```
+
+#### multiple
+
+Here are how you define multiple variables at the same time.
+
+**Multiple variable 1**
+
+```{webr-r}
+#--- example ---#
+flights_mini[, c("total_delay", "carrier_origin") := list(arr_delay + dep_delay, distance/air_time)]
+```
+
+The results of the `n`th expression is assigned to `n`th variable name on the left.
+
+<br>
+
+**Multiple variable 2**
+
+```{webr-r}
+#--- example ---#
+flights_mini[, `:=`(total_delay = arr_delay + dep_delay, speed = distance/air_time)]
+```
+
+Confirm that `flights_mini` was updated to have the new variables defined just above.
+
+#### selective update
+
+You can update column values for some rows that satisfy certain conditions by using logical evaluations in `i` and `:=` in `j`.
+
+**Example**
+
+```{webr-r}
+copy(flights_mini)[month == 4, arr_delay := arr_delay + 10]
+```
+
+#### assign summary
+
+You can calculate grouped summary and assign the values to a variable by grouping in `by` and `:=` with summary expressions in `j`.
+
+```{webr-r}
+flights_mini[, mean_arr_delay := mean(arr_delay, na.rm = TRUE), by = month]
+
+#--- see what's inside ---#
+flights_mini[, .(month, arr_delay, mean_arr_delay)]
+```
+
+Of course, all the rows in the same month will have the same value (mean of the `arr_delay` of the group).
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Grouped operations
+
+::: {.panel-tabset}
+
+### By a single variable
+
+The number of flights by `origin`.
+
+```{webr-r}
+flights[, .(.N), by = .(origin)]
+```
+
++ `i`: no action (all rows) 
++ `j`: the number of observations
++ `by`: group by `origin` 
+
+**Note**: `.N` is a special symbol from the `data.table` package that means .red[the number of observations].
+
+### By multiple variables
+
+```{webr-r}
+flights[, .(.N), by = .(origin, month)] %>% 
+  head()
+```
+
+The number of flights by `origin` and `month`.
+
+
+### Grouped operations for select observations  
+
+```{webr-r}
+flights[carrier == "AA", .(.N), by = .(origin, month)] %>% head()
+```
+
+The number of flights by `origin` and `month` for `carrier == "AA"`
+
+<br>
+
+**`dplyr`** way :
+
+```{webr-r}
+flights %>% 
+  filter(carrier == "AA") %>% 
+  group_by(origin, month) %>% 
+  summarize(n()) %>%
+  head()
+```
+
+:::
+<!--end of panel-->
+
+
+## Other useful operations and tips
+
+::: {.panel-tabset}
+
+### Sorting
+
+You can use `order()` from the base package to sort a `data.table`.
+
+Sorting is about shuffling rows, so you will be working on `i`. 
+
+**Syntax**
+
+```{r eval = F}
+#--- NOT RUN ---#
+data.table[order(variable 1, vairable 2, ..), ]  
+```
+
+<br>
+
+**Example**
+
+```{webr-r}
+flights[order(origin, distance),] %>% head()
+```
+
+### Rename
+
+You can use `setnames()` to rename variables.
+
+```{webr-r}
+flights %>% 
+  setnames(c("dest", "air_time"), c("destination", "Air_Time"))
+```
+
+Note: `setnames()` is one of the `data.table` operations that updates the dataset in-place (by reference) just like `:=`.
+
+
+### Shift
+
+### Duplicated
+
+`duplicated()` checks whether each of the observations have other observations that are identical in values of the user-specified variables, and returns a TRUE/FALSE vector of length equal to the number of rows of the data.
+
+The following code checks if there are any other flights that fly on the same hour of the same day.
+
+```{webr-r}
+flights %>% 
+  duplicated(by = c("year", "month", "day", "hour")) %>% 
+  head(10)
+```
+
+### Unique
+
+`unique()` does the opposite of `duplicated()`. After applying `unique()`, you will be left with only the observations that are unique in all of the variables specified by the user (There will be only one observation that has the same values in all the user-specified variables).
+
+```{webr-r}
+unique(flights, by = c("year", "month", "day", "carrier"))  
+```
+
+### `fcase()`
+
+`fcase()` is like `case_when()` in `dplyr`. 
+
+```{r eval = F}
+fcase(
+  condition 1, value 1,  
+  condition 2, value 2,  
+  condition 3, value 3,  
+  .
+  .
+  .
+) 
+```
+
+**Example**
+
+```{webr-r}
+flights[, above_average_dealy := fcase(
+  arr_delay < mean(arr_delay), FALSE,  
+  arr_delay >= mean(arr_delay), TRUE  
+)]  
+
+flights[, .(arr_delay, above_average_dealy)]
+```
+
+Note: for this example, we could have just used `fifelse()` as the created variable is dichotomous.
+
+### Piping
+
+You can use `%>%` to chain piped operations just like `dplyr` using `.` to refer to the `data.table` generated through the preceding actions. 
+
+**Example:**
+
+```{r}
+#| eval: false
+flights[, .(.N), by = .(origin, month)] %>% 
+  .[i, j, by] %>% 
+  .[i, j, by] %>% 
+  .[i, j, by]  
+```
+
+:::
+<!--end of panel-->
+
+## .SD
+
+::: {.panel-tabset}
+
+### Instruction
+
+`.SD` (which stands for **S**ubset **D**ata) is a special symbol that allows you to do many cool things.
+
+Let's create a small `data.table` that will help us understand what `.SD` does (we will come back to the code later).
+
+```{webr-r}
+(
+flights_mini <- flights[,head(.SD, 2), by = month] %>% 
+  .[, .(year, month, dep_delay, arr_delay)]
+)
+```
+
+
+### What is it?
+
+Without grouping specified in `by`, `.SD` is the `data.table` itself. So, `flights_mini[, .SD]` is the same as `flights_mini` 
+
+But, when grouped, it becomes the subset (grouped) of the `data.table`.
+
+
+```{webr-r}
+flights_mini[, print(.SD), by = month]
+```
+
+Note that `.SD` contains all the columns except the grouping columns by default.
+
+### Example 1
+
+Apply the same function across all the variables:
+
+```{webr-r}
+flights_mini[, lapply(.SD, mean)]
+```
+
+<br>
+
+Of course, you could get the same results by this, but the output is a list, not a data.table.
+
+```{webr-r}
+lapply(flights_mini, mean)
+```
+
+<br>
+
+**dplyr** way:
+
+```{webr-r}
+summarize(flights_mini, across(everything(), mean))
+```
+
+### Example 2
+
+Apply the same function across all the variables by group:
+
+```{webr-r}
+flights_mini[, lapply(.SD, mean), by = month] %>% head()
+```
+
+<br>
+
+**dplyr** way:
+
+```{webr-r}
+flights_mini %>% 
+  group_by(month) %>% 
+  summarize(across(everything(), mean)) %>% head()
+```
+
+### Columns of choice
+
+Instead of let `.SD` contain all the columns, you can use `.SDcols` to pick variables to be included in `.SD` after `by,`.
+
+**Example**
+
+```{webr-r}
+flights_mini[, lapply(.SD, mean), by = month, .SDcols = c("arr_delay", "dep_delay")]
+```
+
+<br>
+
+You cannot use `.(variable name 1, variable name 1, ...)` for `.SDcols`. This would fail:
+
+```{webr-r}
+flights_mini[, lapply(.SD, mean), by = month, .SDcols = .(arr_delay, dep_delay)]
+```
+
+### Maximum
+
+A very important use case of `.SD` is identifying the observation with the maximum (or minimum) value of a variable by group. 
+
+Suppose you are trying to identify the flight that had the longest arrival delay by month-carrier. 
+
+```{webr-r}
+flights[, .SD[which.max(arr_delay), ], by = .(carrier, month)]
+
+#--- or equivalently ---#
+flights[, .SD[arr_delay == max(arr_delay), ], by = .(carrier, month)]
+```
+
+Remember that `.SD` is a list of `data.table`s grouped by carrier and month. `.SD[which.max(arr_dealy), ]` will find the row where the `arr_delay` is the highest by group (month-carrier).
+
+:::
+<!--end of panel-->
+
+## Reshaping datasets 
+
+::: {.panel-tabset}
+  
+### Data preparation
+
+Create the following datasets in the long format:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_long <- data.table(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  )
+)
+```
+
+
+### long to wide
+
+You can use `dcast()` function to make a long dataset wide:
+
+**Syntax**
+
+```{r eval = F}
+#--- NOT RUN ---#  
+dcast(data.table, A ~ B, value.var = C)
+```
+
+Using the `pivot_wider()` language, 
+
++ `B` is equivalent to variables you specify for `names_from` 
++ `C` is equivalent to variables you specify for `values_from` 
++ A are all the variables except B and C.
+
+<br>
+
+**Example**
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original long data:
+
+```{webr-r}
+yield_data_long
+```
+
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Wide data: 
+
+```{webr-r}
+(
+yield_data_wide <- dcast(yield_data_long, state ~ year, value.var = "yield")
+)
+```
+
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->  
+
+
+### wide to long
+
+You can use `melt()` function to make a wide dataset long:
+
+**Syntax**
+
+```{r}
+#| eval: false
+melt(data.table, id.vars = "state")  
+```
+
++ `id.vars` are the variables except those that will be melt into long format
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original wide data:
+
+```{webr-r}
+yield_data_wide 
+```
+
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Long data:
+```{webr-r}
+melt(yield_data_wide, id.vars = "state")
+```
+
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Reshaping datasets: multiple columns 
+
+::: {.panel-tabset}
+
+### prep
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Long data**
+
+```{webr-r}
+(
+yield_data_long <- data.table(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+  rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  )
+)
+```
+
+
+This data has multiple rows to be spread: `yield` and `rainfall`.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**Wide data**
+
+```{webr-r}
+(
+yield_data_wide <- 
+  yield_data_long %>% 
+  pivot_wider(
+    names_from = year, 
+    values_from = c(yield, rainfall)
+  ) %>% 
+  data.table()
+)
+```
+
+This data has multiple sets of columns to be melted: `yield_*` and `rainfall_*`.
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### long to wide
+
+It is easy to cast multiple variables to make a long data wide. You just need to give a list of variable names to the `value.var` option.
+
+
+```{webr-r}
+yield_data_long %>% 
+  dcast(state ~ year, value.var = c("yield", "rainfall"))   
+```
+
+
+### wide to long
+
+It is not as simple to make a wide data with multiple sets of columns to long.
+
+You can provide a list of sets of variables names to `melt()` to tell R which variables are belong to the same group using the `measure()` option.
+
+```{webr-r}
+#--- yield group ---#
+colA <- paste("yield_", 2019:2020, sep = "")
+
+#--- rainfall group ---#
+colB <- paste("rainfall_", 2019:2020, sep = "")
+
+#--- wide to long ---#
+yield_data_long <- melt(yield_data_wide, measure = list(colA, colB), value.name = c("yield", "rainfall")) 
+```
+
+Note however that year information from the variable names are lost. In the resulting dataset, `variable == 1` and `variable == 2` correspond to 2019 and 2020, respectively. So, you need an additional step to recover the original long data format. 
+
+Alternatively, it is probably better to follow the multi-step approach we took we used when we use `pivot_*()` in `dplyr`.
+
+### better alternative
+
+The strategy here is to 
+
++ first make the data long ignoring the fact we want `yield_*` and `rainfall_*` to be separate variables eventually
++ split variable names into two: variable meaning and year (done by `tstrsplit()`)  
++ and then use `dcast()` to make it wider
+
+```{webr-r}
+(
+yield_data_wide %>% 
+  melt(id.var = "state") %>% 
+  .[, c("type", "year") := tstrsplit(variable, "_", fixed = TRUE)] %>% 
+  .[, variable := NULL] %>% 
+  dcast(state + year ~ type, value.var = "value")
+)
+```
+
+:::
+<!--end of panel-->
+
+## Merging datasets
+
+::: {.panel-tabset}
+
+### How
+
+You can use the following syntax:
+
+```{r}
+#| eval: false
+dt1[dt2, on = .(list of variables)]
+```
+
+<br>
+
+This is the same as:
+
+```{r}
+#| eval: false
+left_join(dt2, dt1, by = c(list of variables)) 
+```
+
+<br>
+
+So, `dt2` is the base dataset and you are attaching `dt1` to `dt2`.
+
+
+### Example
+
+Let's first create a price data:
+
+```{webr-r}
+price_data <- 
+  data.table(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    price = runif(8, min = 3, max = 6)
+  )
+```
+
+<br>
+
+Now merge:
+
+```{webr-r}
+price_data[yield_data_long, on = .(state, year)]
+```
+
+
+### `left_join()`
+
+There is nothing to prevent you from using `dplyr::left_join()`.
+
+```{webr-r}
+left_join(yield_data_long, price_data, by = c("state", "year"))
+```
+
+<br>
+
+Remember, `data.table` is also a `data.frame`. So, any function that works with `data.frame` works for `data.table` as well.
+
+```{webr-r}
+#| autorun: true
+class(yield_data_long)
+```
+
+:::
+<!--end of panel-->
+
+
+
+

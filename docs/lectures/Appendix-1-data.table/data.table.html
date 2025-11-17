@@ -10,7 +10,7 @@
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.57">
 
-  <title>Data Science with R (AECN 896-05) – 01-1: Introduction to R</title>
+  <title>Data Science with R (AECN 896-05) – A-1: data.table package for data wrangling</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -653,7 +653,7 @@
   // Document level settings ----
 
   // Determine if we need to install R packages
-  globalThis.qwebrInstallRPackagesList = ['AER', 'fixest', 'dplyr', 'ggplot2'];
+  globalThis.qwebrInstallRPackagesList = ['dplyr', 'microbenchmark', 'data.table'];
 
   // Specify possible locations to search for the repository
   globalThis.qwebrPackageRepoURLS = ['https://repo.r-wasm.org/'];
@@ -675,7 +675,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"id":1,"code":"#--- addition ---#\n2 + 3.3\n\n#--- subtraction ---#\n6 - 2.7\n\n#--- multiplications ---#\n6 * 2\n\n#--- exponentiation ---#\n2^2.4\n\n#--- division ---#\n6 / 2\n\n#--- remainder ---#\n6 %% 4\n\n#--- quotient ---#\n6 %/% 4","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-1","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":2,"code":"5 == 5\n\n5 == 4\n\n5 > 4\n\n5 < 4","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-2","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":3,"code":"#--- character ---#\n\"R\"\n\n#--- character ---#\n\" rocks\"","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-3","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":4,"code":"\"R\" + \"rocks\"","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-4","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":5,"code":"a <- 1\nb <- 2","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-5","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":6,"code":"a","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-6","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":7,"code":"#--- character ---#\nb <- \"R rocks\"\n\nb\n\n#--- logical ---#\nd <- 1 == 2\n\nd","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-7","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":8,"code":"a <- 3\na <- 1\na","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-8","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":9,"code":"1a <- 2  ","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-9","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":10,"code":"#--- try this ---#\nif <- 3  ","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-10","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":11,"code":"#--- create a vector of numbers ---#\na <- c(4, 3, 5, 9, 1)\n\na\n\n#--- create a vector of characters ---#\nb <- c(\"python\", \"is\", \"better\", \"than\", \"R\")\nb","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-11","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":12,"code":"#--- create a vector of numbers ---#\na_vector <- c(4, 3, \"5\", 9, 1)\n\n#--- see its content ---#\na_vector","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-12","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":13,"code":"#--- create a vector of numbers ---#\na_list <- list(4, 3, \"5\", 9, 1)\n\n#--- see its content ---#\na_list","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-13","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":14,"code":"#--- create a matrix of numbers ---#\nM_num <- matrix(c(2, 4, 3, 1, 5, 7), nrow = 3)\n\nM_num","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-14","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":15,"code":"#--- create a matrix of characters ---#\nM_char <- matrix(c(\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"), nrow = 3)\n\nM_char","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-15","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":16,"code":"#--- create a data.frame ---#\nyield_data <- data.frame(\n  nitrogen = c(200, 180, 300),\n  yield = c(240, 220, 230),\n  state = c(\"Kansas\", \"Nebraska\", \"Iowas\")\n)\n\nyield_data","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-16","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":17,"code":"#--- check the class ---#\nclass(yield_data)\n\n#--- check the \"internal\" type ---#\ntypeof(yield_data)\n\n#--- look into the structure of an object ---#\nstr(yield_data)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-17","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":18,"code":"min(c(1, 2))","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-18","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":19,"code":"v1 <- seq(0, 100, by = 5)\nv2 <- seq(0, 100, length = 21)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-19","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":20,"code":"v3 <- rep(10, 5)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-20","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":21,"code":"v1_sum <- sum(v1)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-21","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":22,"code":"v1_len <- length(v1)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-22","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":23,"code":"","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-23","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":24,"code":"","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-24","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":25,"code":"","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-25","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":26,"code":"a <- c(1, 2, 3, 4, 5)\n\nb <- a","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-26","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":27,"code":"#--- addition ---#\na + b\n\n#--- subtraction ---#\na - b\n\n#--- multiplication ---#\na * b\n\n#--- division ---#\na / b","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-27","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":28,"code":"#--- second element of vector a ---#\na[2]\n\n#--- third element of vector a ---#\nb[3]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-28","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":29,"code":"#--- first and second elements of vector a ---#\na[c(1, 2)]\n\n#--- first and fifth elements of vector b ---#\nb[c(1, 5)]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-29","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":30,"code":"#--- define matrix ---#\n# A <- matrix(a value, # of rows, # of cols)\nA <- matrix(2, 3, 2)\nA\n\n# B <- matrix(vector,# rows)\nB <- matrix(c(2, 4, 3, 1, 5, 7), nrow = 3)\nB","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-30","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":31,"code":"#--- matrix addition by element ---#\nA + B\n\n#--- matrix multiplication by element ---#\nA * B","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-31","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":32,"code":"#--- transpose ---#\nt(B)\n\n#--- matrix multiplication ---#\nA %*% t(B)","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-32","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":33,"code":"#--- 1st row, 2nd column ---#\nA[1, 2]\n\n#--- 1st and 3rd row, 2nd column ---#\nA[c(1, 3), 2]\n\n#--- all the values in the first row ---#\nA[1, ]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-33","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":34,"code":"#--- 2nd element ---#\na_list[[2]]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-34","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":35,"code":"#--- 1st and 3rd elements ---#\na_list[c(1, 3)]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-35","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":36,"code":"#--- check the name of the elements ---#\nnames(a_list)\n\n#--- an element called b (2nd element) ---#\na_list$b","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-36","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":37,"code":"mtcars","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-37","out-height":"","editor-max-height":"","editor-word-wrap":"true"}},{"id":38,"code":"#--- list-like: access the state column (element) ---#\nmtcars$gear\n\n#--- matrix-like: 1st row, 2nd column (yield) ---#\nmtcars[1, 2]","options":{"fig-width":7,"out-width":"80%","message":"true","fig-cap":"","autorun":"false","dpi":72,"output":"true","fig-height":5,"context":"interactive","comment":"","results":"markup","warning":"true","classes":"","editor-quick-suggestions":"false","read-only":"false","editor-font-scale":"0.7","label":"unnamed-chunk-38","out-height":"","editor-max-height":"","editor-word-wrap":"true"}}];
+  globalThis.qwebrCellDetails = [{"id":1,"code":"(\n  flights <- fread(\"https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv\")\n)","options":{"context":"interactive","out-height":"","autorun":"true","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-1","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":2,"code":"flights[carrier == \"AA\", .(.N), by = .(origin, month)] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-2","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":3,"code":"flights %>% \n  filter(carrier == \"AA\") %>% \n  group_by(origin, month) %>% \n  summarize(n()) %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-3","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":4,"code":"flights[origin == \"JFK\" & month == 6L, ] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-4","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":5,"code":"flights[, arr_delay] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-5","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":6,"code":"flights[, .(arr_delay)] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-6","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":7,"code":"flights[, .(arr_delay, dep_delay)] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-7","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":8,"code":"flights[, .(a = arr_delay, b = dep_delay)] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-8","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":9,"code":"flights[, c(\"arr_delay\", \"dep_delay\")] %>% head(3)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-9","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":10,"code":"flights[, !c(\"arr_delay\", \"dep_delay\")] %>% head(3)\nflights[, -c(\"arr_delay\", \"dep_delay\")] %>% head(3)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-10","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":11,"code":"flights[, (arr_delay + dep_delay) < 0] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-11","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":12,"code":"flights[\n  origin == \"JFK\" & month == 6L, # i\n  .(m_arr = mean(arr_delay), m_dep = mean(dep_delay)) # j\n  ]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-12","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":13,"code":"filter(flights, origin == \"JFK\" & month == 6L) %>% \n  summarize(m_arr = mean(arr_delay), m_dep = mean(dep_delay))","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-13","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":14,"code":"(\nflights_mini <- flights[month <= 4,head(.SD, 2), by = month] %>% \n  .[, .(year, month, day, dep_delay, arr_delay, distance, air_time)] \n)","options":{"context":"interactive","out-height":"","autorun":"true","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-14","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":15,"code":"flights_mini_no_change <- copy(flights_mini)","options":{"context":"output","out-height":"","autorun":"true","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-15","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":16,"code":"#--- example ---#\nflights_mini[, speed := distance / air_time]\n\n#--- see what's inside now ---#\nflights_mini","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-16","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":17,"code":"#--- create a copy ---#\nflights_mini_copy <- copy(flights_mini)\n\n#--- create a variable ---#\nflights_mini[, constant := 1]\n\n#--- see what's inside of the copy ---#\nflights_mini_copy","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-17","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":18,"code":"#--- example ---#\nflights_mini[, c(\"total_delay\", \"carrier_origin\") := list(arr_delay + dep_delay, distance/air_time)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-18","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":19,"code":"#--- example ---#\nflights_mini[, `:=`(total_delay = arr_delay + dep_delay, speed = distance/air_time)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-19","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":20,"code":"copy(flights_mini)[month == 4, arr_delay := arr_delay + 10]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-20","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":21,"code":"flights_mini[, mean_arr_delay := mean(arr_delay, na.rm = TRUE), by = month]\n\n#--- see what's inside ---#\nflights_mini[, .(month, arr_delay, mean_arr_delay)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-21","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":22,"code":"flights[, .(.N), by = .(origin)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-22","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":23,"code":"flights[, .(.N), by = .(origin, month)] %>% \n  head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-23","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":24,"code":"flights[carrier == \"AA\", .(.N), by = .(origin, month)] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-24","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":25,"code":"flights %>% \n  filter(carrier == \"AA\") %>% \n  group_by(origin, month) %>% \n  summarize(n()) %>%\n  head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-25","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":26,"code":"flights[order(origin, distance),] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-26","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":27,"code":"flights %>% \n  setnames(c(\"dest\", \"air_time\"), c(\"destination\", \"Air_Time\"))","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-27","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":28,"code":"flights %>% \n  duplicated(by = c(\"year\", \"month\", \"day\", \"hour\")) %>% \n  head(10)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-28","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":29,"code":"unique(flights, by = c(\"year\", \"month\", \"day\", \"carrier\"))  ","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-29","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":30,"code":"flights[, above_average_dealy := fcase(\n  arr_delay < mean(arr_delay), FALSE,  \n  arr_delay >= mean(arr_delay), TRUE  \n)]  \n\nflights[, .(arr_delay, above_average_dealy)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-30","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":31,"code":"(\nflights_mini <- flights[,head(.SD, 2), by = month] %>% \n  .[, .(year, month, dep_delay, arr_delay)]\n)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-31","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":32,"code":"flights_mini[, print(.SD), by = month]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-32","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":33,"code":"flights_mini[, lapply(.SD, mean)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-33","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":34,"code":"lapply(flights_mini, mean)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-34","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":35,"code":"summarize(flights_mini, across(everything(), mean))","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-35","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":36,"code":"flights_mini[, lapply(.SD, mean), by = month] %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-36","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":37,"code":"flights_mini %>% \n  group_by(month) %>% \n  summarize(across(everything(), mean)) %>% head()","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-37","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":38,"code":"flights_mini[, lapply(.SD, mean), by = month, .SDcols = c(\"arr_delay\", \"dep_delay\")]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-38","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":39,"code":"flights_mini[, lapply(.SD, mean), by = month, .SDcols = .(arr_delay, dep_delay)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-39","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":40,"code":"flights[, .SD[which.max(arr_delay), ], by = .(carrier, month)]\n\n#--- or equivalently ---#\nflights[, .SD[arr_delay == max(arr_delay), ], by = .(carrier, month)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-40","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":41,"code":"(\nyield_data_long <- data.table(\n  state = c(\"Kansas\", \"Nebraska\", \"Iowa\", \"Illinois\") %>% rep(each = 2),\n  year = c(2019, 2020) %>% rep(4),\n  yield = c(200, 240, 210, 220, 220, 230, 190, 150)\n  )\n)","options":{"context":"interactive","out-height":"","autorun":"true","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-41","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":42,"code":"yield_data_long","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-42","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":43,"code":"(\nyield_data_wide <- dcast(yield_data_long, state ~ year, value.var = \"yield\")\n)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-43","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":44,"code":"yield_data_wide ","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-44","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":45,"code":"melt(yield_data_wide, id.vars = \"state\")","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-45","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":46,"code":"(\nyield_data_long <- data.table(\n  state = c(\"Kansas\", \"Nebraska\", \"Iowa\", \"Illinois\") %>% rep(each = 2),\n  year = c(2019, 2020) %>% rep(4),\n  yield = c(200, 240, 210, 220, 220, 230, 190, 150),\n  rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)\n  )\n)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-46","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":47,"code":"(\nyield_data_wide <- \n  yield_data_long %>% \n  pivot_wider(\n    names_from = year, \n    values_from = c(yield, rainfall)\n  ) %>% \n  data.table()\n)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-47","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":48,"code":"yield_data_long %>% \n  dcast(state ~ year, value.var = c(\"yield\", \"rainfall\"))   ","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-48","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":49,"code":"#--- yield group ---#\ncolA <- paste(\"yield_\", 2019:2020, sep = \"\")\n\n#--- rainfall group ---#\ncolB <- paste(\"rainfall_\", 2019:2020, sep = \"\")\n\n#--- wide to long ---#\nyield_data_long <- melt(yield_data_wide, measure = list(colA, colB), value.name = c(\"yield\", \"rainfall\")) ","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-49","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":50,"code":"(\nyield_data_wide %>% \n  melt(id.var = \"state\") %>% \n  .[, c(\"type\", \"year\") := tstrsplit(variable, \"_\", fixed = TRUE)] %>% \n  .[, variable := NULL] %>% \n  dcast(state + year ~ type, value.var = \"value\")\n)","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-50","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":51,"code":"price_data <- \n  data.table(\n    state = c(\"Kansas\", \"Nebraska\", \"Iowa\", \"Illinois\") %>% rep(each = 2),\n    year = c(2019, 2020) %>% rep(4),\n    price = runif(8, min = 3, max = 6)\n  )","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-51","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":52,"code":"price_data[yield_data_long, on = .(state, year)]","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-52","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":53,"code":"left_join(yield_data_long, price_data, by = c(\"state\", \"year\"))","options":{"context":"interactive","out-height":"","autorun":"false","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-53","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}},{"id":54,"code":"class(yield_data_long)","options":{"context":"interactive","out-height":"","autorun":"true","dpi":72,"read-only":"false","classes":"","label":"unnamed-chunk-54","out-width":"100%","output":"true","comment":"","editor-max-height":"","results":"markup","message":"true","editor-font-scale":"0.7","editor-quick-suggestions":"false","warning":"true","fig-height":5,"fig-cap":"","fig-width":7,"editor-word-wrap":"true"}}];
 
   </script>
   <script type="module">
@@ -1872,8 +1872,8 @@
   }
 
   </script>
-<meta property="og:title" content="01-1: Introduction to R – Data Science with R (AECN 896-05)">
-<meta property="og:description" content="Chapter 1: R Introduction">
+<meta property="og:title" content="A-1: data.table package for data wrangling – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Appendix 1: Data Wrangling with data.table Package">
 <meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 <body class="quarto-light">
@@ -2165,456 +2165,285 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">01-1: Introduction to R</h1>
+  <h1 class="title">A-1: <code>data.table</code> package for data wrangling</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="learning-objectives" class="slide level2">
-<h2>Learning Objectives</h2>
-<ul>
-<li>become familiar with programming</li>
-<li>become capable of using R software to conduct research independently
-<ul>
-<li>manipulate data</li>
-<li>visualize data</li>
-<li>report results</li>
-<li>spatial data management</li>
-</ul></li>
-</ul>
-</section>
-<section id="table-of-contents" class="slide level2 scrollable">
-<h2>Table of contents</h2>
-<ol type="1">
-<li><a href="#/sec-intro">Introduction to R and RStudio</a></li>
-<li><a href="#/sec-objects">Various object types</a></li>
-<li><a href="#/sec-functions-pacakges">Functions and packages</a></li>
-<li><a href="#/sec-objects-basics">Some fundamentals on vector, matrix, list, and data.frame</a></li>
-</ol>
-</section>
-<section>
-<section id="sec-intro" class="title-slide slide level1 center">
-<h1>Introduction to R and RStudio</h1>
-
-<div style="float:left">
-
-</div>
-<hr color="#EB811B" size="2px" width="1280px">
-
-</section>
-<section id="r" class="slide level2">
-<h2>R</h2>
-<ul>
-<li>a very popular statistical programming language used in academia and industry<br>
-</li>
-<li>started out as software to do statistics, designed by a number of statisticians</li>
-<li>is open-source and free</li>
-<li>has been and is evolving rapidly by the contributions of its users</li>
-<li>state-of-the-art statistical methods (e.g., machine learning algorithms) written by the developers of the methods</li>
-<li>geographic information system (GIS)</li>
-<li>big data handling and analysis</li>
-</ul>
-</section>
-<section id="rstudio" class="slide level2">
-<h2>RStudio</h2>
-<ul>
-<li>R has a terrible graphic user interface</li>
-<li>RStudio is by far the most popular graphic user interface of R</li>
-</ul>
-
-<img data-src="R-interface.png" class="r-stretch quarto-figure-center"><p class="caption">R User Interface</p></section>
-<section id="install-r-and-rstudio" class="slide level2">
-<h2>Install R and RStudio</h2>
-<ul>
-<li>Install <a href="https://www.r-project.org/">R</a></li>
-<li>Install <a href="https://www.rstudio.com/">RStudio</a></li>
-</ul>
-</section>
-<section id="introduction-to-rstudio" class="slide level2">
-<h2>Introduction to RStudio</h2>
-<p><strong>Four panes</strong></p>
-<ul>
-<li>R script (upper left)</li>
-<li>Console (lower left)</li>
-<li>Environment (upper right)</li>
-<li>Files, plots, packages, and help (lower right)</li>
-</ul>
-<p><strong>Small tips</strong></p>
-<ul>
-<li>Appearance</li>
-<li>Pane Layout</li>
-</ul>
-</section></section>
-<section>
-<section id="getting-started-with-r-and-rstudio" class="title-slide slide level1 center">
-<h1>Getting started with R and RStudio</h1>
-
-<div style="float:left">
-
-</div>
-<hr color="#EB811B" size="2px" width="1280px">
-
-</section>
-<section id="objectives" class="slide level2">
-<h2>Objectives</h2>
-<p>Learn how to</p>
-<ul>
-<li>do basic mathematical operations</li>
-<li>define objects in R</li>
-<li>learn different object types</li>
-<li>use RStudio at the same time</li>
-</ul>
-</section>
-<section id="basic-element-types-atomic-mode" class="slide level2">
-<h2>Basic element types (atomic mode)</h2>
-<ul>
-<li>integer: e.g., 1, 3,<br>
-</li>
-<li>numeric (double): e.g., 1, 1.3</li>
-<li>complex:</li>
-<li>logical (boolean): true or false</li>
-<li>character: combination of letters (numerical operations not allowed)</li>
-</ul>
-</section>
-<section id="basic-arithmetic-r-as-a-calculator" class="slide level2">
-<h2>Basic arithmetic: R as a calculator</h2>
-<div id="qwebr-insertion-location-1"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<div title="RStudio Tip">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>RStudio Tip</strong></p>
-</div>
-<div class="callout-content">
-<p>You can run the selected codes by hitting</p>
-<ul>
-<li>Mac: <code>command</code> + <code>enter</code></li>
-<li>Windows: <code>Control</code> + <code>enter</code></li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="logical-values-and-operators" class="slide level2">
-<h2>logical values and operators</h2>
-<div id="qwebr-insertion-location-2"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</section>
-<section id="character" class="slide level2">
-<h2>Character</h2>
-<p>Contents enclosed by double (or single) quotation marks will be recognized as characters.</p>
-<div id="qwebr-insertion-location-3"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>You cannot do addition using characters</p>
-<div id="qwebr-insertion-location-4"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>We will learn string manipulations later using the <code>stringr</code> package.</p>
-</section>
-<section id="assigning-contents-to-an-object" class="slide level2">
-<h2>Assigning contents to an object</h2>
+<section id="tips-to-make-the-most-of-the-lecture-notes" class="slide level2">
+<h2>Tips to make the most of the lecture notes</h2>
 <div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">How</a></li><li><a href="#tabset-1-2">Example</a></li><li><a href="#tabset-1-3">Object evaluation</a></li><li><a href="#tabset-1-4">More examples</a></li><li><a href="#tabset-1-5">Notes</a></li></ul>
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Interactive navigation tools</a></li><li><a href="#tabset-1-2">Running and writing codes</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1">
 <ul>
-<li>You can assign contents (numeric numbers, character, boolean, etc) to an object on R and reuse it later using either <code>&lt;-</code> or <code>=</code>.</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>object_name <span class="ot">&lt;-</span> contents</span>
-<span id="cb1-2"><a></a>object_name <span class="ot">=</span> contents</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<ul>
-<li>It does not really matter which of <code>&lt;-</code> or <code>=</code> to use. You should pick whichever makes sense for you (though it is often recommended to use <code>&lt;-</code>). But, it is a good idea to be consistent.</li>
+<li><p>Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want</p></li>
+<li><p>Hit letter “o” on your keyboard and you will have a panel view of all the slides</p></li>
 </ul>
 </div>
 <div id="tabset-1-2">
+<ul>
+<li>The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the “code area”).</li>
+<li>Hit the “Run Code” button to execute all the code inside the code area.</li>
+<li>You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).</li>
+<li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
+<li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
+</ul>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="learning-objectives" class="slide level2">
+<h2>Learning objectives</h2>
+<p>The objectives of this chapter is to learn how to use the <code>data.table</code> package to</p>
+<ul>
+<li>manipulate data</li>
+<li>reshape a dataset</li>
+<li>merge multiple datasets</li>
+</ul>
+</section>
+<section id="data.table-package" class="slide level2">
+<h2><code>data.table</code> package</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">What is it?</a></li><li><a href="#tabset-2-2">preparation</a></li><li><a href="#tabset-2-3">how</a></li><li><a href="#tabset-2-4">To a <code>data.able</code> object</a></li><li><a href="#tabset-2-5">key difference from <code>dplyr</code></a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<ul>
+<li>The <code>data.table</code> package is a popular alternative to <code>dplyr</code> that is <strong>much faster</strong> than <code>dplyr</code> for most data operations particularly when the dataset is large.
+<ul>
+<li>See <a href="https://github.com/Rdatatable/data.table/wiki/Benchmarks-%3A-Grouping">here</a> for the speed comparison of <code>dplyr</code> and <code>data.table</code>.</li>
+<li><a href="https://atrebas.github.io/post/2019-03-03-datatable-dplyr/">This website</a> compares <code>dply</code> vs <code>data.table</code> side by side.</li>
+</ul></li>
+<li><code>data.table</code> has its own class of “<code>data.frame</code>” called <code>data.table</code></li>
+</ul>
+</div>
+<div id="tabset-2-2">
+<p><strong>Package</strong></p>
+<p>Install the package if you have not and library it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="co">#--- install ---# </span></span>
+<span id="cb1-2"><a></a><span class="fu">install.packages</span>(<span class="st">"data.table"</span>)</span>
+<span id="cb1-3"><a></a></span>
+<span id="cb1-4"><a></a><span class="co">#--- library ---#</span></span>
+<span id="cb1-5"><a></a><span class="fu">library</span>(data.table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Dataset</strong></p>
+<p>We use the following <code>weather</code> dataset.</p>
+<div id="qwebr-insertion-location-1"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-2-3">
+<p>Here is the general form of <code>data.table</code> operation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>data.table[i, j, by]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><code>i</code>: specify which rows (like <code>dplyr::filter</code>)<br>
+</li>
+<li><code>j</code>: specify the operations on selected columns<br>
+</li>
+<li><code>by</code>: specify the variable to be used as groups by which operations specified in <code>j</code> are implemented</li>
+</ul>
+</div>
+<div id="tabset-2-4">
+
+</div>
+<div id="tabset-2-5">
+<p>You can implement all the three main actions in a single statement unlike <code>dplyr</code>:</p>
+<p>For example, the following set of codes below will give the same results (the number of flights by American Airline by origin-month):</p>
+<p><strong><code>data.table</code></strong> way:</p>
+<div id="qwebr-insertion-location-2"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong><code>dplyr</code></strong> way :</p>
+<div id="qwebr-insertion-location-3"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="key-actions" class="slide level2">
+<h2>Key actions</h2>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Filter rows</a></li><li><a href="#tabset-5-2">Select columns</a></li><li><a href="#tabset-5-3">Operations in <code>j</code></a></li><li><a href="#tabset-5-4">Create new (or update) variables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<p>You can filter rows that satisfy certain conditions like below:</p>
+<div id="qwebr-insertion-location-4"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<ul>
+<li><code>i</code>: <code>origin == "JFK" &amp; month == 6L</code></li>
+<li><code>j</code>: no action (all columns)</li>
+<li><code>by</code>: non</li>
+</ul>
+</div>
+<div id="tabset-5-2">
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Single column</a></li><li><a href="#tabset-3-2">Multiple columns</a></li><li><a href="#tabset-3-3">Like a <code>data.frame</code></a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<p><strong>single column as a vector</strong></p>
 <div id="qwebr-insertion-location-5"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>Notice that these objects are now in the list of objects on the <strong>environment</strong> tab of RStudio.</p>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>You can insert the assignment operator (<code>&lt;-</code>) by hitting</p>
 <ul>
-<li>Mac: <code>Option</code> + <code>-</code></li>
-<li>Windows <code>Alt</code> + <code>-</code></li>
+<li><code>i</code>: no action (all rows)</li>
+<li><code>j</code>: get <code>arr_delay</code> itself as it is</li>
+<li><code>by</code>: non</li>
 </ul>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-1-3">
-<p>Once objects are created, you can evaluate them on the console to see what is inside:</p>
+<p><strong>single column as a data.table</strong></p>
 <div id="qwebr-insertion-location-6"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><code>.</code> here is a short hand for <code>list</code></p>
+</div>
+<div id="tabset-3-2">
+<p><strong>multiple column as a data.table</strong></p>
+<div id="qwebr-insertion-location-7"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
+<p><strong>select and rename multiple column as a data.table</strong></p>
+<div id="qwebr-insertion-location-8"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p>I often ask you to <strong>evaluate</strong> an R object. That just means looking inside the R object to see what is inside.</p>
+<p>As long as j-expression returns a list, each element of the list will be converted to a column in the resulting data.table.</p>
 </div>
 </div>
 </div>
 </div>
-<div id="tabset-1-4">
-<div id="qwebr-insertion-location-7"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-1-5">
-<p>Several things to remember about assignment:</p>
-<ul>
-<li>If you assign contents to an object of the same name, the object that had the same name will be overwritten</li>
-</ul>
-<div id="qwebr-insertion-location-8"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ul>
-<li>Object names cannot start with a numeric number. Try the following:</li>
-</ul>
+<div id="tabset-3-3">
+<p><strong>Select variables (like <code>data.frame</code>)</strong></p>
+<p>Another way to select particular columns is to provide a concatenated list of variable names in double quotes (just like a <code>data.frame</code>):</p>
 <div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<ul>
-<li>You cannot use a reserved word as the name of an object (complete list found <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html">here</a>)</li>
-</ul>
+<p><strong>Dropping variables</strong></p>
+<p>You can drop variables by using <code>-</code> or <code>!</code> in front of the list of the variables to drop:</p>
 <div id="qwebr-insertion-location-10"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
 </div>
 <!--end of panel-->
-</section></section>
-<section>
-<section id="sec-objects" class="title-slide slide level1 center">
-<h1>Various object types</h1>
-
-<div style="float:left">
-
 </div>
-<hr color="#EB811B" size="2px" width="1280px">
-
-</section>
-<section id="objects" class="slide level2">
-<h2>Objects</h2>
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Basics</a></li><li><a href="#tabset-3-2">Vector</a></li><li><a href="#tabset-3-3">List</a></li><li><a href="#tabset-3-4">Matrix</a></li><li><a href="#tabset-3-5"><code>data.frame</code></a></li><li><a href="#tabset-3-6">Recognizing the class</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<ul>
-<li>R is an object-oriented programming (OOP), which basically means:</li>
-</ul>
-<p>“Everything is an object and everything has a name.”</p>
-<ul>
-<li><p>R has many different object types (classes)</p>
-<ul>
-<li>vector</li>
-<li>matrix</li>
-<li>data.frame</li>
-<li>list</li>
-<li>function</li>
-</ul></li>
-</ul>
-</div>
-<div id="tabset-3-2">
-<div title="Definition">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Definition</strong></p>
-</div>
-<div class="callout-content">
-<p>A vectors is a class of object that consists of elements of the <strong>same</strong> kind (it can have only one type of elements). You use <code>c()</code> to create a vector.</p>
-</div>
-</div>
-</div>
-</div>
-<p><strong>Example</strong></p>
+<div id="tabset-5-3">
+<p><strong>An operation in <code>j</code></strong></p>
 <div id="qwebr-insertion-location-11"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<p><strong>Different modes?</strong></p>
-<p>What if we mix elements of different mode</p>
+<p><strong>Row-wise subset and operation in <code>j</code> at the same time</strong></p>
 <div id="qwebr-insertion-location-12"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Remember the rule? <code>.(m_arr = mean(arr_delay), m_dep = mean(dep_delay))</code> is a list, so the output is a <code>data.table</code>.</p>
 <p><br></p>
-<p>All the numeric values are converted to characters.</p>
-</div>
-<div id="tabset-3-3">
-<div title="Definition">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Definition</strong></p>
-</div>
-<div class="callout-content">
-<p>A <code>list</code> is a class of object that consists of elements of mixed types.</p>
-</div>
-</div>
-</div>
-</div>
-<p><strong>Example</strong></p>
-<ul>
-<li>A <code>list</code> is very flexible. It can hold basically any type of R objects as its elements.</li>
-</ul>
+<p><strong><code>dplyr</code> way</strong>:</p>
 <div id="qwebr-insertion-location-13"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ul>
-<li>We will see more complex examples later.</li>
-</ul>
 </div>
-<div id="tabset-3-4">
-<div title="Definition">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Definition</strong></p>
-</div>
-<div class="callout-content">
-<p>A <code>matrix</code> is a class of object that consists of elements of the <strong>same</strong> kind (it can have only one element) stored in a two-dimensional array.</p>
-</div>
-</div>
-</div>
-</div>
-<p><strong>Examples</strong></p>
+<div id="tabset-5-4">
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">preparation</a></li><li><a href="#tabset-4-2">a variable</a></li><li><a href="#tabset-4-3">copy</a></li><li><a href="#tabset-4-4">multiple</a></li><li><a href="#tabset-4-5">selective update</a></li><li><a href="#tabset-4-6">assign summary</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<p>Create the following dataset we are going to use in this slide:</p>
 <div id="qwebr-insertion-location-14"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
+<p><code>flights_mini</code> has two observations per month.</p>
 <div id="qwebr-insertion-location-15"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-3-5">
-<p><code>data.frame</code> is like a matrix (or a list of columns)</p>
-<p><br></p>
+<div id="tabset-4-2">
+<p>In <code>data.table</code>, you use <code>:=</code> to create a new variable instead of <code>=</code>.</p>
 <div id="qwebr-insertion-location-16"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>There are different kinds of objects that are like “data.frame”</p>
-<ul>
-<li>tibble</li>
-<li>data.table</li>
-</ul>
-<p>We will talk about some of them later.</p>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
 </div>
-<div id="tabset-3-6">
-<div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Why?</a></li><li><a href="#tabset-2-2">How</a></li><li><a href="#tabset-2-3">Visual inspection</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1">
-<p>It is critical to recognize the class of the objects:</p>
+<div class="callout-content">
 <ul>
-<li>the same function does different things depending on the class of the object to which the function is applied<br>
-</li>
-<li>some functions work on some object classes, but not on others</li>
+<li><code>:=</code> operator updates data.table columns in-place (by reference), meaning the original data is altered.</li>
+<li>Evaluate <code>flights</code> and confirm that <code>speed</code> is indeed in <code>flights_mini</code>.</li>
+<li>This holds true for any operations involving <code>:=</code>.</li>
+<li>This is different from <code>dply.r::mutate()</code> which does not alter the original dataset</li>
 </ul>
-<p>Many of the errors you will encounter while working on R has something to do with applying functions that are not applicable to the objects you are working on!</p>
 </div>
-<div id="tabset-2-2">
-<p>Use <code>class</code>, <code>typeof</code>, and <code>str</code> commands to know more about what kind of objects you are dealing with:</p>
+</div>
+</div>
+</div>
+<div id="tabset-4-3">
+<p>If you have a reason to not wanting the original data to be altered after <code>:=</code> operations. You can create a <code>deep copy</code> of the dataset using <code>data.table::copy()</code> function.</p>
+<p>The object created by <code>copy()</code> is independent of the original dataset in the sense that actions on one of them do not affect the other.</p>
 <div id="qwebr-insertion-location-17"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-2-3">
-<p>You could also use <code>View()</code> function for visual inspection:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">View</span>(yield_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section></section>
-<section>
-<section id="sec-functions-pacakges" class="title-slide slide level1 center">
-<h1>Function and package</h1>
-
-<div style="float:left">
-
-</div>
-<hr color="#EB811B" size="2px" width="1280px">
-
-</section>
-<section id="function" class="slide level2 scrollable">
-<h2>Function</h2>
-<div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">What is a function?</a></li><li><a href="#tabset-4-2">Why functions?</a></li><li><a href="#tabset-4-3">Some other useful functions</a></li><li><a href="#tabset-4-4">Exercises</a></li></ul>
-<div class="tab-content">
-<div id="tabset-4-1">
-<p>A function takes R objects (vector, data.frame, etc), processes them, and returns R objects</p>
-<p><br></p>
-<p><strong>Example:</strong></p>
-<p><code>min()</code> takes a vector of values as an argument and returns the minimum of all the values in the vector</p>
+<div id="tabset-4-4">
+<p>Here are how you define multiple variables at the same time.</p>
+<p><strong>Multiple variable 1</strong></p>
 <div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-4-2">
-<ul>
-<li><p>Functions (both base and user-written) are what makes R compelling to use as major statistical and programming software!</p></li>
-<li><p>Indeed, this course is pretty much all about learning useful functions that make your life easier</p></li>
-<li><p>We will learn lots of functions that are made available through user-written packages</p></li>
-</ul>
-</div>
-<div id="tabset-4-3">
-<ul>
-<li>create a sequence of values</li>
-</ul>
+<p>The results of the <code>n</code>th expression is assigned to <code>n</code>th variable name on the left.</p>
+<p><br></p>
+<p><strong>Multiple variable 2</strong></p>
 <div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ul>
-<li>repeat values</li>
-</ul>
+<p>Confirm that <code>flights_mini</code> was updated to have the new variables defined just above.</p>
+</div>
+<div id="tabset-4-5">
+<p>You can update column values for some rows that satisfy certain conditions by using logical evaluations in <code>i</code> and <code>:=</code> in <code>j</code>.</p>
+<p><strong>Example</strong></p>
 <div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ul>
-<li>sum values</li>
-</ul>
+</div>
+<div id="tabset-4-6">
+<p>You can calculate grouped summary and assign the values to a variable by grouping in <code>by</code> and <code>:=</code> with summary expressions in <code>j</code>.</p>
 <div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ul>
-<li>find the length of an vector</li>
-</ul>
+<p>Of course, all the rows in the same month will have the same value (mean of the <code>arr_delay</code> of the group).</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="grouped-operations" class="slide level2">
+<h2>Grouped operations</h2>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">By a single variable</a></li><li><a href="#tabset-6-2">By multiple variables</a></li><li><a href="#tabset-6-3">Grouped operations for select observations</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<p>The number of flights by <code>origin</code>.</p>
 <div id="qwebr-insertion-location-22"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<ul>
+<li><code>i</code>: no action (all rows)</li>
+<li><code>j</code>: the number of observations</li>
+<li><code>by</code>: group by <code>origin</code></li>
+</ul>
+<p><strong>Note</strong>: <code>.N</code> is a special symbol from the <code>data.table</code> package that means .red[the number of observations].</p>
 </div>
-<div id="tabset-4-4">
-<ol type="1">
-<li>generate a vector (call it <span class="math inline">\(x\)</span>) that starts from 1 and increase by 2 until 99</li>
-</ol>
+<div id="tabset-6-2">
 <div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<ol start="2" type="1">
-<li>calculate the sample mean of <span class="math inline">\(x\)</span></li>
-</ol>
-<p><span class="math inline">\(\frac{1}{n}\sum_{i=1}^n x_i\)</span></p>
+<p>The number of flights by <code>origin</code> and <code>month</code>.</p>
+</div>
+<div id="tabset-6-3">
 <div id="qwebr-insertion-location-24"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>The number of flights by <code>origin</code> and <code>month</code> for <code>carrier == "AA"</code></p>
 <p><br></p>
-<ol start="3" type="1">
-<li>calculate the sample variance of <span class="math inline">\(x\)</span></li>
-</ol>
-<p><span class="math inline">\(\frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})^2\)</span>, where <span class="math inline">\(\bar{x}\)</span> is the sample mean</p>
+<p><strong><code>dplyr</code></strong> way :</p>
 <div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -2622,212 +2451,297 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </div>
 <!--end of panel-->
 </section>
-<section id="package" class="slide level2">
-<h2>Package</h2>
+<section id="other-useful-operations-and-tips" class="slide level2">
+<h2>Other useful operations and tips</h2>
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">What are packages?</a></li><li><a href="#tabset-5-2">How to use them?</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Sorting</a></li><li><a href="#tabset-7-2">Rename</a></li><li><a href="#tabset-7-3">Shift</a></li><li><a href="#tabset-7-4">Duplicated</a></li><li><a href="#tabset-7-5">Unique</a></li><li><a href="#tabset-7-6"><code>fcase()</code></a></li><li><a href="#tabset-7-7">Piping</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1">
-<p>A drawer in your work space (R environment) that has specialized tools (functions) to complete tasks.</p>
-<p><br></p>
-<p><strong>Example packages:</strong></p>
-<ul>
-<li>dplyr (data wrangling)</li>
-<li>data.table (data wrangling)</li>
-<li>ggplot2 (data visualization)</li>
-<li>sf (spatial vector data handling)</li>
-<li>raster (spatial raster data handling)</li>
-<li>stars (spatiotemporal data handling)</li>
-</ul>
-</div>
-<div id="tabset-5-2">
-<ul>
-<li>Before you use tools (functions) in the drawer (package), you need to buy (install) it first. You can install a package using the following syntax:</li>
-</ul>
+<div id="tabset-7-1">
+<p>You can use <code>order()</code> from the base package to sort a <code>data.table</code>.</p>
+<p>Sorting is about shuffling rows, so you will be working on <code>i</code>.</p>
+<p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="fu">install.packages</span>(<span class="st">"package name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co">#--- NOT RUN ---#</span></span>
+<span id="cb3-2"><a></a>data.table[<span class="fu">order</span>(variable <span class="dv">1</span>, vairable <span class="dv">2</span>, ..), ]  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
-<ul>
-<li>For example,</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">install.packages</span>(<span class="st">"ggplot2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<ul>
-<li>You need to bring the drawer (package) to your working space (R environment) by using the <code>library()</code> function:</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<ul>
-<li>Now, you can start using specialized tools (functions) in the drawer (package)!!</li>
-</ul>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="working-with-r-or-any-computer-programs" class="slide level2">
-<h2>Working with R (or any computer programs)</h2>
-<ul>
-<li><p>You are the architect who has the blueprint of the final product, but does not have an ability to build specific pieces by yourself</p></li>
-<li><p>You work with one worker (R) who can build specific pieces perfectly without any error <span style="color:red"> if given right tools and instructions </span></p></li>
-<li><p>This worker is weird. If you do not give right tools or your instruction is wrong, he/she will speak up and tell you there has been an error. He/she will not try to figure out how things could have been done differently by himself/herself.</p></li>
-<li><p>Your job is to provide the right tools and instructions to the worker (R), and correct your instructions when you found out you made a mistake (debugging)</p></li>
-</ul>
-</section></section>
-<section>
-<section id="sec-objects-basics" class="title-slide slide level1 center">
-<h1>A bit more on vector, matrix, list, and data.frame</h1>
-
-<div style="float:left">
-
-</div>
-<hr color="#EB811B" size="2px" width="1280px">
-
-</section>
-<section id="vector-1" class="slide level2">
-<h2>Vector</h2>
-<div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Prep</a></li><li><a href="#tabset-6-2">Arithmetic operations</a></li><li><a href="#tabset-6-3">Access elements</a></li></ul>
-<div class="tab-content">
-<div id="tabset-6-1">
-<p>Let’s define two vectors to work with</p>
+<p><strong>Example</strong></p>
 <div id="qwebr-insertion-location-26"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-6-2">
+<div id="tabset-7-2">
+<p>You can use <code>setnames()</code> to rename variables.</p>
 <div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Note</strong></p>
+<p>Note: <code>setnames()</code> is one of the <code>data.table</code> operations that updates the dataset in-place (by reference) just like <code>:=</code>.</p>
 </div>
-<div class="callout-content">
-<p>Vector arithmetic operations happen <strong>element by element</strong>!</p>
+<div id="tabset-7-3">
+
 </div>
-</div>
-</div>
-</div>
-<!--end of the fragment-->
-</div>
-<div id="tabset-6-3">
-<p>To access element(s) of a vector, you use <code>[]</code> like below:</p>
+<div id="tabset-7-4">
+<p><code>duplicated()</code> checks whether each of the observations have other observations that are identical in values of the user-specified variables, and returns a TRUE/FALSE vector of length equal to the number of rows of the data.</p>
+<p>The following code checks if there are any other flights that fly on the same hour of the same day.</p>
 <div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>You can access multiple elements of a vector</p>
+</div>
+<div id="tabset-7-5">
+<p><code>unique()</code> does the opposite of <code>duplicated()</code>. After applying <code>unique()</code>, you will be left with only the observations that are unique in all of the variables specified by the user (There will be only one observation that has the same values in all the user-specified variables).</p>
 <div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
+<div id="tabset-7-6">
+<p><code>fcase()</code> is like <code>case_when()</code> in <code>dplyr</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">fcase</span>(</span>
+<span id="cb4-2"><a></a>  condition <span class="dv">1</span>, value <span class="dv">1</span>,  </span>
+<span id="cb4-3"><a></a>  condition <span class="dv">2</span>, value <span class="dv">2</span>,  </span>
+<span id="cb4-4"><a></a>  condition <span class="dv">3</span>, value <span class="dv">3</span>,  </span>
+<span id="cb4-5"><a></a>  .</span>
+<span id="cb4-6"><a></a>  .</span>
+<span id="cb4-7"><a></a>  .</span>
+<span id="cb4-8"><a></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Example</strong></p>
+<div id="qwebr-insertion-location-30"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Note: for this example, we could have just used <code>fifelse()</code> as the created variable is dichotomous.</p>
+</div>
+<div id="tabset-7-7">
+<p>You can use <code>%&gt;%</code> to chain piped operations just like <code>dplyr</code> using <code>.</code> to refer to the <code>data.table</code> generated through the preceding actions.</p>
+<p><strong>Example:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>flights[, .(.N), by <span class="ot">=</span> .(origin, month)] <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a></a>  .[i, j, by] <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a></a>  .[i, j, by] <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a></a>  .[i, j, by]  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
 </div>
 </div>
 <!--end of panel-->
 </section>
-<section id="matrix-1" class="slide level2">
-<h2>Matrix</h2>
+<section id="sd" class="slide level2">
+<h2>.SD</h2>
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Prep</a></li><li><a href="#tabset-7-2">Arithmetic operations</a></li><li><a href="#tabset-7-3">Other operations</a></li><li><a href="#tabset-7-4">Access elements</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Instruction</a></li><li><a href="#tabset-8-2">What is it?</a></li><li><a href="#tabset-8-3">Example 1</a></li><li><a href="#tabset-8-4">Example 2</a></li><li><a href="#tabset-8-5">Columns of choice</a></li><li><a href="#tabset-8-6">Maximum</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
-<div id="qwebr-insertion-location-30"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-<div id="tabset-7-2">
+<div id="tabset-8-1">
+<p><code>.SD</code> (which stands for <strong>S</strong>ubset <strong>D</strong>ata) is a special symbol that allows you to do many cool things.</p>
+<p>Let’s create a small <code>data.table</code> that will help us understand what <code>.SD</code> does (we will come back to the code later).</p>
 <div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-7-3">
+<div id="tabset-8-2">
+<p>Without grouping specified in <code>by</code>, <code>.SD</code> is the <code>data.table</code> itself. So, <code>flights_mini[, .SD]</code> is the same as <code>flights_mini</code></p>
+<p>But, when grouped, it becomes the subset (grouped) of the <code>data.table</code>.</p>
 <div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Note that <code>.SD</code> contains all the columns except the grouping columns by default.</p>
 </div>
-<div id="tabset-7-4">
-<p>To access element(s) of a matrix, you use <code>[]</code> just like we did for a vector. But, now you have two arguments inside <code>[]</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>matrix[indices <span class="cf">for</span> rows, indices <span class="cf">for</span> columns]  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<p><strong>Examples</strong></p>
+<div id="tabset-8-3">
+<p>Apply the same function across all the variables:</p>
 <div id="qwebr-insertion-location-33"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="list-1" class="slide level2">
-<h2>List</h2>
-<div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Access elements using [[]]</a></li><li><a href="#tabset-8-2">Access elements using $</a></li></ul>
-<div class="tab-content">
-<div id="tabset-8-1">
-<p>To access element(s) of a matrix, you can use either <code>[[]]</code> operator for accessing a single element and use <code>[]</code> for multiple elements.</p>
-<p><strong>Example: single element</strong></p>
+<p><br></p>
+<p>Of course, you could get the same results by this, but the output is a list, not a data.table.</p>
 <div id="qwebr-insertion-location-34"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<p><strong>Example: multiple elements</strong></p>
+<p><strong>dplyr</strong> way:</p>
 <div id="qwebr-insertion-location-35"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-2">
-<p>You can also use <code>$</code> operator to access a single element of a list as long as the element has a name.</p>
+<div id="tabset-8-4">
+<p>Apply the same function across all the variables by group:</p>
 <div id="qwebr-insertion-location-36"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="data.frame-1" class="slide level2">
-<h2>data.frame</h2>
-<div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Basics</a></li><li><a href="#tabset-9-2">Access parts of a <code>data.frame</code></a></li></ul>
-<div class="tab-content">
-<div id="tabset-9-1">
-<p><code>data.frame</code> (and its relatives)</p>
-<ul>
-<li>is the most common object type we use.</li>
-<li>is a special kind of <code>list</code> of vectors that are of the same length that makes a <code>matrix</code>-like structure</li>
-<li>shares properties of both the matrix and the list</li>
-</ul>
+<p><br></p>
+<p><strong>dplyr</strong> way:</p>
 <div id="qwebr-insertion-location-37"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-9-2">
-<p>Accessing parts of a <code>data.frame</code> works like accessing elements of a matrix or list.</p>
-<section id="examples" class="slide level2">
-<h2>Examples</h2>
+<div id="tabset-8-5">
+<p>Instead of let <code>.SD</code> contain all the columns, you can use <code>.SDcols</code> to pick variables to be included in <code>.SD</code> after <code>by,</code>.</p>
+<p><strong>Example</strong></p>
 <div id="qwebr-insertion-location-38"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<p><span style="color:red"> We will spend lots of time on how to do data wrangling on <code>data.frame</code>s using the <code>tidyverse</code> package! </span></p>
-</section>
+<p>You cannot use <code>.(variable name 1, variable name 1, ...)</code> for <code>.SDcols</code>. This would fail:</p>
+<div id="qwebr-insertion-location-39"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-8-6">
+<p>A very important use case of <code>.SD</code> is identifying the observation with the maximum (or minimum) value of a variable by group.</p>
+<p>Suppose you are trying to identify the flight that had the longest arrival delay by month-carrier.</p>
+<div id="qwebr-insertion-location-40"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Remember that <code>.SD</code> is a list of <code>data.table</code>s grouped by carrier and month. <code>.SD[which.max(arr_dealy), ]</code> will find the row where the <code>arr_delay</code> is the highest by group (month-carrier).</p>
 </div>
 </div>
 </div>
 <!--end of panel-->
 </section>
-<section id="next-class-quarto" class="slide level2">
-<h2>Next class: Quarto</h2>
-
-<div style="float:left">
-
+<section id="reshaping-datasets" class="slide level2">
+<h2>Reshaping datasets</h2>
+<div class="panel-tabset">
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Data preparation</a></li><li><a href="#tabset-9-2">long to wide</a></li><li><a href="#tabset-9-3">wide to long</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<p>Create the following datasets in the long format:</p>
+<div id="qwebr-insertion-location-41"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<hr color="#EB811B" size="2px" width="1280px">
-
+<div id="tabset-9-2">
+<p>You can use <code>dcast()</code> function to make a long dataset wide:</p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co">#--- NOT RUN ---#  </span></span>
+<span id="cb6-2"><a></a><span class="fu">dcast</span>(data.table, A <span class="sc">~</span> B, <span class="at">value.var =</span> C)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Using the <code>pivot_wider()</code> language,</p>
+<ul>
+<li><code>B</code> is equivalent to variables you specify for <code>names_from</code></li>
+<li><code>C</code> is equivalent to variables you specify for <code>values_from</code></li>
+<li>A are all the variables except B and C.</li>
+</ul>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Original long data:</p>
+<div id="qwebr-insertion-location-42"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p>Wide data:</p>
+<div id="qwebr-insertion-location-43"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-9-3">
+<p>You can use <code>melt()</code> function to make a wide dataset long:</p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="fu">melt</span>(data.table, <span class="at">id.vars =</span> <span class="st">"state"</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><code>id.vars</code> are the variables except those that will be melt into long format</li>
+</ul>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p>Original wide data:</p>
+<div id="qwebr-insertion-location-44"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p>Long data:</p>
+<div id="qwebr-insertion-location-45"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="reshaping-datasets-multiple-columns" class="slide level2">
+<h2>Reshaping datasets: multiple columns</h2>
+<div class="panel-tabset">
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">prep</a></li><li><a href="#tabset-10-2">long to wide</a></li><li><a href="#tabset-10-3">wide to long</a></li><li><a href="#tabset-10-4">better alternative</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Long data</strong></p>
+<div id="qwebr-insertion-location-46"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>This data has multiple rows to be spread: <code>yield</code> and <code>rainfall</code>.</p>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><strong>Wide data</strong></p>
+<div id="qwebr-insertion-location-47"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>This data has multiple sets of columns to be melted: <code>yield_*</code> and <code>rainfall_*</code>.</p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-10-2">
+<p>It is easy to cast multiple variables to make a long data wide. You just need to give a list of variable names to the <code>value.var</code> option.</p>
+<div id="qwebr-insertion-location-48"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-10-3">
+<p>It is not as simple to make a wide data with multiple sets of columns to long.</p>
+<p>You can provide a list of sets of variables names to <code>melt()</code> to tell R which variables are belong to the same group using the <code>measure()</code> option.</p>
+<div id="qwebr-insertion-location-49"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p>Note however that year information from the variable names are lost. In the resulting dataset, <code>variable == 1</code> and <code>variable == 2</code> correspond to 2019 and 2020, respectively. So, you need an additional step to recover the original long data format.</p>
+<p>Alternatively, it is probably better to follow the multi-step approach we took we used when we use <code>pivot_*()</code> in <code>dplyr</code>.</p>
+</div>
+<div id="tabset-10-4">
+<p>The strategy here is to</p>
+<ul>
+<li>first make the data long ignoring the fact we want <code>yield_*</code> and <code>rainfall_*</code> to be separate variables eventually</li>
+<li>split variable names into two: variable meaning and year (done by <code>tstrsplit()</code>)<br>
+</li>
+<li>and then use <code>dcast()</code> to make it wider</li>
+</ul>
+<div id="qwebr-insertion-location-50"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="merging-datasets" class="slide level2">
+<h2>Merging datasets</h2>
+<div class="panel-tabset">
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">How</a></li><li><a href="#tabset-11-2">Example</a></li><li><a href="#tabset-11-3"><code>left_join()</code></a></li></ul>
+<div class="tab-content">
+<div id="tabset-11-1">
+<p>You can use the following syntax:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>dt1[dt2, on <span class="ot">=</span> .(list of variables)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>This is the same as:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">left_join</span>(dt2, dt1, <span class="at">by =</span> <span class="fu">c</span>(list of variables)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>So, <code>dt2</code> is the base dataset and you are attaching <code>dt1</code> to <code>dt2</code>.</p>
+</div>
+<div id="tabset-11-2">
+<p>Let’s first create a price data:</p>
+<div id="qwebr-insertion-location-51"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Now merge:</p>
+<div id="qwebr-insertion-location-52"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+<div id="tabset-11-3">
+<p>There is nothing to prevent you from using <code>dplyr::left_join()</code>.</p>
+<div id="qwebr-insertion-location-53"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Remember, <code>data.table</code> is also a <code>data.frame</code>. So, any function that works with <code>data.frame</code> works for <code>data.table</code> as well.</p>
+<div id="qwebr-insertion-location-54"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+<!--end of panel-->
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 <p><a href="https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/">back to the lecture slides on the course website</a></p>
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 
