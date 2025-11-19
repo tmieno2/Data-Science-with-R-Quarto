@@ -155,7 +155,7 @@ ggplot() +
 
 + We can stop carrying around the unnecessary parts of the data, which would educe its size (This matters when your raster data is spatially very fine and large.)
 
-+ Extracting value to an `sf` from a smaller raster data is faster (we will talk about this later in [this section](#sec-extract))
++ Extracting value to an `sf` from a smaller raster data is faster (we will talk about this later)
 
 <br>
 
@@ -299,7 +299,7 @@ We use
 Here is what they look like:
 
 ```{webr-r}
-#| context: setup
+#| context: output
 ggplot() +
   geom_spatraster(data = prism_us) +
   geom_sf(data = ne_counties, color = "orange") +
@@ -480,7 +480,7 @@ polygon_extract <- st_polygon(list(
 polygons_extract_viz <- ggplot() +
   geom_stars(data = stars_cells, alpha = 0.5) +
   scale_fill_distiller(name = "Value", palette = "Spectral") +
-  geom_sf(data = polygon_extract, fill = NA) +
+  geom_sf(data = polygon_extract, fill = NA, linewidth = 1) +
   geom_sf(data = cell_centroids, color = "black", size = 0.8) +
   geom_sf_text(data = raster_like_cells, aes(label = value), nudge_x = -0.25, nudge_y = 0.25) +
   theme_void()
@@ -565,11 +565,7 @@ NDRE_extracted <- terra::extract(NDRE, st_transform(corn_yield, crs(NDRE)))
 
 #### post-extraction processing
 
-+ Just extracting the raster values to the points is not where we stop. 
-
-+ We need to merge the extracted values back to the points data so that we can use them for further analysis.
-
----
+Just extracting the raster values to the points is not where we stop. We need to merge the extracted values back to the points data so that we can use them for further analysis.
 
 Let's first check the class of `NDRE_extracted`.
 
@@ -643,7 +639,7 @@ You can use `terra::extract()` with the following syntax. Yes, same as value ext
 terra::extract(SpatRaster, sf of polygons)
 ```
 
-#### Demonstration
+#### Demo
 
 Extract NDRE values to each of the treatment blocks:
 
@@ -711,6 +707,10 @@ NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDR
 
 #### Area-weighted summarization
 
+::: {.panel-tabset}
+
+##### Why
+
 ::: {.columns}
 
 ::: {.column width="70%"}
@@ -718,13 +718,7 @@ NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDR
 
 + This is very much acceptable in the current application, because the resolution of the raster data is high (cells are so small) relative to the size of the polygons.
 
-+ However, if the cells are relatively large, you might want to consider calculating area-weighted summary. 
-
-<br>
-
----
-
-We can add `exact = TRUE` option, which returns `fraction` variable indicating the fraction of the cells intersecting with the polygon.
++ However, if the cells are relatively large, you might want to consider calculating area-weighted summary.
 
 <br>
 
@@ -737,6 +731,9 @@ We can add `exact = TRUE` option, which returns `fraction` variable indicating t
 :::
 <!--end of the columns-->
 
+##### How
+
+We can add `exact = TRUE` option, which returns `fraction` variable indicating the fraction of the cells intersecting with the polygon.
 
 ```{webr-r}
 #| warning: false
@@ -745,11 +742,16 @@ NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDR
 
 <br>
 
+Now, we can do fraction (area)-weighted summary of the extracted values:
+
 ```{webr-r}
 NDRE_extracted_tb %>%
   dplyr::group_by(ID) %>%
   dplyr::summarize(NDRE = sum(NDRE * fraction) / sum(fraction))
 ```
+
+:::
+<!--end of panel-->
 
 #### Multiple layers
 
@@ -776,9 +778,6 @@ NDRE_extracted_tb_twolayers %>%
 
 :::
 <!--end of panel-->
-
-### Exercises
-
 
 :::
 <!--end of panel-->

@@ -1,5 +1,5 @@
 ---
-title: "09-3: R as GIS: Creating maps from vector data"
+title: "09-3: R as GIS: Creating maps from vector and raster data"
 abstract: "Chapter 9: Spatial Data"
 format: 
   revealjs: 
@@ -958,6 +958,7 @@ Comment out line 2 and comment in line 3 to see what happens.
 ## Create maps using raster data
 
 ```{webr-r}
+#| context: setup
 library(stars) 
 data(NIR)
 NIR <- terra::rast(NIR)
@@ -973,7 +974,7 @@ RED <- terra::rast(RED)
 
 + The `tidyterra` package provides `geom_spatraster()` that works specifically for `SpatRaster` object from the `terra` package.
 
-+ There are other options like the `tmap` package. But, we do not talk about it in this course.
++ There are other package options like the `tmap` package. But, we do not talk about it in this course.
 
 ### How
 
@@ -998,7 +999,7 @@ By default, the cells with NA values are colored grey. You can set the color for
 ```{webr-r}
 ggplot() +
   geom_spatraster(data = NIR) +
-  scale_fill_continuous(na.value = "transparent")
+  scale_fill_continuous(na.value = "transparent") +
   theme_void()
 ```
 
@@ -1024,11 +1025,6 @@ ggplot() +
   geom_spatraster(data = nir_red, aes(fill = NIR))
 ```
 
-:::{.callout-note}
-+ But, remember faceting is often not appropriate when you are plotting multiple variable of different scales (e.g., temperature and precipitation) as they share the same legend.
-+ A good use case of faceting is displaying the same variable observed at different times (e.g., temperature on different days).
-:::
-
 ### Faceting
 
 When you want to create maps for individual attributes at the same time, you can add `facet_wrap(~lyr)`. 
@@ -1038,6 +1034,11 @@ ggplot() +
   geom_spatraster(data = nir_red, aes(fill = NIR)) +
   facet_wrap( ~ lyr)
 ```
+
+:::{.callout-note}
++ But, remember faceting is often not appropriate when you are plotting multiple variable of different scales (e.g., temperature and precipitation) as they share the same legend.
++ A good use case of faceting is displaying the same variable observed at different times (e.g., temperature on different days).
+:::
 
 :::
 
