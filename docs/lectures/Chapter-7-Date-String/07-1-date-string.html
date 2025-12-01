@@ -6,8 +6,8 @@
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.7.32">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.31">
 
   <title>Data Science with R (AECN 896-05) – 07-1: Date and String Management</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2372,13 +2372,13 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <span id="cb8-6"><a></a></span>
 <span id="cb8-7"><a></a><span class="fu">head</span>(all_files, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/corn_experiment_1.rds" 
-[2] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/corn_experiment_10.rds"</code></pre>
+<pre><code>[1] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/corn_experiment_1.rds" 
+[2] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/corn_experiment_10.rds"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">tail</span>(all_files, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_8.rds"
-[2] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_9.rds"</code></pre>
+<pre><code>[1] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_8.rds"
+[2] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_9.rds"</code></pre>
 </div>
 </div>
 <p><br></p>
@@ -2391,36 +2391,36 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>all_files[is_soy]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_1.rds" 
- [2] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_10.rds"
- [3] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_11.rds"
- [4] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_12.rds"
- [5] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_13.rds"
- [6] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_14.rds"
- [7] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_15.rds"
- [8] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_16.rds"
- [9] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_17.rds"
-[10] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_18.rds"
-[11] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_19.rds"
-[12] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_2.rds" 
-[13] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_20.rds"
-[14] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_21.rds"
-[15] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_22.rds"
-[16] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_23.rds"
-[17] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_24.rds"
-[18] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_25.rds"
-[19] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_26.rds"
-[20] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_27.rds"
-[21] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_28.rds"
-[22] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_29.rds"
-[23] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_3.rds" 
-[24] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_30.rds"
-[25] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_4.rds" 
-[26] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_5.rds" 
-[27] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_6.rds" 
-[28] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_7.rds" 
-[29] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_8.rds" 
-[30] "/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_9.rds" </code></pre>
+<pre><code> [1] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_1.rds" 
+ [2] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_10.rds"
+ [3] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_11.rds"
+ [4] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_12.rds"
+ [5] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_13.rds"
+ [6] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_14.rds"
+ [7] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_15.rds"
+ [8] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_16.rds"
+ [9] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_17.rds"
+[10] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_18.rds"
+[11] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_19.rds"
+[12] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_2.rds" 
+[13] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_20.rds"
+[14] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_21.rds"
+[15] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_22.rds"
+[16] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_23.rds"
+[17] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_24.rds"
+[18] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_25.rds"
+[19] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_26.rds"
+[20] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_27.rds"
+[21] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_28.rds"
+[22] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_29.rds"
+[23] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_3.rds" 
+[24] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_30.rds"
+[25] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_4.rds" 
+[26] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_5.rds" 
+[27] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_6.rds" 
+[28] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_7.rds" 
+[29] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_8.rds" 
+[30] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/supplementary-material/data/data-for-loop-demo/soy_experiment_9.rds" </code></pre>
 </div>
 </div>
 <p><br></p>

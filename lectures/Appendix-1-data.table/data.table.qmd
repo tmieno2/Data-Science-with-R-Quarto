@@ -20,6 +20,12 @@ filters:
   - webr
 ---
 
+```{r}
+#| include: false 
+library(dplyr)
+library(data.table)
+```
+
 ## Tips to make the most of the lecture notes
 
 ::: {.panel-tabset}
@@ -452,6 +458,25 @@ Note: `setnames()` is one of the `data.table` operations that updates the datase
 
 
 ### Shift
+
+The `data.table::shift()` function can move up or down a variable.
+
+```{webr-r}
+flights_mini[, air_time_lag := shift(air_time, n = 1, type = "lag")]
+flights_mini[, air_time_lead_2 := shift(air_time, n = 2, type = "lead")]
+
+flights_mini[, .(air_time, air_time_lag, air_time_lead_2)]
+```
+
+<br>
+
+**By group**
+
+```{webr-r}
+flights_mini[, air_time_lag := shift(air_time, n = 1, type = "lag"), by = month]
+
+flights_mini[, .(air_time, air_time_lag)]
+```
 
 ### Duplicated
 
