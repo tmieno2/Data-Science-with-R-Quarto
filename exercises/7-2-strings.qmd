@@ -1,0 +1,433 @@
+---
+title: "Ex-7-2: Manipulating Strings"
+abstract: "Date and String"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'stringr', 'gt']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+These run in your browser. We use `pizzaplace` again, because its text columns
+have exactly the properties that make string work necessary: names written with
+underscores, an order id with structure inside it, and category labels that are
+almost but not quite presentable.
+
+Every function here is from `stringr`, and they all follow the same shape:
+`str_something(the_strings, the_pattern)`. The strings come first, which means
+they pipe.
+
+# Data
+
+```{webr-r}
+#| autorun: true
+data(pizzaplace, package = "gt")
+
+pizza <- pizzaplace
+
+#--- what the text columns look like ---#
+unique(pizza$name)
+unique(pizza$type)
+head(pizza$id)
+```
+
+# Find rows by what the text contains
+
+**Task.**
+
+1. How many orders were for a chicken pizza? Chicken pizzas have `ckn` somewhere
+   in the `name`.
+2. How many distinct chicken pizzas are there, and what are they called?
+3. Now find every order that is either a veggie or a supreme `type`, using a
+   single pattern rather than two comparisons.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+library(stringr)
+
+sum(str_detect(pizza$name, "ckn"))                    # 11050
+dplyr::n_distinct(pizza$name[str_detect(pizza$name, "ckn")])   # 6
+unique(pizza$name[str_detect(pizza$name, "ckn")])
+#> "thai_ckn" "bbq_ckn" "southw_ckn" "cali_ckn" "ckn_pesto" "ckn_alfredo"
+
+#--- inside filter, which is how you will actually use it ---#
+chicken <- dplyr::filter(pizza, str_detect(name, "ckn"))
+
+#--- either/or in one pattern ---#
+sum(str_detect(pizza$type, "veggie|supreme"))         # 23636
+```
+
+`str_detect()` returns `TRUE`/`FALSE` for each element, which is exactly what
+`filter()` wants.
+
+Two things worth noticing. `ckn` appears at the start of some names and the end
+of others, and `str_detect()` does not care: it looks anywhere in the string.
+That is usually what you want and occasionally not, which is what anchors are
+for in exercise 6.
+
+And `|` means "or" inside a pattern. `str_detect(type, "veggie|supreme")` is
+shorter and less error-prone than `type == "veggie" | type == "supreme"`,
+especially once there are five alternatives.
+:::
+
+# Make text presentable
+
+`classic_dlx` is a database name, not something you put in a figure legend.
+
+**Task.** Turn `name` into something readable: underscores replaced with spaces,
+and each word capitalized. Then plot the ten most-ordered pizzas with the
+readable names on the axis.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+pizza <-
+  pizza %>%
+  dplyr::mutate(
+    name_nice = str_to_title(str_replace_all(name, "_", " "))
+  )
+
+unique(pizza$name_nice)[1:4]
+#> "Hawaiian" "Classic Dlx" "Mexicana" "Thai Ckn"
+
+top10 <-
+  pizza %>%
+  dplyr::count(name_nice, sort = TRUE) %>%
+  head(10)
+
+ggplot(top10) +
+  geom_col(aes(x = n, y = reorder(name_nice, n))) +
+  labs(x = "Orders", y = NULL)
+```
+
+Note `str_replace_all()` rather than `str_replace()`. The plain version replaces
+only the **first** match, so `pep_msh_pep` would come back as `pep msh_pep`. One
+of the pizza names has two underscores, which is the only reason you would catch
+this before it reached a figure.
+
+Do the cleaning in a `mutate()` into a new column rather than overwriting `name`.
+Keeping the machine-readable version means you can still join, filter, and match
+on it; the pretty version is for display only.
+
+The `reorder(name_nice, n)` in the plot is what sorts the bars by count instead
+of alphabetically.
+:::
+
+# Take strings apart
+
+The `id` column looks like `2015-000001`: a year, then a sequence number.
+
+**Task.**
+
+1. Split `id` into a year column and an order-number column.
+2. Confirm the year always matches the year in `date`.
+3. How many distinct order ids are there, and why is that fewer than the number
+   of rows?
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+pizza <-
+  pizza %>%
+  dplyr::mutate(
+    id_year = str_split_fixed(id, "-", 2)[, 1],
+    id_num  = str_split_fixed(id, "-", 2)[, 2]
+  )
+
+head(pizza$id_year)   # "2015" "2015" ...
+head(pizza$id_num)    # "000001" "000002" ...
+
+all(pizza$id_year == substr(pizza$date, 1, 4))   # TRUE
+
+dplyr::n_distinct(pizza$id)   # 21350
+nrow(pizza)                   # 49574
+```
+
+There are 21,350 orders but 49,574 rows, because **one row is one pizza, not one
+order**. An order containing three pizzas appears as three rows sharing an id.
+
+That is the single most important thing to know about this dataset, and the id
+column is what tells you. If you had computed "average order value" as
+`mean(price)` you would have got the average *pizza* price and been wrong by a
+factor of more than two.
+
+On the mechanics: `str_split_fixed(x, "-", 2)` returns a **matrix** with two
+columns, which is why the `[, 1]` and `[, 2]` are needed. Use it rather than
+`str_split()` when you know how many pieces you want; `str_split()` returns a
+list, which is more awkward inside `mutate()`.
+:::
+
+::: {.callout-tip collapse="true" title="The tidier way to split a column"}
+```{r}
+#| eval: false
+pizza %>% tidyr::separate_wider_delim(id, "-", names = c("id_year", "id_num"))
+```
+
+One call, two columns, no matrix indexing. Worth knowing once you have done it
+by hand.
+:::
+
+# Rebuild an id with padding
+
+**Task.** You are given order numbers as plain integers: `c(7, 42, 1350)`.
+Rebuild ids in the original format, `2015-000007` and so on.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+nums <- c(7, 42, 1350)
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+nums <- c(7, 42, 1350)
+
+str_c("2015-", str_pad(nums, width = 6, side = "left", pad = "0"))
+#> "2015-000007" "2015-000042" "2015-001350"
+```
+
+`str_pad()` is what keeps ids the same length. Fixed-width ids sort correctly as
+text, which unpadded ones do not: alphabetically, `"1350"` comes before `"42"`.
+
+This is the same problem as the leading zeros in FIPS codes from
+[Ex-3-1](3-1-input-output.qmd), approached from the other direction. There you
+were stopping R from destroying the padding on the way in; here you are creating
+it on the way out. Both exist because an identifier is text that happens to look
+like a number.
+
+`str_c()` is `paste0()` with one useful difference: it propagates `NA` instead of
+turning it into the literal string `"NA"`. `paste0("x", NA)` gives `"xNA"`, which
+is almost never what you want and is very hard to spot later.
+:::
+
+# Build labels for a figure
+
+**Task.** Create a single label column combining the readable name, the size, and
+the price, formatted like `Classic Dlx (M) - $16.00`. Then show the five most
+expensive distinct pizza-size combinations using those labels.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+labelled <-
+  pizza %>%
+  dplyr::distinct(name_nice, size, price) %>%
+  dplyr::mutate(
+    label = str_c(name_nice, " (", size, ") - $", format(price, nsmall = 2))
+  ) %>%
+  dplyr::arrange(desc(price))
+
+head(labelled$label, 5)
+```
+
+`str_c()` takes as many pieces as you like and is vectorized, so this builds
+50,000 labels in one call rather than in a loop.
+
+The `format(price, nsmall = 2)` is there because `str_c()` converts numbers using
+R's default rules, which drop trailing zeros: a price of 16 becomes `"16"`, not
+`"16.00"`, and your labels come out inconsistent. Anywhere you paste a number
+into text for people to read, decide the number of decimal places explicitly.
+:::
+
+# Anchors and counting
+
+**Task.**
+
+1. Find the pizza names that **start** with `ckn`, as opposed to containing it
+   anywhere.
+2. Find names containing two or more underscores.
+3. What are the shortest and longest names?
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+nm <- unique(pizza$name)
+
+nm[str_detect(nm, "^ckn")]          # "ckn_pesto" "ckn_alfredo"
+nm[str_detect(nm, "ckn$")]          # "thai_ckn" "bbq_ckn" "southw_ckn" "cali_ckn"
+
+nm[str_count(nm, "_") >= 2]         # "pep_msh_pep"
+
+range(str_length(nm))               # 7 12
+nm[str_length(nm) == max(str_length(nm))]
+```
+
+`^` anchors to the start of the string and `$` to the end. Compare with exercise
+1, where the unanchored `"ckn"` matched all six names: anchoring is how you turn
+"contains" into "begins with".
+
+`str_count()` counts matches rather than reporting whether there are any, which
+is how you find the awkward case that breaks a naive `str_replace()`.
+
+Those two characters are your entire introduction to regular expressions, and
+between them and `|` you can express most of what you actually need day to day.
+:::
+
+# Clean a column nobody validated
+
+**Task.** Real category columns arrive like this. Clean it so that
+`dplyr::count()` gives three categories rather than nine.
+
+```{webr-r}
+messy <- c("Corn", "corn ", " CORN", "corn", "Soybean", "soybean",
+           "SOY BEAN", "Wheat ", "wheat")
+```
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+messy <- c("Corn", "corn ", " CORN", "corn", "Soybean", "soybean",
+           "SOY BEAN", "Wheat ", "wheat")
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+cleaned <-
+  messy %>%
+  str_trim() %>%                       # drop leading/trailing spaces
+  str_to_lower() %>%                   # one case
+  str_replace_all(" ", "")             # "soy bean" -> "soybean"
+
+table(cleaned)
+#> corn 4, soybean 3, wheat 2
+```
+
+Three operations, in this order, fix most category columns you will ever meet:
+trim the whitespace, force one case, then deal with internal spacing.
+
+Order matters a little. Trimming before lowercasing is not important, but doing
+both before you compare is essential, and doing the internal-space replacement
+last keeps it from interfering with the trim.
+
+The reason this exercise exists: `" CORN"`, `"corn "`, and `"Corn"` are three
+different strings, so `group_by()` gives you three groups, and your summary table
+splits one crop across three rows. Nothing errors. You just get an answer that
+is quietly wrong, and it is easy to miss in a table with forty rows.
+
+Whenever you are about to group by a text column, run `unique()` on it first and
+look at the result.
+:::
+
+# Put it together
+
+**Task.** Produce a table of revenue by pizza category, where:
+
+- the categories come from `type`, with readable labels (`Classic`, not
+  `classic`)
+- chicken pizzas are pulled out as their own category regardless of `type`
+- the ingredient count for each pizza name is estimated as the number of
+  underscore-separated pieces
+- the output is sorted by revenue
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+result <-
+  pizza %>%
+  dplyr::mutate(
+    category = dplyr::case_when(
+      str_detect(name, "ckn") ~ "Chicken",
+      TRUE                    ~ str_to_title(type)
+    ),
+    n_pieces = str_count(name, "_") + 1
+  ) %>%
+  dplyr::group_by(category) %>%
+  dplyr::summarize(
+    revenue    = sum(price),
+    n_pizzas   = dplyr::n(),
+    mean_pieces = mean(n_pieces)
+  ) %>%
+  dplyr::arrange(desc(revenue))
+
+result
+```
+
+Two things worth noting.
+
+`case_when()` evaluates its conditions **in order** and stops at the first match,
+which is what makes "chicken first, then whatever `type` says" work. Reverse the
+two lines and every chicken pizza gets its `type` label instead, because that
+condition now matches first.
+
+`str_count(name, "_") + 1` counts separators and adds one to get pieces, which is
+the standard fencepost adjustment. `hawaiian` has no underscore and one piece;
+`pep_msh_pep` has two and three.
+:::

@@ -1,0 +1,1973 @@
+---
+title: "04-3: Data Visualization with `ggplot2`: Fine Tuning"
+abstract: "Chapter 4: Data Visualization"
+format: 
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'nycflights13', 'ggthemes', 'RColorBrewer', 'MASS', 'patchwork']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 70%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same two navigation tricks, and you will want them here because this is the longest deck in the chapter. The three stacked lines at the bottom left open a table of contents. The letter o gives you every slide at once. This lecture is essentially a reference: you will come back to it looking for one specific option, so learning to jump around now will save you time later.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the same live code areas, running R in your browser. Run Code executes the box, highlighting a portion and pressing command-enter runs just that part, the two-sheets icon copies the code for your own session, and the reload button restores the original. In this lecture in particular, change the numbers and rerun. Almost every slide here is one option with one value, and the fastest way to understand what it controls is to make it absurdly large and see what moves.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::{.callout-important title="If you run this code in RStudio"}
+These slides run R in your browser, and the browser session already has every package attached. Your own R session does not, so code copied from here will fail with `could not find function` until you load them yourself:
+
+```r
+library(ggplot2)
+library(dplyr)
+library(ggthemes)      # theme_stata(), theme_economist(), ...
+library(RColorBrewer)  # display.brewer.all()
+library(patchwork)     # combining figures with | and /
+library(nycflights13)  # flights, weather
+```
+:::
+
+<!-- ADDED: the webr "packages:" list installs and attaches these for the
+     browser only. Nothing in the visible code ever calls library() for
+     ggthemes, RColorBrewer, patchwork or nycflights13, so every example using
+     them breaks the moment a student pastes it into RStudio, with an error
+     that points at the function rather than at the missing package. -->
+
+:::
+<!--end of panel-->
+
+```{webr-r}
+#| context: setup
+
+#--- install and library the data package ---#
+#--- r.workshop.datasets carries county_yield with no geometry column and ---#
+#--- no dependencies, so one repo is enough. Its spatial sibling imports  ---#
+#--- sf, which drags in eleven more packages before any cell can run.     ---#
+webr::install(
+  "r.workshop.datasets",
+  repos = "https://tmieno2.github.io/rwasm-package/repo"
+)
+
+data(county_yield, package = "r.workshop.datasets")
+```
+
+# Make your figures presentable to others
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Make your figures presentable to others
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us be honest about where we are. The figures we have made so far are fine for looking at ourselves, and not good enough for a paper or a seminar. They are too crude. This lecture is about closing that gap, and the good news is that ggplot2 lets you control virtually every element of a figure. The bad news is that there are a great many elements. Read the callout, because it is the genuine skill here: the hard part is not the syntax, it is knowing what the part of the figure you want to change is called.
+
+</details>
+
++ Figures we have created so far cannot be used for formal presentations or publications. They are simply too crude.
+
++ We need to fine-tune raw figures before they are publishable.
+
++ You can control virtually every element of a figure under the `ggplot2` framework.
+
++ Take a look at [here](https://ggplot2.tidyverse.org/reference/theme.html) for the complete list of options you can use to modify the theme of figures
+
+:::{.callout-note title="Key"}
+The most important thing is actually to know which part of a figure a theme option refers to (e.g., `axis.text`)
+:::
+
+
+### two types of operations
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is a distinction that will organize the whole lecture. Changes come in two kinds. Content-altering changes what the figure says: the words of the axis title, the range of the axis, which colours mean which group. Theme-altering changes how it looks: the font size of that title, its position, the colour of the background. The example makes it concrete. The words Corn Yield in brackets bu per acre are content. The fact that they are set in fourteen point is theme. Content and theme are independent, which is why we handle them with different functions.
+
+</details>
+
+**Two types of operations** 
+
+Operations to make your figures presentable can be categorized into two types:
+
++ Content-altering
++ Theme-altering
+
+<br> 
+
+**Examples** 
+
+For the y-axis title,
+
++ The axis title text itself (say "Corn Yield (bu/acre)") falls under the **content** category.
+
++ The position of or the font size of the axis-title fall under the **theme** category
+
+The content itself does not change when theme is altered.
+
+
+### content-altering
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is content-altering, side by side with the original. On the right we have given the axes proper titles and changed the fill colours to a different scheme. Notice what changed: the words on the axes and the meaning of the colours. Notice what did not: the font, the sizes, the grey background, the grid lines. Everything about the styling is untouched, because we only altered content. Keep this comparison in mind as you look at the next tab, which does exactly the opposite.
+
+</details>
+
+```{webr-r}
+#| context: setup
+county_yield_s_b2010 <- 
+  county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+
+g_box <- 
+  ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))
+```
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+g_box 
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Altered
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+g_box +
+  xlab("Year") +
+  ylab("Corn Yield (bu/acre)") +
+  scale_fill_viridis_d()
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### theme-altering
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And now theme-altering, from the same starting figure. One line, setting the axis title size to twenty. The titles get bigger. Their text is identical, the data is identical, the colours are identical. Only the appearance changed. Put this next to the previous tab and the distinction should be clear: content is what the figure communicates, theme is how it is dressed. Once you can classify a change as one or the other, you know which function to reach for, which is most of the battle.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+Original
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+g_box 
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Altered
+
+```{webr-r}
+#| autorun: true
+g_box +
+  theme(
+    axis.title = element_text(size = 20)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Note
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A caveat and a rule of thumb to close the section. The distinction is not always crisp, and there are places where you could reasonably argue a change is either. But the practical guide holds almost always: the scale functions alter content, and the theme function alters theme. And note the last bullet, because it saves typing: for the most commonly changed pieces of content there are shorthand functions, like xlab and ylab for axis titles, which do the same job as the longer scale call.
+
+</details>
+
++ Distinctions between the two types of actions are not always clear
+
++ But, typically, you use 
+  * `scale_*()` function series to alter contents
+  * `theme()` function to alter the theme
+
++ Note that there are shorthand convenience functions to alter figure contents for commonly altered parts of figures
+
+:::
+<!--end of panel-->
+
+## Axes content
+
+::: {.panel-tabset}
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+We are going to build one figure up through this whole section, so start here. This is a boxplot of corn yield by year, filled by state, over a six-year window. Run it and get it into your session as g_box, because every tab from here refers back to it. Notice that it is deliberately unpolished: no proper axis titles, default colours, everything at default size. That is the raw material we are about to make presentable.
+
+</details>
+
+We are going to build on this figure in this section:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+county_yield_s_b2010 <- 
+  county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+
+(
+g_box <- 
+  ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))
+)
+```
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The functions for controlling axis content are the scale functions, and there are four of them because there are two axes and two kinds of variable. Read the callout first, because choosing the wrong one is the most common error here: use the discrete version when the variable is categorical and the continuous version when it is numeric. In our figure the x variable is year wrapped in factor, so it is discrete, while corn yield is numeric, so it is continuous. Then whichever you pick, the four things you can control are the same: the axis title, the range, where the ticks sit, and what the tick labels say.
+
+</details>
+
+We can use 
+
++ `scale_x_discrete()`/`scale_x_continuous()` for x-axis
++ `scale_y_discrete()`/`scale_y_continuous()` for y-axis
+
+to control the following elements of axes:
+
++ `name`: an axis title 
++ `limit`: the range of an axis
++ `breaks`: axis ticks positions
++ `label`: axis texts at ticks
+
+:::{.callout-note}
++ We use `scale_x_discrete()` if `x` is a discrete variable (not numeric) and `scale_x_continuous()` if `x` is a continuous variable (numeric).
++ The same applies for `y`.
+:::
+
+### axis title
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The simplest thing to change is the axis title, and there are two ways of doing it that produce identical results. The long way, through the name argument of the scale functions, is worth seeing because it shows you that the title is just one of several things those functions control. The short way, xlab and ylab, is what you will actually type, because it is two words instead of a function call. Use the shorthand day to day, and remember the long form exists for when you want to change the title and the range in the same breath.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_box + 
+  scale_x_discrete(name = "Year") + 
+  scale_y_continuous(name = "Corn Yield (bu/acre)") 
+```
+
+:::
+
+<br>
+
+<br>
+
+Or just this,
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_box + 
+  xlab("Year") +
+  ylab("Corn Yield (bu/acre)") 
+```
+
+### limit
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Limits control the range of an axis, and again you get the long form through the scale function and the shorthand ylim. But read the third option on this slide carefully, because it is the important one. Setting a limit does not zoom the plot; it throws away the data outside the range before drawing, which is why you may see a warning about removed rows. For a boxplot that genuinely matters, because a box computed from a truncated sample is not the same box. If what you want is to zoom in without changing the statistics, filter the data deliberately and say so, or look up coord_cartesian.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+#| warning: false
+g_box + 
+  scale_x_discrete(
+    name = "Year" 
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    #--- first min, second max ---#
+    limit = c(100, 200)
+  ) 
+```
+
+:::
+
+<br>
+
+Or just,
+
+```{webr-r}
+g_box + 
+  xlab("Year") +
+  ylab("Corn Yield (bu/acre)") +
+  ylim(100, 200)
+```
+
+<br>
+
+Or,
+
+You can filter the data first and then use the filtered data.
+
+### breaks and labels
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two related controls. breaks decides where the tick marks sit, and labels decides what text appears at them. Look at the y axis here: limits from 100 to 200 with breaks every 10. Now look at the x axis, where labels is given a little function that strips the 20 from the front of each year, so 2005 prints as 05. The callout explains why a function is better than a plain vector. A vector of labels has to match the number of breaks exactly, and if the data changes so that there are more or fewer breaks, your labels silently attach to the wrong ticks. A function is applied to whatever the breaks turn out to be, so it cannot fall out of step.
+
+</details>
+
++ `breaks`: determines where the ticks are located
++ `labels`: defines the texts at the ticks
+
+::: {.side-out}
+
+```{webr-r} 
+#| autorun: true
+#| out-width: 70%
+#| warning: false
+g_box +
+  scale_x_discrete(
+    name = "Year",
+    labels = ~ gsub("20", "", .x)
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    limit = c(100, 200),
+    breaks = seq(100, 200, by = 10)
+  )
+```
+
+:::
+
+<br>
+
+:::{.callout-warning}
+If you supply `labels` as a plain vector, it must have exactly as many elements as there are breaks. Supplying a function (here, `~ gsub("20", "", .x)`) applies it to whatever the breaks happen to be, so the labels can never fall out of sync with the data.
+:::
+
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now you do it. The instruction tab builds a line plot of mean arrival delay by month for the three New York airports, and then the exercise asks you to fix up both axes: titles, limits, and breaks. Everything you need is in the four tabs you just worked through. Note that the x variable here is month, which is numeric, so this is scale_x_continuous rather than the discrete version we used on the boxplot. That choice is the first thing to get right.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+Run the following code to create `gg_delay`, which you will build on.
+
+```{webr-r}  
+#| autorun: true
+(
+gg_delay <- 
+  flights %>% 
+  group_by(origin, month) %>% 
+  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  ggplot(.) +
+    geom_line(aes(y = mean_arr_delay, x = month, color = origin))
+)
+```
+
+#### Exercise
+
+::: {.columns}
+::: {.column width="50%"}
+Change the axes content to create the figure on the right using `scale_x_continuous()` and `scale_y_continuous()`. 
+
+Here are the list of changes you need to make:
+
++ x-axis 
+  * change the x-axis title to "Month"
+  * change the limit of the x-axis title to 4 through 8
+  * change the breaks and their labels of the x-axis ticks to 4 through 8
++ y-axis 
+  * change the y-axis title to "Average Arrival Delay (minutes)"
+  * change the limit of the y-axis title to 0 through 25
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+#| out-width: 100%
+#| warning: false
+gg_delay + 
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  ) 
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+::: {.panel-tabset}
+
+##### Work here
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+
+
+```
+
+##### Answer
+
+```{r}
+#| code-fold: true
+#| eval: false
+gg_delay + 
+  scale_x_continuous(
+    name = "Month",
+    limit = c(4, 8),
+    breaks = 4:8
+  ) +
+  scale_y_continuous(
+    name = "Average Arrival Delay (minutes)",
+    limit = c(0, 25)
+  )
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+## Legends content
+
+::: {.panel-tabset}
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Next section, legends, and we build on the figure we just finished styling. g_axis is the boxplot with its axes sorted out, so run this first. A word on why legends get their own section: a legend is not decoration, it is the key that makes a colour-coded figure readable at all. If your reader cannot tell which box is Nebraska, the colour is worse than useless. So the things we change here, its title, its colours, its layout, are all about making that key do its job.
+
+</details>
+
+We are going to build on this figure in this section:
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+( 
+g_axis <-
+  g_box +
+  scale_x_discrete(
+    name = "Year",
+    labels = ~ gsub("20", "", .x)
+  ) +
+  scale_y_continuous(
+    name = "Corn Yield (bu/acre)",
+    limit = c(100, 200),
+    breaks = seq(100, 200, by = 10)
+  )
+)
+```
+
+:::
+
+### Title
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first thing to fix on almost any legend is its title, because by default it is the name of your variable, and variable names are written for code rather than for readers. Here it says state_name, with an underscore, which is fine in a script and wrong in a figure. Notice which function does it: scale_fill_brewer, a fill function, because the legend exists to explain the fill aesthetic. That is the general rule, and it catches people out: to change a legend you change the scale for whatever aesthetic that legend belongs to.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + scale_fill_brewer(name = "State")
+```
+
+:::
+
+
+### Fill color
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same function also chooses the colours, through the palette argument. Set1 is one of the ColorBrewer palettes, and we come back to those properly later in this lecture. For now, notice that one argument changed both the appearance of the boxes and the swatches in the legend, and they stayed in step automatically. That is a real advantage of changing colours through a scale function rather than by hand: the legend is generated from the same scale, so it cannot disagree with the figure.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + scale_fill_brewer(name = "State", palette = "Set1")
+```
+
+:::
+
+
+### Title position
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the layout of the legend itself, which is controlled through the guide argument. Here we move the title to the left of the keys instead of above them. That looks like a triviality, and it becomes useful when the legend goes at the bottom of the figure, where a title stacked above the keys wastes a whole line of vertical space. The general pattern to notice: the scale function decides what the legend says, and guide_legend inside it decides how the legend is arranged.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + 
+  scale_fill_brewer(
+    name = "State",
+    palette = "Set1",
+    guide = guide_legend(title.position = "left")
+  )
+```
+
+:::
+
+### wrapping
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The other layout control you will reach for is the number of rows or columns. Setting nrow to two wraps the entries onto two lines instead of one. This matters when a legend has many categories: left to itself it makes one tall column down the right-hand side, which squeezes the plot area. Wrapping the entries into a short wide block, and then putting it underneath the figure, is often the difference between a figure that fits on a slide and one that does not.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis + 
+  scale_fill_brewer(
+    name = "State",
+    palette = "Set1",
+    guide = guide_legend(title.position = "left", nrow = 2)
+  )
+```
+
+:::
+
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+An exercise on legends, and note the twist in the instruction: you have to work out for yourself what goes in the star of scale-star-brewer. Think about which aesthetic the legend is explaining. In this figure the airports are distinguished by line colour, not by fill, so it is the colour version you need. That single decision is the thing being tested; the rest is filling in the arguments you have just seen. Getting fill and colour confused here is extremely common, and the symptom is that your code runs and nothing changes.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+Run the following code to create `gg_delay`, which you will build on.
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+(
+gg_delay <- 
+  flights %>% 
+  group_by(origin, month) %>% 
+  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  ggplot(.) +
+    geom_line(aes(y = mean_arr_delay, x = month, color = origin))
+)
+```
+
+#### Exercise
+
+::: {.columns}
+
+::: {.column width="50%"}
+Change the legend contents to create the figure on the right using `scale_*_brewer()`. You need to identify what goes into `*` in `scale_*_brewer()`.
+
+Here are the list of changes you need to make:
+
+* change the legend title to "Airports in NY"
+* change the legend title position to "bottom"
+* change the legend items to be spread in 3 columns
+* change the color palette to `Set2`
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+gg_delay + 
+  scale_color_brewer(
+    name = "Airports in NY",
+    palette = "Set2",
+    guide = guide_legend(
+      title.position = "bottom",
+      ncol = 3
+    )
+  ) 
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+::: {.panel-tabset}
+
+##### Work here
+```{webr-r}
+
+```
+
+##### Answer
+```{r}
+#| code-fold: true
+#| eval: false
+gg_delay +
+  scale_color_brewer(
+    name = "Airports in NY",
+    palette = "Set2",
+    guide = guide_legend(
+      title.position = "bottom",
+      ncol = 3
+    )
+  )
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Theme
+
+::: {.panel-tabset}
+
+### Naming rules
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now we move from content to theme, and this tab is about naming, which the very first slide called the real skill. The convention is hierarchical. axis.title refers to the titles of both axes. Add a suffix and you narrow it: axis.title.x is only the x axis title. That pattern is consistent throughout, so axis.text is both, axis.text.y is one. Once you see the rule, you can often guess the name of the thing you want to change, and when you cannot, the linked reference page lists them all.
+
+</details>
+
+When specifying the theme of figure elements, it is good to know the naming convention of figure elements:
+
+For example:
+
++ `axis.title` 
+
+This refers to the title of both x- and y-axis. Any aesthetic theme you apply to this element will be reflected on the title of both x- and y-axis.  
+
++ `axis.title.x` 
+
+This refers to the title of only x-axis. Any aesthetic theme you apply to this element will be reflected on the title of only x-axis.
+
+So, basically appending a suffix (e.g., `.x`, `.y`) narrows down the scope of the figure elements the element name refers to.
+
+### Common functions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second half of the naming system is that you cannot just assign a value to an element; you have to say what kind of element it is, using one of these functions. element_text for anything made of words, where you set size, family, angle, colour. element_rect for anything box-shaped, like backgrounds, where you set fill and border. element_line for lines, like grid lines and axis lines, where you set thickness and colour. element_blank for anything at all, which makes it disappear. And unit for measurements like widths and spacings. Match the function to the kind of thing and the rest is straightforward.
+
+</details>
+
+There are common functions we use to specify the aesthetic nature of figure elements based on the type of the elements:
+
+<br>
+
++ `element_text()`: for text elements like `axis.text`, `axis.title`, `legend.text`
+
+Inside the function, you specify things like font size, font family, angle, etc.
+
++ `element_rect()`: for box-like elements like `legend.background`, `plot.background`, `strip.background`
+
+Inside the function, you specify things like the fill (background) color, border line color, etc.
+
++ `element_line()`: for line elements like `panel.grid.major`, `axis.line.x`
+
+Inside the function, you specify things like line thickness, line color, etc.
+
++ `element_blank()`: any components
+
+It makes the specified component disappear.
+
++ `unit()`: for attributes of figure elements like `legend.key.width`, `legend.box.spacing` 
+
+:::
+<!--end of panel-->
+
+
+## Axis theme
+
+::: {.panel-tabset}
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This section is theme changes applied to axes, and we build on g_axis, the figure whose content we sorted out earlier. Run it so you have the starting point in front of you. Each of the next three tabs adds one more theme setting to the same call, so you can watch them accumulate rather than seeing them all at once.
+
+</details>
+
+We are going to build on this figure in this section:
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis
+```
+
+:::
+
+
+### title and text
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two text elements, and notice they use different levels of the naming hierarchy on purpose. axis.title.x, with the suffix, changes only the x axis title, making it small and red. axis.text, with no suffix, changes the tick labels on both axes at once. Both take element_text, because both are made of words. This is the naming rule from two tabs ago doing real work: the suffix is how you choose between changing one axis and changing both.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times")
+  )
+```
+
+### line
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now a line element. axis.line.y draws the axis line itself, and because it is a line it takes element_line, where you set linewidth and colour. Note that in the default ggplot2 theme there is no visible axis line at all, so this is adding something rather than restyling it. If you want the classic look with a solid line along the bottom and left edges, this is how you get it, and it is one of the things the pre-made themes later in this lecture do for you.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times"),
+    axis.line.y = element_line(linewidth = 2, color = "blue")
+  )
+```
+
+### ticks
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And a measurement. axis.ticks.length.x controls how long the tick marks are, and because it is a length rather than a colour or a font, it takes unit, where you give a number and the units. The two centimetres here is deliberately ridiculous, so you can see exactly which part of the figure moved. That is a good debugging habit generally: when you are not sure what an option controls, set it to an absurd value, find what jumps, then dial it back to something sensible.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis +
+  theme(
+    axis.title.x = element_text(size = 8, color = "red"),
+    axis.text = element_text(size = 14, family = "Times"),
+    axis.line.y = element_line(linewidth = 2, color = "blue"),
+    axis.ticks.length.x = unit(2, "cm")
+  )
+```
+
+:::
+<!--end of panel-->
+
+## Legends theme
+
+::: {.panel-tabset}
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Legends again, but now their appearance rather than their content. The list shows what you can get at: the title, where the whole legend sits, the keys, the text, the direction it runs, and the background behind it. Note the difference from the earlier legend section: there we used scale functions to decide what the legend said and which colours it showed. Here we use theme to decide how it looks. Same distinction as the very first slide, applied to one component.
+
+</details>
+
+We can use `theme()` to change the aesthetics of legends. Some of the elements include
+
++ title
++ position
++ key 
++ text
++ direction
++ background
+
+See [here](https://ggplot2.tidyverse.org/reference/theme.html) for the full list of options related to legends.
+
+We will discuss how to change the color scheme of legends in much more detail later.
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The starting point for this section, and it is worth looking at what it does. It takes our axis-styled figure and adds a fill scale with the Paired palette, arranged in two rows with the title on the left. So all the legend content decisions are already made. Everything in the following tabs is pure theme applied on top of that, which keeps the two kinds of change cleanly separated.
+
+</details>
+
+This is what we will build on: 
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+(  
+g_l <- 
+  g_axis +
+  scale_fill_brewer(
+    palette = "Paired",
+    guide = guide_legend(title.position = "left", nrow = 2)
+  )
+)
+```
+
+:::
+
+
+
+### position
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The single most useful legend theme setting is position. By default the legend goes to the right, which eats horizontal space, and horizontal space is exactly what a wide figure needs. Moving it to the bottom often buys you a noticeably larger plot area for free. You can also use top, left, or the word none to remove the legend entirely, which is what you want when the same key is already explained in a neighbouring panel or in the caption.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_l +
+  labs(fill = "State") +
+  theme(legend.position = "bottom")
+```
+
+### key
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The keys are the little coloured swatches next to each label, and their size is set with legend.key.height and legend.key.width, both taking unit because they are measurements. Widening the keys, as here, is genuinely useful for a bottom-mounted legend: a long flat swatch reads more clearly at a glance than a small square, especially when the colours are close together. Notice also that these two settings are being added to the position setting from the previous tab, so the theme call is accumulating.
+
+</details>
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm")
+  ) 
+```
+
+### font
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Fonts for the two text parts of a legend, and they are named separately because you usually want them different. legend.text is the labels next to each key, and legend.title is the heading. Both take element_text. The values chosen here are deliberately mismatched, a large Times label against a small red Courier title, so you can see clearly which is which. In real use you would set them to the same family as the rest of your figure, and the point of this tab is simply to show you which name controls which part.
+
+</details>
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm"),
+    legend.text = element_text(size = 16, family = "Times"),
+    legend.title = element_text(size = 6, family = "Courier", color = "red")
+  )
+```
+
+### background
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the panel behind the legend, which is a box, so it takes element_rect and you set its fill and its border. A light background behind the legend can help when the legend sits on top of a busy plot, and it is unnecessary when the legend has its own space outside the panel. Notice that the theme call has now accumulated six settings across four tabs, all inside one theme function separated by commas. That is how real theme code looks: one call, a list of element assignments.
+
+</details>
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_l +
+  labs(fill = "State") +
+  theme(
+    legend.position = "bottom",
+    legend.key.height = unit(0.5, "cm"),
+    legend.key.width = unit(2, "cm"),
+    legend.text = element_text(size = 16, family = "Times"),
+    legend.title = element_text(size = 6, family = "Courier", color = "red"),
+    legend.background = element_rect(fill = "lightblue", linetype = "solid")
+  ) 
+```
+
+:::
+<!--end of panel-->
+
+## Pre-made and customized themes
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far has been setting elements one at a time, which is powerful and slow. A pre-made theme changes dozens of them at once. ggplot2 ships with several, and the ggthemes package adds many more, including imitations of the house styles of various publications. Install and load ggthemes to follow along. The linked gallery is genuinely worth a look, because picking a theme that is already close to what you want is far less work than building one from the default.
+
+</details>
+
+There are a bunch of pre-made themes from the `ggplot2` and `ggthemes` packages that can quickly change how figures look.
+
+Install and library  `ggthemes` package first:
+
+```{r eval = F}
+#--- install ---#
+install.packages("ggthemes") 
+
+#--- library ---#
+library("ggthemes") 
+```
+
+<br>
+
+See the full list of pre-made themes [here](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/).
+
+### Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Six themes on the same figure, so click through them and see the range. theme_bw is the sober one you will probably use most, white background with grid lines. theme_void removes essentially everything, which is what you want for a map. Then stata, gdocs, economist and excel, imitating other software and publications. Two things to notice as you click. First, how much changes with one function call. Second, that a theme only touches appearance; the data, the axis titles, and the colour meanings are identical throughout.
+
+</details>
+
+::: {.panel-tabset}
+
+#### bw
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_bw()
+```
+
+:::
+
+#### void
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_void()
+```
+
+:::
+
+#### stata
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_stata()
+```
+
+:::
+
+#### gdocs
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_gdocs()
+```
+
+:::
+
+#### economist
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_economist()
+```
+
+:::
+
+#### excel
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis + theme_excel()
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+### Build on a pre-made theme
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the technique I would actually recommend, and it combines the last two sections. Start from the pre-made theme closest to what you want, then override the specific parts you do not like by adding a theme call after it. Order matters: the later one wins, so the pre-made theme must come first. The tabs work through an example, taking theme_bw and then removing the minor grid lines, then the vertical major ones, then restyling the horizontal ones. That is a realistic workflow, and it is far less effort than specifying forty elements yourself.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How
+
+You can simply override parts of the pre-made theme by adding theme options like this (see the **Custom theme** tab below for more on this):
+
+```{r eval = F}
+g_axis +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+<br>
+
+So, you can pick the pre-made theme that looks the closest to what you would like, and then add on theme elements to the part you do not like.
+
+#### Preparation
+
+We will build from this figure:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis_bw <- g_axis + theme_bw()
+```
+
+#### minor grid
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis_bw + theme(panel.grid.minor = element_blank())
+```
+
+
+#### major grid
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_axis +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(linewidth = 1, color = "blue", linetype = "dotted")
+  )
+```
+
+See [here](http://sape.inf.usi.ch/quick-reference/ggplot2/linetype) for the line types available.
+
+:::
+<!--end of panel-->
+
+### Custom theme
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the final step: if you have a combination you like, save it to a name and reuse it. A theme is an ordinary R object, so my_theme can be built once and then added to any figure exactly like a built-in theme. The tabs show it built on theme_economist, compared against the unmodified version, and then the theme_set function, which applies your theme to every figure you draw from then on. For a paper where every figure has to look the same, define the theme once at the top of your script and use theme_set. That consistency is worth more to a reader than any individual styling choice.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+You can create your own theme, save it, and then use it later. 
+
+Here, I am creating my own theme off of `theme_economist()`, where axis titles and major panel grids are absent.
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+my_theme <- 
+  theme_economist() +
+  theme(
+    axis.title = element_blank(),
+    panel.grid.major = element_blank()  
+  )
+```
+
+:::
+
+You can add `my_theme` like below just like a regular pre-made theme:
+
+```{r}
+#| eval: false
+ggplot(data = weather) +
+  geom_boxplot(
+    aes(y = temp, x = factor(month))
+  ) +
+  my_theme
+```
+
+#### Compare
+
+::: {.columns}
+
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot(data = weather) +
+  geom_boxplot(aes(y = temp, x = factor(month))) +
+  theme_economist()
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot(data = weather) +
+  geom_boxplot(aes(y = temp, x = factor(month))) +
+  my_theme
+```
+
+:::
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `theme_set()`
+
+If you would like to apply your theme to all the figures you generate, then use `theme_set()` like below:
+
+```{r eval = F}
+theme_set(my_theme)
+```
+
+After this, all of your figures will follow  `my_theme`.
+
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+## Faceted figure theme
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Faceted figures have parts that ordinary figures do not, and they need their own names. The strip is the little labelled bar along the edge of each panel telling you which group it holds. So there is strip.background for the bar itself, strip.text for the words in it, strip.placement for where it sits, and panel.spacing for the gaps between panels. If you have ever wanted to make those labels readable and not known what to call them, this is the vocabulary.
+
+</details>
+
+Faceted figures have `strip` elements that do not exist for non-faceted figures, such as
+
++ `strip.background`
++ `strip.placement`
++ `strip.text`
++ `panel.spacing`
+
+We learn how to modify these elements. 
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The setup for this section, and note that it deliberately cuts the data down to three states and two years. That is not just to keep the example small; it is the lesson from the faceting lecture applied again. A grid of six panels can be read, and a grid of sixty cannot. Then we build the faceted histogram we will restyle, with free x scales so each panel gets an axis suited to its own data.
+
+</details>
+
+Create a dataset for this section:
+
+```{webr-r}
+#| autorun: true
+county_yield_f <- 
+  county_yield %>%
+  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>%
+  filter(year %in% c(2005, 2006))
+```
+
+<br>
+
+Create a faceted figure we will build on:
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+(
+g_f <-
+  ggplot(data = county_yield_f) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year, 
+    scales = "free_x"
+  )
+)
+```
+
+:::
+
+
+### text
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Strip text, and notice it uses the suffix rule from earlier: strip.text.x is the labels across the top, strip.text.y is the labels down the side. They are styled separately here for a reason worth knowing. The labels down the right-hand side are rotated ninety degrees by default, which is hard to read, and setting angle to zero turns them upright. That single change makes a faceted figure noticeably easier to read, and it is probably the most useful thing on this slide.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_f +
+  theme(
+    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
+    strip.text.y = element_text(angle = 0, size = 6, color = "blue")
+  )
+```
+
+
+### background
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The strip backgrounds, which are boxes, so element_rect. Two different treatments here on purpose. The x strips get a blue border, and the y strips get element_blank, which removes their grey background entirely. That second one is a common piece of polish: the default grey bars can dominate a figure with many panels, and stripping them back so only the label text remains usually looks cleaner. Remember element_blank works on any element, so it is your general tool for making something go away.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_f +
+  theme(
+    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
+    strip.text.y = element_text(angle = 0, size = 6, color = "blue"),
+    strip.background.x = element_rect(color = "blue"),
+    strip.background.y = element_blank()
+  ) 
+```
+
+### panel spacing
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the gaps between panels, set with panel.spacing, again with x and y variants and again taking unit because they are measurements. The values here are deliberately extreme in opposite directions, a wide two centimetre gap horizontally and almost nothing vertically, so you can see each one act independently. In practice you would widen the spacing when the axis labels of neighbouring panels are colliding, and tighten it when you want the panels read as one continuous picture.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+g_f +
+  theme(
+    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
+    strip.text.y = element_text(angle = 0, size = 6, color = "blue"),
+    strip.background.x = element_rect(color = "blue"),
+    strip.background.y = element_blank(),
+    panel.spacing.x = unit(2, "cm"),
+    panel.spacing.y = unit(0.01, "cm")
+  ) 
+```
+
+:::
+<!--end of panel-->
+
+# Color
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## More flexible color options with HEX
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now colour, properly. So far we have used colour names like red and blue, which is fine and very limited. A HEX code specifies a colour exactly, as a hash followed by six characters, and it gives you the entire range your screen can produce. The direction in the callout is worth actually doing: go to the site, pick a colour you like, and copy the code beneath it. Note the remark at the end too, that RGB codes also work but there is no real reason to use them.
+
+</details>
+
+Instead of naming the color you want to use, you can use **HEX color codes** instead.
+
+:::{.callout-note title="Direction"}
++ Visit [here](https://www.color-hex.com/)
++ Click on any color you like
++ Then you will see two sets of color gradients (thicker and lighter from the color you picked)
++ Pick the color you like from the color bar and copy the HEX color code beneath the color you picked
+:::
+
+You could alternatively use the RGB codes, but I do not see any reason to do so because the use of HEX codes is sufficient.
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here it is in use. A HEX code goes anywhere a colour name goes, in exactly the same position, so nothing about the syntax changes. This matters more than it sounds. If your department or journal has house colours, you can use precisely those colours rather than an approximation, and a figure that uses two or three deliberately chosen colours consistently looks considerably more professional than one built from the default palette. Try one of your own.
+
+</details>
+
+You can use HEX color codes for any color-related elements in a figure.
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = county_yield) +
+  geom_point(aes(y = corn_yield, x = d3_5_9), color = "#824283") 
+```
+
+:::{.callout-note title="Try"}
+Pick a Hex color and try it yourself.
+:::
+
+:::
+<!--end of panel--> 
+
+
+## Color scale
+
+::: {.panel-tabset}
+
+### Intro 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now colour scales, meaning the rule that maps your data to colours, which matters far more than any individual colour choice. The naming follows a pattern worth internalizing, because there are a lot of these functions and the pattern is the only way to keep them straight. Every one is scale, then the aesthetic, then the method. So the first blank is either colour or fill, and the second is whichever colour system you are using. Learn the pattern and the long list on the next tab stops being intimidating.
+
+</details>
+
+The choice of color schemes for your figures is very important.
+
+We use `scale_A_B()` functions for color specification:
+
++ **A** is the name of aesthetic (`color` or `fill`)
++ **B** is the type of color specification method
+
+### Intro 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the pattern applied. In this code the aesthetic being mapped is colour, so the first blank is colour, and that already halves the list. Then the second blank is the method, and there are many. Do not try to memorize them. Instead note the single most important thing, which is at the bottom of the slide: some of these are for discrete variables and some for continuous, and you have to know which kind your variable is. Corn yield is numeric, so it needs a continuous scale, and handing it a discrete one is a very common error.
+
+</details>
+
+For example, consider the following code:
+
+```{r color-aes, eval = F}
+ggplot(data = county_yield) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield))
+```
+
+Since it is the `color` aesthetic that we want to work on, **A** = `color`.
+
+There are many options for **B**. Indeed, there are so many that, it gets confusing!
+
++ `scale_color_brewer()` (discrete)
++ `scale_color_distiller()` (continuous)
++ `scale_color_viridis_d()` (discrete)
++ `scale_color_viridis_c()` (continuous)
++ `scale_color_continuous()` (continuous)
++ `scale_color_discrete()` (discrete)
++ `scale_color_hue()` (discrete)
+
+One thing to remember is that you need to be aware of whether the aesthetic variable (here, `corn_yield`) is numeric or not as that determines acceptable type of **B**.
+
+
+:::
+<!--end of panel-->
+
+## Viridis
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Viridis is the colour system I would recommend as a default, and this tab is the whole of it. Four functions, from the two aesthetics times the two variable types, following the naming pattern you just learned, with c for continuous and d for discrete. Then eight palettes within it, selected with the option argument by name or by letter. And the line at the bottom is the real reason to prefer these: they are colour-blind safe, which around one man in twelve in your audience will benefit from, and they also survive being printed in greyscale.
+
+</details>
+
+We have four `scale` functions for Viridis color map:
+
++ `scale_color_viridis_c()`: for `color` aesthetic with a continuous variable
++ `scale_color_viridis_d()`: for `color` aesthetic with a discrete variable
++ `scale_fill_viridis_c()`: for `fill` aesthetic with a continuous variable
++ `scale_fill_viridis_d()`: for `fill` aesthetic with a discrete variable
+
+There are several color scheme types under the Viridis color map:
+
++ `magma` (option A)
++ `inferno` (option B)
++ `plasma` (option C)
++ `viridis` (option D, the default)
++ `cividis` (option E)
++ `rocket`, `mako`, `turbo` (options F, G, H)
+
+You can use `option` to specify which one of them you want to use inside the `scale` functions, using either the name or the letter.
+
+These color schemes are color-blind safe.
+
+### types
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four of the palettes shown together on the same data so you can compare them fairly. Magma and inferno run through black and red into yellow, plasma is purple to yellow, and viridis, the default, runs blue through green to yellow. They all share the property that matters: brightness increases steadily from one end to the other, so the ordering survives even if the colour information is lost. Pick whichever suits your subject; the technical properties are the same.
+
+</details>
+
+```{webr-r}
+#| context: output
+#| warning: false
+data("geyser", package = "MASS")
+
+ggplot(geyser, aes(x = duration, y = waiting)) +
+  xlim(0.5, 6) + ylim(40, 110) +
+  stat_density2d(aes(fill = after_stat(level)), geom = "polygon") +
+  theme_bw() +
+  theme(panel.grid=element_blank()) -> gg
+
+((gg + scale_fill_viridis_c(option="A") + labs(x="magma (option A)", y=NULL)) |
+(gg + scale_fill_viridis_c(option="B") + labs(x="inferno (option B)", y=NULL)))/ 
+((gg + scale_fill_viridis_c(option="C") + labs(x="plasma (option C)", y=NULL)) |
+(gg + scale_fill_viridis_c(option="D") + labs(x="viridis (default)", y=NULL)))
+```
+
+### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A continuous example, using the default viridis palette. Notice which function is used, scale colour viridis c, and take the two parts of the name apart: colour because we mapped the colour aesthetic, and c because corn yield is a continuous variable. If you take one thing from this section, make it the habit of reading those function names as a specification rather than as a word to memorize.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +
+  scale_color_viridis_c()
+```
+
+### Example 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same figure with a different palette, selected through the option argument. Use the letter, in quotes, or the palette name; here B gives you inferno. One warning worth having: option also appears to accept a bare number, but the numbering does not line up with the A to H list on the instruction tab the way you would expect, so a number will quietly give you a different palette from the one you meant. Write the letter or the name and there is no ambiguity.
+
+</details>
+
+<!-- CHANGED: was option = 2. A number does NOT index the A-H list shown on the
+     Instruction tab: verified that option = 2 returns exactly the colours of
+     option = "A" (magma), not "B" (inferno) as the list implies. Using the
+     letter, or the name "inferno", says what is meant and matches the tab
+     above. -->
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +
+  scale_color_viridis_c(option = "B")
+```
+
+
+### reverse
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One more argument you will want. Setting direction to minus one reverses the palette, so the dark end and the light end swap. This is not cosmetic fussiness. Whether high values should be dark or light depends on what you are showing and on what your reader expects, and getting it backwards makes a figure actively misleading. For a variable where high means bad, a reader will usually expect the intense end of the scale to sit on the high values.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +
+  scale_color_viridis_c(option = "B", direction = -1)
+```
+
+:::
+<!--end of panel-->
+
+## RColorBrewer
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The other colour system worth knowing is ColorBrewer, and its real contribution is the three-way classification at the top of this tab, which is a genuinely useful way to think. Sequential palettes are for variables that run from low to high, like temperature. Diverging palettes have a meaningful midpoint with two directions away from it, which is exactly right for something like change, where negative and positive mean opposite things. And qualitative palettes are for categories with no order at all, like state names. Then two functions, brewer for discrete variables and distiller for continuous.
+
+</details>
+
+`RColorBrewer` package provides a number of color palettes of three types:
+
++ **sequential**: suitable for a variable that has ordinal meaning (e.g., temperature, precipitation)
++ **diverging**: suitable for variables that take both negative and positive values (e.g., changes in groundwater level)
++ **qualitative**: suitable for qualitative or categorical variable
+
+We use two types of scale functions for the palettes:
+
++ `scale_A_brewer()`: for discrete aesthetic variable
++ `scale_A_distiller()`: for continuous aesthetic variable 
+
+### different types of sets
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These three tabs display every palette in each family, and they are worth spending a moment with. Look at the sequential ones and see the brightness climb steadily. Look at the diverging ones and see the pale midpoint with colour intensifying in both directions. Then look at the qualitative ones and notice that the colours are equally bright, deliberately, because none of those categories is meant to look more important than another. Matching the family to the kind of variable you have is most of what good colour choice consists of.
+
+</details>
+
+::: {.panel-tabset}
+
+#### sequential
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+display.brewer.all(type = "seq")  
+```
+
+:::
+
+#### diverging
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+display.brewer.all(type = "div")  
+```
+
+:::
+
+#### qualitative
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+display.brewer.all(type = "qual")  
+```
+
+:::
+:::
+<!--end of panel-->
+
+
+### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A discrete example: state is a category with no natural ordering, so this is a qualitative palette applied with scale fill brewer. brewer because the variable is discrete, fill because we are colouring the interiors of boxes. Set2 is a good default for this kind of thing, being distinguishable without being garish. Follow the naming apart again: aesthetic, then method, and both halves determined by facts about your data rather than by preference.
+
+</details>
+
+Generate a dataset for visualization:
+
+```{webr-r}  
+#| autorun: true
+county_yield_s_b2010 <- 
+  county_yield %>% 
+  filter(year >= 2005, year <= 2010)
+```
+
+<br>
+
+Create a figure:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70% 
+ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +
+  scale_fill_brewer(palette = "Set2")
+```
+ 
+### Example 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And a continuous example, which is where the distiller function comes in. Same palette family, but corn yield is numeric, so the palette has to be interpolated into a smooth gradient rather than used as a handful of discrete swatches, and distiller is what does that. The palette here, red-yellow-green, is a diverging one, so pause on whether it is really appropriate: diverging palettes imply a meaningful middle, and if yield has no natural centre point, a sequential palette would represent the data more honestly.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = filter(county_yield, corn_yield > 50)) +
+  geom_point(aes(y = corn_yield, x = d3_5_9, color = corn_yield)) +
+  scale_color_distiller(palette = "RdYlGn")
+```
+
+:::
+<!--end of panel-->
+
+
+## Set color scale manually
+
+::: {.panel-tabset}
+
+### discrete
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Sometimes none of the ready-made palettes is what you want, and you simply need specific colours for specific groups. That is what the manual scales are for. The mechanism is a named vector: each group name paired with the colour it should get. Two things worth noticing. You can mix colour names and HEX codes freely in the same vector. And because the mapping is by name rather than by position, it does not matter what order the groups happen to appear in your data, and the colours stay attached to the right groups even if the data changes.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+Sometimes, you just want to pick colors yourself. In that case, you can use 
+
++ `scale_color_manual()`
++ `scale_fill_manual()`
+
+Inside the `scale_*_manual()` function, you provide a named vector where a sequence of group names and their corresponding colors are specified to the `scale` function via the `values` option.
+
+For example, consider the box plot of corn yield for the three states in `county_yield`: Colorado, Kansas, and Nebraska. Then, a sample named vector looks like this:
+
+```{r eval = F}
+(
+cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "#ff0080")
+)
+```
+
+Note that you can mix color names and HEX codes freely.
+
+<br>
+
+Now that a named vector is created, you can do the following to impose the color scheme you just defined.
+
+```{r eval = F}
+scale_fill_manual(values = cols)
+```
+
+#### Example
+
+Define a named color vector:
+
+```{webr-r}
+#| autorun: true
+cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "#ff0080")
+```
+
+<br>
+
+Create a figure:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70% 
+ggplot(data = county_yield_s_b2010) + 
+  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +
+  scale_fill_manual(values = cols)
+```
+
+:::
+<!--end of panel-->
+
+### continuous
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the continuous counterpart, gradientn, where you build a smooth scale from your own colours. You give it a vector of colours and a matching vector of positions between zero and one, and the two must be the same length, because each colour is placed at its position and ggplot blends between neighbours. That is the key idea: the positions do not carve the bar into blocks, they are pins that the gradient is stretched between. Colours pinned close together give a fast transition, colours far apart a long gradual one, which is exactly what the example demonstrates.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+**How**
+
+You can use `scale_*_gradientn()` to create your own continuous color scale. 
+
+<br>
+
+**Syntax**
+
+`scale_*_gradientn(colors, values)`
+
++ `colors`: a vector of colors
++ `values`: a vector of numbers ranging from 0 to 1
++ `limits`: define the lower and upper bounds of the scale bar
+
+Each colour is **positioned at** the corresponding entry of `values`, and `ggplot2` blends smoothly between neighbouring colours. So `colors` and `values` must have the **same length**.
+
+<!-- CHANGED: the original said "the nth value of colors is used for the interval
+     defined by the nth and n+1th values in values", and supplied 4 colours
+     against 5 values. That is not how scale_*_gradientn() works: values gives
+     the position of each colour, not the edges of an interval, so the two
+     vectors have to be the same length. Verified with scales::gradient_n_pal():
+     with 4 colours and 5 values the ramp is silently rescaled rather than
+     erroring, which is why the mistake was invisible. -->
+
+:::{.callout-note title="Reading a positions vector"}
+Colours bunched close together in `values` give a fast transition; colours far apart give a long, gradual one.
+:::
+
+#### Example
+
+Create a figure:
+
+::: {.side-out}
+
+```{webr-r}
+ggplot(data = county_yield) + 
+  geom_point(
+    aes(x = d1_5_9, y = corn_yield,color = corn_yield),
+    size = 0.3
+  ) +
+  scale_color_gradientn(
+    colors = c("red", "orange", "green", "blue"),
+    values = c(0, 0.2, 0.9, 1),
+    limits = c(100, 250)
+  )
+```
+
+:::
+
+<br>
+
+Four colours, four positions. Read it as: red sits at the bottom of the scale, orange a fifth of the way up, green nine tenths of the way up, and blue right at the top.
+
+With `limits = c(100, 250)`, those positions correspond to actual yields of `r 100 + (250-100)*0.2` and `r 100 + (250-100)*0.9` bu/acre ($100 + (250-100)\times 0.2$ and $100 + (250-100)\times 0.9$).
+
+So the long stretch from 130 to 235 bu/acre is one slow orange-to-green blend, which is why warm and green tones fill most of the bar, while blue is squeezed into the top tenth.
+
+<!-- CHANGED: values was c(0, 0.1, 0.2, 0.9, 1), five entries against four
+     colours. Dropping 0.1 makes the lengths match without changing the
+     0.2 / 0.9 figures the surrounding text quotes. The explanation is also
+     rewritten: the original attributed the wide green band to green "owning"
+     the interval [0.2, 0.9], but colours mark positions and are blended
+     between, so what actually fills that stretch is the orange-to-green
+     transition. -->
+
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+

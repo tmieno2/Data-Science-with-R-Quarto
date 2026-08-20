@@ -1,0 +1,1890 @@
+---
+title: "03-3: Reshaping and Merging"
+abstract: "Chapter 3: Data Wrangling"
+format:
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'nycflights13', 'tidyr']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+execute:
+  echo: true
+filters:
+  - webr
+---
+
+```{r}
+#| include: false
+library(dplyr)
+library(ggplot2)
+library(nycflights13)
+library(tidyr)
+```
+
+# Reshaping
+
+<html>
+
+::: {style="float:left"}
+:::
+
+<hr color='#EB811B' size=1px width=1200px>
+
+</html>
+
+## Long and wide formats
+
+::::::: panel-tabset
+### long vs wide
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two words you will hear constantly, so let us pin them down with an example rather than a definition. On the left is the same data in long format: one column called yield holding every yield value, and a year column saying which year each belongs to. On the right is wide format: the years have become column names, and the yields sit underneath them. Same information, two shapes. Now read the note under the wide version, because it is the real cost of that shape: there is nothing in the wide dataset telling you what those numbers are. The column is called 2019, not yield in 2019.
+
+</details>
+
+::::: columns
+::: {.column width="50%"}
+**Long format**
+
+A single column representing a single variable
+
+```{webr-r}
+#| context: output
+(
+yield_data_long <-
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+    )
+  ) %>%
+  as_tibble()
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+**Wide format**
+
+Multiple columns representing a single variable
+
+```{webr-r}
+#| context: output
+(
+  yield_data_wide <-
+    tidyr::pivot_wider(yield_data_long, names_from = year, values_from = yield)
+)
+```
+
+Note: there is nothing in the dataset that tells you what the data values represent in the wide format.
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+### wide or long?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the question people get stuck on: which shape is correct? The answer is that it depends entirely on what you are about to do. Look at the model on the slide. It has separate coefficients for rainfall in each month, which means the estimation needs each month's rainfall in its own column. So for this analysis, the dataset shown is the long one, even though it has months spread across columns, because long and wide are relative to the variable you are thinking about. That is why the word long on this slide is in red: it is long with respect to yield, while being wide with respect to rainfall.
+
+</details>
+
+Suppose you are interested in estimating the following statistical model:
+
+$$\text{corn yield} = \beta_0 + \beta_1 R_{May} + \beta_2 R_{June} + \beta_3 R_{July} + \beta_4 R_{August} + \beta_5 R_{September} + v$$
+
+where $R$ refers to rainfall.
+
+Then the following dataset is in a [ long ]{style="color:red"} format:
+
+```{webr-r}
+#| context: output
+data.frame(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  ) %>% 
+  .[rep(1:nrow(.), each = 5), ] %>% 
+  mutate(
+    month = rep(c("May", "June", "July", "August", "September"), 8),
+    rainfall = 20*runif(40)
+  ) %>% 
+  tidyr::pivot_wider(names_from  = month, values_from = rainfall, names_prefix = "R_")
+```
+
+### too long
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is the same data in a shape that is too long for that analysis. Every rainfall observation is on its own row, with a month column saying which month it is. Nothing is wrong with this data; it is perfectly tidy. It simply does not match the model we want to estimate, which needs one column per month. Read the callout, because it is the point of this whole slide: whether a dataset is wide or long is not a property of the data, it is a judgment about what you are doing with it. There is no universally correct shape.
+
+</details>
+
+This is [ too long ]{style="color: red;"} for your analysis.
+
+```{webr-r}
+#| context: output
+data.frame(
+  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+  year = c(2019, 2020) %>% rep(4),
+  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  ) %>% 
+  .[rep(1:nrow(.), each = 5), ] %>% 
+  mutate(
+    month = rep(c("May", "June", "July", "August", "September"), 8),
+    rainfall = 20*runif(40)
+  ) %>% 
+  head(15)
+```
+
+<br>
+
+::: {.callout-note title="Point"}
+Whether a dataset is wide or long is determined based on what you are doing with the dataset.
+:::
+:::::::
+
+<!--end of panel-->
+
+## Long to wide
+
+::::::: panel-tabset
+### prepare
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us actually do the conversion, starting from long and going to wide. First we need something to work with, so this tab just creates the dataset: four states, two years each, with a yield for every combination. Eight rows, three columns. Run it and look at it, and keep the shape in mind, because in a moment we are going to turn those eight rows into four.
+
+</details>
+
+Create the following dataset in long format:
+
+```{webr-r}
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  )
+)
+```
+
+### how and example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The function is pivot_wider from the tidyr package, and it takes two arguments beyond the data itself. names_from says which column supplies the new column names, and values_from says which column supplies the values that go underneath them. So here, the values in the year column become the new column headers, and the values in the yield column fill the cells. Read the two bullets under each side; they say exactly that. If you can hold onto names_from meaning where the headers come from and values_from meaning where the numbers come from, you have understood this function.
+
+</details>
+
+::::: columns
+::: {.column width="40%"}
+**How**
+
+To convert a long-formatted `data.frame` into a wide-formatted `data.frame`, you can use `tidyr::pivot_wider()` function from the `tidyr` package.
+
+```{r}
+#| echo: true
+#| eval: false
+#--- NOT RUN ---#
+tidyr::pivot_wider(
+  data,
+  names_from = variable_1,
+  values_from = variable_2
+)
+```
+
+-   the value of `variable_1` becomes the name of the new variables
+-   the value of `variable_2` becomes the value of the new variables
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="60%"}
+**Example**
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_wide <- 
+  tidyr::pivot_wider(
+    yield_data_long, 
+    names_from = year, 
+    values_from = yield
+  )
+)
+```
+
+-   the value of `year` becomes the name of the new variables
+-   the value of `yield` becomes the value of the new variables
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+### prefix
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small practical problem with what we just did: the new columns are called 2019 and 2020, which are numbers. Column names that begin with a digit are awkward in R; you end up needing backticks around them every time you refer to one. The fix is names_prefix, which sticks a string on the front of every new name, so you get yield_2019 instead. It also makes the columns self-documenting, which addresses the complaint from the very first slide that a wide dataset does not say what its numbers are.
+
+</details>
+
+You can append a character string to the new variable names. The previous example had `2019` and `2020` as the name of the new variables.
+
+```{webr-r}
+yield_data_long %>%
+  tidyr::pivot_wider(
+    #--- let R know what the prefix is ---#
+    names_prefix = "yield_",
+    names_from = "year",
+    values_from = "yield"
+  )
+```
+
+### multiple columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One more capability before we go the other way. So far we have widened a single value column, but datasets usually have several. These two tabs show that values_from accepts a vector of column names, so you can widen yield and rainfall in the same call. Look carefully at the resulting column names, because this is the part that matters later: you get yield_2019, yield_2020, rainfall_2019, rainfall_2020. The new names combine the original variable with the year, joined by an underscore. Remember that structure, because reversing it is the trickiest thing in this lecture.
+
+</details>
+
+::: panel-tabset
+#### Prepare a dataset
+
+Create the following data in long format:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  )
+)
+```
+
+#### demonstration
+
+You can simply supply multiple variables to be made wide like this:
+
+```{webr-r}
+#| autorun: true
+yield_data_long %>%  
+  tidyr::pivot_wider(
+    names_from = "year",
+    values_from = c("yield", "rainfall")
+  )  
+```
+:::
+
+<!--end of panel-->
+:::::::
+
+<!--end of panel-->
+
+## Wide to long
+
+::::::::::::: panel-tabset
+### how and example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the other direction, wide to long, using pivot_longer. It takes three things. cols is which columns to gather up. names_to is the name of the new column that will hold what those column headers were. And values_to is the name of the new column that will hold the values. In the example, we pivot everything except state, using a minus sign to say all but this one, and we declare that the old headers represent years and the old values represent yields. Notice that pivot_longer is where the information a wide dataset was missing gets put back in, because you are telling it what those columns meant.
+
+</details>
+
+::::: columns
+::: {.column width="40%"}
+**How**
+
+To convert a wide-formatted `data.frame` into a long-formatted `data.frame`, you can use `tidyr::pivot_longer()` function from the `tidyr` package.
+
+```{r}
+#| echo: true
+#| eval: false
+#--- NOT RUN ---#
+tidyr::pivot_longer(
+  data, 
+  cols = x,
+  names_to = y, 
+  values_to = z 
+)
+```
+
+-   `x`: list of the name of the columns to pivot into longer format
+-   `y`: what the name of `x` represents
+-   `z`: what the values stored in `x` represents
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="60%"}
+**Example**
+
+```{webr-r}
+yield_data_wide %>% 
+  tidyr::pivot_longer(
+    - state, 
+    names_to = "year", 
+    values_to = "yield"
+  )
+```
+
+-   `x`: all the variables except `state`
+-   `y`: "year"
+-   `z`: "yield"
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+### prefix
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+If you widened with a prefix, you will want to strip it off when you go back. names_prefix on pivot_longer does exactly that, removing the given string from the front of each name before storing it. Otherwise your year column would contain yield_2019 rather than 2019. And note the sentence at the bottom, which catches people out: the resulting year column is character, not numeric, because column names are always text. If you intend to use it as a number, in a model or on an axis, convert it with as.numeric.
+
+</details>
+
+You do not want `year_` in front of the year numbers in the new `year` variable? You can use the `names_prefix` option as follows:
+
+```{webr-r}
+yield_data_wide %>%  
+  tidyr::pivot_longer(
+    - state,
+    #--- let R know what the prefix is ---#
+    names_prefix = "yield_",
+    names_to = "year",
+    values_to = "yield"
+  )
+```
+
+Notice `year` is character. Convert it to numeric using `as.numeric()` if you use it as a numeric variable.
+
+### multiple sets of columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the hardest thing in this lecture, so take it slowly through the four tabs. The situation is that we widened two variables at once, so every column name now encodes two pieces of information, the variable and the year, glued together with an underscore. Going back is not a single pivot_longer, and the second tab shows you the failed attempt so you can see exactly how it falls short. The trick is to pivot everything into one long column first, then split the combined name into its two parts with separate, and then widen just the variable part back out again. Three steps, and the last tab puts them together.
+
+</details>
+
+::::::::: panel-tabset
+#### Prep
+
+::::: columns
+::: {.column width="50%"}
+**Long**
+
+Create the following dataset in the long format:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_long <- 
+  data.frame(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  )
+)
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+**Wide**
+
+Convert the long dataset into the wide format:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_wide <- 
+  yield_data_long %>% 
+  tidyr::pivot_wider(
+    names_from = year, 
+    values_from = c(yield, rainfall)
+  )
+)
+```
+
+[ Objective ]{style="color: red;"}: We would like to convert the wide data back to the original long data.
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+#### one-step?
+
+You cannot revert this data back to the original long-formatted data in one step.
+
+```{webr-r}
+yield_data_wide %>% 
+  tidyr::pivot_longer(
+    - state,
+    names_to = "year",
+    values_to = "yield"
+  )
+```
+
+#### separate()
+
+However, you can take advantage of the `tidyr::separate()` function, which separates a variable of type character by a user-specified separator into two variables in the dataset.
+
+```{r}
+#| eval: false
+#--- NOT RUN ---#
+separate(data, col, into = c("new_var_1", "new_var_2"), sep = "separator")
+```
+
+::::: columns
+::: {.column width="50%"}
+Before separation:
+
+```{webr-r}
+#| autorun: true
+yield_data_wide %>% 
+  #--- pivot every column except state into long format ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) 
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+After separation:
+
+```{webr-r}
+#| autorun: true
+yield_data_wide %>% 
+  #--- pivot every column except state into long format ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) %>% separate(type_year, c("type", "year"), sep = "_") #<<
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+#### three-step
+
+After separating `type_year` to `type` and `year`, all you have to do is to apply `tidyr::pivot_wider()` to have the desired long-formatted data.
+
+```{webr-r}
+yield_data_wide %>% 
+  #--- pivot every column except state into long format ---#
+  tidyr::pivot_longer(
+    - state,
+    names_to = "type_year",
+    values_to = "value"
+  ) %>% 
+  separate(type_year, c("type", "year"), sep = "_") %>% 
+  tidyr::pivot_wider(
+    names_from = "type",
+    values_from = "value"
+  )
+```
+:::::::::
+
+<!--end of panel-->
+:::::::::::::
+
+<!--end of panel-->
+
+## Exercises
+
+::: panel-tabset
+### Data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Time to practise on real data rather than eight made-up rows. We are back to the flights dataset from nycflights13, which you met in the previous lecture. Run it and remind yourself what is in it. The three exercises that follow take you round a full circle: summarize it into a long dataset, widen that, and then narrow it back. If you can do that round trip, you have the reshaping half of this lecture.
+
+</details>
+
+We will use `flights` data from the `nycflights13` package.
+
+<br>
+
+```{webr-r}
+#| autorun: true
+flights
+```
+
+### Exercise 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first exercise is really a revision of last lecture: count the number of flights for each carrier and month. That is group_by on two variables and then summarize with n. The result is in long format, one row per carrier-month combination, and that is the input for the next exercise, so name it as instructed. There is a folded answer, and there is also a chunk showing the output you should be getting, so you can check yourself without reading the code.
+
+</details>
+
+Using `flights` data, calculate the total number of flights by carrier-month, which is in the long format. Name the resulting object `num_flights`.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+#| eval: false
+num_flights <-
+  flights %>% 
+  group_by(carrier, month) %>% 
+  summarize(num_obs = n()) 
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+(
+num_flights <- 
+  flights %>% 
+  group_by(carrier, month) %>% 
+  summarize(num_obs = n())
+)
+```
+
+### Exercise 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now widen it. You want months across the top and carriers down the side, which means names_from is month and values_from is your count column. Use the names_prefix argument as well, so that your columns come out as month_1 rather than a bare 1, for the reason we discussed earlier. Look at the shape of the result: instead of a long list of carrier-month rows, you get a compact table with one row per carrier. This is the shape you would want for a printed table in a paper.
+
+</details>
+
+Reshape the `num_flights` data into a wide format with the number of flights per month as columns, and assign the result to an R object named `num_flights_wide`.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+#| eval: false
+num_flights %>% 
+  tidyr::pivot_wider(
+    names_from = month,
+    names_prefix = "month_",
+    values_from = num_obs
+  ) 
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+(
+num_flights_wide <- 
+  num_flights %>% 
+  tidyr::pivot_wider(
+    names_from = month,
+    names_prefix = "month_",
+    values_from = num_obs
+  ) 
+)
+```
+
+### Exercise 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And now reverse it, to complete the circle. pivot_longer, gathering all the month columns, which you can select neatly with starts_with of month underscore rather than listing twelve of them. Strip the prefix off with names_prefix, and name the two new columns. Compare your answer with the object you created in exercise one. It should hold the same information, though the row ordering and the column types may differ, which is itself a useful thing to notice about round trips.
+
+</details>
+
+Reshape the data (`num_flights_wide`) back into the long format so that a single column has all the flight number values.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+#| eval: false
+num_flights_wide %>% 
+  tidyr::pivot_longer(
+    starts_with("month_"),
+    names_to = "month",
+    names_prefix = "month_",
+    values_to = "num_flights"
+  )
+```
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+num_flights_wide %>%
+  tidyr::pivot_longer(
+    starts_with("month_"),
+    names_to = "month",
+    names_prefix = "month_",
+    values_to = "num_flights"
+  ) 
+```
+:::
+
+<!--end of panel-->
+
+# Merging multiple datasets
+
+<html>
+
+::: {style="float:left"}
+:::
+
+<hr color='#EB811B' size=1px width=1200px>
+
+</html>
+
+```{webr-r}
+#| context: setup
+N <- 2
+T <- 2
+
+set.seed(582374)
+
+price_data <- data.frame(
+  price = runif(N * T, min = 2, max = 6),
+  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  year = c(2015, 2016, 2015, 2016)
+  )
+
+yield_data <- data.frame(
+  yield = runif(N * T, min = 180, max = 280),
+  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  year = c(2015, 2015, 2016, 2016)
+  )
+```
+
+## Merging multiple datasets
+
+:::::::::::::::: panel-tabset
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second half of this lecture is merging, and the motivation is completely practical. Data almost never arrives in one file. If you want to know how crop prices affect supply, you need price and production in the same dataset, and they will have come from different sources in different files. Combining them is not a minor preliminary; it is usually where the real errors creep into an analysis, which is why we are spending time on doing it deliberately rather than hopefully.
+
+</details>
+
+It is very common that you have data stored in separate files, and you need to combine them before you conduct any statistical analysis.
+
+For example, if you are interested in how crop price affects the supply of crops, you want to have price and production data in a single dataset. However, it may be that price and production data are stored in two separate files.
+
+### Match? 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us build up to why merging works, starting from a deliberately impossible case. Here are two datasets: one column of prices, one column of yields. The question in the callout is whether you can merge them. Look at them and think about it before I answer. The answer is no, and the reason is worth stating precisely: nothing in either dataset says which price goes with which yield. They are just two lists of numbers. Whatever order they happen to be in is not information you can rely on.
+
+</details>
+
+Now suppose, you have collected price and production data for Lancaster and Douglas County from 2015 to 2016.
+
+Here is what the datasets look like (these are made-up numbers).
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(price_data, price)
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(yield_data, yield)
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+<br>
+
+::: {.callout-note title="Question"}
+Can you merge the two?
+:::
+
+### Match? 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now we add a column to each: county. Can you merge them now? Better, but still no, and this is the case that catches people out. We now know which county each price and each yield belongs to, but every county appears twice, once for each year. So for Lancaster there are two prices and two yields, and nothing says which price goes with which yield. Knowing who is not enough when you have several observations for the same who.
+
+</details>
+
+Let's display one more variable from each of the datasets.
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(price_data, price, county)
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(yield_data, yield, county)
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+<br>
+
+Okay, great. At least we know which price and production belong to which county! In other words, we know which price and production belong to **who** (or **where**).
+
+<br>
+
+::: {.callout-note title="Question"}
+Can you merge the two?
+:::
+
+### Match? 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And now year as well. This time the answer is yes. Every row is uniquely identified by the combination of county and year, so each price has exactly one yield it can correspond to. That combination is what the important callout names: the keys. The keys are the variables that, taken together, uniquely identify a row and let you line two datasets up. Note that here it takes two variables together; neither county nor year alone would do it. Identifying your keys correctly is the single most important step in any merge.
+
+</details>
+
+Let's display one more variable from each of the datasets.
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(price_data, price, county, year)
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| context: output
+select(yield_data, yield, county, year)
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+<br>
+
+::: {.callout-note title="Question"}
+Can you merge the two now?
+:::
+
+<br>
+
+::: {.callout-important title="Key"}
+-   The variables that let you merge two datasets are called [ keys]{style="color:blue"}.
+-   What are the keys here?
+:::
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The function is left_join from dplyr. There is a whole family of join functions, and they are listed here, but I want to give you permission to ignore most of them for now. left_join covers the overwhelming majority of real cases. The advice in the last bullet is genuine: learn the others when you hit a situation left_join cannot handle, and not before. Trying to memorize the differences between six joins in the abstract, before you have a problem that needs them, is a waste of your time and it does not stick.
+
+</details>
+
+-   You can use the `left_join()` function from the `dplyr` package to merge two datasets.
+
+-   There are different types of join functions:
+
+    -   `right_join()` (you never need to use this one)
+    -   `inner_join()`
+    -   `full_join()`
+    -   `semi_join()`
+    -   `nest_join()`
+
+-   But, most of the time, `left_join()` is sufficient.
+
+-   Try to learn other functions when you encounter a case where `left_join()` is not sufficient. Do not waste your time until then.
+::::::::::::::::
+
+<!--end of panel-->
+
+## Joining datasets with `dplyr::left_join()`
+
+::::::::::::::: panel-tabset
+### `left_join()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The syntax is two datasets and the keys, but the three rules underneath are what you actually need to know. Rule one: you get every row from the left dataset, and columns from both. Rule two: where a left-hand row has no match on the right, the new columns are filled with NA rather than the row being dropped. Rule three: where there are multiple matches, you get every combination, which means the result can have more rows than you started with. And the note is the practical upshot of rule one: the order of the two datasets matters, because the left one determines which rows survive.
+
+</details>
+
+**Syntax**
+
+```{r}
+#| eval: false
+#--- Syntax (NOT RUN) ---#
+left_join(data_x, data_y, by = keys)  
+```
+
+<br>
+
+**Rules to be aware of**
+
+-   [Rule 1]{style="color: blue;"}: It returns all rows from `data_x`, and all columns from `data_x` and `data_y`
+-   [Rule 2]{style="color: blue;"}: Rows in `data_x` with no match in `data_y` will have NA values in the new columns
+-   [Rule 3]{style="color: blue;"}: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned
+
+::: {.callout-note title="Note"}
+The order of datasets matters.
+:::
+
+### demonstration: 1 to 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These tabs work through the simplest case, where each row on the left has exactly one match on the right. Start with the data prep tab and answer the question there yourself before moving on: what are the keys? Then the first demo joins them, and does it in both orders. Notice that here the order makes no difference, and the callout explains why: every row in each dataset has exactly one partner in the other, so nothing gets dropped or duplicated whichever way round you go. Then the later tabs deliberately break that symmetry by adding a county to one dataset and not the other, so you can see rules one and two actually operating.
+
+</details>
+
+::::::::: panel-tabset
+#### Data prep
+
+We use `price_data` and `yield_data` for demonstrations.
+
+```{webr-r}
+#| context: setup
+N <- 2
+T <- 2
+
+set.seed(582374)
+
+price_data <- data.frame(
+  price = runif(N * T, min = 2, max = 6),
+  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  year = c(2015, 2016, 2015, 2016)
+  )
+
+yield_data <- data.frame(
+  yield = runif(N * T, min = 180, max = 280),
+  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  year = c(2015, 2015, 2016, 2016)
+  )
+```
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+price_data
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+yield_data
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+<br>
+
+::: {.callout-note title="Question"}
+What are the keys?
+:::
+
+#### Demo 1
+
+The keys are `county` and `year`, so
+
+```{webr-r}
+left_join(yield_data, price_data, by = c("county", "year"))  
+```
+
+<br>
+
+Switching the two?
+
+```{webr-r}
+left_join(price_data, yield_data, by = c("county", "year"))  
+```
+
+<br>
+
+::: callout-note
+In this instance, [ which comes first does not matter ]{style="color: red;"} because all the individual rows in `yield_data` (left data) have exactly one match in `price_data` (right data) without fail, and vice versa.
+:::
+
+#### Data prep 2
+
+Let's expand the `yield_data` as follows:
+
+```{webr-r}
+#| autorun: true
+(
+yield_data_with_chase <- 
+  data.frame(
+    yield = runif(6, min = 180, max = 280),
+    county = c("Lancaster", "Douglas", "Chase", "Lancaster", "Douglas", "Chase"),
+    year = c(2015, 2015, 2015, 2016, 2016, 2016)
+  )
+)
+```
+
+#### Demo 2
+
+**`yield_data_with_chase` on the right**:
+
+```{webr-r}
+left_join(price_data, yield_data_with_chase, by = c("county", "year"))  
+```
+
+<br>
+
+**`yield_data_with_chase` on the left**:
+
+```{webr-r}
+left_join(yield_data_with_chase, price_data, by = c("county", "year"))  
+```
+
+<br>
+
+::: {.callout-note title="Remember?"}
+-   **Rule 1**: `left_join()` returns all rows from `data_x`, and all columns from `data_x` and `data_y`
+-   **Rule 2**: Rows in `data_x` with no match in `data_y` will have NA values in the new columns
+:::
+
+#### keeping all rows
+
+We saw in the previous slide having `price_data` (as `data_x`) and `yield_data_with_chase` as (`data_y`), `left_join()` discarded rows in `yield_data_with_chase` (`data_y`).
+
+If you would like to keep unmatched rows in `data_y`, you can use `full_join()`.
+
+```{webr-r}
+#| echo: true
+full_join(price_data, yield_data_with_chase, by = c("county", "year"))  
+```
+:::::::::
+
+<!--end of panel-->
+
+### demonstration: 1 to m
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now a more realistic case, one to many. The weather data here has several observations per county and year, one for each month, whereas the yield data has just one row per county-year. So each yield row has several weather rows it matches. Look carefully at what the join produces: the yield value gets repeated across every matching weather row. That is rule three in action, and it is correct behaviour, but it means your dataset has grown and any given yield figure now appears more than once. If you were to average yields on that result without thinking, you would be weighting by the number of weather observations.
+
+</details>
+
+:::: panel-tabset
+#### Data prep
+
+Let's create a weather dataset where you have more than one observation per county-year:
+
+```{webr-r}
+#| autorun: true
+( 
+weather_data <- 
+  data.frame(
+    rainfall = 20 * runif(12),
+    county = rep(c("Lancaster", "Douglas", "Chase"), each = 4),
+    year = rep(c(2015, 2016), each = 2) %>% rep(3),
+    month = rep(c(4, 5), 6)
+  ) 
+)
+```
+
+#### Demo
+
+```{webr-r}
+#| autorun: true
+left_join(yield_data, weather_data, by = c("county", "year"))
+```
+
+::: {.callout-note title="Remember?"}
+**Rule 3**: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned.
+:::
+::::
+
+<!--end of panel-->
+
+### demonstration: m to m
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And now many to many, which is where you should be genuinely careful. The yield data now has multiple crops per county-year, and the weather data has multiple months per county-year, so both sides have several rows per key. The join produces every combination of the two, and the result grows quickly. Notice the commented-out line in the code, which passes relationship equals many-to-many. Recent versions of dplyr warn you when a join is many-to-many, precisely because it is so often a mistake, and that argument is how you confirm you meant it. If you see that warning and you were not expecting it, stop and check your keys.
+
+</details>
+
+::: panel-tabset
+#### Data prep
+
+Let's create an expanded crop yield dataset for multiple crops:
+
+```{webr-r}
+#| autorun: true
+yield_data <- 
+  data.frame(
+    yield = c(runif(4, min = 180, max = 280), runif(4, min = 40, max = 80)),
+    county = rep(c('Lancaster','Douglas','Lancaster','Douglas'), 2),
+    year = rep(c(2015, 2015, 2016, 2016), 2),
+    crop = c(rep("Corn", 4), rep("Soybean", 4))
+  )
+```
+
+#### Demo
+
+```{webr-r}
+#| autorun: true
+left_join(yield_data, weather_data, by = c("county", "year"))
+# left_join(yield_data, weather_data, by = c("county", "year"), relationship = "many-to-many")
+```
+:::
+
+<!--end of panel-->
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two exercises to finish, and they are deliberately built as a pair. Both merge temperature onto the January flights, but one uses daily temperature and the other hourly. Before you write any code, answer the question each exercise asks: is this one-to-one, one-to-many, or many-to-many? Work it out by thinking about how many rows each dataset has per key, not by running it and seeing. That habit of predicting the relationship before joining is what stops you silently multiplying your dataset, and it is the real lesson of this whole section.
+
+</details>
+
+::: panel-tabset
+#### Preparation
+
+Create the following datasets and take a look at them to understand what's in them:
+
+<br>
+
+**Flights in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  flights_Jan <- 
+    flights %>% 
+    filter(month == 1) %>% 
+    select(month, day, dep_delay, origin)
+)
+```
+
+**daily temperature in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  daily_temp_Jan <- 
+    weather %>% 
+    filter(month == 1) %>% 
+    group_by(origin, month, day) %>% 
+    summarize(temp = mean(temp))
+)
+```
+
+**hourly temperature in January**:
+
+```{webr-r}
+#| autorun: true
+(
+  hourly_temp_Jan <- 
+    weather %>% 
+    filter(month == 1) %>% 
+    select(origin, month, day, hour, temp) 
+)
+```
+
+#### Exercise 1
+
+-   You are interested in learning the impact of **daily** temperature on departure delay for the flights in January. To do so, you need to have the variables in a single dataset.
+
+-   Is this going to be a 1-to-1 matching, 1-to-m, or m-to-m matching?
+
+-   Merge `daily_temp_Jan` to `flights_Jan` using `left_join()`
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+left_join(flights_Jan, daily_temp_Jan, by = c("origin", "month", "day"))
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+left_join(flights_Jan, daily_temp_Jan, by = c("origin", "month", "day"))
+```
+
+#### Exercise 2
+
+-   You are interested in learning the impact of **hourly** temperature on departure delay for the flights in January. To do so, you need to have them in a single dataset.
+
+-   Is this going to be a 1-to-1 matching, 1-to-m, or m-to-m matching?
+
+-   Merge `hourly_temp_Jan` to `flights_Jan` using `left_join()`
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"), relationship = "many-to-many")
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"), relationship = "many-to-many")
+```
+:::
+
+<!--end of panel-->
+:::::::::::::::
+
+## Rolling and nearest joins
+
+::::::::::::::: panel-tabset
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let me start with a join you have already written. In the exercises a moment ago you matched January flights to the hourly temperature at their origin airport, and it looked like it worked. Every flight came back, no warning, no error. But count the missing temperatures and fifty-two flights have none, because the weather station did not report for three particular hours. Nobody spots that in twenty-seven thousand rows. This is what equality joins do the moment your two datasets are on slightly different schedules, and it is why the rest of this section exists. What you actually wanted was the nearest observation in time, not the exactly matching one.
+
+</details>
+
+:::::::: panel-tabset
+#### Data prep
+
+January flights, and the hourly weather at each origin airport:
+
+```{webr-r}
+#| autorun: true
+jan_flights <-
+  flights %>%
+  filter(month == 1) %>%
+  select(origin, dep_time = time_hour, dep_delay)
+
+jan_weather <-
+  weather %>%
+  filter(month == 1) %>%
+  select(origin, obs_time = time_hour, temp)
+```
+
+<br>
+
+Both carry a `time_hour` column, so this looks like an ordinary equality join on airport and hour.
+
+#### A join that quietly fails
+
+You already did this in the last section: match each flight to the temperature at its origin, for its hour.
+
+```{webr-r}
+#| autorun: true
+matched <- left_join(jan_flights, jan_weather, join_by(origin, dep_time == obs_time))
+
+nrow(matched)              # every flight is still here
+sum(is.na(matched$temp))   # ...but how many have no temperature?
+```
+
+<br>
+
+::: {.callout-important title="No error, no warning"}
+Every flight survived the join, so nothing looks wrong. Yet **52 flights** came out with no temperature at all.
+:::
+
+#### The missing hours
+
+Where did they go?
+
+```{webr-r}
+#| autorun: true
+matched %>%
+  filter(is.na(temp)) %>%
+  count(origin, dep_time)
+```
+
+<br>
+
+The weather station simply **did not report** for three particular hours. Those flights had nothing to match, so `left_join()` did exactly what Rule 2 says and filled `NA`.
+
+::: {.callout-note title="The real question"}
+There *was* a perfectly good observation an hour earlier. Equality could not reach it, because equality only accepts an [exact]{style="color: red;"} match.
+:::
+
+#### A smaller example
+
+27,000 rows is too many to watch a join happen. So we switch to something you can see all of.
+
+Soil moisture is measured on **irregular** dates, and irrigation happens on its **own** dates:
+
+```{webr-r}
+#| autorun: true
+readings <- data.frame(
+  field     = c("A", "A", "A", "B", "B"),
+  read_date = as.Date(c("2024-05-01", "2024-05-10", "2024-05-20", "2024-05-05", "2024-05-15")),
+  moisture  = c(30, 22, 35, 28, 19)
+)
+
+irrigation <- data.frame(
+  field      = c("A", "A", "B", "B"),
+  irrig_date = as.Date(c("2024-05-08", "2024-05-22", "2024-05-14", "2024-05-02")),
+  inches     = c(1.0, 0.8, 1.2, 0.5)
+)
+```
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+readings
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+irrigation
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+#### Why equality fails
+
+**Goal**: for each irrigation event, attach the **most recent soil moisture reading taken before it**.
+
+<br>
+
+Joining on `date` is hopeless, because [not a single date appears in both datasets]{style="color: red;"}. Joining on `field` alone gives every combination:
+
+```{webr-r}
+#| autorun: true
+left_join(irrigation, readings, by = "field", relationship = "many-to-many")
+```
+
+<br>
+
+::: {.callout-note title="The problem"}
+Four irrigation events became **ten** rows. Equality is the wrong tool: we do not want rows where the dates *match*, we want the row where the date is **closest**.
+:::
+::::::::
+
+<!--end of panel-->
+
+### `join_by()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+To match on anything other than equality you need a different way of writing the keys, and that is `join_by`. Notice the two lines in the first block do exactly the same thing: `by` equals a character vector of names, and `join_by` with the names unquoted. So `join_by` is just a more expressive way of saying what you already know how to say. The payoff is the second block, where instead of naming a column you write a comparison: field, and irrigation date greater than or equal to reading date. That is no longer a key at all, it is a condition, and only `join_by` can express it.
+
+</details>
+
+:::::::: panel-tabset
+#### Same thing, new syntax
+
+These two are [identical]{style="color: blue;"}:
+
+```{r}
+#| eval: false
+#--- Syntax (NOT RUN) ---#
+left_join(x, y, by = c("county", "year"))   # what we have been writing
+left_join(x, y, join_by(county, year))      # the same, unquoted
+```
+
+<br>
+
+`join_by()` is not just a style preference. Because it takes **expressions** rather than names, it can say things `by =` cannot.
+
+#### From `==` to `>=`
+
+Inside `join_by()`, the left-hand side refers to `data_x` and the right-hand side to `data_y`. So you can write a **comparison** instead of a key:
+
+```{webr-r}
+#| autorun: true
+left_join(irrigation, readings, join_by(field, irrig_date >= read_date))
+```
+
+<br>
+
+::: {.callout-note title="Read it out loud"}
+"Match rows in the same `field` where the irrigation date is **at or after** the reading date."
+:::
+
+<br>
+
+This is an [inequality join]{style="color: blue;"}. It is progress, but look at field A on 2024-05-22: it matched **all three** of its earlier readings.
+::::::::
+
+<!--end of panel-->
+
+### Rolling join
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The inequality join gave us every earlier reading, but we only wanted one, the most recent. Wrapping the comparison in `closest` says exactly that: of all the rows satisfying the inequality, keep only the one where the two dates are nearest. Now every irrigation event gets at most one reading. This is what is normally called a rolling join, because the value rolls forward in time until a newer one replaces it. Look at the last row though. Field B irrigated on the second of May, with no reading at or before that date, so it is NA; `closest` cannot invent a match. Then the last tab takes this straight back to the flights, where fifty-two missing temperatures become zero.
+
+</details>
+
+:::::::: panel-tabset
+#### `closest()`
+
+Wrap the inequality in `closest()` to keep only the **nearest** qualifying match:
+
+```{webr-r}
+#| autorun: true
+left_join(irrigation, readings, join_by(field, closest(irrig_date >= read_date)))
+```
+
+<br>
+
+::: {.callout-note title="This is a rolling join"}
+Four irrigation events in, four rows out. Each one carries the **most recent** reading that preceded it. The value "rolls" forward in time until a newer reading replaces it.
+:::
+
+#### Direction matters
+
+Flip the inequality and you get the **next** reading instead of the previous one:
+
+```{webr-r}
+#| autorun: true
+#--- most recent reading at or BEFORE (roll backward) ---#
+left_join(irrigation, readings, join_by(field, closest(irrig_date >= read_date)))
+```
+
+```{webr-r}
+#| autorun: true
+#--- first reading at or AFTER (roll forward) ---#
+left_join(irrigation, readings, join_by(field, closest(irrig_date <= read_date)))
+```
+
+<br>
+
+::: {.callout-important title="Look at the NAs"}
+Each direction fails on a **different** row.
+
+-   Rolling **backward**, field B on 05-02 has no earlier reading.
+-   Rolling **forward**, field A on 05-22 has no later reading.
+
+`closest()` never invents a match. Unmatched rows behave exactly like Rule 2: `NA` in the new columns.
+:::
+
+#### Back to the flights
+
+Now fix the join we started with. Same data, same question, one word different:
+
+```{webr-r}
+#| autorun: true
+rolled <- left_join(jan_flights, jan_weather, join_by(origin, closest(dep_time >= obs_time)))
+
+nrow(rolled)              # same number of flights
+sum(is.na(rolled$temp))   # ...and now?
+```
+
+<br>
+
+::: {.callout-note title="52 to 0"}
+| | rows | flights with no temperature |
+|---|---|---|
+| `dep_time == obs_time` | 27,004 | **52** |
+| `closest(dep_time >= obs_time)` | 27,004 | **0** |
+
+The row count did not change, so nothing was duplicated. The 52 flights that fell in a reporting gap now carry the most recent observation before departure, which is the number you wanted all along.
+:::
+::::::::
+
+<!--end of panel-->
+
+### Nearest join
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A rolling join is deliberately one-directional, and sometimes that is wrong. If you just want the closest reading in time, whichever side it falls on, you have to look both ways. There is no single helper for this, so we build it: roll backward, roll forward, then compare the two gaps and keep the smaller one. Look at the first row of the intermediate table. Rolling backward found a reading seven days earlier, rolling forward found one just two days later. The rolling join gave you the seven-day-old reading; the nearest join gives you the two-day-old one. Same data, different answer, and which is correct depends entirely on your question.
+
+</details>
+
+:::::::: panel-tabset
+#### The idea
+
+A rolling join only ever looks **one way**. If you want the closest reading in **either** direction, do both and keep the better one:
+
+1.  Roll **backward** to get the previous reading and its gap
+2.  Roll **forward** to get the next reading and its gap
+3.  Keep whichever gap is **smaller**
+
+::: {.callout-note title="No built-in helper"}
+`closest()` always needs a direction, so there is no one-liner for a two-sided nearest match in `dplyr`. You build it from the pieces you just learned.
+:::
+
+#### Code
+
+```{webr-r}
+#| autorun: true
+nearest <-
+  irrigation %>%
+  #--- step 1: the previous reading ---#
+  left_join(readings, join_by(field, closest(irrig_date >= read_date))) %>%
+  rename(date_before = read_date, moisture_before = moisture) %>%
+  #--- step 2: the next reading ---#
+  left_join(readings, join_by(field, closest(irrig_date <= read_date))) %>%
+  rename(date_after = read_date, moisture_after = moisture) %>%
+  #--- step 3: measure both gaps and keep the smaller ---#
+  mutate(
+    gap_before = as.numeric(irrig_date - date_before),
+    gap_after  = as.numeric(date_after - irrig_date)
+  ) %>%
+  mutate(
+    moisture = ifelse(
+      is.na(gap_after) | (!is.na(gap_before) & gap_before <= gap_after),
+      moisture_before,
+      moisture_after
+    )
+  )
+
+nearest
+```
+
+#### Compare
+
+The intermediate columns show the choice being made:
+
+```{webr-r}
+#| autorun: true
+select(nearest, field, irrig_date, gap_before, gap_after, moisture)
+```
+
+<br>
+
+::: {.callout-important title="It is a different answer"}
+For field A on 05-08, the previous reading is **7 days** old but the next one is only **2 days** away.
+
+-   The **rolling** join returns the 7-day-old reading (`moisture` = 30)
+-   The **nearest** join returns the 2-day-later reading (`moisture` = 22)
+
+Neither is wrong. Choose the one your question needs.
+:::
+
+#### Which should you use?
+
+-   Use a [rolling join]{style="color: blue;"} when the direction is part of the question, and especially when **only the past may be used**: "what was the soil moisture *going into* this irrigation?" Using a later reading there would leak information you could not have had at the time.
+
+-   Use a [nearest join]{style="color: blue;"} when you simply want the best available measurement of an underlying condition, and time direction carries no meaning.
+::::::::
+
+<!--end of panel-->
+
+### Cautions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three things to watch, and the first is a distinction worth getting straight. A reading five days before and a reading five days after are not a tie, because the inequality has already thrown one side away before `closest` ever looks at distance. A real tie means two rows sharing the same nearest date, which in practice means a duplicate in your lookup table, and then you do get both rows back and your dataset quietly grows. Second, unmatched rows are easy to miss at scale, so count your NAs rather than assuming. Third, if you have used `data.table`, you already know all of this as the roll argument. Same concepts, different spelling.
+
+</details>
+
+:::::::: panel-tabset
+#### Equidistant is not a tie
+
+An irrigation on 05-10 sits exactly 5 days from a reading on 05-05 and 5 days from one on 05-15. That is **not** a tie, because the inequality already chose a side:
+
+```{webr-r}
+#| autorun: true
+tie_irrig <- data.frame(field = "A", irrig_date = as.Date("2024-05-10"), inches = 1)
+tie_read  <- data.frame(
+  field     = "A",
+  read_date = as.Date(c("2024-05-05", "2024-05-15")),
+  moisture  = c(24, 31)
+)
+
+#--- one row each: the inequality picks the side, then closest() picks within it ---#
+left_join(tie_irrig, tie_read, join_by(field, closest(irrig_date >= read_date)))
+left_join(tie_irrig, tie_read, join_by(field, closest(irrig_date <= read_date)))
+```
+
+<br>
+
+::: {.callout-note title="Two filters, in order"}
+`closest()` never compares across the inequality. First the inequality discards one side, **then** `closest()` finds the nearest of what survives.
+:::
+
+#### A real tie
+
+A genuine tie needs two rows at the **same** distance on the **same** side, which in practice means a duplicated date in your lookup table:
+
+```{webr-r}
+#| autorun: true
+dup_read <- data.frame(
+  field     = "A",
+  read_date = as.Date(c("2024-05-05", "2024-05-05")),
+  moisture  = c(24, 31)
+)
+
+#--- one row in, TWO rows out ---#
+left_join(tie_irrig, dup_read, join_by(field, closest(irrig_date >= read_date)))
+```
+
+<br>
+
+::: {.callout-warning title="Check your row count"}
+Rule 3 has not gone away. `closest()` narrows you to the nearest **distance**, not to a single **row**. If several rows sit at that distance you get all of them, so compare `nrow()` before and after, every time.
+:::
+
+#### Unmatched rows
+
+`closest()` cannot invent a match. When nothing satisfies the inequality you get `NA`, exactly as in Rule 2:
+
+```{webr-r}
+#| autorun: true
+result <- left_join(irrigation, readings, join_by(field, closest(irrig_date >= read_date)))
+
+#--- how many failed to match? ---#
+sum(is.na(result$read_date))
+```
+
+<br>
+
+::: {.callout-note title="Count them"}
+In a four-row example you can see the `NA`. In a four-million-row dataset you cannot. Count them deliberately.
+:::
+
+#### If you know `data.table`
+
+The same two operations exist in `data.table`, spelled differently:
+
+```{r}
+#| eval: false
+#--- Syntax (NOT RUN) ---#
+
+#--- rolling: most recent at or before ---#
+readings[irrigation, on = .(field, read_date = irrig_date), roll = TRUE]
+
+#--- nearest: closest in either direction ---#
+readings[irrigation, on = .(field, read_date = irrig_date), roll = "nearest"]
+```
+
+<br>
+
+::: {.callout-note title="Same idea, different spelling"}
+`roll = TRUE` is `closest(x >= y)`. `roll = "nearest"` is the two-sided version we had to build by hand in `dplyr`.
+:::
+::::::::
+
+<!--end of panel-->
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two exercises, and the second one matters more than the first. The first is deliberately the opposite direction from the demonstration: you want the first rain on or after planting, so work out which way the inequality points before you write it. Field A had rain two days before planting, which should not be selected, and field C has no rain after planting at all. The second asks for the nearest rain in either direction, and then asks whether that is actually the right answer. It is not. For fields A and C the nearest rain fell before the seed was even in the ground, and field C's honest NA becomes a date that means nothing. Nearest is not an upgrade. It answers a different question.
+
+</details>
+
+:::::::: panel-tabset
+#### Preparation
+
+```{webr-r}
+#| autorun: true
+planting <- data.frame(
+  field      = c("A", "B", "C"),
+  plant_date = as.Date(c("2024-04-20", "2024-05-02", "2024-05-25"))
+)
+
+rain <- data.frame(
+  field     = c("A", "A", "B", "B", "C"),
+  rain_date = as.Date(c("2024-04-18", "2024-04-27", "2024-05-06", "2024-05-19", "2024-05-10")),
+  inches    = c(0.4, 1.1, 0.7, 2.0, 1.5)
+)
+```
+
+::::: columns
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+planting
+```
+:::
+
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{webr-r}
+#| autorun: true
+rain
+```
+:::
+
+<!--end of the 2nd column-->
+:::::
+
+<!--end of the columns-->
+
+#### Exercise 1
+
+-   For each field, find the **first rain event on or after** the planting date.
+
+-   Before running anything, predict two things:
+
+    -   Field A had rain on 04-18, two days **before** planting. Should it be selected?
+    -   Field C planted on 05-25. What will its row look like?
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+left_join(planting, rain, join_by(field, closest(plant_date <= rain_date)))
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+left_join(planting, rain, join_by(field, closest(plant_date <= rain_date)))
+```
+
+#### Exercise 2
+
+Now the other tool. For each field, find the **nearest** rain event in **either** direction, following the three steps from the Nearest join tab.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+Here is the output you are supposed to get if done correctly:
+
+```{webr-r}
+#| context: output
+planting %>%
+  left_join(rain, join_by(field, closest(plant_date >= rain_date))) %>%
+  rename(date_before = rain_date, inches_before = inches) %>%
+  left_join(rain, join_by(field, closest(plant_date <= rain_date))) %>%
+  rename(date_after = rain_date, inches_after = inches) %>%
+  mutate(
+    gap_before = as.numeric(plant_date - date_before),
+    gap_after  = as.numeric(date_after - plant_date)
+  ) %>%
+  select(field, plant_date, date_before, gap_before, date_after, gap_after)
+```
+
+<br>
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+planting %>%
+  left_join(rain, join_by(field, closest(plant_date >= rain_date))) %>%
+  rename(date_before = rain_date, inches_before = inches) %>%
+  left_join(rain, join_by(field, closest(plant_date <= rain_date))) %>%
+  rename(date_after = rain_date, inches_after = inches) %>%
+  mutate(
+    gap_before = as.numeric(plant_date - date_before),
+    gap_after  = as.numeric(date_after - plant_date)
+  ) %>%
+  select(field, plant_date, date_before, gap_before, date_after, gap_after)
+```
+
+<br>
+
+::: {.callout-note title="Now decide"}
+Read off which rain event the **nearest** rule would pick for each field. Is it the same one Exercise 1 gave you? Should it be?
+:::
+
+#### Discussion
+
+**Exercise 1** behaved itself:
+
+-   Field A's 04-18 rain is [correctly excluded]{style="color: blue;"}. `plant_date <= rain_date` only admits rain **at or after** planting.
+-   Field C returns [`NA`]{style="color: red;"}. There is no rain on or after 05-25, and `closest()` will not reach backward to invent one.
+
+<br>
+
+**Exercise 2 is where it gets interesting.** The nearest rule picks:
+
+| field | nearest rain | but that is... |
+|---|---|---|
+| A | 04-18 (2 days) | **2 days *before* planting** |
+| B | 05-06 (4 days) | after planting, same as Ex. 1 |
+| C | 05-10 (15 days) | **15 days *before* planting** |
+
+::: {.callout-important title="Nearest is not the better tool here"}
+For "did the crop get water **after** it went in the ground?", rain that fell **before** planting is no answer at all. Worse, field C's honest [`NA`]{style="color: red;"} gets replaced by a real-looking date that is simply irrelevant.
+
+A nearest join is not an upgrade on a rolling join. It answers a **different question**, and when direction carries meaning, it will quietly answer the wrong one.
+:::
+
+<br>
+
+::: {.callout-note title="The habit to keep"}
+Same as the rest of this chapter: decide what the relationship *should* be before you join, then check that the result matches your prediction.
+:::
+::::::::
+
+<!--end of panel-->
+:::::::::::::::
+
+<!--end of panel-->

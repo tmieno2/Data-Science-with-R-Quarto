@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Ex-3-1: Importing and Exporting Files – Data Science with R (AECN 896-05)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-38d9d8fd61e003a5a1c343a80d3dce47.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Ex-3-1: Importing and Exporting Files – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Data Wrangling">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science with R (AECN 896-05)</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/syllabus_26.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/calendar_26.html"> 
+<span class="menu-text">Calendar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lectures/index.html"> 
+<span class="menu-text">Lecture Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../assignments.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../exercises/index.html"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-setup" id="toc-sec-setup" class="nav-link active" data-scroll-target="#sec-setup"><span class="header-section-number">1</span> Setup</a></li>
+  <li><a href="#one-dataset-four-formats" id="toc-one-dataset-four-formats" class="nav-link" data-scroll-target="#one-dataset-four-formats"><span class="header-section-number">2</span> One dataset, four formats</a></li>
+  <li><a href="#read.csv-renames-your-columns" id="toc-read.csv-renames-your-columns" class="nav-link" data-scroll-target="#read.csv-renames-your-columns"><span class="header-section-number">3</span> <code>read.csv()</code> renames your columns</a></li>
+  <li><a href="#a-column-you-did-not-ask-for" id="toc-a-column-you-did-not-ask-for" class="nav-link" data-scroll-target="#a-column-you-did-not-ask-for"><span class="header-section-number">4</span> A column you did not ask for</a></li>
+  <li><a href="#list-the-sheets-before-you-read-them" id="toc-list-the-sheets-before-you-read-them" class="nav-link" data-scroll-target="#list-the-sheets-before-you-read-them"><span class="header-section-number">5</span> List the sheets before you read them</a></li>
+  <li><a href="#spreadsheets-made-by-human-beings" id="toc-spreadsheets-made-by-human-beings" class="nav-link" data-scroll-target="#spreadsheets-made-by-human-beings"><span class="header-section-number">6</span> Spreadsheets made by human beings</a></li>
+  <li><a href="#stop-read_csv-guessing" id="toc-stop-read_csv-guessing" class="nav-link" data-scroll-target="#stop-read_csv-guessing"><span class="header-section-number">7</span> Stop <code>read_csv()</code> guessing</a></li>
+  <li><a href="#stata-files-bring-their-labels-with-them" id="toc-stata-files-bring-their-labels-with-them" class="nav-link" data-scroll-target="#stata-files-bring-their-labels-with-them"><span class="header-section-number">8</span> STATA files bring their labels with them</a></li>
+  <li><a href="#straight-from-the-internet" id="toc-straight-from-the-internet" class="nav-link" data-scroll-target="#straight-from-the-internet"><span class="header-section-number">9</span> Straight from the internet</a></li>
+  <li><a href="#what-a-csv-throws-away" id="toc-what-a-csv-throws-away" class="nav-link" data-scroll-target="#what-a-csv-throws-away"><span class="header-section-number">10</span> What a csv throws away</a></li>
+  <li><a href="#rds-holds-any-object-not-just-data" id="toc-rds-holds-any-object-not-just-data" class="nav-link" data-scroll-target="#rds-holds-any-object-not-just-data"><span class="header-section-number">11</span> rds holds any object, not just data</a></li>
+  <li><a href="#the-exercise-that-decides-whether-your-assignment-runs" id="toc-the-exercise-that-decides-whether-your-assignment-runs" class="nav-link" data-scroll-target="#the-exercise-that-decides-whether-your-assignment-runs"><span class="header-section-number">12</span> The exercise that decides whether your assignment runs</a></li>
+  <li><a href="#read-the-error-do-not-guess" id="toc-read-the-error-do-not-guess" class="nav-link" data-scroll-target="#read-the-error-do-not-guess"><span class="header-section-number">13</span> Read the error, do not guess</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Ex-3-1: Importing and Exporting Files</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    Data Wrangling
+  </div>
+</div>
+
+
+</header>
+
+
+<p>None of these run in your browser. Reading and writing files is the one thing a browser cannot do, so all of this happens in RStudio on your own machine. That is the point of the lecture: code that only works on your computer is not much use to anybody, and you cannot learn that lesson without a real computer.</p>
+<p>Work through these in order. Several exercises use objects built in earlier ones, and the last two are the ones that decide whether your assignments run.</p>
+<section id="sec-setup" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Setup</h1>
+<p>Do this once. Everything below depends on it.</p>
+<ol type="1">
+<li>Clone <a href="https://github.com/tmieno2/data-science-course-supplementary-datasets" class="uri">https://github.com/tmieno2/data-science-course-supplementary-datasets</a> if you have not already. Lecture 02-0 shows you how.</li>
+<li>Make a new folder called <code>ch3-practice</code> wherever you keep coursework.</li>
+<li>In RStudio: <code>File -&gt; New Project -&gt; Existing Directory</code>, and choose <code>ch3-practice</code>. <strong>This step is what makes <code>here()</code> work later.</strong></li>
+<li>Inside <code>ch3-practice</code>, make two subfolders, <code>data</code> and <code>analysis</code>.</li>
+<li>Copy these five files from the cloned repository into <code>ch3-practice/data</code>: <code>corn_yields.csv</code>, <code>corn_yields.xls</code>, <code>corn_yields.dta</code>, <code>corn_yields.rds</code>, and <code>corn_yields_exp_rownames.csv</code>.</li>
+</ol>
+<p>You should end up with this:</p>
+<pre><code>ch3-practice/
+├── ch3-practice.Rproj
+├── analysis/
+└── data/
+    ├── corn_yields.csv
+    ├── corn_yields.dta
+    ├── corn_yields.rds
+    ├── corn_yields.xls
+    └── corn_yields_exp_rownames.csv</code></pre>
+<p>The data is corn yields for Nebraska counties: one row per county per irrigation status, with <code>Yield</code> measured in bushels per acre.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>here::here()</code> typed in the console prints the path to <code>ch3-practice</code>, and nothing longer.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="If it printed something else">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+If it printed something else
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>here()</code> looks upward from the current folder for a <code>.Rproj</code> file. If it printed a parent folder, you either opened a different project, or you created the project one level up. Close RStudio, double-click <code>ch3-practice.Rproj</code>, and check again.</p>
+<p>If it printed your home folder, you have no project open at all.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="one-dataset-four-formats" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> One dataset, four formats</h1>
+<p>The same corn yield data is stored four ways. Read all four and confirm you got the same thing.</p>
+<p><strong>Task.</strong> In a new script, read each file and report <code>class()</code> and <code>dim()</code> of each object.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Three of them are 161 rows by 9 columns. <strong>One of them is not, and you should work out why before opening the answer.</strong></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)   <span class="co"># NOT loaded by library(tidyverse)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>corn_csv <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>corn_xls <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.xls"</span>), <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>corn_dta <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.dta"</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>corn_rds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.rds"</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(<span class="fu">list</span>(corn_csv, corn_xls, corn_dta, corn_rds), dim)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(<span class="fu">list</span>(corn_csv, corn_xls, corn_dta, corn_rds), class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>All four come back as 161 by 9 tibbles, so on the face of it nothing is wrong. The catch is not visible in this output at all: <code>corn_yields.xls</code> has <strong>two</strong> sheets, and by asking for <code>sheet = 1</code> you silently took half the data. The csv holds 2008 only; the workbook holds 2008 and 2009 on separate sheets.</p>
+<p>This is the failure mode worth internalising. A wrong file path throws an error and you fix it in ten seconds. Reading the wrong <em>sheet</em> throws nothing, and you find out three weeks later when your regression uses half the sample. Exercise 4 deals with it properly.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="could not find function &quot;read_excel&quot;">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+could not find function “read_excel”
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>readxl</code> is installed by <code>tidyverse</code> but is <strong>not loaded</strong> by <code>library(tidyverse)</code>, unlike <code>readr</code>, <code>dplyr</code>, and <code>ggplot2</code>. It needs its own <code>library(readxl)</code>. This catches everybody exactly once.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="read.csv-renames-your-columns" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> <code>read.csv()</code> renames your columns</h1>
+<p>Open <code>corn_yields.csv</code> in a text editor, or in RStudio via <code>File -&gt; Open File</code>, and look at the seventh column heading. It is <code>Data item</code>, with a space in it.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Read the file with <code>read.csv()</code> and with <code>read_csv()</code>.</li>
+<li>Print <code>names()</code> of each and find the difference.</li>
+<li>Extract that column from each object.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can state what <code>read.csv()</code> did to the name without being told, and the extraction that works on one object fails on the other.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>base_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tidy_tb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(base_df)[<span class="dv">7</span>]   <span class="co"># "Data.item"  &lt;- renamed behind your back</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tidy_tb)[<span class="dv">7</span>]   <span class="co"># "Data item"  &lt;- left alone</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>base_df<span class="sc">$</span>Data.item          <span class="co"># works</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>tidy_tb<span class="sc">$</span><span class="st">`</span><span class="at">Data item</span><span class="st">`</span>        <span class="co"># works, note the backticks</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>tidy_tb<span class="sc">$</span>Data.item          <span class="co"># NULL: that column does not exist</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>read.csv()</code> replaces characters it considers illegal in a variable name with dots. That is convenient right up to the moment you are working from a codebook that says the variable is called <code>Data item</code> and you cannot find it in your data.</p>
+<p><code>read_csv()</code> leaves names exactly as they were and you refer to awkward ones with backticks. Backticks are worth learning now, because you will need them again the moment a dataset has a column called <code>2008</code> or <code>GDP (millions)</code>.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Cleaning names properly">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Cleaning names properly
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>When every name in a file is awkward, do not fix them one at a time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>corn <span class="ot">&lt;-</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>(<span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>)))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(corn)   <span class="co"># year, state, fips, county_name, ..., data_item, irrigated, yield</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>janitor::clean_names()</code> converts everything to lowercase with underscores. Many people run it on every file they read, and it saves a lot of backticks.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="a-column-you-did-not-ask-for" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> A column you did not ask for</h1>
+<p><code>corn_yields_exp_rownames.csv</code> was written out carelessly. Read it and look at what came back.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Read it with both <code>read.csv()</code> and <code>read_csv()</code>. Compare <code>dim()</code> against the 161 by 9 you got in Exercise 1.</li>
+<li>Name the extra column in each case.</li>
+<li>Get rid of it.</li>
+<li>Work out which line of R code created this file.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You end up with 9 columns, and you can name the argument that would have prevented the problem in the first place.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>r_base <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields_exp_rownames.csv"</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>r_tidy <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields_exp_rownames.csv"</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(r_base)        <span class="co"># 161 10  &lt;- one column too many</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(r_base)[<span class="dv">1</span>]   <span class="co"># "X"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(r_tidy)[<span class="dv">1</span>]   <span class="co"># "...1"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># drop it</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>r_tidy <span class="ot">&lt;-</span> <span class="fu">select</span>(r_tidy, <span class="sc">-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The file was written with <code>write.csv(data, "file.csv")</code> and no <code>row.names = FALSE</code>, so R wrote the row numbers out as an unnamed first column. When it is read back, that column of 1 to 161 becomes a variable.</p>
+<p>The fix when writing: use <code>readr::write_csv()</code>, which never does this, or pass <code>row.names = FALSE</code> to <code>write.csv()</code>.</p>
+<p>Two names for the same problem are worth remembering, because you will meet both: <code>X</code> from <code>read.csv()</code>, and <code>...1</code> from <code>read_csv()</code>, which is what readr calls any column whose header is blank.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="list-the-sheets-before-you-read-them" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> List the sheets before you read them</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Run <code>excel_sheets()</code> on <code>corn_yields.xls</code> <strong>before</strong> reading anything.</li>
+<li>Read each sheet by name, not by number.</li>
+<li>Stack them into one dataset and check the result.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Your combined dataset has 322 rows and <code>unique(Year)</code> returns both 2008 and 2009.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">excel_sheets</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.xls"</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "corn_yields_08" "corn_yields_09"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.xls"</span>), <span class="at">sheet =</span> <span class="st">"corn_yields_08"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.xls"</span>), <span class="at">sheet =</span> <span class="st">"corn_yields_09"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>corn_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(corn_08, corn_09)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(corn_all)            <span class="co"># 322 9</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(corn_all<span class="sc">$</span>Year)    <span class="co"># 2008 2009</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The sheets are called <code>corn_yields_08</code> and <code>corn_yields_09</code>, which is not what anybody would have guessed. That is precisely why <code>excel_sheets()</code> comes first.</p>
+<p>Note the asymmetry in how the two mistakes fail. Guessing a sheet <em>name</em> gets you <code>Error: Sheet '2008' not found</code>, which is annoying and instantly fixable. Guessing a sheet <em>number</em> gets you no error at all and half your data missing. Always list, then read.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Reading every sheet at once">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reading every sheet at once
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.xls"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>corn_all <span class="ot">&lt;-</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">excel_sheets</span>(path) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(<span class="cf">function</span>(x) <span class="fu">read_excel</span>(path, <span class="at">sheet =</span> x)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is a preview of Chapter 5. It reads however many sheets there are, so it does not break when someone adds 2010 to the workbook.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="spreadsheets-made-by-human-beings" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Spreadsheets made by human beings</h1>
+<p>Real spreadsheets almost never start with a tidy header in cell A1. There is a title, a blank row, some notes off to the side, and a few cells containing <code>-</code> where a number should be.</p>
+<p><strong>Task.</strong> Build one yourself so you can practise the fix.</p>
+<ol type="1">
+<li>Open <code>corn_yields.xls</code> in Excel or Numbers.</li>
+<li>Insert three rows above the header. Put a title in the first, leave the second blank, and write a note in the third.</li>
+<li>Replace three yield values with <code>-</code> and a couple more with <code>n/a</code>.</li>
+<li>Save it as <code>corn_messy.xlsx</code> in your <code>data</code> folder.</li>
+<li>Read it so that the result is identical in structure to the clean version: right header, and those cells read as <code>NA</code> rather than as text.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>Yield</code> comes back numeric, not character, and <code>sum(is.na(corn$Yield))</code> matches the number of cells you sabotaged.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>corn_messy <span class="ot">&lt;-</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_messy.xlsx"</span>),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="dv">1</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">skip  =</span> <span class="dv">3</span>,                        <span class="co"># the title, the blank row, the note</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">na    =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"n/a"</span>, <span class="st">"-"</span>)   <span class="co"># everything that means "missing"</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(corn_messy<span class="sc">$</span>Yield)          <span class="co"># "numeric"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(corn_messy<span class="sc">$</span>Yield))     <span class="co"># however many cells you sabotaged</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The diagnostic to remember: if a column you know is numeric comes back as <code>character</code>, it is almost always because one cell contains something that is not a number. A dash, an <code>n/a</code>, a footnote marker, a stray space. One cell in ten thousand is enough to turn the whole column into text, and every arithmetic operation you then attempt will fail.</p>
+<p>Two other arguments worth knowing:</p>
+<ul>
+<li><code>range = "B4:J165"</code> reads one rectangle and ignores notes elsewhere on the sheet</li>
+<li><code>col_names = FALSE</code> for a sheet with no header at all, which gives you <code>...1</code>, <code>...2</code>, and so on to rename yourself</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="stop-read_csv-guessing" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Stop <code>read_csv()</code> guessing</h1>
+<p><code>read_csv()</code> decides each column’s type by looking at the first thousand rows. It is usually right. When it is wrong, it is wrong in a way you cannot undo afterwards.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Create this file to see the problem clearly:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"county_id,yield"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"01001,158"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"01003,164"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"31019,173"</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"ids.csv"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li>Read it with <code>read_csv()</code> and look at <code>county_id</code>.</li>
+<li>Read it again so that <code>county_id</code> keeps its leading zero.</li>
+<li>Now do the same thing for <code>FIPS</code> in <code>corn_yields.csv</code>, and say why a FIPS code should never be stored as a number.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>county_id</code> reads <code>01001</code>, not <code>1001</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bad <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"ids.csv"</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bad<span class="sc">$</span>county_id      <span class="co"># 1001 1003 31019  &lt;- the leading zero is gone forever</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>good <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"ids.csv"</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">county_id =</span> <span class="fu">col_character</span>())</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>good<span class="sc">$</span>county_id     <span class="co"># "01001" "01003" "31019"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># same idea on the real file</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">FIPS =</span> <span class="fu">col_character</span>())</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A FIPS code is an <strong>identifier</strong>, not a quantity. The average of two FIPS codes is meaningless, and <code>01001</code> and <code>1001</code> are not the same county. Once R has stored it as a number the zero is not recoverable, because it was never written down.</p>
+<p>The general rule: anything that identifies rather than measures should be character. County codes, zip codes, well IDs, plot numbers, phone numbers. If you would never add two of them together, it is not a number.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Other useful col_types shortcuts">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Other useful col_types shortcuts
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the compact form: one letter per column, in order</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"file.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdid"</span>)   <span class="co"># character, double, integer, date</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># set the type of a few and let readr guess the rest</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"file.csv"</span>, <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">FIPS =</span> <span class="fu">col_character</span>()))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># read absolutely everything as text, then convert deliberately</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"file.csv"</span>, <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">.default =</span> <span class="fu">col_character</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The last one is a genuinely useful defensive move with an unfamiliar file.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="stata-files-bring-their-labels-with-them" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> STATA files bring their labels with them</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Read <code>corn_yields.dta</code> with <code>read_dta()</code>.</li>
+<li>Print <code>County_name</code>. Compare it with <code>County_name</code> from the csv.</li>
+<li>Make the STATA version show county names.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>County_name</code> reads <code>BUFFALO</code>, not <code>8</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>corn_dta <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.dta"</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(corn_dta<span class="sc">$</span>County_name)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;labelled&lt;double&gt;[6]&gt;: County_name</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  8  8 19 19 21 21</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(corn_csv<span class="sc">$</span>County_name)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "BUFFALO" "BUFFALO" "CUSTER" "CUSTER" ...</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># convert every labelled column in one go</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>corn_dta <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">as_factor</span>(corn_dta)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(corn_dta<span class="sc">$</span>County_name)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] BUFFALO BUFFALO CUSTER CUSTER ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>STATA stores text variables as integers with a lookup table attached, which is efficient and completely invisible inside STATA. <code>haven</code> imports both parts faithfully, so you get numbers with the labels riding along as an attribute. That is the honest translation, but it is not what you want to group by or plot.</p>
+<p><code>as_factor()</code> applied to the whole tibble resolves every labelled column at once. If you ever find yourself grouping by county and getting integers back, this is why.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="straight-from-the-internet" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Straight from the internet</h1>
+<p><code>read_csv()</code> accepts a URL anywhere it accepts a file path.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Read <code>corn_yields.csv</code> directly from the course dataset repository, without downloading it first:</li>
+</ol>
+<pre><code>https://raw.githubusercontent.com/tmieno2/data-science-course-supplementary-datasets/master/corn_yields.csv</code></pre>
+<ol start="2" type="1">
+<li>Confirm it matches what you read from disk.</li>
+<li>Then give two reasons not to build an analysis this way.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>all.equal()</code> on the two objects returns <code>TRUE</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/tmieno2/data-science-course-supplementary-datasets/master/corn_yields.csv"</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>corn_web <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(url)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(corn_web, corn_csv)   <span class="co"># TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note it must be the <strong>raw</strong> URL. The ordinary github.com page address gives you a web page containing the data, not the data, and <code>read_csv()</code> will either error or hand you a column of HTML.</p>
+<p>Two reasons not to rely on it:</p>
+<ol type="1">
+<li>It re-downloads on every run, including every time you render. That is slow, and it fails entirely when you are on a plane.</li>
+<li>A URL is somebody else’s promise. Files get moved, repositories get renamed, agencies redesign their websites. When that happens your analysis stops working and the data you used is gone.</li>
+</ol>
+<p>Download once, keep the file in your project, read the local copy, and cite the URL in your paper. Reading from a URL is for exploring, not for anything you intend to keep.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="what-a-csv-throws-away" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> What a csv throws away</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Take the tibble from <code>read_csv()</code> and add a factor column whose levels are deliberately <strong>not</strong> alphabetical.</li>
+<li>Write it out twice, once with <code>write_csv()</code> and once with <code>saveRDS()</code>.</li>
+<li>Read both back and compare <code>class()</code> and <code>levels()</code> of that column.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The two round-trips disagree, and you can say what a csv file is physically incapable of storing.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>corn2 <span class="ot">&lt;-</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  corn_csv <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">irrigation =</span> <span class="fu">factor</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ifelse</span>(Irrigated <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"irrigated"</span>, <span class="st">"dryland"</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"irrigated"</span>, <span class="st">"dryland"</span>)   <span class="co"># deliberately not alphabetical</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(corn2, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"roundtrip.csv"</span>))</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(corn2,   <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"roundtrip.rds"</span>))</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>from_csv <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"roundtrip.csv"</span>))</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>from_rds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"roundtrip.rds"</span>))</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(from_csv<span class="sc">$</span>irrigation)    <span class="co"># "character"  &lt;- the factor is gone</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(from_rds<span class="sc">$</span>irrigation)    <span class="co"># "factor"</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(from_rds<span class="sc">$</span>irrigation)   <span class="co"># "irrigated" "dryland"  &lt;- order survived</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A csv is a text file. It stores the <em>values</em> and nothing else: no classes, no factor level order, no attributes, no dates as dates. An rds stores the R object itself, so everything survives exactly.</p>
+<p>Use csv when a human or another program has to open it. Use rds for anything you are handing back to R, especially intermediate results partway through an analysis.</p>
+<p>This matters more than it looks. In Chapter 4, the order of a factor’s levels is the order of the bars in your figure. Round-trip through csv and your carefully ordered categories come back alphabetical.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="rds-holds-any-object-not-just-data" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> rds holds any object, not just data</h1>
+<p>The lecture says an rds file stores “a single R object, not necessarily a dataset”. That distinction is worth proving to yourself.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Fit a regression of <code>Yield</code> on <code>Irrigated</code>.</li>
+<li>Save the fitted model, not its output, to an rds file.</li>
+<li>Restart R (<code>Session -&gt; Restart R</code>), so your Environment is empty.</li>
+<li>Read the model back and call <code>summary()</code> and <code>predict()</code> on it.</li>
+<li>Then save a list containing the model, the data, and today’s date, all in one file, and read that back too.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>After restarting R, you get a full regression summary without re-reading the data or re-fitting anything.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> Irrigated, <span class="at">data =</span> corn_csv)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(model, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"yield_model.rds"</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Session -&gt; Restart R ---</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"yield_model.rds"</span>))</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(model, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">Irrigated =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)))</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># a list of several things in one file</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> model,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> corn_csv,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">run_on =</span> <span class="fu">Sys.Date</span>()</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(results, <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"results.rds"</span>))</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"results.rds"</span>))</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>results<span class="sc">$</span>model</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>results<span class="sc">$</span>run_on</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is what makes rds different in kind from the other three formats. csv, xlsx, and dta all store <em>tables</em>. An rds stores whatever you give it: a model, a list, a figure, a function, a list of lists of models.</p>
+<p>The practical use comes in Chapter 5. When one step of your analysis takes twenty minutes, you run it once, save the result to rds, and every later script reads that instead of re-running it.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-exercise-that-decides-whether-your-assignment-runs" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> The exercise that decides whether your assignment runs</h1>
+<p>This one is the whole reason the lecture spends a third of its time on paths.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>In the console, run <code>read_csv("data/corn_yields.csv")</code>. It works.</li>
+<li>Run <code>setwd("~")</code>, then run the same line again. Read the error.</li>
+<li>Restart R (<code>Session -&gt; Restart R</code>). Create <code>analysis/report.qmd</code> containing a chunk with that same line, and render it. Read the error.</li>
+<li>Now rewrite the line using <code>here()</code> and confirm it works from the console <strong>and</strong> from the rendered qmd, with no other changes.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One single line of code works from both places. If you had to write the path one way in the qmd and another way in the console, you have not finished.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># breaks depending on where you happen to be standing</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">"data/corn_yields.csv"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># works from anywhere inside the project, including a qmd in a subfolder</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 3 is the important one, and it surprises nearly everybody. When you render a qmd, R sets the working directory to <strong>the folder the qmd is in</strong>, not the folder the project is in. So <code>analysis/report.qmd</code> looks for <code>analysis/data/corn_yields.csv</code>, which does not exist.</p>
+<p>Your code worked interactively and failed on render. That is the single most common way an assignment arrives broken, and it is why “but it works on my machine” is not a defence: it did not even work on your machine, it worked in your console.</p>
+<p><code>here()</code> builds every path from the project root, so it does not care which folder the document asking the question lives in.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="Why not just setwd() at the top of the qmd?">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why not just setwd() at the top of the qmd?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Two reasons. <code>setwd()</code> inside a chunk does not persist the way you expect during a render, and knitr resets the directory between chunks. More importantly it hard-codes a path that exists on exactly one computer in the world, so the first line fails when anyone else opens your file.</p>
+<p>An R Project plus <code>here()</code> solves both, and requires you to think about it exactly once.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="read-the-error-do-not-guess" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Read the error, do not guess</h1>
+<p>No code to write for this one. For each message below, say what it means and what the <em>first</em> thing you would check is. All four are real messages, copied verbatim from R.</p>
+<p><strong>1.</strong></p>
+<pre><code>Error : 'corn_yields.csv' does not exist in current working directory
+('/Users/taro/ch3-practice/analysis').</code></pre>
+<p><strong>2.</strong></p>
+<pre><code>Error in read_excel("corn_yields.xls") :
+  could not find function "read_excel"</code></pre>
+<p><strong>3.</strong></p>
+<pre><code>Error: '\U' used without hex digits in character string (&lt;input&gt;:1:14)</code></pre>
+<p><strong>4.</strong></p>
+<pre><code>Error in readRDS("corn_yields.csv") : unknown input format</code></pre>
+<div class="callout callout-style-default callout-note callout-titled" title="Answers">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answers
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>1.</strong> The file is not where R looked. Note that R tells you exactly where it looked, in the brackets, and it is the <code>analysis</code> folder rather than the project root. So this is a rendered qmd, or somebody ran <code>setwd()</code>. First check: <code>getwd()</code>, then rewrite the path with <code>here()</code>.</p>
+<p><strong>2.</strong> The function does not exist <em>as far as R currently knows</em>. That means one of exactly three things: the package is not loaded, the package is not installed, or you misspelled the name. Here it is the readxl trap, installed by tidyverse but not loaded by it. First check: is there a <code>library(readxl)</code> above this line? Note that the message never suggests <code>library()</code>, so you have to know to ask.</p>
+<p><strong>3.</strong> A Windows path written with single backslashes. R reads <code>\U</code> as the start of an escape sequence, not as a folder separator. First check: the path string. Either double the backslashes, <code>C:\\Users\\...</code>, or use forward slashes, <code>C:/Users/...</code>, or stop writing the top of the path at all and use <code>here()</code>. The character position at the end, <code>1:14</code>, points at where R gave up.</p>
+<p><strong>4.</strong> The right function pointed at the wrong format. <code>readRDS()</code> opened the file, found text where it expected a compressed R object, and gave up. This is the lecture’s central rule failing in practice: the function must match the format, and no function reads everything. First check: the file extension against the function name. Here it is <code>.csv</code>, so it wants <code>read_csv()</code>.</p>
+<p>Worth noticing how much less helpful this message is than the first three. It does not name the file, does not say what format it expected, and does not suggest anything. Some errors tell you what to do and some only tell you that something is wrong; the second kind is why the extension-to-function mapping is worth memorising rather than guessing at.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Made with Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

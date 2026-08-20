@@ -1,0 +1,1315 @@
+---
+title: "09-3: R as GIS: Creating maps from vector and raster data"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf', 'ggspatial', 'tidyterra', 'terra', 'stars', 'viridis', 'ggmapinset'] # CHANGED: dropped 'ggrepel', never used here, and every listed package is downloaded in the student's browser
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This deck is the payoff for the last two. You have spatial data; now you make something a reader can look at. The good news is that there is almost nothing new to learn. Maps in ggplot2 are ordinary ggplot2 figures with a different geom, and everything you already know about aesthetics, faceting and themes carries over unchanged. We start with geom_sf for vector data, work through aesthetics for points, lines and polygons, then stack layers, control projections, and add the furniture that makes a map look finished. At the end we do the same for raster data with geom_spatraster.
+
+</details>
+
+```{r}
+#| include: false 
+#| cache: false 
+
+#--- CHANGED: dropped patchwork, tigris, mapview, lubridate and RStoolbox.   ---#
+#--- None of them is called anywhere in this deck, but each had to be         ---#
+#--- installed for the deck to render. RStoolbox alone is a heavy dependency. ---#
+library(sf)
+library(tidyverse)
+library(ggspatial)
+```
+
+```{webr-r}
+#| context: setup
+#--- install and library the data package ---#
+#--- Both repos are required. r.spatial.workshop.datasets declares         ---#
+#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#
+#--- repos named here. With the custom repo alone, sf cannot be found and   ---#
+#--- the install never completes, so nothing downstream ever runs.          ---#
+webr::install(
+  "r.spatial.workshop.datasets",
+  repos = c(
+    "https://tmieno2.github.io/rwasm-package/repo",
+    "https://repo.r-wasm.org"
+  )
+)
+
+library("r.spatial.workshop.datasets")
+
+#--- load datasets ---#
+#--- CHANGED: was data(wells_ne), a plain data.frame this deck never uses.    ---#
+#--- Every map here uses wells_ne_sf, so that is what setup names. NOTE: this ---#
+#--- is tidying, not a bug fix — the package is LazyData: true, so either     ---#
+#--- object resolves by name once the package is attached.                    ---#
+data(wells_ne_sf)
+data(ne_counties)
+data(railroads_ne)
+data(corn_acres_ne)
+```
+
+<br>
+
+### Learning objectives
+
+Learn how to create maps using the `ggplot2` package.
+
+<br>
+
+### Table of contents
+
+1. [Creating maps from `sf` objects](#sec-vector-maps)
+2. [Specifying aesthetics](#sec-aesthetics)
+3. [Plotting multiple objects in one figure](#sec-multiple)
+4. [Making maps look professional](#sec-professional)
+5. [Inset maps](#sec-inset)
+6. [Creating maps from raster data](#sec-raster-maps)
+
+<br>
+
+### Pre-requisite
+
+Basic understanding of `ggplot2` is necessary. Here are some resources:
+
++ [ggplot2: Elegant Graphics for Data Analysis (book)](https://ggplot2-book.org/)
++ [Lecture slides](https://tmieno2.github.io/Data-Science-with-R/Chapter-4-DataVisualization/data_visualization_x.html)
+
+
+## Tips to make the most of the lecture notes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual arrangement, with one caution for this deck in particular. It loads ten packages into your browser, several of them large, and almost every cell draws a figure. So the first run will be slow and the plots take a moment to appear. Be patient rather than clicking Run repeatedly. Also, many of the cells here are deliberately set up for you to fiddle with, changing a colour or commenting out a line to see what breaks. That is the fastest way to learn map making, so do take the invitations seriously rather than just reading them.
+
+</details>
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+
+
+
+## Create maps from `sf` using the `ggplot2` package {#sec-vector-maps}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The point of this slide is reassurance. Making maps is not a separate skill you have to acquire from scratch. The grammar is identical to any other ggplot2 figure: you start with ggplot, you add a geom, you map variables to aesthetics inside aes, you adjust scales and themes. The single substantive difference is which geom you use. For an sf object it is geom_sf, and that one function handles points, lines and polygons without you telling it which you have. If you were comfortable with ggplot2 in Chapter 4, you are already most of the way here.
+
+</details>
+
++ Creating maps differs from creating non-spatial figures in some ways. However, the underlying principle and syntax under `ggplot2` to create maps and non-spatial figures are very similar. 
+
++ Indeed, you will find map making very intuitive and rather easy if you already have some knowledge of how `ggplot2` works even if you have not created maps using `ggplot2`. The only major difference between them is the choice of `geom_*()` types.
+
+To create a map from `sf`s, we use `geom_sf()`.
+
+### Create a map
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three datasets for the whole deck: wells as points, counties as polygons, railroads as lines. One of each geometry type, which is deliberate, because you will want to see how geom_sf handles all three. Notice the first tab uses plain plot rather than ggplot, and that is a habit worth keeping: when you load spatial data, plot it immediately and crudely before you invest any effort in making it pretty. Then the How tab gives you the entire syntax, which is two lines. geom_sf inspects the geometry column and decides what to draw, so you do not choose.
+
+</details>
+
+::: {.panel-tabset}
+
+
+
+#### Data preparation
+
+```{webr-r}
+#--- wells in Nebraska ---#
+data(wells_ne_sf)
+
+#--- counties in Nebraska ---#
+data(ne_counties)
+
+#--- railroads in Nebraska ---#
+data(railroads_ne)
+```
+
+<br>
+
+Check what one of them looks like using `plot()`:
+
+```{webr-r}
+plot(wells_ne_sf$geometry)
+```
+
+
+#### How
+
+**Instruction**
+
++ We can use `geom_sf()` to create maps from `sf` objects
+
++ `geom_sf()` <span style = "color: red;"> automatically detects the geometry type </span> of spatial objects stored in an `sf` object and draw maps accordingly 
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+ggplot() +
+  geom_sf(data = sf)
+```
+
+#### Try yourself
+
+Try to create a map using one of `wells_ne_sf`, `ne_counties`, and `railroads_ne`.
+
+```{webr-r}
+ggplot() +
+  geom_sf()
+```
+:::
+
+<!--end of panel-->
+
+### Labels on a map
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Putting text on a map needs a different geom. geom_sf will not do it, and this trips people up because they expect a label argument somewhere. Instead you add a second layer, geom_sf_text, with the label mapped inside aes to whichever column holds the name. It works out where to put each label from the geometry, taking the centroid for a polygon. Watch the size argument in the example, set to two: at the default size, ninety-three county names cover the map completely. Labels on a busy map are usually a matter of restraint rather than technique.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Motivation
+
++ Sometimes you would like to print text on a map, like below
+
+```{webr-r}
+#| context: output
+#| warning: false
+ggplot(data = ne_counties) +
+  #--- draw county border ---#
+  geom_sf() +
+  #--- print county names ---#
+  geom_sf_text(aes(label = name), size = 2) +
+  theme_void()
+```
+
+#### How
+
+When you want to print labels on a map, you can use `geom_sf_text()`. `geom_sf()` cannot do it.  
+
+<br>
+
+**Syntax**
+```{r, eval = FALSE}
+geom_sf_text(aes(label = var_name)) 
+```
+
++ `var_name`: name of the label variable
+
+<br>
+
+**Example**
+
+```{webr-r}
+#| warning: false
+ggplot(data = ne_counties) +
+  #--- draw county border ---#
+  geom_sf() +
+  #--- print county names ---#
+  geom_sf_text(aes(label = name), size = 2) +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+### Faceting
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Faceting works on maps exactly as it does anywhere else in ggplot2, because a map is just a figure. The dataset here is worth understanding before you plot it, which is why the first tab asks you to sort and look. Each county appears four times, once per year, and the geometry is repeated identically in every one of those rows. That is what makes faceting work: facet_wrap splits by year and draws the same counties in each panel with different fill values. Spatial panel data looks wasteful, storing the same polygon over and over, but it is the shape ggplot2 wants.
+
+</details>
+
++ We can do faceting just like we do with other types of figures you can create with `ggplot2`. 
++ Remember, a map is just a special case of a `ggplot2` figure. 
+
+::: {.panel-tabset}
+
+
+#### Understand the data
+
++ We use `corn_acres_ne` for demonstration. This is a county-level corn harvested acres data observed annually from 2020 through 2023.
+
++ Notice that a single county has multiple rows (one row for one year) with the identical geometry
+
+```{webr-r}
+dplyr::arrange(corn_acres_ne, county_code, year)
+```
+
+#### faceted map
+
+```{webr-r}
+ggplot(corn_acres_ne) +
+  geom_sf(aes(fill = acre)) +
+  facet_wrap(year ~ ., ncol = 2) +
+  scale_fill_viridis() +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+:::
+
+<!--end of panel-->
+
+## Specifying aesthetics {#sec-aesthetics}
+
+<!-- CHANGED: the bullet below used to sit between ::: {.panel-tabset} and the
+     first ### tab. Content in that position is silently DROPPED from the
+     rendered deck — students never saw this sentence. Moved above the tabset. -->
+
++ Maps are just special kinds of figures and what you have learned about `ggplot2` directly applies here.
+
+::: {.panel-tabset}
+
+### Points
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four aesthetics matter for points, and the slide is honest about which are actually useful. Colour is the workhorse. Shape is occasionally handy for distinguishing categories. Size is listed as rarely useful, and fill only applies to certain shapes. That last point catches people: R's point shapes are split between those that take colour only and those numbered twenty-one to twenty-five, which have a separate border and interior, so they respond to both colour and fill. Work through the three examples and watch which arguments sit inside aes and which sit outside, because that distinction is about to matter a great deal.
+
+</details>
+
+Here are some of the aesthetic variables for points:
+
++ `color`: color of the points
++ `fill`: available for some shapes (but likely useless)
++ `shape`: shape of the points
++ `size`: size of the points (rarely useful)
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: dependent on `gw_extracted` (the amount of groundwater extraction)
++ `size`: constant across the points (bigger than the default)
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    aes(color = gw_extracted),
+    size = 2
+  )
+```
+
+#### Example 2
+
++ `color`: constant across the points (blue)
++ `size`: dependent on `gw_extracted`
++ `shape`: constant at 21 across the points (a circle with a separate border)
+
+```{webr-r}  
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    aes(size = gw_extracted),
+    color = "blue",
+    shape = 21
+  )
+```
+
+#### Example 3
+
++ `color`: constant across the points (blue)
++ `fill`: constant across the points (red)
++ `size`: constant at 1.5 across the points
++ `shape`: constant at 22 across the points (square)
+
+```{webr-r}  
+ggplot() +
+  geom_sf(
+    data = wells_ne_sf,
+    size = 1.5,
+    color = "blue",
+    fill = "red",
+    shape = 22
+  )
+```
+
+:::
+
+### Polygons
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For polygons the vocabulary shifts. Colour now means the border, not the interior, and fill means the interior. That catches nearly everyone at least once: you set colour to darkgreen expecting green counties and get green outlines around white shapes. Linewidth controls border thickness. Shape and size do not apply at all. Look carefully at the second and third examples, where colour and fill are mapped to a variable rather than set to a constant. Ninety-three counties means ninety-three legend entries, which is a good demonstration of the mechanism and a terrible map.
+
+</details>
+
+Here are some of the aesthetic variables for polygons:
+
++ `color`: color of the <span style = "color: blue;"> borders </span> of the polygons
++ `linewidth`: width of the <span style = "color: blue;"> borders </span> of the polygons
++ `fill`: color of the <span style = "color: blue;"> inside </span> of the polygons
++ `shape`: not available
++ `size`: not available
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: constant at "red" across the polygons
++ `fill`: constant at "darkgreen" across the polygons
++ `linewidth`: constant at 0.4 across the polygons
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    linewidth = 0.4,
+    color = "red",
+    fill = "darkgreen"
+  )
+```
+
+#### Example 2
+
++ `color`: depends on `name`
++ `fill`: constant at "darkgreen" across the polygons
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    aes(color = name),
+    fill = "darkgreen"
+  )
+```
+
+#### Example 3
+
++ `color`: constant at "red" across the polygons
++ `fill`: depends on "countyfp"
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data  = ne_counties,
+    aes(fill = countyfp),
+    color = "red"
+  )
+```
+
+:::
+
+### Lines
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Lines are the simplest of the three, with only really two aesthetics worth knowing: colour and linewidth. There is no fill, because a line has no interior, and no shape. The railroads example is one short block. The thing to note is that you did not have to tell geom_sf that this dataset contains lines rather than points or polygons. It read that from the geometry column. This is why the same two-line pattern works for all three datasets in this deck, and why you can stack them together without thinking about it, which is next.
+
+</details>
+
+Here are some of the aesthetic variables for lines:
+
++ `color`: color of the lines
++ `linewidth`: width of the lines
+
+::: {.panel-tabset}
+
+#### Example 1
+
++ `color`: constant at "blue" across the lines
++ `linewidth`: constant at 0.5 across the lines
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = railroads_ne,
+    linewidth = 0.5,
+    color = "blue"
+  )
+```
+
+:::
+
+:::
+
+## Plotting multiple spatial objects in one figure {#sec-multiple}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A real map almost never shows one thing. You want the county boundaries for context, the railroads because they matter to your story, and the wells because they are what you are actually studying. All three come from separate sf objects with separate geometry types. The question this section answers is how you combine them, and the answer is pleasingly boring: you add them, the same way you add any two ggplot2 layers. There is no special spatial merging step and the objects need not even share a projection, as we will see shortly.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ It is often the case that you want to create a map using more than one spatial object. 
+
++ For example, you want to have county boundary (`ne_counties`), railroads (`railroads_ne`), and wells (`wells_ne_sf`) all in one map.
+:::
+
+::: {.column width="30%"}
+:::
+
+:::
+
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This slide is about where you put the data argument, and it is worth slowing down. Data named inside ggplot is global and every later geom inherits it. Data named inside a geom_sf belongs to that layer alone. The two cells look nearly identical and behave differently once you uncomment the extra layer: the first works because the global data is still available, the second fails because there is nothing for the new layer to draw. Read the second callout too, on why writing fill equals red inside aes gives you salmon and a stray legend rather than red polygons.
+
+</details>
+
++ You can create layers with `geom_sf()` by setting different `sf` objects as the datasets individually, and then simply add them so they appear in a single map.
+
++ Remember that when you specify data in `ggplot()`, all subsequent `geom_*()` functions will use this data unless otherwise specified.
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{webr-r}
+#| out-width: 100%
+ggplot(data = ne_counties) +
+  geom_sf() 
+  # geom_sf(aes(fill = "red"))
+```
+:::
+
+::: {.column width="50%"}
+```{webr-r}
+#| out-width: 100%
+ggplot() +
+  geom_sf(data = ne_counties)
+  # geom_sf(aes(fill = "red"))
+```
+:::
+
+:::
+
+<br>
+
+:::{.callout-note title="Instruction"}
++ Uncomment line 3, add `+` at the end of line 2, run, and see what happens
++ Confirm the first one works fine because data is set globally to `ne_counties` in line 1.
++ Confirm the second one does not, because the global dataset is not set.
+:::
+
+:::{.callout-important title="`aes(fill = \"red\")` does not fill red"}
+Look at what the first one actually draws: salmon polygons and a legend with one
+entry reading `red`. Anything inside `aes()` is treated as a **variable**, so
+`fill = "red"` maps every polygon to the constant character value `"red"` and then
+asks `ggplot2` to pick a colour for that category — which comes out `#F8766D`.
+
+To actually set a colour, put it **outside** `aes()`: `geom_sf(fill = "red")`.
+The same rule applies to `color`, `size` and `shape`. A stray legend appearing
+where you expected none is the usual sign you have done this by accident.
+:::
+
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the whole idea in one block: three geom_sf calls, one per dataset, added together. Counties first, then railroads in red, then wells at a small size. Notice the comments naming each layer, which is a habit worth copying, because a map with five or six layers becomes unreadable quickly without them. Also notice that the size of 0.2 on the wells is doing real work. There are thousands of wells, and at the default size they merge into a solid blob that hides everything underneath. Point size on a dense map is a substantive choice, not decoration.
+
+</details>
+
+```{webr-r}
+ggplot() +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  ) +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  )
+
+```
+
+### Order matters
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Layers are drawn in the order you add them, so later layers paint over earlier ones. This is obvious once stated and a common source of confusion when a layer seems to have vanished. In the example the wells are added first, then the filled county polygons on top, and the wells simply disappear underneath. They are in the plot; you cannot see them. The fix is either to reorder the layers or to make the covering layer transparent, by setting fill to NA. Then try the exercise, which asks you to hide the railroads the same way.
+
+</details>
+
+`geom_sf()`s that are added later are <span style = "color: red;"> superimposed </span> on top of the existing layers 
+
+::: {.panel-tabset}
+
+#### Example
+
+Wells are hidden beneath the county layer:
+
+```{webr-r}
+ggplot()  +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  ) +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  )
+```
+
+#### Try yourself
+
+:::{.callout-note title="Instruction"}
+Hide the railroads beneath the county layer.
+:::
+
+<br>
+
+```{webr-r}
+ggplot()  +
+  #--- wells ---#
+  geom_sf(
+    data = wells_ne_sf,
+    size = 0.2
+  ) +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  ) +
+  #--- railroads ---#
+  geom_sf(
+    data = railroads_ne,
+    color = "red"
+  )
+```
+
+:::
+
+### CRS I
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+By default ggplot2 draws using whatever CRS the sf object carries, so your projection choice shows up directly in the shape of the map. The two examples make the comparison. Unprojected, in longitude and latitude, the grid lines are straight. Projected into UTM zone fourteen, which is the right zone for Nebraska, the grid lines curve, because a projected map cannot keep meridians straight and areas honest at the same time. Notice also what does not change: the axis labels are still longitude and latitude even after projecting, which we deal with on the next slide.
+
+</details>
+
+`ggplot()` uses the CRS of the `sf` to draw a map by default. 
+
+::: {.panel-tabset}
+
+#### Example (unprojected)
+
+Currently, `ne_counties` is unprojected:
+
+```{webr-r}
+st_crs(ne_counties)
+```
+
+<br>
+
+```{webr-r}
+ggplot()  +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties 
+  )
+```
+
+#### Example (projected)
+
+Let's project it to WGS 84, UTM zone 14.
+
+```{webr-r}
+ne_counties_projected <- st_transform(ne_counties, 32614)
+```
+
+<br>
+
++ Now, the map is drawn based on the new CRS of 32614
+
++ Notice that the major grid lines are no longer straight in figure at the bottom unlike the one at the top 
+
++ X-Y labels are still in longitude and latitude (we will see how we change this)
+
+```{webr-r}
+ggplot()  +
+  #--- county ---#
+  geom_sf(
+    data = ne_counties_projected 
+  )
+```
+:::
+
+### CRS II
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things here. coord_sf changes the projection used for drawing without touching the object itself, which is convenient but does the conversion afresh every time you draw. And the datum argument fixes the axis labels, so that a projected map gets projected coordinates on its axes rather than degrees. The last two tabs cover multiple layers, and the behaviour is generous: the first layer's CRS wins and everything else is reconciled to it automatically, so mixing projections across layers does not break your map. coord_sf overrides all of that at once when you want a specific projection.
+
+</details>
+
+::: {.panel-tabset}
+
+#### `coord_sf()`
+
+You can use `coord_sf()` to alter the CRS on the map on the go, but not the CRS of the `sf` object itself.
+
+```{webr-r}
+ggplot() +
+  #--- this is unprojected remember? ---#
+  geom_sf(data = ne_counties) +
+  coord_sf(crs = 32614)
+```
+
+<br>
+
++ pros: you do not have to change the CRS of the sf
++ cons: it takes time to change the CRS behind the scene every time you do this
+
+#### Change X, Y labels on the map
+
+In order to have `X` and `Y` values in the same units as that of the CRS in use on the map, you need to add `datum =` in `coord_sf()`.
+
+```{webr-r}
+ggplot() +
+  #--- this is unprojected remember? ---#
+  geom_sf(data = ne_counties) +
+  coord_sf(
+    crs = 32614,
+    datum = 32614
+  )
+```
+
+#### Multiple layers   
+
+When there are multiple `geom_sf()` layers, the CRS of the first layer is automatically applied to all the layers, reconciling any difference in CRS for you.
+
+```{webr-r}
+ggplot() +
+  #--- epsg: 32614 ---#
+  geom_sf(
+    data = st_transform(
+      ne_counties,
+      32614
+    )
+  ) +
+  #--- epsg: 4269 ---#
+  geom_sf(
+    data = railroads_ne
+  )
+```
+
+#### `coord_sf()` with multiple layers
+
++ `coord_sf()` applies to all the layers. 
++ try the codes with and without `coord_sf(crs = 32614)` at the end. Note the
+`crs =`: the first argument of `coord_sf()` is `xlim`, so `coord_sf(32614)` sets
+an x limit rather than a projection.
+
+```{webr-r}
+ggplot() +
+  #--- epsg: 4269 ---#
+  geom_sf(
+    data = railroads_ne
+  ) +
+  #--- epsg: 32614 ---#
+  geom_sf(
+    data = st_transform(
+      ne_counties,
+      32614
+    ),
+    fill = NA
+  ) +
+  #--- overwrite the CRS ---#
+  coord_sf(crs = 32614)
+```
+
+:::
+
+:::
+
+## Making maps look professional {#sec-professional}
+
+::: {.panel-tabset}
+
+### Theme
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+theme_void is the single highest-value line in map making. A default ggplot2 figure comes with a grey panel, grid lines, axis ticks and axis labels, all of which make sense for a scatterplot and none of which make sense for a map. Nobody wants to read latitude off an axis. Compare the two cells side by side and the difference is stark. Almost every finished map in a paper starts with theme_void or something close to it. If you take one habit from this section, take this one, because it costs eleven characters.
+
+</details>
+
+`theme_void()` is a very suitable pre-made theme for maps, which gets rid of many unnecessary components of the default.
+
+<br>
+
+:::: {.columns}
+
+::: {.column}
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot() +
+  geom_sf(data = ne_counties)
+
+```
+:::
+
+::: {.column}
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot() +
+  geom_sf(data = ne_counties) +
+  theme_void()
+```
+:::
+
+::::
+
+### North arrow and scale bar
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A north arrow and a scale bar are what make a figure read as a map rather than a coloured shape. Both come from the ggspatial package, as annotation_scale and annotation_north_arrow, and both work the same way. Location is a two-letter code, bottom-left, top-right and so on. Width_hint sizes the scale bar relative to the plot. Then pad_x and pad_y nudge the position away from the edge in real units like inches. Note the preparation tab stores a base map in an object, so the following tabs can add to it rather than repeating the whole plot each time.
+
+</details>
+
+The `ggspatial` package lets you put a north arrow and scale bar on a map using `annotation_scale()` and `annotation_north_arrow()`
+
+<br>
+
+::: {.panel-tabset}
+
+#### Preparation
+
+```{webr-r}
+#| autorun: true
+#--- load the package ---#
+library(ggspatial)
+
+#--- create a map to work with ---#
+g_county <- 
+  ggplot() +
+    geom_sf(data = ne_counties) +
+    theme_void()
+```
+
+
+#### Scale bar
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2
+  )
+```
+
++ `location`: determines where the scale bar is
+  * first letter is either `t` (top) or `b` (bottom)
+  * second letter is either `l` (left) or `r` (right).  
+
++ `width_hint`: determines the length of the scale bar relative to the plot
+
+:::{.callout-note title="Try yourself"}
+Play with `location` and `width_hint` and see what happens.
+:::
+
+#### Fine-tuning the location
+
+Use `pad_x` and `pad_y` options to fine-tune the location of the scale bar.
+
+A positive number means that the scale bar will be placed further away from the closest border of the plot.
+
++ `pad_x`: since the second letter of `location` is `l`, the scale bar moves an inch from the left border of the map
+
++ `pad_y`: since the first letter of `location` is `b`, the scale bar moves 0.3 inches from the bottom border of the map
+
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2,
+    pad_x = unit(1, "in"),
+    pad_y = unit(0.3, "in")
+  )
+```
+
+:::{.callout-note title="Try yourself"}
+Play with `pad_x` and `pad_y` and see what happens.
+:::
+
+#### North arrow
+
++ Use `annotation_north_arrow()` to add north arrow
++ It works just like `annotation_scale()`
++ use `style` option to pick a different type of north arrow symbol
+
+```{webr-r}
+g_county +
+  annotation_scale(
+    location = "bl",
+    width_hint = 0.2,
+    pad_x = unit(1, "in"),
+    pad_y = unit(0.3, "in")
+  ) +
+  #--- add north arrow ---#
+  annotation_north_arrow(
+    location = "tl",
+    pad_x = unit(0.2, "in"),
+    pad_y = unit(-0.1, "in"),
+    style = north_arrow_fancy_orienteering
+  )
+```
+:::
+
+:::
+
+## Inset map {#sec-inset}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+An inset map answers a question every reader of a regional map silently has, which is where on earth this is. You show your study area at the scale you need, and a small panel places it in a wider context, or magnifies a corner that is too small to see. The image on this slide is the finished product we are building towards. It is genuinely useful in papers: reviewers ask about geographic context surprisingly often, and an inset costs you a few lines rather than a second figure.
+
+</details>
+
+Inset map (like one below) provides a better sense of the geographic extent and the location of the area of interest relative to the larger geographic extent that the readers are more familiar with. 
+
+```{r, echo = FALSE, out.width = "80%"}
+knitr::include_graphics("assets/inset.jpg")
+```
+
+### Objective
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the target, drawn in full, so you can see where the next five slides are going. Three counties in southwest Nebraska picked out in red, with a circular inset magnifying them and a frame connecting the inset back to its true location. Do not try to absorb the code yet. Skim it and notice the shape of it: a base map, then a configuration object describing the inset, then a few extra layers that draw the inset itself. We build those three pieces one at a time, and the ggmapinset website has more if you want to go further.
+
+</details>
+
+Create a map like this using `ne_counties` with the `ggmapinset` package. 
+
+```{webr-r}
+#| context: output
+
+three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
+
+inset_config <- 
+  configure_inset(
+    shape = shape_circle(st_centroid(st_union(three_counties)), 80),
+    translation = c(300, -250),
+    scale = 2,
+    units = "km"
+  )
+
+(
+g_inset_example <- 
+  ggplot() +
+    #--- base map ---#
+    geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
+    #--- additional layers ---#
+    geom_sf(data = three_counties, fill = "red", alpha = 0.4) +
+    # geom_sf_text(data = three_counties, aes(label = name)) +
+    #--- inset ---#
+    geom_sf_inset(data = three_counties, map_base = "none") +
+    geom_sf_text_inset(data = three_counties, aes(label = name)) +
+    geom_inset_frame() +
+    coord_sf_inset(inset = inset_config) +
+    theme_void()
+)
+
+```
+
+:::{.callout-note}
+Visit the [`ggmapinset` website](https://cidm-ph.github.io/ggmapinset/index.html) for more examples and other functionalities beyond what is presented here, including multiple insets. 
+:::
+
+### Create the base layer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step one is an ordinary map with nothing special about it. Filter the three counties of interest into their own sf object, then draw all the counties in blue and those three in red on top. Note the alpha argument, which is what lets the second layer sit over the first without hiding it entirely. Store the result in an object called g_base rather than printing it directly. That matters for what follows, because every remaining step adds layers to this same base, and rebuilding the whole plot each time would make the code unreadable.
+
+</details>
+
+The first step of making an inset map is to create the base map layer, a part of which is going to be expanded as an inset.
+
+We want to create a map of all the counties in Nebraska with only the three counties (Perkins, Chase, and Dundy) colored red.
+
+Let's first create an `sf` consisting of the three counties first:
+
+```{webr-r}
+three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
+``` 
+
+<br>
+
+We now create the base map. You use `geom_sf()` to create base map layers.
+
+```{webr-r}
+(
+g_base <- 
+  ggplot() +
+    geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
+    geom_sf(data = three_counties, fill = "red", alpha = 0.4) +
+    theme_void()
+)
+```
+
+### Configure the inset
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The configuration is a separate object, which is a slightly unusual design but a sensible one, because several layers all need to agree about where the inset goes. Four things to specify. The shape, either a circle or a rectangle, centred somewhere and given a radius. Translation, how far to shift the magnified copy away from its true position, in the units you name. Scale, how much to enlarge it. And units. Notice the centre is computed rather than typed: the centroid of the union of the three counties, which is a nice small use of what you learned last deck.
+
+</details>
+
+We now configure (specify) the inset using `configure_inset()`. Here is the list of parameters you want to provide:
+
++ `shape`: the shape and size of the inset
+  + `shape_circle`: `centre` and `radius`
+  + `shape_rectangle`: `centre` and `hwidth`
++ `translation`: how much you shift in x and y from the center to display the enlarged circle
++ `scale`: how much to enlarge
++ `units`: length unit 
+
+```{webr-r}
+inset_config <- 
+  configure_inset(
+    #--- centroid of the three counties as the center, and the radius ---#
+    shape = shape_circle(st_centroid(st_union(three_counties)), 80),
+    # shape = shape_rectangle(st_centroid(st_union(three_counties)), 80),
+    #--- move 300 east and 250 south ---#
+    translation = c(300, -250),
+    #--- scale up by 2 ---#
+    scale = 2,
+    units = "km"
+  )
+```
+
+### Add an inset
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three new layers on top of the base. geom_sf_inset draws the magnified copy, geom_sf_text_inset labels it, and geom_inset_frame draws the circle in place, the enlarged circle, and the lines joining them. Then coord_sf_inset ties the whole thing to the configuration you just built. If you forget that last line, nothing works, because the layers have no idea where the inset is meant to be. Do take up the invitation in the callout: comment out one line at a time and see what disappears. That is the quickest way to learn which piece does what.
+
+</details>
+
++ Use `geom_sf_inset()` and/or `geom_sf_text_inset()` to create layers to present as an inset.
++ Use `geom_inset_frame()` to add the inset frame (small circle, big circle, and the lines connecting them)
++ Use `coord_sf_inset(inset = inset_config)` to reflect the configuration you set up earlier.  
+
+<br> 
+
+```{webr-r}
+g_base +
+  geom_sf_inset(data = three_counties, map_base = "none") +
+  geom_sf_text_inset(data = three_counties, aes(label = name)) +
+  geom_inset_frame() +
+  coord_sf_inset(inset = inset_config)
+```
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ Comment out one line of the code above, run it, and see what each line does.
++ Go back to the previous slide and change the value of the parameters to see what happens.
+:::
+
+### `map_base`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One argument worth understanding, because its default surprises people. By default geom_sf_inset draws your layer twice, once on the base map and once inside the inset. Usually that is what you want. But when the layer is already on the base map, as the three red counties are here, you get it drawn twice and the second copy sits on top looking wrong. Setting map_base to none restricts the layer to the inset only. Run the code as given, then swap the commented lines, and the difference will be obvious immediately.
+
+</details>
+
++ By default, `geom_sf_inset()` creates two copies of the map layer: one for the base map and the other for the inset map. 
+
++ `map_base` option in `geom_sf_inset()` determines whether you create the copy for the base map or not.
+
+In the code below, `map_base` is not specified, meaning that `geom_sf_inset(data = three_counties, fill = "black")` will be applied for both the base and inset maps.
+
+```{webr-r}
+g_base +
+  geom_sf_inset(data = three_counties, fill = "black") +
+  # geom_sf_inset(data = three_counties, fill = "black", map_base = "none") +
+  geom_sf_text_inset(data = three_counties, aes(label = name)) +
+  geom_inset_frame() +
+  coord_sf_inset(inset = inset_config)
+```
+
+<br>
+
+:::{.callout-note title="Try yourself"}
+Comment out line 2 and comment in line 3 to see what happens.
+:::
+
+
+:::
+
+## Create maps using raster data {#sec-raster-maps}
+
+```{webr-r}
+#| context: setup
+library(stars) 
+data(NIR)
+NIR <- terra::rast(NIR)
+data(RED) 
+RED <- terra::rast(RED)
+```
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Raster maps use tidyterra, which supplies geom_spatraster for SpatRaster objects from terra. The design mirrors what you already know, so this section is short. Note the aside about tmap: it is a well-regarded alternative that takes a different approach to map making, and it is deliberately out of scope here, since learning one grammar properly beats half-learning two. If you find yourself doing a lot of cartography later, it is worth a look. For everything in this course, ggplot2 with geom_sf and geom_spatraster covers it.
+
+</details>
+
++ We will use the `ggplot2` and `tidyterra` packages to create maps using raster data.
+
++ The `tidyterra` package provides `geom_spatraster()` that works specifically for `SpatRaster` object from the `terra` package.
+
++ There are other package options like the `tmap` package. But, we do not talk about it in this course.
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+As promised, it is the same pattern with one substitution: geom_spatraster in place of geom_sf, and a SpatRaster in place of an sf object. Everything else, including theme_void, behaves identically. The callout points out something convenient. You did not write anything mapping the cell values to colour, and yet the cells are coloured by value. geom_spatraster does that automatically, because a raster has exactly one thing worth colouring by. That is different from geom_sf, where you must say explicitly which column you want mapped to fill.
+
+</details>
+
+It works very much like map creation with `sf`. We just use `SpatRaster` object and use `geom_spatraster()` in place of `geom_sf`.
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NIR) +
+  theme_void()
+```
+
+<br>
+
+:::{.callout-note}
+Notice that `geom_spatraster()` automatically bases the fill color of the cells on the attribute values without you specifying so.
+:::
+
+### NA values
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Rasters are rectangles, but the things they describe rarely are, so most real raster data has missing cells around the edges, and by default those come out grey. Grey is fine on its own but wrong when the raster sits on top of something else, because it hides what is underneath. The fix is the na.value argument inside the fill scale, set to transparent. This becomes essential in the very last section of the deck, where a raster is drawn under county boundaries, and it is worth remembering as a general habit for layered maps.
+
+</details>
+
+By default, the cells with NA values are colored grey. You can set the color for such cells using the `na.value` option inside `scale_*()` function. For example, the following code makes the cells with NA values transparent (invisible).
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = NIR) +
+  scale_fill_continuous(na.value = "transparent") +
+  theme_void()
+```
+
+### Multi-layer raster
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Give geom_spatraster a raster with more than one layer and it does something unhelpful but honest: it draws all of them, stacked on top of each other, and warns you that it has done so. The warning is worth reading rather than dismissing, because it tells you the two ways out. Either name a single layer with aes fill, which is shown here, or facet by layer, which is next. This is a case where the package is trying quite hard to stop you from misreading your own figure. Take the hint.
+
+</details>
+
+How does `geom_spatraster()` behave with a multi-layer `SpatRaster`?
+
+```{webr-r}
+nir_red <- c(NIR, RED)
+
+ggplot() +
+  geom_spatraster(data = nir_red)
+```
+
+<br>
+
+As the warning message suggests, both layers are plotted by default. You can specify which layer to use with `aes(fill = layer_name)` like below.
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_spatraster(data = nir_red, aes(fill = NIR))
+```
+
+### Faceting
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The other resolution: leave fill unmapped and add facet_wrap by lyr, and you get one panel per layer, side by side. Note that this only works if you do not also pin fill to a single layer, since naming one layer and then faceting by layer leaves you with exactly one panel. Read the callout, because it is about interpretation rather than syntax. Facets share one legend and therefore one colour scale, which is right for the same variable at different times and misleading for different variables measured in different units.
+
+</details>
+
+When you want to create maps for individual attributes at the same time, you can add `facet_wrap(~lyr)`. 
+
+```{webr-r}
+#--- CHANGED: aes(fill = NIR) removed. Naming a single layer and then         ---#
+#--- faceting by layer produces exactly ONE panel, so the old code did not    ---#
+#--- demonstrate faceting at all. Leave fill unmapped and you get one panel   ---#
+#--- per layer, which is the point.                                           ---#
+ggplot() +
+  geom_spatraster(data = nir_red) +
+  facet_wrap( ~ lyr)
+```
+
+:::{.callout-note}
++ But remember that faceting is often not appropriate when you are plotting multiple variables on different scales (e.g., temperature and precipitation), as they share the same legend.
++ A good use case of faceting is displaying the same variable observed at different times (e.g., temperature on different days).
+:::
+
+:::
+
+## Create a map with both `sf` and `SpatRaster`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything in this deck comes together here, and the point is how unremarkable it is. Add geom_spatraster for the raster and geom_sf for the vector, in that order so the boundaries sit on top, then facet by layer, set a viridis scale with a proper legend title, and finish with theme_void and the legend moved to the bottom. Five daily rainfall surfaces with county lines over them. Notice the boundaries use fill equals NA and a thin orange line, so they mark the counties without hiding the data underneath, which is the point of the whole exercise.
+
+</details>
+
+It is very easy to achieve this. You just use `geom_sf()` for `sf` and `geom_spatraster()` for `SpatRaster`. You just add them as layers just like any figures you create with `ggplot2`.
+
+<br>
+
+```{webr-r}
+#| context: setup
+ 
+data(prism_2012_aug)
+prism_2012_aug <- terra::rast(prism_2012_aug)
+```
+
+```{webr-r}
+ggplot() +
+  #--- raster data ---#
+  geom_spatraster(data = prism_2012_aug) +
+  #--- vector data ---#
+  geom_sf(data = ne_counties, color = "orange", fill = NA, linewidth = 0.1) +
+  #--- facet by layer of the raster data ---#
+  facet_wrap(~lyr, ncol = 2) +
+  #--- CHANGED: was "Precipitation (inches)". PRISM ppt is millimetres, and  ---#
+  #--- these five daily layers run 0 to 73.8 — impossible as inches.         ---#
+  scale_fill_viridis(name = "Precipitation (mm)") +
+  theme_void() +
+  theme(legend.position = "bottom")
+
+```

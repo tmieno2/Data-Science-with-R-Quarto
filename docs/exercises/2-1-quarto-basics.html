@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Ex-2-1: Quarto Basics – Data Science with R (AECN 896-05)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-38d9d8fd61e003a5a1c343a80d3dce47.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Ex-2-1: Quarto Basics – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Quarto">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science with R (AECN 896-05)</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/syllabus_26.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/calendar_26.html"> 
+<span class="menu-text">Calendar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lectures/index.html"> 
+<span class="menu-text">Lecture Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../assignments.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../exercises/index.html"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-setup" id="toc-sec-setup" class="nav-link active" data-scroll-target="#sec-setup"><span class="header-section-number">1</span> Setup</a></li>
+  <li><a href="#your-first-render" id="toc-your-first-render" class="nav-link" data-scroll-target="#your-first-render"><span class="header-section-number">2</span> Your first render</a></li>
+  <li><a href="#make-the-output-show-what-you-want" id="toc-make-the-output-show-what-you-want" class="nav-link" data-scroll-target="#make-the-output-show-what-you-want"><span class="header-section-number">3</span> Make the output show what you want</a></li>
+  <li><a href="#label-your-chunks" id="toc-label-your-chunks" class="nav-link" data-scroll-target="#label-your-chunks"><span class="header-section-number">4</span> Label your chunks</a></li>
+  <li><a href="#the-render-does-not-know-what-your-console-knows" id="toc-the-render-does-not-know-what-your-console-knows" class="nav-link" data-scroll-target="#the-render-does-not-know-what-your-console-knows"><span class="header-section-number">5</span> The render does not know what your console knows</a></li>
+  <li><a href="#diagnose-three-failed-renders" id="toc-diagnose-three-failed-renders" class="nav-link" data-scroll-target="#diagnose-three-failed-renders"><span class="header-section-number">6</span> Diagnose three failed renders</a></li>
+  <li><a href="#caching-and-the-trap-that-comes-with-it" id="toc-caching-and-the-trap-that-comes-with-it" class="nav-link" data-scroll-target="#caching-and-the-trap-that-comes-with-it"><span class="header-section-number">7</span> Caching, and the trap that comes with it</a></li>
+  <li><a href="#paths-from-inside-a-render" id="toc-paths-from-inside-a-render" class="nav-link" data-scroll-target="#paths-from-inside-a-render"><span class="header-section-number">8</span> Paths, from inside a render</a></li>
+  <li><a href="#make-an-html-you-can-actually-submit" id="toc-make-an-html-you-can-actually-submit" class="nav-link" data-scroll-target="#make-an-html-you-can-actually-submit"><span class="header-section-number">9</span> Make an html you can actually submit</a></li>
+  <li><a href="#numbers-in-your-prose-that-update-themselves" id="toc-numbers-in-your-prose-that-update-themselves" class="nav-link" data-scroll-target="#numbers-in-your-prose-that-update-themselves"><span class="header-section-number">10</span> Numbers in your prose that update themselves</a></li>
+  <li><a href="#put-it-together" id="toc-put-it-together" class="nav-link" data-scroll-target="#put-it-together"><span class="header-section-number">11</span> Put it together</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Ex-2-1: Quarto Basics</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    Quarto
+  </div>
+</div>
+
+
+</header>
+
+
+<p>Quarto runs on your machine, not in your browser, so every exercise here is something you do in RStudio.</p>
+<p>Several of these ask you to <strong>break something on purpose</strong>. That is deliberate. Almost everything that goes wrong with Quarto announces itself through an error message, and the fastest way to learn those messages is to cause them deliberately while you are calm, rather than meet them for the first time at eleven o’clock the night before an assignment is due.</p>
+<section id="sec-setup" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Setup</h1>
+<ol type="1">
+<li>You cloned <a href="https://github.com/tmieno2/quarto-examples" class="uri">https://github.com/tmieno2/quarto-examples</a> in lecture 02-0. Find that folder now and confirm these exist:
+<ul>
+<li><code>templates/sample_qmd.qmd</code></li>
+<li><code>templates/custom.scss</code></li>
+<li><code>templates/nebraska-n.jpg</code></li>
+</ul></li>
+<li>Make a new folder <code>quarto-practice</code>, and in RStudio do <code>File -&gt; New Project -&gt; Existing Directory</code> on it.</li>
+<li>Inside it, make a <code>data</code> folder and put a copy of <code>corn_yields.csv</code> in it. That file is in the datasets repository from <a href="../exercises/3-1-input-output.html">Ex-3-1</a>.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>here::here()</code> in the console prints the path to <code>quarto-practice</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="If you cannot find your clone">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+If you cannot find your clone
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Open Sublime Merge, open the repository, then <code>File -&gt; Open Containing Folder</code>. If you deleted it, clone it again; it takes twenty seconds.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="your-first-render" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Your first render</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li><code>File -&gt; New File -&gt; Quarto Document</code>. Save it as <code>first.qmd</code> in <code>quarto-practice</code>.</li>
+<li>Delete everything below the YAML header.</li>
+<li>Add a <code>##</code> heading, a sentence of ordinary text, and one R chunk that draws a plot from a built-in dataset.</li>
+<li>Click <strong>Render</strong>.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mtcars<span class="sc">$</span>wt, mtcars<span class="sc">$</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A file called <code>first.html</code> appears <strong>next to</strong> <code>first.qmd</code> in the Files pane, and your figure is inside it.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="What just happened">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What just happened
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Render did three things, in this order:</p>
+<ol type="1">
+<li>started a brand new R session and ran every chunk in order, top to bottom</li>
+<li>pasted each chunk’s results underneath its code</li>
+<li>converted the whole thing, text and code and results, into html</li>
+</ol>
+<p>The <code>.qmd</code> is your source and the <code>.html</code> is the output. You edit the first and you hand in the second. They are two separate files and they always will be.</p>
+<p>This is also the answer to “why not just use Word?”. In Word the numbers in your document are things you typed. Here they are things your document computed, and they cannot disagree with your data.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-the-output-show-what-you-want" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Make the output show what you want</h1>
+<p>The default shows your code, your results, and every message the packages decide to emit. That is almost never what a reader wants.</p>
+<p><strong>Task.</strong> Write a chunk that loads <code>tidyverse</code> and draws a plot, then produce each of these four outputs. Each needs a different chunk option, and you should find them before opening the answer.</p>
+<ol type="a">
+<li>The figure appears; the code is hidden; no package startup noise.</li>
+<li>The code appears, nicely formatted, but does not run.</li>
+<li>The chunk runs, but nothing whatever appears in the html.</li>
+<li>Everything from (a), applied to every chunk in the document at once, without editing them one by one.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For (c) you can <em>prove</em> the chunk ran even though nothing appeared. Define an object inside it and use that object in a later, visible chunk.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>a.  #| echo: false
+    #| message: false
+    #| warning: false
+
+b.  #| eval: false
+
+c.  #| include: false
+
+d.  in the YAML header:
+
+    execute:
+      echo: false
+      message: false
+      warning: false</code></pre>
+<p>The distinction to hold on to:</p>
+<ul>
+<li><code>eval</code> controls whether the code <strong>runs</strong></li>
+<li><code>echo</code> controls whether the code is <strong>shown</strong></li>
+<li><code>include: false</code> hides everything, code and output both, while still running</li>
+</ul>
+<p><code>include: false</code> is exactly what you want for the <code>library()</code> chunk at the top of a report. It has to run, and nobody wants to read it.</p>
+<p>For (d), note that a chunk-level option always beats the global one, so you can set a document-wide default and then override it for the two chunks where you actually do want to show the code.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="label-your-chunks" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Label your chunks</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Give each chunk in <code>first.qmd</code> a label describing what it does.</li>
+<li>Label the plotting chunk <code>fig-mpg</code>, give it a <code>fig-cap</code>, and refer to it from your text with <code>@fig-mpg</code>.</li>
+<li>Now break it: copy a labelled chunk and paste it lower down without changing the label. Render, and read the error.</li>
+<li>Break it again: rename <code>fig-mpg</code> to <code>fig_mpg</code>, with an underscore. Render and look carefully at the cross-reference in the output.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Step 3 stops the render with a clear complaint. Step 4 does <strong>not</strong> stop the render, and instead prints <code>?fig_mpg</code> into your text.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>```{r}</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>#| label: fig-mpg</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>#| fig-cap: "Fuel economy falls with weight."</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>#| echo: false</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plot(mtcars$wt, mtcars$mpg)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>Heavier cars are less efficient (@fig-mpg).</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Three things labels buy you: the error message names the chunk that failed rather than “chunk 7”; the cached results have somewhere to live; and figures and tables become cross-referenceable.</p>
+<p>Two rules:</p>
+<ul>
+<li><strong>Labels must be unique.</strong> A duplicate gives <code>Duplicate chunk label 'fig-mpg'</code>, and the chunk it blames is the second one even though the real cause is usually that you copy-pasted the first.</li>
+<li><strong>Hyphens, never underscores.</strong> <code>fig_mpg</code> is a perfectly legal label and the chunk runs fine, but the cross-reference silently fails and prints <code>?fig_mpg</code>. Nothing warns you. This is the single most common way a cross-reference breaks.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="the-render-does-not-know-what-your-console-knows" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> The render does not know what your console knows</h1>
+<p><strong>Task.</strong> Break this one on purpose.</p>
+<ol type="1">
+<li>In the <strong>console</strong>, and only the console, type <code>secret &lt;- 42</code>.</li>
+<li>In <code>first.qmd</code>, add a chunk containing just <code>secret * 2</code>. Run it with the green arrow. It works.</li>
+<li>Now click Render.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The render fails with <code>object 'secret' not found</code>, even though the identical line worked when you clicked the green arrow thirty seconds earlier.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Why, and what to do about it">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why, and what to do about it
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Rendering starts a <strong>completely new R session</strong>. Nothing in your Environment pane is available to it, not your data, not your packages, not the object you made an hour ago and forgot about.</p>
+<p>This is a feature rather than an annoyance. It is the guarantee that your document contains everything needed to reproduce itself, which is what makes it work on my computer as well as yours.</p>
+<p>The habit that follows: your qmd must create everything it uses. Load the packages, read the data, build the objects, all inside chunks in the document.</p>
+<p>The check, which takes ten seconds and should become automatic before you submit anything:</p>
+<pre><code>Session -&gt; Restart R
+Run -&gt; Run All</code></pre>
+<p>If that fails, your document depends on something invisible, and it will fail for me too.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="diagnose-three-failed-renders" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Diagnose three failed renders</h1>
+<p>Cause each of these, <strong>read the message before fixing it</strong>, and write down which chunk Quarto blamed.</p>
+<ol type="a">
+<li>Misspell a function name, for instance <code>libary(tidyverse)</code>.</li>
+<li>Call a function from a package you have not installed, for instance <code>gganimate::animate()</code>.</li>
+<li>Ask for a column that does not exist, for instance <code>corn$Yeild</code>.</li>
+</ol>
+<p>Then: make (a) render anyway, printing the error into the document instead of stopping.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="What each looks like, and the fix">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What each looks like, and the fix
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a.</strong> <code>could not find function "libary"</code>. Quarto names the chunk and the line. Fix the spelling. Remember that this exact message also appears when a package is not loaded, so “could not find function” always means one of three things: typo, not loaded, or not installed.</p>
+<p><strong>b.</strong> <code>there is no package called 'gganimate'</code>. Install it. Note this is a <em>different</em> message from (a), and the difference is informative: it tells you the package is missing rather than merely unloaded.</p>
+<p><strong>c.</strong> <code>object 'Yeild' not found</code>, wrapped in dplyr’s <code>In argument:</code> framing if you were inside a verb. First check <code>names()</code> against what you typed, and watch capitalisation: <code>Yield</code> and <code>yield</code> are different columns.</p>
+<p><strong>Rendering anyway:</strong></p>
+<pre><code>#| error: true</code></pre>
+<p>The error is printed into the document and the render continues. These lecture notes use it deliberately, to show you what a failure looks like. Do not leave it switched on in an assignment: it lets broken code through silently, which is worse than failing.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Reading a Quarto error">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reading a Quarto error
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Work from the bottom up. The last few lines are usually R’s actual complaint; everything above is Quarto and knitr explaining how they got there. The line beginning <code>Quitting from</code> names the chunk and line number, and is the fastest thing to look for.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="caching-and-the-trap-that-comes-with-it" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Caching, and the trap that comes with it</h1>
+<p>Once a chunk takes real time, you do not want to run it on every render.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Add a chunk that deliberately takes a few seconds:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>slow_result <span class="ot">&lt;-</span> {<span class="fu">Sys.sleep</span>(<span class="dv">5</span>); <span class="fu">mean</span>(mtcars<span class="sc">$</span>mpg)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li>Render, and notice how long it takes. Render again, and notice it is no faster.</li>
+<li>Turn on caching for that chunk. Render twice more and compare.</li>
+<li>Now spring the trap. Put the data in an <em>earlier</em> chunk, have the cached chunk use it, then change the earlier chunk. Render.</li>
+<li>Fix it two ways.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>At step 4 your document reports a number computed from data that no longer exists anywhere in the file.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>```{r}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>#| label: prep</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d &lt;- mtcars[mtcars$cyl == 4, ]     # change 4 to 6 at step 4</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>```{r}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>#| label: slow-bit</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>slow_result &lt;- {Sys.sleep(5); mean(d$mpg)}</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The trap: <code>cache: true</code> reruns a chunk when <strong>that chunk’s own code</strong> changes. Editing <code>prep</code> does not change <code>slow-bit</code>, so the cache is kept and your document silently reports last week’s answer. Nothing warns you, and the number looks perfectly reasonable.</p>
+<p>Two fixes:</p>
+<pre><code>#| dependson: prep      # rerun me when prep changes</code></pre>
+<p>or delete the <code>_cache</code> folder next to your qmd, which throws everything away and starts clean. That folder is also the first thing to try when caching behaves inexplicably.</p>
+<p>The rule of thumb: cache chunks that are slow <em>and</em> self-contained. Do not cache a chunk that reads data, because the whole point of caching is to not notice the data changed.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="freeze, for whole documents">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+freeze, for whole documents
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>On a website, <code>freeze: auto</code> in <code>_quarto.yml</code> stops Quarto re-running a document at all unless its source has changed. That is the right tool for a site with thirty pages where only one has been edited. <code>cache</code> is per chunk; <code>freeze</code> is per document.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="paths-from-inside-a-render" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Paths, from inside a render</h1>
+<p>You met this in <a href="../exercises/3-1-input-output.html">Ex-3-1</a>. It is here again because it breaks Quarto documents specifically, and because seeing it twice is how it sticks.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Make a subfolder <code>analysis</code> and create <code>analysis/report.qmd</code> inside it.</li>
+<li>Add a chunk reading <code>read_csv("data/corn_yields.csv")</code>.</li>
+<li>Render. It fails.</li>
+<li>Read the error carefully. It tells you which folder R looked in.</li>
+<li>Fix it so the same line works whether you render from <code>analysis/</code> or paste it into the console at the project root.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>report.qmd</code> renders, and the exact same line also works pasted into the console, unchanged.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When Quarto renders <code>analysis/report.qmd</code>, the working directory becomes <code>analysis/</code>, so a relative path looks for <code>analysis/data/corn_yields.csv</code>. <code>here()</code> always builds from the project root, so it does not care where the rendering document lives.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-an-html-you-can-actually-submit" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Make an html you can actually submit</h1>
+<p>This is the one that decides whether your assignment arrives readable.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Render a document containing a figure. Notice that a folder named <code>something_files</code> appeared next to your html.</li>
+<li>Copy <strong>only</strong> the <code>.html</code> file to your Desktop. Not the folder. Open it.</li>
+<li>Observe what happened to your figure.</li>
+<li>Add <code>embed-resources: true</code> under <code>html:</code> in the YAML, render again, and repeat step 2.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The second copy shows the figure on the Desktop, with no folder next to it.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer, and why this matters">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer, and why this matters
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"My report"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">html</span><span class="kw">:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">embed-resources</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>By default Quarto writes the html plus a <code>_files</code> folder holding every figure, and the html points at that folder. Separate the two and the figures vanish.</p>
+<p>When you email the html on its own, or upload just that file, you have separated them. Your document arrives with broken images and you have no way of knowing, because on your machine the folder is still sitting right there and everything looks perfect.</p>
+<p><code>embed-resources: true</code> packs the figures, the styling, and everything else into the single html file. It gets bigger. Submit it anyway.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Check it properly">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Check it properly
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Zip the single html file on its own and mail it to yourself, then open it from the download. That is the closest thing to what your grader will actually do, and it catches problems that dragging to the Desktop does not.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="numbers-in-your-prose-that-update-themselves" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Numbers in your prose that update themselves</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Give <code>first.qmd</code> a proper header: title, your name, today’s date, a table of contents, and section numbering.</li>
+<li>Read <code>corn_yields.csv</code> in a hidden chunk.</li>
+<li>Write a sentence in ordinary prose reporting the number of observations and the mean yield, using inline R rather than typing the numbers.</li>
+<li>Now filter the data to irrigated observations only, re-render, and watch the sentence change.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You did not retype a single number in step 4.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>title: "Corn yields in Nebraska"</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>author: "Your Name"</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>date: today</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>format:</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  html:</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    toc: true</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    number-sections: true</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    embed-resources: true</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>The dataset has `r nrow(corn)` observations, with a mean yield of</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>`r round(mean(corn$Yield), 1)` bushels per acre.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Inline code is a single backtick, the letter <code>r</code>, a space, your expression, and a closing backtick. It runs in the same session as your chunks, so it can use any object they created.</p>
+<p>This one exercise is the whole argument for Quarto over Word. In Word that sentence is a number you typed once, and the moment the data changes it quietly becomes false. Here it cannot be wrong, because nobody typed it.</p>
+<p>Keep the expressions short. If a sentence needs three lines of computation, compute it in a hidden chunk and put the resulting object inline.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="put-it-together" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Put it together</h1>
+<p><strong>Task.</strong> Produce a short report on the corn yield data, from scratch, that:</p>
+<ul>
+<li>has a title, your name, a date, a table of contents, and numbered sections</li>
+<li>reads its data with <code>here()</code></li>
+<li>hides every <code>library()</code> call and all package messages</li>
+<li>contains at least one labelled, captioned figure, cross-referenced from the text</li>
+<li>reports at least two numbers inline rather than typed</li>
+<li>renders to a single self-contained html</li>
+</ul>
+<p>Then run the real test: <code>Session -&gt; Restart R</code>, then Render, then copy only the html somewhere else and open it.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It renders from a clean session, and the copy opens correctly somewhere else on your disk. That is the standard every assignment in this course has to meet.</p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Made with Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

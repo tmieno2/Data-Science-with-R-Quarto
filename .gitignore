@@ -1,0 +1,117 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Data Science with R (AECN 896-05)
+#
+# Two things this file must NOT break:
+#   1. docs/ is the published site. GitHub Pages serves it. It is TRACKED,
+#      including its *_files/ asset directories.
+#   2. lectures/Chapter-9-Spatial-Data/Data/PRISM/ is read at render time and
+#      its contents are PRINTED on a slide. Every sidecar there is tracked,
+#      including .prj and .xml. See "Chapter 9 data" below.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Quarto / knitr intermediates ─────────────────────────────────────────────
+# Scoped to the source tree so docs/**/*_files/ survives. /.quarto/ also holds
+# a live deno-kv database that Dropbox creates conflicted copies of.
+/.quarto/
+/*_files/
+/*_cache/
+/lectures/**/*_files/
+/lectures/**/*_cache/
+/exercises/**/*_files/
+/exercises/**/*_cache/
+/syllabus/**/*_files/
+/syllabus/**/*_cache/
+/templates/**/*_files/
+/templates/**/*_cache/
+
+# ── Student work: never in a public repository ───────────────────────────────
+# 825 MB, and *_submission/ holds identifiable student work (FERPA).
+# Assignments are distributed to students by Dropbox link, not from this repo,
+# so nothing here is published. The old rule said "Assignments/" (capital A)
+# and did not match the directory, which is actually named "assignments/".
+/assignments/
+
+# Student names and @huskers.unl.edu addresses.
+/roster/
+
+# ── Directories that are separate git repositories ───────────────────────────
+# Tracking these would create broken gitlinks in the new repo.
+/sample-project-reproducible/
+/supplementary-material/
+/data/
+
+# ── Not part of the course site ──────────────────────────────────────────────
+/sample-project/
+/templates/
+/Video/
+/Datasets/
+/FinalProject/
+# Contains a business proposal, not course material.
+# BOTH rules are needed. _quarto.yml does not exclude this from the render, so
+# a full render keeps regenerating docs/IndustryPartnership/. Ignoring only the
+# source would still publish the rendered proposal, because GitHub Pages serves
+# whatever is committed under docs/.
+/IndustryPartnership/
+/docs/IndustryPartnership/
+
+# ── Chapter 9 data ───────────────────────────────────────────────────────────
+# TRACKED (required to render; do not add extension globs that catch these):
+#   Data/PRISM/**            9 .bil rasters + .hdr/.prj/.xml/.stx sidecars.
+#                            Two live chunks list this folder and print the
+#                            result, so its contents are visible output.
+#                            .prj carries the CRS - drop it and the printed
+#                            SpatRaster loses "coord. ref. : lon/lat NAD83".
+#   Data/il_ne_corn_yield.rds   read by an include=FALSE chunk.
+#
+# IGNORED below: master copies of the student Dropbox bundle. Every chunk that
+# names them is eval=FALSE and points at "data-files-for-participants/", a
+# folder that does not exist here. They are never read by the render.
+/lectures/Chapter-9-Spatial-Data/Data/gm_precip_2018.nc
+/lectures/Chapter-9-Spatial-Data/Data/gm_precip_2018.nc.aux.*
+/lectures/Chapter-9-Spatial-Data/Data/reflec_*.tif
+/lectures/Chapter-9-Spatial-Data/Data/nc_practice.*
+/lectures/Chapter-9-Spatial-Data/Data/blue.rds
+# Note the path: this one is directly under Data/, NOT under Data/PRISM/.
+/lectures/Chapter-9-Spatial-Data/Data/PRISM_ppt_stable_4kmD2_20120801_bil/
+
+# ── Credentials ──────────────────────────────────────────────────────────────
+# L06 once carried a live USDA-NASS key that reached the public site.
+.Renviron
+.env
+*.pem
+
+# ── LaTeX byproducts ─────────────────────────────────────────────────────────
+# Scoped to the source tree: docs/ may legitimately serve a .pdf or .tex.
+/lectures/**/*.tex
+/lectures/**/*.aux
+/lectures/**/*.log
+/exercises/**/*.tex
+/syllabus/**/*.tex
+
+# ── R / RStudio ──────────────────────────────────────────────────────────────
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# ── Editor and OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*~
+.vscode/
+# Machine-specific paths; the rest of .claude/ is shared and tracked.
+.claude/settings.local.json
+
+# ── Dropbox ──────────────────────────────────────────────────────────────────
+# This repo lives in Dropbox, which leaves these behind after a sync race.
+*conflicted copy*
+.dropbox
+.dropbox.attr
+
+# ── Stray artefacts from running chunks interactively ────────────────────────
+/a_list.rds
+/_tmp-open.html
+
+# ── Personal notes ───────────────────────────────────────────────────────────
+*/chatGPT_questions.md

@@ -1,0 +1,139 @@
+---
+title: "02-3: Introduction to Using Quarto to Create a Website"
+abstract: "Chapter 2: Quarto"
+format:
+  revealjs:
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+filters:
+  - webr
+draft: true
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+library(dplyr)
+```
+
+## Get Started
+
+::: {.panel-tabset}
+
+### Start with a template
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Rather than building a website from an empty folder, we start from a template somebody else has already got working and then bend it to our needs. The command is on the slide. You open a terminal, use cd to navigate to wherever you want the website folder to live, and run quarto use template with the template's address. It will ask you a series of questions. One of them is the name of the folder it creates, so answer that one deliberately; say yes to the rest. When it finishes you will have a folder of files that looks like the screenshot, and that is already a working website.
+
+</details>
+
+We are going to start with a Quarto website template and then modify it to our likings.
+
++ Open a terminal app or go to the terminal tab of the console pane.
++ Navigate to the folder in which you want to create a folder with all the website materials using `cd`.
++ Run the following code and you will see a series of questions. One of them ask you the name of the folder created. Say yes to all the other questions.
+
+```console
+quarto use template EmilHvitfeldt/website-template
+```
+
+<br>
+
+Once the code is run, you should see files like below:
+
+![](files-quarto-website-template.png){fig-align="center"}
+
+### Build a website
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now let's actually see it. In RStudio, look at the upper-right pane, find the Build tab, and click Render Website. Quarto processes every qmd in the project and assembles them into a site, and when it finishes your default browser opens on the result. One thing to be clear about: this website is not online. It is sitting on your own machine and only you can see it. Publishing it is a separate step we are not doing today. For now the loop that matters is edit a file, click Render Website, look at the browser.
+
+</details>
+
++ Click on the `Build` tab of the right upper pane and click on the **Render Website** button.
+
++ You will be then taken to the website (not online yet) of your default web-browser.
+
+### index.qmd
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Every website needs a home page, and in a Quarto project that comes from the index.qmd file sitting directly under the project folder. It becomes index.html, which is what a browser loads when somebody visits your site without asking for any particular page. Look at the screenshot in the What tab and you will see the YAML header is where you set the title, the subtitle, and so on. Then in the Try yourself tab, do exactly that: change the title and subtitle, render the website again, and confirm the change shows up. That edit, render, look loop is the whole workflow.
+
+</details>
+
+::: {.panel-tabset}
+
+#### What?
+
+The **index.qmd** file directly under the project folder will turn into the index.html, which is the home of the website.
+
+As you can see below, you configure things like title, subtitle, etc.
+
+![](home-index-qmd.png)
+
+#### Try yourself
+
+Change the title and subtitle, build a website, and then confirm how the website changed. 
+
+:::
+<!--end of panel-->
+
+### _quarto.yml
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The other file that matters is _quarto.yml, and this one is configuration for the project as a whole rather than the content of any single page. Two things in there you will want early. Under the website option you define the navigation, which is the menu running across the top of every page. And under the format option you set the appearance of the whole site, the theme and so on. The rule of thumb is simple: if a setting should apply to the entire site rather than to one page, it belongs in _quarto.yml.
+
+</details>
+
+In the `_quarto.yml` file, you can specify things like website navigation under the `website:` option, change the aesthetics of the website (under the `format:` option).
+
+![](quarto-yml.png)
+
+:::
+<!--end of panel-->
+
+
+## Create a page
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Adding a page to your site is just adding a qmd file. There is no registration step and no list to update; the callout says it plainly, when you hit Render Website every qmd in the project gets processed and becomes part of the site. That is convenient, but it has an edge worth knowing. If you have a qmd you are not ready to publish, add draft true to its YAML header and it will stay off the website. Read the wording carefully though: draft keeps the file off the site, but the file is still processed, so if it contains errors it will still break your build.
+
+</details>
+
+You can create a page on your website with a qmd file (and yml).
+
+:::{.callout-note title="Important"}
+When you build a website (by hitting the **Render website** button on RStudio), all the qmd files will be processed to be part of the website.
+:::
+
+<br>
+
+
+You can add `draft: true` in the YAML header to prevent the qmd file from appearing on the website.
+
+This will still process the qmd file, and will cause a build error if the qmd file has errors.
+
+### 
+
+:::
+<!--end of panel-->

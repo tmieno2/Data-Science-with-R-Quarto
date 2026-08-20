@@ -1,0 +1,211 @@
+<!-- @dsCard group="Transcript panel" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Transcript panel — Notebook margin</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* NOTEBOOK transcript — it lives in the margin column and never overlays.
+
+   The brief said the margin makes the panel unnecessary, with the catch that
+   students would then see the transcript by default. That catch is avoidable:
+   keep <details>, but put it IN the margin instead of on top of the slide.
+
+   What that buys, against both the rail and the drawer:
+     · nothing is ever covered — no scrim, no shadow, no z-index
+     · no absolute positioning, so no 17% magic number and no collision with
+       the tab row; the panel simply cannot reach the tabs
+     · it is still closed by default, so students get it on demand
+     · type at 14px, because the column is a column rather than an overlay
+
+   Cost: the margin is spoken for on slides that carry a transcript. On those
+   slides margin notes stack above it and the column scrolls. */
+.sys-notebook { padding: 30px 38px 0; }
+
+.nb-head { display:flex; align-items:baseline; gap:14px;
+           border-bottom:1px solid var(--rule); padding-bottom:8px; margin-bottom:4px; }
+.sys-notebook h2 { font-size:32px; font-weight:600; color:var(--ink); margin:0;
+                   line-height:1.15; }
+.nb-head .chap { margin-left:auto; font-size:14px; color:var(--ink-muted);
+                 letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+
+.nb-tabs { display:inline-block; margin:10px 0 14px; white-space:nowrap; }
+.nb-tabs span { display:inline-block; font-size:var(--t-tab); padding:3px 12px;
+                color:var(--ink-muted); border-bottom:2px solid transparent; }
+.nb-tabs span.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:700; }
+
+.nb-cols { display:grid; grid-template-columns:1fr var(--margin-w); gap:26px;
+           height:530px; }
+.nb-margin { border-left:1px solid var(--rule); padding-left:18px; font-size:15px;
+             line-height:1.45; color:var(--ink-muted); display:flex;
+             flex-direction:column; min-height:0; }
+.nb-margin .lbl { display:block; font-size:12px; letter-spacing:.1em;
+                  text-transform:uppercase; color:var(--accent); font-weight:700;
+                  margin-bottom:5px; }
+.nb-margin .note { margin-bottom:16px; }
+.nb-margin code { font-size:14px; }
+
+/* the transcript, in the margin. Opts out of custom.scss's global <details>
+   border and <summary> negative margin, exactly as transcript-support.html does. */
+/* Anchored directly under the margin notes in BOTH states. An earlier version
+   pushed it to the foot of the column with margin-top:auto, which made the
+   control jump up the moment it was clicked. */
+details.tr { border:0; padding:0; border-radius:0; min-height:0;
+             border-top:1px solid var(--rule); padding-top:9px; display:flex;
+             flex-direction:column; }
+details.tr > summary { margin:0; padding:0; list-style:none; cursor:pointer;
+                       font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+                       font-weight:700; color:var(--accent-sub);
+                       display:flex; align-items:center; gap:7px; }
+details.tr > summary::-webkit-details-marker { display:none; }
+details.tr > summary::before { content:"▸"; font-size:10px; }
+details.tr[open] > summary::before { content:"▾"; }
+details.tr > summary .n { margin-left:auto; font-weight:600; font-size:11px;
+                          color:var(--ink-muted); letter-spacing:.04em; }
+details.tr .body { margin-top:8px; overflow-y:auto; min-height:0;
+                   font-size:14px; line-height:1.5; color:var(--ink); }
+details.tr .body p { margin:0 0 8px; }
+details.tr .body code { font-size:13px; }
+details.tr[open] { flex:1; }
+
+.ok { color:#1d4e89; font-weight:600; }
+.note-p { font-size:13px; color:#52616b; max-width:1050px; margin:10px 0 0; line-height:1.55; }
+</style>
+
+<h1 class="page">Notebook — the transcript lives in the margin</h1>
+<p class="page">
+  Still a <code>&lt;details&gt;</code>, still closed by default, still one shared
+  include — but in the margin column rather than on top of the slide. It cannot
+  cover content, cannot reach the tab row, and needs no absolute positioning, so
+  the <code>17%</code> offset and the z-index stack both disappear. Type lands at
+  <b>14px</b>, against 10.56px today.
+</p>
+
+<p class="caption"><b>1 · Closed.</b> A rule and a label at the foot of the
+  margin. Margin notes sit above it and are unaffected.</p>
+<div class="stage sys-notebook safeline">
+  <div class="nb-head">
+    <h2>Summarizing by group</h2><span class="chap">Ch 3 · Data Wrangling</span>
+  </div>
+  <div class="nb-tabs"><span>Syntax</span><span class="on">Example</span><span>Your turn</span></div>
+  <div class="nb-cols">
+    <div>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+  &lt;chr&gt;         &lt;dbl&gt;
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+    </div>
+    <div class="nb-margin">
+      <div class="note">
+        <span class="lbl">The pipe</span>
+        <code>%&gt;%</code> passes the result on the left into the function on the
+        right as its <i>first</i> argument. Read it as "and then".
+      </div>
+      <details class="tr">
+        <summary>Transcript <span class="n">3 ¶</span></summary>
+      </details>
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>2 · Open.</b> The margin note stays; the transcript takes
+  the rest of the column and scrolls. The code and its output are untouched —
+  the first time in any of the three directions that the transcript and the thing
+  it describes are both fully visible.</p>
+<div class="stage sys-notebook safeline">
+  <div class="nb-head">
+    <h2>Summarizing by group</h2><span class="chap">Ch 3 · Data Wrangling</span>
+  </div>
+  <div class="nb-tabs"><span>Syntax</span><span class="on">Example</span><span>Your turn</span></div>
+  <div class="nb-cols">
+    <div>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+  &lt;chr&gt;         &lt;dbl&gt;
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+    </div>
+    <div class="nb-margin">
+      <div class="note">
+        <span class="lbl">The pipe</span>
+        <code>%&gt;%</code> passes the result on the left into the function on the
+        right as its <i>first</i> argument.
+      </div>
+      <details class="tr" open>
+        <summary>Transcript <span class="n">3 ¶</span></summary>
+        <div class="body">
+          <p>So the pipe is the thing to get comfortable with today. Read
+             <code>%&gt;%</code> as "and then". We take the corn data, and then we
+             keep only Nebraska, and then we split it by county, and then we take
+             a mean.</p>
+          <p>Notice I never assigned anything to an intermediate variable. That is
+             the whole point — you can read the chain top to bottom as a sentence,
+             in the order the work actually happens.</p>
+          <p>If you have used base R you might be reaching for nested function
+             calls. Resist that for now; we come back to when nesting is the
+             clearer choice in Chapter 5.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>3 · Two-column slide.</b> The case that defeats a right
+  rail. Code, plot and transcript all fit, because the transcript was never
+  competing for the same space.</p>
+<div class="stage sys-notebook safeline">
+  <div class="nb-head">
+    <h2>Yields by county</h2><span class="chap">Ch 3 · Data Wrangling</span>
+  </div>
+  <div class="nb-tabs"><span>Code</span><span class="on">Plot</span></div>
+  <div class="nb-cols">
+    <div>
+<pre class="src"><span class="fn">ggplot</span>(county_means) +
+  <span class="fn">geom_col</span>(<span class="fn">aes</span>(x = county, y = mean_yield)) +
+  <span class="fn">theme_bw</span>()</pre>
+      <div style="background:#eef1f4;height:230px;display:grid;place-items:center;
+                  color:#8a8f98;font-size:15px;border:1px solid #dde1e6;margin-top:10px">
+        [ plot output ]</div>
+    </div>
+    <div class="nb-margin">
+      <details class="tr" open style="border-top:0;padding-top:0">
+        <summary>Transcript <span class="n">2 ¶</span></summary>
+        <div class="body">
+          <p>Bar height is the county mean. Notice the counties come out in
+             alphabetical order, which is almost never the order you want — we
+             fix that with <code>reorder()</code> in Chapter 4.</p>
+          <p>Also notice how little code this is. Two verbs and a theme.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="note-p">
+  <span class="ok">Summary label #a8552b on paper = 4.7:1; body ink = 14.9:1.</span>
+  The <b>"3 ¶"</b> count tells the lecturer how much script is in there before
+  they open it. Closing on slide change and on tab click still applies, and the
+  existing script in <code>transcript-support.html</code> already does both — it
+  needs no change beyond the selector.
+</p>

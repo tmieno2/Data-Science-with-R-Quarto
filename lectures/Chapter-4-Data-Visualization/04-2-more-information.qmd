@@ -1,0 +1,970 @@
+---
+title: "04-2: Data Visualization with `ggplot2`: More in One"
+abstract: "Chapter 4: Data Visualization"
+format: 
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'data.table', 'nycflights13']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 70%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same two navigation tricks as last time, briefly. The three stacked lines at the bottom left open a table of contents so you can jump around. And the letter o gives you a panel view of every slide at once. This deck is long, so both are worth using.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the same interactive setup: the pale blue boxes are live code areas running R in your browser. Run Code executes the whole box, or highlight a portion and use command-enter, control-enter on Windows. The copy icon in the top right puts the code on your clipboard for your own session, and the reload button restores the original. In this lecture especially, experiment with the examples, because most of what we cover is about small changes producing quite different figures.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+# Placing more information in one figure
+
+```{webr-r}
+#| context: setup
+
+#--- install and library the data package ---#
+#--- r.workshop.datasets carries county_yield with no geometry column and ---#
+#--- no dependencies, so one repo is enough. Its spatial sibling imports  ---#
+#--- sf, which drags in eleven more packages before any cell can run.     ---#
+webr::install(
+  "r.workshop.datasets",
+  repos = "https://tmieno2.github.io/rwasm-package/repo"
+)
+
+data(county_yield, package = "r.workshop.datasets")
+
+mean_yield <-
+  county_yield %>%
+  group_by(year) %>%
+  summarize(
+    corn_yield = mean(corn_yield, na.rm = TRUE)
+  ) %>%
+  filter(!is.na(year))
+
+county_yield_mean <- 
+  county_yield %>% 
+  group_by(state_name, year) %>% 
+  summarize(corn_yield = mean(corn_yield, na.rm = TRUE))
+```
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Placing more information in one figure
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Last lecture we built figures where everything looked the same: all the points one colour, all the lines one style. Now we make a figure carry more information, by letting its appearance depend on the data. Look at the target figure: instead of one line for the whole country, there is a line per state, each in its own colour, with a legend telling you which is which. That is the same underlying plot as before, doing considerably more work. This is the single most valuable technique in ggplot2, and it is one word in one place.
+
+</details>
+
+So far, we have learned the basics of `ggplot2` and how to create popular types of figures. We can make a figure much more informative by making its aesthetics data-dependent.
+
+For example, suppose you are interested in comparing the history of corn yield by state in a line plot. So, you want to create a line for each state and make the lines distinguishable so the readers know which line is for which state like this:
+
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+ggplot(data = county_yield_mean) +
+  geom_line(
+    aes(y = corn_yield, x = year, color = state_name)
+  )  
+```
+
+:::
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is that one place, in red on the slide because it is the whole lesson: inside aes. Writing color equals state_name inside aes tells ggplot to split the data into groups by state and draw a separately coloured line for each. Compare that against last lecture, where we wrote color equals red outside aes to set one fixed colour. Inside aes means make this depend on a variable. Outside aes means set it to this value. Same argument name, completely different behaviour, and the position is the only thing that distinguishes them. Note too that the legend appears automatically; you never have to build one.
+
+</details>
+
+We can make the aesthetics of a figure data-dependent by specifying which variable you use for aesthetics differentiation <span style="color:red"> INSIDE </span>`aes()`.
+
+Here is an example:
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield_mean) +
+  geom_line(
+    aes(y = corn_yield, x = year, color = state_name)
+  )   
+```
+
+:::
+
+In this code, `color = state_name` is inside `aes()` and it tells R to divide the data into groups by `state_name` (by state) and draw a color-differentiated line for each group.
+
+A legend is automatically generated.
+
+### Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four examples, and I want you to notice what changes between them and what does not. The aesthetic being mapped changes: colour for lines, fill for densities and boxplots, and in the last example both colour and shape at once. But the pattern never changes: a variable name, inside aes, mapped to an aesthetic. Also look at example two, where alpha is set to zero point three outside aes, so the overlapping densities are semi-transparent and you can see through them. That is a fixed value, so it goes outside. Both kinds of argument sitting side by side in one geom is exactly the situation you need to be able to read.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Data
+
+Create a data set of corn yield by state-year first:
+
+```{webr-r}
+#| autorun: true
+( 
+county_yield_mean <- 
+  county_yield %>% 
+  group_by(state_name, year) %>% 
+  summarize(corn_yield = mean(corn_yield, na.rm = TRUE))
+)
+```
+
+#### Example 1
+
+::: {.side-out}
+
+```{webr-r}
+ggplot(data = county_yield_mean) +
+  geom_line(
+    aes(
+      y = corn_yield, 
+      x = year, 
+      color = state_name 
+    )
+  )
+```
+
+:::
+
+#### Example 2
+
+::: {.side-out}
+
+```{webr-r}
+ggplot(data = county_yield_mean) + 
+  geom_density(
+    aes(
+      x = corn_yield, 
+      fill = state_name 
+    ),
+    alpha = 0.3
+  )
+```
+
+:::
+
+#### Example 3
+
+::: {.side-out}
+
+```{webr-r}
+county_yield %>% 
+  filter(state_name %in% c("Nebraska", "Kansas")) %>% 
+  ggplot(data = .) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield,
+      fill = state_name
+    )
+  )
+
+```
+
+:::
+
+#### Example 4
+
+::: {.side-out}
+
+```{webr-r}
+county_yield %>% 
+  filter(state_name %in% c("Nebraska", "Kansas")) %>%
+  ggplot(data = .) +
+  geom_point(
+    aes(
+      x = d3_5_9,
+      y = corn_yield,
+      color = state_name,
+      shape = state_name
+    ),
+    size = 0.7
+  )
+
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two exercises to practise the distinction. The first asks for a scatter plot coloured by clarity, and the second for density plots filled by colour with alpha set to zero point five. That second one is deliberately chosen: it needs one thing inside aes, the fill mapped to a variable, and one thing outside, the fixed transparency. If you find yourself unsure where a given argument goes, ask whether its value should change from group to group. If yes, it goes inside aes; if no, outside.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+This exercise uses the `diamonds` dataset from the `ggplot2` package. First, load the dataset and extract observations with `Premium` cut whose color is one of `E`, `I`, and `F`:
+
+```{webr-r}
+#| autorun: true
+data("diamonds")
+premium <-
+  diamonds %>%
+  dplyr::filter(cut == "Premium" & color %in% c("E", "I", "F"))
+
+#--- take a look ---#
+premium
+```
+
+#### Exercise 1
+
+Using `premium`, create a scatter plot of `price` (y-axis) against `depth` (x-axis) by `clarity`:
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+
+```
+
+### Answer
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(data = premium) +
+  geom_point(aes(y = price, x = depth, color = clarity))
+```
+
+:::
+
+
+#### Exercise 2
+
+Using `premium`, create density plots of `carat` by `color` (set `alpha` to 0.5):
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+
+```
+
+### Answer
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(data = premium) +
+  geom_density(aes(x = carat, fill = color), alpha = 0.5)
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+# Faceting
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Faceting
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Faceting is the other way to show more in one figure, and the comparison on this slide makes the case better than I can. On the left, every state's boxplots crowded into one panel, colour-coded. It is technically correct and almost unreadable. On the right, the same data split into a grid of small panels, one per state. Suddenly you can actually compare states, because each has its own space. The general rule: use colour when you want groups compared directly against each other, and faceting when there are too many groups for that to work.
+
+</details>
+
+Sometimes, you would like to visualize information across groups on separate panels. 
+
+::: {.columns}
+
+::: {.column width="50%"}
+Too much information in one panel?
+
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+#| out-width: 100%
+ggplot(data = county_yield) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield, 
+      fill = state_name
+    )
+  )
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+On separate panels (faceting)?
+
+::: {.side-out}
+
+```{webr-r}  
+#| context: output
+#| out-width: 100%
+ggplot(data = county_yield) + 
+  geom_boxplot(
+    aes(
+      x = factor(year), 
+      y = corn_yield 
+    )
+  ) +
+  facet_wrap(~ state_name, nrow = 3)
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The mechanism is a new layer added with a plus, either facet_wrap or facet_grid, naming the variable to split on. The syntax looks odd at first because it uses a tilde, which is R's formula notation, the same thing you will meet in regression models. For facet_wrap the formula is one-sided: nothing to the left, and what you want to facet by on the right. Read tilde state_name as simply split this by state. The callout explains why there is nothing on the left, and it is worth reading now, because facet_grid does use both sides of the tilde and the difference between the two functions turns on exactly that point.
+
+</details>
+
+We can make faceted figures by adding either `facet_wrap()` or `facet_grid()` in which you specify which variable to use for faceting.
+
+Here is an example:
+
+::: {.side-out}
+
+```{webr-r}
+ggplot(data = county_yield) + 
+  geom_boxplot(
+    aes(x = factor(year), y = corn_yield)
+  ) +
+  facet_wrap(~ state_name)
+```
+
+:::
+
+<br>
+
+In this code, `facet_wrap(~ state_name)` is added to a simple boxplot, which tells R to make a boxplot by `state_name` (state).
+
+<br>
+
+:::{.callout-note title="Why the tilde, and why nothing on the left"}
+`facet_wrap()` takes a **one-sided** formula: everything you want to facet by goes to the right of the `~`. It simply lays the panels out in reading order and wraps them onto the next row when it runs out of width, so there is no notion of which variable controls rows and which controls columns.
+
+That distinction does exist for `facet_grid()`, which we come to shortly, and there the two sides of the `~` matter a great deal.
+:::
+
+<!-- CHANGED: the code was facet_wrap(state_name ~ .) and the callout explained
+     the "." as "facet by no variable". That is facet_grid() grammar borrowed
+     for facet_wrap(), where the two sides carry no row/column meaning at all.
+     It runs without complaint, which is why it survived, but it blurs exactly
+     the distinction the facet_grid() tab further down is trying to teach. -->
+
+### Two-way
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You can facet on two variables at once, and then you get one panel for every combination of the two. These tabs show it, and the second one is the more useful demonstration, because it first filters down to two years so the grid stays small enough to read. That filtering step is a genuine lesson rather than housekeeping: two-way faceting multiplies, so ten states by twenty years is two hundred panels, and no figure with two hundred panels has ever communicated anything. Cut the data down before you facet on two variables.
+
+</details>
+
+::: {.panel-tabset}
+
+#### What?
+
+Two-way faceting will 
+
++ divide the data into groups where each group has a unique combination of the two faceting variables  
+
++ create a plot for each group
+
+**Example**
+
+::: {.side-out}
+
+```{webr-r}
+ggplot(data = county_yield) + 
+  geom_histogram(
+    aes(x = corn_yield)
+  ) +
+  facet_wrap(state_name ~ year)
+```
+
+:::
+
+#### Another example
+
+Filter `county_yield` to those in 2017 and 2018.
+
+```{webr-r}
+#| autorun: true
+county_yield_s <- 
+  county_yield %>% 
+  filter(year %in% c(2017, 2018))
+```
+
+Create faceted histograms.
+
+::: {.side-out}
+
+```{webr-r}  
+ggplot(data = county_yield_s) + 
+  geom_histogram(
+    aes(x = corn_yield)
+  ) +
+  facet_wrap(state_name ~ year)  
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+### `facet_grid()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+There are two faceting functions and it is worth knowing when to use which. These tabs compare them directly. facet_wrap takes the panels and wraps them into a block, filling row after row, which is what you want with one variable and many levels. facet_grid lays them out on a genuine two-dimensional grid, with one variable controlling rows and the other columns. Look at the two side by side on the compare tab: with two variables, facet_grid produces a table you can read across and down, which is almost always clearer.
+
+</details>
+
+::: {.panel-tabset}
+
+#### compare
+
+::: {.columns}
+
+::: {.column width="50%"}
+`facet_wrap`
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot(data = county_yield_s) +
+  geom_histogram(aes(x = corn_yield)) +
+  facet_wrap(state_name ~ year)  
+```
+
+:::
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+`facet_grid`
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(state_name ~ year)  
+```
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### facet_grid()
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(state_name ~ year)
+```
+
+:::
+
+:::{.callout-note}
++ Unlike `facet_wrap()`, which side you put faceting variables matters a lot. 
+
+  - left hand side: rows 
+  - right hand side: columns 
+
++ In the code above, `state_name` values become the rows, and `year` values become columns.
+
+:::
+
+#### order matters
+
+::: {.columns}
+
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100% 
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(state_name ~ year)
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(year ~ state_name) 
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### scale
+
+::: {.panel-tabset}
+
+##### Guide
+
+`facet_grid()` allows 
+
++ the figures in different columns to have different scales for the x-axis (figures in the same column have the same scale for the x-axis)
+
++ the figures in different rows to have different scales for the y-axis (figures in the same row have the same scale for the y-axis)
+
+
+
+##### free x
+
+::: {.side-out}
+
+```{webr-r}  
+#| autorun: true
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year, 
+    scales = "free_x"
+  )
+```
+
+:::
+
+##### free y
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year, 
+    scales = "free_y"
+  )
+```
+
+:::
+
+##### both free
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield_s) + 
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year, 
+    scales = "free"
+  )
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+### Strip label
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small but genuinely useful piece of polish. By default the strip labels along the edge of each panel show the bare value, so you get 2017 rather than Year equals 2017, and a reader coming to your figure cold has to guess what that number means. There is no label argument to set; the trick is to build the label you want as a new variable with mutate, pasting the text onto the value, and then facet on that variable instead. It is slightly indirect, but it is the standard way of doing it and it gives you complete control over the wording.
+
+</details>
+
+Create a variable that has the values you want to use as labels and use it as a faceting variable:
+
+::: {.side-out}
+
+```{webr-r}  
+county_yield_s %>% 
+  mutate(
+    year_text = paste0("Year = ", year)
+  ) %>%
+  ggplot(data = .) +
+    geom_histogram(aes(x = corn_yield)) +
+    facet_grid(
+      state_name ~ year_text
+    )
+```
+
+:::
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two faceting exercises, each showing you the target figure. The first is a one-way facet by colour, and note that the target has the panels stacked vertically, which tells you which side of the tilde colour belongs on. The second is a two-way facet by colour and clarity. Work out from the picture which variable is in the rows and which in the columns before you write the code; reading a target figure carefully is half the skill.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Exercise 1
+
+::: {.columns}
+
+::: {.column width="50%"}
+Using `premium`, create scatter plots of `price` (y-axis) against `carat` (x-axis) by `color` on separate panels as shown on the right.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+#| out-width: 80%
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price)) +
+  facet_grid(color ~ .)
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+::: {.panel-tabset}
+##### Work here
+
+```{webr-r}
+#--- write your code here ---#
+
+
+
+```
+
+##### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price)) +
+  facet_grid(color ~ .)
+```
+:::
+<!--end of panel-->
+
+
+#### Exercise 2
+
+::: {.columns}
+
+::: {.column width="50%"}
+Using `premium`, create histograms of `carat` by `color` and `clarity` on separate panels as shown on the right.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+#| message: false
+#| warning: false
+#| out-width: 80%
+ggplot(data = premium) +
+  geom_histogram(aes(x = carat)) +
+  facet_grid(color ~ clarity)
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+::: {.panel-tabset}
+##### Work here
+```{webr-r}
+#--- write your code here ---#
+
+
+
+
+```
+
+##### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(data = premium) +
+  geom_histogram(aes(x = carat)) +
+  facet_grid(color ~ clarity)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+## Preparing datasets for visualization
+
+::: {.panel-tabset}
+
+### Long-format needed
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now a point that connects this lecture back to the previous chapter, and it explains a lot of frustration. Everything we have done today, colour-differentiation and faceting alike, works by taking one variable and splitting the data by its values. Read the callout: that requires your data to be in long format. If the thing you want to split by is spread across several columns rather than living in one column, none of these techniques can work, because there is no single variable to name.
+
+</details>
+
+We have seen 
+
++ figures whose main elements (points, lines, boxes, etc.) are made color differentiated (e.g., with `aes(color = var)` inside the `geom_*()` function)
++  faceted figures  
+
+:::{.callout-important}
+The dataset has to be in long format to create these types of figures!!
+:::
+
+<br>
+
+### Wide v.s. Long
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is that problem made concrete. The dataset shown is wide: the years 2000 and 2001 have become column names, with yields underneath them. Now try to facet by year. You cannot, because there is no year variable to name; year is encoded in the column headers instead. The fix is the one from lecture 03-3: pivot_longer, to turn those columns back into a proper year variable. So reshaping is not a separate topic from plotting. Very often the reason a plot cannot be made is that the data is in the wrong shape, and pivot_longer is the answer.
+
+</details>
+
+For example consider the following dataset in a wide format:
+
+```{webr-r}
+#| context: output
+data.table(county_yield)[, .(county_code, corn_yield, year, state_name)] %>% 
+  filter(year %in% c(2000, 2001)) %>% 
+  dcast(county_code + state_name ~ year, value.var = "corn_yield")  
+```
+
+<br> 
+
+This dataset has county-level yields for Nebraska, Colorado, and Kansas stored in variables named `2000` and `2001` (they themselves represent years).
+
+Imagine creating boxplots of corn yield fill color-differentiated by state and faceted by year. You actually cannot specify `facet_grid()` properly because you do not have a single variable that represents `year`.
+
+You will find that reshaping wide datasets using `pivot_longer()` is very useful in creating figures.
+
+:::
+<!--end of panel--> 
+
+# Multiple datasets in one figure
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Multiple datasets in one figure
+
+::: {.panel-tabset}
+
+### Global v.s. local
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last topic is combining several datasets in one figure, and it rests on a distinction worth stating clearly. A dataset named inside ggplot is global: every geom you add afterwards uses it, unless told otherwise. A dataset named inside a particular geom is local: only that geom uses it, and it overrides the global one. Almost everything we have written so far used the global form without thinking about it. Once you know both exist, plotting two different datasets together becomes straightforward.
+
+</details>
+
+:::{.callout-important}
++ (Global) When a dataset is specified inside `ggplot()`, then the dataset is used in <span style = "color: red;"> ALL </span> of the subsequent `geom_*()` unless otherwise specified
++ (Local) When a dataset is specified inside of a `geom_*()`, the dataset is used only for the `geom_*()` over-riding the global dataset set inside `ggplot()`.
+:::
+
+### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first example is the ordinary case, to fix the pattern. The dataset is named once, inside ggplot, and then both geoms, the points and the smoothed line, use it without either mentioning it. That is the global dataset doing its job, and it is why every plot in the previous lecture worked with the data named only once at the top.
+
+</details>
+
+This works with `county_yield` used in both `geom_point()` and `geom_smooth()`.
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot(data = county_yield) + 
+  geom_point(aes(y = corn_yield, x = d3_5_9)) +
+  geom_smooth(aes(y = corn_yield, x = d3_5_9))
+```
+
+:::
+
+### Example 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the same figure written to fail, which is worth running so you see the error. Here ggplot is called empty, with no data at all. geom_point is given a dataset locally so it works fine. But geom_smooth is given nothing, and there is no global dataset for it to fall back on, so it has no idea what to draw. This is the most common error when people first start using local datasets: they move one dataset into a geom and forget that the other geom was silently relying on the global one.
+
+</details>
+
+This does not work because no global dataset is set inside `ggplot()` and no dataset is supplied to `geom_smooth()`.
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot() + 
+  geom_point(data = county_yield, aes(y = corn_yield, x = d3_5_9)) +
+  geom_smooth(aes(y = corn_yield, x = d3_5_9))
+```
+
+### Use multiple datasets
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is the payoff. Call ggplot empty, then give each geom its own data. The points come from the county-level data, showing every observation, and the line comes from the yearly averages, showing the trend through them. Two datasets, at two different levels of aggregation, in one figure. This is an extremely common pattern in published work: raw observations in the background, a summary or a fitted line on top. Now you know how it is done.
+
+</details>
+
+To use multiple datasets inside a single `ggplot` object (or a figure), you just need to specify what dataset to use locally inside individual `geom_*()`s.
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+#| out-width: 70%
+ggplot() +
+  geom_point(
+    data = county_yield, 
+    aes(y = corn_yield, x = year)
+  ) +
+  geom_line(
+    data = mean_yield, 
+    aes(y = corn_yield, x = year)
+  )
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+
+
+

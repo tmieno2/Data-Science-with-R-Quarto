@@ -1,0 +1,102 @@
+<!-- @dsCard group="Slide layouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Output box — colour options</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="_deck.css">
+<style>
+/* All four sit on Notebook paper #fbf9f3 with the shipped code block #f4f1e9
+   above them, because the only question that matters is whether OUTPUT reads as
+   a different kind of thing from CODE — not whether the swatch is pretty alone. */
+.wrap { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px;
+        max-width:1100px; }
+.opt { background:#fbf9f3; padding:20px 22px 22px; box-shadow:0 2px 12px rgba(0,0,0,.13); }
+.opt h3 { font-size:15px; margin:0 0 3px; color:#22201b; }
+.opt .hex { font-family:var(--font-mono); font-size:12px; color:#5d574a; margin:0 0 14px; }
+.opt pre { font-family:var(--font-mono); margin:0; padding:9px 12px; white-space:pre;
+           overflow:hidden; font-size:15px; line-height:1.35; border-radius:2px; }
+.opt pre.src { background:#f4f1e9; color:#22201b; border:1px solid #e2dcd0; }
+.opt pre.out { font-size:14px; color:#5d574a; margin-top:8px; }
+.opt .why { font-size:13px; color:#5d574a; line-height:1.5; margin:12px 0 0; }
+.fn { color:#6d28d9; } .str { color:#0b6b53; }
+
+/* A — cool grey */
+.a pre.out { background:#eceef0; }
+/* B — deeper warm */
+.b pre.out { background:#e9e3d5; }
+/* C — blue tint, accent family */
+.c pre.out { background:#e9eef5; }
+/* D — not a box: paper with a rule */
+.d pre.out { background:#fbf9f3; border-left:3px solid #cfc9bb; padding-left:14px;
+             border-radius:0; }
+
+h1.page { margin-bottom:4px; }
+.cur { font-size:13px; color:#52616b; max-width:1100px; line-height:1.55; margin:0 0 24px; }
+</style>
+
+<h1 class="page">R output box — four alternatives</h1>
+<p class="cur">
+  Currently <code>#efece3</code>, a warm grey that sits only 2% away from the code
+  block's <code>#f4f1e9</code> — close enough that on a projector the two blocks
+  can merge into one grey slab. Each option below is shown under the real code
+  block, since the pairing is the whole question.
+</p>
+
+<div class="wrap">
+  <div class="opt a">
+    <h3>A · Cool grey</h3>
+    <p class="hex">#eceef0</p>
+<pre class="src">corn_data <span class="fn">%>%</span> <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.</pre>
+    <p class="why">Separates by <b>temperature</b>, not lightness: code stays warm
+      (paper family, "what you wrote"), output goes cool ("what the machine said").
+      Reads clearly even on a washed-out projector. The most legible of the four.</p>
+  </div>
+
+  <div class="opt b">
+    <h3>B · Deeper warm</h3>
+    <p class="hex">#e9e3d5</p>
+<pre class="src">corn_data <span class="fn">%>%</span> <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.</pre>
+    <p class="why">Same hue family, just further down. Keeps the page entirely warm
+      and quiet. Weakest separation of the four — it is a lightness step only, so
+      it is the first to collapse on a bad projector.</p>
+  </div>
+
+  <div class="opt c">
+    <h3>C · Blue tint</h3>
+    <p class="hex">#e9eef5</p>
+<pre class="src">corn_data <span class="fn">%>%</span> <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.</pre>
+    <p class="why">Ties output to the ink-blue accent, so the deck has one cool
+      colour with one meaning. Strongest separation. Risk: blue is also the active
+      tab edge and the try-it rule, so it is doing a third job here.</p>
+  </div>
+
+  <div class="opt d">
+    <h3>D · No box — paper with a rule</h3>
+    <p class="hex">#fbf9f3 + 3px #cfc9bb</p>
+<pre class="src">corn_data <span class="fn">%>%</span> <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.</pre>
+    <p class="why">Output stops being a box and becomes an indented continuation of
+      the code. Quietest, and the only one that adds no new fill to a slide — which
+      matters on slides already at the 700px ceiling. Weakest if a student is
+      scanning for "where is the answer".</p>
+  </div>
+</div>

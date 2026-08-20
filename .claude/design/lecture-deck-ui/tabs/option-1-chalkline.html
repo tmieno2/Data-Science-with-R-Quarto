@@ -1,0 +1,94 @@
+<!-- @dsCard group="Tabs" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Tabs — Chalkline</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* CHALKLINE tabs — no fill at all.
+   Active = darkest text in the row + 2px accent underline + weight 700.
+   That reverses today's inverted hierarchy without adding a single pixel of
+   height, and removes the loudest object from the slide. */
+.spec { width: 966px; background: var(--paper); padding: 22px 24px 26px;
+        box-shadow: 0 2px 14px rgba(0,0,0,.14); margin-bottom: 6px;
+        box-sizing: border-box; font-size: var(--t-body); color: var(--ink); }
+.spec .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+             color: #8a8f98; margin-bottom: 12px; }
+
+.tabs { display: inline-block; border-bottom: 1px solid var(--rule);
+        margin-bottom: 12px; white-space: nowrap; max-width: 100%; }
+.tabs span { display: inline-block; font-size: var(--t-tab); padding: 3px 11px;
+             color: var(--ink-muted); border-bottom: 2px solid transparent;
+             margin-bottom: -1px; }
+.tabs span.on { color: var(--accent); border-bottom-color: var(--accent);
+                font-weight: 700; }
+.tabs span code { font-size: inherit; color: inherit; }
+
+/* nested: subordinate by SIZE and INDENT, never by fading.
+   A dotted rule and a smaller cap-height say "one level down"; the active label
+   stays full-strength ink so it never reads as disabled. */
+.tabs.nest { border-bottom: 1px dotted var(--rule); margin-left: 14px; }
+.tabs.nest span { font-size: 14.5px; padding: 2px 9px; }
+.tabs.nest span.on { color: var(--ink); border-bottom-color: var(--ink-muted);
+                     font-weight: 700; }
+
+.note { font-size: 13px; color: var(--ink-muted); margin: 10px 0 0; }
+.ok { color: #0f6b4a; font-weight: 600; }
+</style>
+
+<h1 class="page">Chalkline tabs — the fill goes away</h1>
+<p class="page">
+  Active is the darkest, heaviest label in the row with a 2px accent underline;
+  inactive is muted ink. Contrast on the active label is <span class="ok">6.31:1</span>
+  against white, versus 2.71:1 today — and it is now the most readable item in the
+  row rather than the least. Row height is unchanged, and the strip stops
+  competing with the slide title.
+</p>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">1 · Normal row — four tabs</div>
+  <div class="tabs">
+    <span class="on">Objectives</span><span>read.csv()</span
+    ><span>Working directory</span><span>Exercise</span>
+  </div>
+  <div>Tab content sits here.</div>
+  <p class="note"><span class="ok">Active #0f6b4a on white = 6.31:1 — passes AA.</span>
+     Inactive #52616b = 6.4:1, but at weight 400 against the active 700.</p>
+</div>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">2 · Long row — real headings from 02-2</div>
+  <div class="tabs">
+    <span>YAML</span><span>Creating a new slide</span
+    ><span class="on">Include R codes and results</span><span>Moving around</span
+    ><span>Exporting to PDF</span><span>Speaker notes</span>
+  </div>
+  <div>Six real labels, one line.</div>
+  <p class="note">Budget: 966px usable. This row measures ~700px, leaving room for
+     roughly two more labels of average length.</p>
+</div>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">3 · Labels containing inline code</div>
+  <div class="tabs">
+    <span class="on"><code>echo</code> and <code>eval</code></span
+    ><span>Example: <code>read.csv()</code></span><span><code>readRDS()</code></span>
+  </div>
+  <div>Code in a label inherits size and colour, so a label reads as one thing.</div>
+</div>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">4 · Nested tabset</div>
+  <div class="tabs">
+    <span class="on">Syntax and Examples</span><span>Your turn</span>
+  </div>
+  <div>
+    <div class="tabs nest">
+      <span class="on">Example 1</span><span>Example 2</span><span>Example 3</span>
+    </div>
+    <div style="padding-top:6px">Inner content.</div>
+  </div>
+  <p class="note">The inner row is smaller, indented, and sits on a dotted rule —
+     subordinate by structure. Its active label stays full-strength ink, so it
+     never reads as disabled the way the pale <code>#cfe9dd</code> fill does.</p>
+</div>

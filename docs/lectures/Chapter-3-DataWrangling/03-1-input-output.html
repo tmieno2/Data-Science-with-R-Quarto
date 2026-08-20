@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.31">
+
+  <title>Data Science with R (AECN 896-05) – 03-1: Importing Files and Exporting to Files</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <!--
+    Support for collapsible "Transcript" panels in revealjs decks.
+
+    Include it from a deck's YAML header, with the path relative to the qmd:
+
+        format:
+          revealjs:
+            include-in-header: ../transcript-support.html
+
+    Then add a transcript anywhere inside a slide (or inside a single tab of a
+    tabset, which is the usual case):
+
+        <details class="transcript">
+        <summary>Transcript</summary>
+
+        What the lecturer says about this tab.
+
+        </details>
+
+    It must live in the header rather than the body of a qmd: raw HTML placed
+    above the first "##" heading becomes its own untitled slide.
+
+    <details> is a native HTML element, so the collapse/expand works with no
+    JavaScript at all, including in a self-contained (embed-resources) file. The
+    script at the bottom adds one behaviour on top: collapsing an open panel when
+    the reader moves on. Without it everything still works, panels just keep their
+    open state.
+  -->
+  <style>
+  /* The panel is positioned against the slide rather than sitting in its normal
+     flow. That is the whole point: collapsed it costs the slide no vertical
+     space, and opened it overlays the content instead of pushing it off the
+     bottom edge. Each panel lives inside its own tab, and hidden tabs do not
+     render, so only the visible tab's transcript is ever shown. */
+  .reveal details.transcript {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 20;
+    width: auto;
+    font-size: 0.55em;
+    line-height: 1.45;
+    text-align: left;
+    border-radius: 6px;
+    /* custom.scss styles every bare <details> as an "answer box" (grey border
+       plus padding) for Quarto's folded-code blocks. Opt out of both here so the
+       collapsed pill is not sitting inside a grey rectangle. */
+    border: none;
+    padding: 0;
+  }
+
+  /* Collapsed: a small pill that hugs the top-right corner. */
+  .reveal details.transcript > summary {
+    display: inline-block;
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+    /* custom.scss pulls every bare <summary> with a negative margin; undo it. */
+    margin: 0;
+    padding: 0.15em 0.7em;
+    border: 1px solid #06a666;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #06a666;
+    font-weight: 600;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .reveal details.transcript > summary::-webkit-details-marker { display: none; }
+  .reveal details.transcript > summary::before { content: "\25B8\00A0"; }
+  .reveal details.transcript[open] > summary::before { content: "\25BE\00A0"; }
+
+  /* Opened: a tall, narrow panel down the right-hand side, where slide content
+     rarely reaches. It starts below the tab bar (which ends at 16.4% of slide
+     height on the busiest slide in 02-2) so tab names stay clickable while a
+     transcript is open, and runs down to just above the footer. */
+  .reveal details.transcript[open] {
+    top: 17%;
+    width: 36%;
+    max-height: 79%;
+    overflow-y: auto;
+    padding: 0.55em 0.85em 0.7em;
+    background: #f4fbf8;
+    border: 1px solid #06a666;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  }
+  .reveal details.transcript[open] > summary {
+    display: block;
+    padding: 0 0 0.4em 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  .reveal details.transcript p { margin: 0.35em 0; }
+
+  /* The logo defaults to the bottom-right, exactly where the transcript panel
+     runs. Move it to the bottom-left so the whole right-hand column stays free.
+     The 56px offset clears reveal's menu button, which occupies x 8-43px. */
+  .reveal .slide-logo {
+    right: auto !important;
+    left: 56px !important;
+  }
+  </style>
+
+  <script>
+  // Collapse any open transcript when the reader moves to another slide or
+  // another tab, so a panel left open never reappears over unrelated content.
+  (function () {
+    function closeAll() {
+      document.querySelectorAll("details.transcript[open]")
+        .forEach(function (d) { d.open = false; });
+    }
+
+    // Slide changes come from reveal, which is not ready when this runs.
+    function hookReveal() {
+      if (window.Reveal && typeof Reveal.on === "function") {
+        Reveal.on("slidechanged", closeAll);
+        Reveal.on("overviewshown", closeAll);
+        return true;
+      }
+      return false;
+    }
+    if (!hookReveal()) {
+      var tries = 0;
+      var timer = setInterval(function () {
+        if (hookReveal() || ++tries > 100) clearInterval(timer);
+      }, 100);
+    }
+
+    // Tab changes are plain clicks; capture so this runs before the tab switches.
+    document.addEventListener("click", function (e) {
+      var el = e.target;
+      if (el && el.closest && el.closest('.panel-tabset [role="tab"]')) closeAll();
+    }, true);
+  })();
+  </script>
+<meta property="og:title" content="03-1: Importing Files and Exporting to Files – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Chapter 3: Data Wrangling">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">03-1: Importing Files and Exporting to Files</h1>
+
+<div class="quarto-title-authors">
+</div>
+
+</section>
+<section class="slide level2">
+
+<!--
+================================================================================
+REVISED VERSION of 03-1-input-output.qmd
+
+Every change is marked with an HTML comment starting with "CHANGED:", "ADDED:",
+or "REMOVED:". None appear in the rendered slides. Delete once accepted.
+
+NOTE: this block must stay BELOW the YAML header.
+
+Change log at a glance:
+  A. Corrections .......... WRONG CLASS CLAIM for read_dta (it returns a tibble,
+                            the slide said data.frame), hard-coded absolute
+                            paths in chunks that actually execute, old
+                            {r eval = F} chunk headers, "pacakge", "obeject",
+                            dangling modifier in the readxl sentence, the
+                            "rownames" filename, the "r data set" gloss.
+  B. New material ......... here::here(), why setwd() fails in a rendered
+                            document (demonstrated), reading a sheet by name,
+                            excel_sheets(), skip/na for messy spreadsheets,
+                            col_types, reading from a URL, Windows paths, a
+                            "file not found" checklist, and an answer to the
+                            file-size question the original only asked.
+  C. Improvements ......... the Compare tab now shows differences that matter
+                            instead of only class(), the rds demo no longer
+                            writes a stray file into the repo, chunk labels.
+
+REPO HYGIENE (flagged, not changed): past renders committed build artifacts into
+this folder: a_list.rds, corn_yields_exp.csv/.dta/.rds,
+corn_yields_exp_rownames.csv. They are outputs of the lecture, not inputs, and
+could be deleted and gitignored.
+================================================================================
+-->
+<!-- CHANGED (C3): labelled the chunk, and added `here`, which this lecture now
+     teaches instead of only using it invisibly. -->
+<!-- ADDED (A2): a single place where the data folder is resolved. The original
+     pasted "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into
+     chunks that actually ran, so the lecture only rendered on Taro's computer.
+     Note it also spelled the folder "Lectures" with a capital L while the real
+     folder is "lectures"; that survived only because macOS ignores case. -->
+</section>
+<section>
+<section id="importing-and-exporting-datasets" class="title-slide slide level1 center">
+<h1>Importing and Exporting Datasets</h1>
+
+<div style="float:left">
+
+</div>
+<hr color="#EB811B" size="1px" width="796px">
+
+</section>
+<section id="importing-and-exporting-datasets-1" class="slide level2">
+<h2>Importing and Exporting Datasets</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Objectives</a></li><li><a href="#tabset-1-2">Directions</a></li><li><a href="#tabset-1-3">How</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Before you can wrangle any data you have to get it into R, and getting it out again matters just as much. Three objectives today. First, reading datasets in the four formats you will actually meet: csv, Excel, STATA, and R’s own rds. Second, writing R objects back out to files. And third, which is the one people underestimate, understanding where R looks for a file. That third objective is the middle third of this lecture and it is the part that goes wrong in assignments, because code that works on your machine and nowhere else is not much use to anybody.</p>
+</details>
+<ul>
+<li><p>Read datasets in various formats (<strong>csv</strong>, <strong>xlsx</strong>, <strong>dta</strong>, and <strong>rds</strong>) containing corn yields in Nebraska counties</p></li>
+<li><p>Write R objects as files in various formats</p></li>
+<li><p>Understand where R looks for a file, so that your code runs on someone else’s computer too <!-- ADDED: the third objective. It is what the middle third of this lecture is
+     really about, and it is the part students get wrong in assignments. --></p></li>
+</ul>
+</div>
+<div id="tabset-1-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two things to do before we go further. Clone the repository linked here, which holds the datasets this lecture uses, so you can follow along rather than watch. And install two packages: tidyverse, which is a whole collection we will lean on for the rest of the course, and haven, which is what reads STATA files. Install them once now. The callout makes the point that tidyverse does a great deal more than reading and writing files; today we are using one small corner of it.</p>
+</details>
+<ul>
+<li>Go <a href="https://github.com/tmieno2/data-science-course-supplementary-datasets">here</a> and clone the repository that hosts datasets used in this lecture</li>
+<li>Install the <code>tidyverse</code> and <code>haven</code> packages, which we will use to read and write files.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"tidyverse"</span>, <span class="st">"haven"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>The <code>tidyverse</code> package does far more than read and write files. We will cover it in much greater depth later.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>How do you know which function to use? You look at the file extension, the bit after the final dot, because that tells you how the data is stored. A csv is plain text that essentially every piece of software can open. An xlsx is Excel’s own format, and note it can hold more than one sheet, which matters later. A dta is STATA’s format, which you will meet constantly if you work around economists. And an rds is R’s own. The rule that follows is simple but absolute: you must use the function that matches the format. There is no universal read-this-file function.</p>
+</details>
+<p>You can tell how a dataset is stored from the file extension, the part that follows the final dot in the file name.</p>
+<ul>
+<li><p><strong>corn.csv</strong>: a plain text format that Microsoft Excel and almost everything else supports.</p></li>
+<li><p><strong>corn.xlsx</strong>: Microsoft Excel’s own format, which may hold more than one sheet.</p></li>
+<li><p><strong>corn.dta</strong>: a format that STATA supports (software that is immensely popular among economists).</p></li>
+<li><p><strong>corn.rds</strong>: a format that R supports.</p></li>
+</ul>
+<p>To import a dataset, you must use the function appropriate for the format that dataset is stored in.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="read-a-csv-file" class="slide level2">
+<h2>Read a CSV file</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1"><code>read.csv()</code></a></li><li><a href="#tabset-2-2"><code>read_csv()</code></a></li><li><a href="#tabset-2-3">Compare</a></li><li><a href="#tabset-2-4">Awkward files</a></li><li><a href="#tabset-2-5">From a URL</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Start with csv, and with the function that comes built into R: read.csv, with a dot. You give it a path to a file and it hands you back a data.frame. The syntax block shows the shape, and the example actually runs, reading the corn yields file. Note in passing how the example builds its path rather than typing one out; we come back to why that matters shortly. This function works, it needs no packages, and for a small clean file it is perfectly adequate. But it is not what I am going to recommend.</p>
+</details>
+<p>You can use <code>read.csv()</code> from the <code>base</code> package.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"path to the file to import"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- CHANGED (A3): the chunk header was ```{r eval = F}, the old R Markdown
+     style, while 02-1 teaches "#| eval: false". Applied throughout this file.
+     CHANGED: also switched "=" to "<-" for assignment, and quoted the
+     placeholder path so the line is at least syntactically valid R. -->
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>corn_yields_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Here is the alternative: read_csv, with an underscore, from the readr package, which comes with tidyverse. Notice the naming convention, because it runs through the whole tidyverse: underscores rather than dots. The call looks almost identical, you hand it a path and get your data back. The difference is in what you get back and how it behaves, and that is what the next tab is about. When you see both of these in code on the internet, and you will, the underscore version is the modern one.</p>
+</details>
+<p>You can use <code>read_csv()</code> from the <code>readr</code> package.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"path to the file to import"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>corn_yields_tbl <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>So what actually differs, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.</p>
+</details>
+<!-- CHANGED (C1): the original Compare tab printed class() for each and stopped
+     there. That tells a student the two objects differ without telling them
+     anything they can act on. The three differences below are the ones that
+     actually change what your code has to look like. -->
+<p><strong>1. What you get back</strong></p>
+<div class="side-out tight">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">class</span>(corn_yields_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.frame"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">class</span>(corn_yields_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame" </code></pre>
+</div>
+</div>
+</div>
+<p><strong>2. How it prints</strong></p>
+<p>A <code>tibble</code> shows the first 10 rows and the type of every column. A <code>data.frame</code> prints the entire object, which floods the screen for a large dataset.</p>
+<p><strong>3. What happens to awkward column names</strong></p>
+<p>If the file has a column called <code>county name</code>, with a space:</p>
+<ul>
+<li><code>read.csv()</code> renames it to <code>county.name</code></li>
+<li><code>read_csv()</code> keeps it as <code>county name</code>, and you refer to it with backticks</li>
+</ul>
+<div title="Which should you use?">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Which should you use?</strong></p>
+</div>
+<div class="callout-content">
+<p>Use <code>read_csv()</code>. It is faster on large files, it does not rename your columns behind your back, and it tells you which type it guessed for each column. This course uses the tidyverse throughout, so <code>tibble</code> is the object you want anyway.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Now a real-world problem the clean examples hide. read_csv guesses each column’s type by looking at the first rows, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.</p>
+</details>
+<!-- ADDED (B6): entire tab. read_csv guessing a column type wrongly is the most
+     common real-world import problem and the original never mentioned it. -->
+<p><code>read_csv()</code> guesses each column’s type from the first rows. When it guesses wrong, say a zip code read as a number and stripped of its leading zero, tell it directly:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">read_csv</span>(</span>
+<span id="cb10-2"><a></a>  <span class="st">"corn_yields.csv"</span>,</span>
+<span id="cb10-3"><a></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">county_code =</span> <span class="fu">col_character</span>())</span>
+<span id="cb10-4"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Other arguments worth knowing:</p>
+<ul>
+<li><code>skip = 2</code>: ignore the first 2 lines, for files with a title above the header</li>
+<li><code>na = c("", "NA", ".")</code>: treat these strings as missing</li>
+<li><code>col_names = FALSE</code>: the file has no header row</li>
+</ul>
+</div>
+<div id="tabset-2-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A small convenience with a warning attached. Anywhere read_csv accepts a file path, it also accepts a web address, so you can read a dataset straight off the internet without downloading it first. That is genuinely useful when you are exploring. But read the callout before you build anything on it: this re-downloads the file every single time you render, which is slow, and more importantly a URL can change or vanish without warning, taking your analysis with it. For anything you actually rely on, download it once, keep it in your project, and read the local copy.</p>
+</details>
+<!-- ADDED (B7): entire tab. Students find data online constantly and do not
+     realise they can skip the download entirely. -->
+<p><code>read_csv()</code> accepts a web address wherever it accepts a file path:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/user/repo/main/corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>This re-downloads the file every time you render. For anything you rely on, download it once, save it in your project, and read the local copy. A URL can change or disappear without warning.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="where-r-looks-for-your-files" class="slide level2 scrollable">
+<h2>Where R looks for your files</h2>
+<!-- CHANGED (B1/B2): this whole section was "Setting the working directory" and
+     taught setwd() as the main tool. That is the wrong default for a course
+     where everything is rendered: setwd() does not survive from one chunk to
+     the next (demonstrated in the "Why setwd fails" tab), and a hard-coded
+     path breaks on every other computer. here() is now the recommendation,
+     matching what 02-1 teaches and what this file already did in its own
+     hidden chunks. -->
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Working directory</a></li><li><a href="#tabset-3-2">Relative paths</a></li><li><a href="#tabset-3-3">RStudio projects</a></li><li><a href="#tabset-3-4"><code>here()</code> (recommended)</a></li><li><a href="#tabset-3-5">Avoid <code>setwd()</code></a></li><li><a href="#tabset-3-6">Windows paths</a></li><li><a href="#tabset-3-7">File not found</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. Once you know that, the simple case makes sense: if the working directory is your project folder and the file is sitting in it, then the bare file name is enough. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
+</details>
+<p>R always has one folder it treats as “here”, called the <strong>working directory</strong>. A path that does not start from the root of your disk is interpreted relative to it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling"</code></pre>
+</div>
+</div>
+<p>So if the working directory is your project folder, this is enough:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>corn_yield <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>You do not have to keep every file in one folder. A relative path lets you point at nearby folders starting from the working directory. Data slash the filename goes into a subfolder called data. Two dots followed by a slash goes up one level, to the folder containing your working directory. And you can combine them, going up one and then down into a different folder. The callout notes you can repeat the two dots to go up several levels. These are worth being fluent in, because a sensible project has data and code in separate folders, and relative paths are how they find each other.</p>
+</details>
+<p>You can point at files in nearby folders without writing the whole path:</p>
+<ul>
+<li><code>"data/corn_yields.csv"</code>: the <code>data</code> folder inside the working directory</li>
+<li><code>"../corn_yields.csv"</code>: one folder <strong>up</strong> from the working directory</li>
+<li><code>"../data/corn_yields.csv"</code>: up one, then into <code>data</code></li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>..</code> means “the folder above this one”. You can repeat it: <code>"../../corn_yields.csv"</code> goes up two levels.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>An R Project is the piece that makes all of this reliable, and if you take one practical habit from this lecture, make it this one. Creating a project sets the working directory for you, automatically, every time you open it, so you are never guessing where R thinks it is. You make one from the blue box with a plus in the upper left of RStudio, either starting a new folder or adopting one you already have. Do the exercise in the callout: make a project, close it, reopen it, and run getwd to confirm. This gives your project a fixed root, which is exactly what the next tab builds on.</p>
+</details>
+<p>An <strong>R Project</strong> sets the working directory for you, every time you open it.</p>
+<ul>
+<li>Click the blue box with a plus sign at the upper left corner of RStudio</li>
+<li>Click “New Directory” to start a new folder, or “Existing Directory” to adopt one you already have</li>
+</ul>
+<div title="Let's try">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Let’s try</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Create an R project</li>
+<li>Close and reopen it, then run <code>getwd()</code> and confirm it points at the project folder</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<p>This is the foundation for the next tab: it gives your project a fixed root that everything else can be measured from.</p>
+</div>
+<div id="tabset-3-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>And here is the recommendation. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.</p>
+</details>
+<!-- ADDED (B1): entire tab. -->
+<p>Inside an R Project, the <code>here</code> package builds paths from the project root:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"lectures"</span>, <span class="st">"Chapter-3-DataWrangling"</span>, <span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/corn_yields.csv"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Why this is the one to use:</p>
+<ul>
+<li>It works no matter which subfolder your qmd file sits in</li>
+<li>It works on any computer, because nothing above the project root is written down</li>
+<li>It works the same whether you run a chunk by hand or render the document</li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Run <code>here::here()</code> on its own to see which folder it decided is the root. It looks for your <code>.Rproj</code> file.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>You will see setwd in older code and all over the internet, and I want you to avoid it, for two independent reasons. The first is specific to the way we work and it surprises people: when you render a document, R resets the working directory after every single chunk. So calling setwd in one chunk has no effect at all on the next one, and the file-not-found error you get looks completely mysterious. The second reason is more general: the path you would write only exists on your computer, so your code cannot run anywhere else, including wherever it is being graded. getwd is a useful thing to check. setwd is not the way to change it.</p>
+</details>
+<!-- ADDED (B2): entire tab. The original taught setwd() with no warning. This
+     behaviour was verified by rendering a test document. -->
+<p>You will see <code>setwd()</code> in older code and on the internet:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">setwd</span>(<span class="st">"/Users/tmieno2/Dropbox/Data-Science-with-R-Quarto"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Avoid it, for two separate reasons.</p>
+<p><strong>1. It does not survive from one chunk to the next.</strong></p>
+<p>When you render, R resets the working directory after <strong>every</strong> chunk. So this does not do what it looks like it does:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a></a>```{r}</span>
+<span id="cb19-2"><a></a>setwd("some/other/folder")   # applies only inside this chunk</span>
+<span id="cb19-3"><a></a>```</span>
+<span id="cb19-4"><a></a></span>
+<span id="cb19-5"><a></a>```{r}</span>
+<span id="cb19-6"><a></a>read_csv("corn_yields.csv")  # back to the original folder. File not found.</span>
+<span id="cb19-7"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>2. The path only exists on your computer.</strong></p>
+<p>Nobody else has <code>/Users/tmieno2/...</code>, so your code cannot run anywhere else, including on the computer of whoever is grading it.</p>
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p><code>getwd()</code> is useful for checking where you are. <code>setwd()</code> is not the way to change it. Use an R Project plus <code>here()</code> instead.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-6">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
+</details>
+<!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
+     first week. -->
+<p>Windows shows paths with backslashes, but a backslash means something special inside an R string. Copying a path straight from File Explorer gives you this, which errors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:\Users</span><span class="sc">\t</span><span class="st">aro\data\corn_yields.csv"</span>)   <span class="co"># does not work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Two fixes, both fine:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>)    <span class="co"># forward slashes</span></span>
+<span id="cb21-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Using <code>here()</code> sidesteps this entirely, because you never write the top part of the path.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-7">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files.</p>
+</details>
+<!-- ADDED (B9): entire tab. "cannot open file" is the single most common error
+     in this chapter and the original offered no way to diagnose it. -->
+<p>The error looks like this:</p>
+<pre><code>Error: 'corn_yields.csv' does not exist in current working directory</code></pre>
+<p>Work through these in order:</p>
+<ol type="1">
+<li><code>getwd()</code>: where is R actually looking?</li>
+<li><code>list.files()</code>: what does R see in that folder? Compare against the name you typed.</li>
+<li>Check the <strong>extension</strong>. Windows hides extensions by default, so <code>corn_yields.csv</code> may really be <code>corn_yields.csv.txt</code>.</li>
+<li>Check spelling and capitalization. <code>Corn_Yields.csv</code> and <code>corn_yields.csv</code> are different files on some systems.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">getwd</span>()</span>
+<span id="cb23-2"><a></a><span class="fu">list.files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="read-a-sheet-from-an-xlsx-file" class="slide level2">
+<h2>Read a sheet from an xls(x) file</h2>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Instruction</a></li><li><a href="#tabset-4-2">Syntax and Examples</a></li><li><a href="#tabset-4-3">Sheets by name</a></li><li><a href="#tabset-4-4">Messy spreadsheets</a></li><li><a href="#tabset-4-5">Note</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Now Excel files. The function is read_excel from the readxl package, and there is one wrinkle worth stating clearly because it catches everybody. readxl is installed when you install tidyverse, so you already have it. But it is not loaded when you call library of tidyverse, unlike most of the others. So you have to load it explicitly with its own library call. If you get a could not find function read_excel error despite having tidyverse loaded, this is why.</p>
+</details>
+<ul>
+<li><p>You can use <code>read_excel()</code> from the <code>readxl</code> package to read data sheets from an <strong>xls(x)</strong> file.</p></li>
+<li><p><code>readxl</code> is installed when you install the <code>tidyverse</code> package, but it is <strong>not</strong> loaded when you run <code>library(tidyverse)</code>.</p></li>
+<li><p>So you have to load it yourself: <!-- CHANGED (A6/A5): the original sentence read "...to read data sheets from an
+     xls(x) file, which is part of the tidyverse package", where "which" appears
+     to refer to the file rather than to readxl. Also fixed "pacakge" and
+     replaced "you need to library the package", which uses library as a verb. --></p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>The syntax adds one argument you have not needed before: sheet. An Excel workbook can hold many sheets, so you have to say which one you want, and the simplest way is by number, with sheet equals one for the first. The examples show reading two different sheets from the same workbook into two different objects. That is the basic pattern, and it works. But referring to sheets by number has a weakness, which is what the next tab is about.</p>
+</details>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">read_excel</span>(<span class="st">"path to the file"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Examples</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">1</span>) <span class="co"># 1st sheet</span></span>
+<span id="cb26-2"><a></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">2</span>) <span class="co"># 2nd sheet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Here is that weakness. Sheet numbers are positional, so the moment somebody inserts a sheet at the front of the workbook, every number shifts by one and your code silently reads the wrong data. Silently is the problem; nothing errors. So use names instead. The function excel_sheets lists every sheet name in a workbook without you having to open Excel at all, which is useful in its own right. Then pass that name to the sheet argument instead of a number. It reads better and it survives somebody reorganizing the file.</p>
+</details>
+<!-- ADDED (B3): entire tab. Sheet numbers break the moment someone reorders the
+     workbook; names do not. And students need a way to see what the sheets are
+     called without opening Excel. -->
+<p>Referring to a sheet by number is fragile: insert a sheet and every number shifts. Use the name instead.</p>
+<p>First, list what is in the workbook:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">excel_sheets</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.xls"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "corn_yields_08" "corn_yields_09"</code></pre>
+</div>
+</div>
+<p>Then read the one you want:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="st">"2008"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-4-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>And now the reality of spreadsheets made by human beings, which almost never begin with a tidy header in the very first cell. There is usually a title, maybe a blank row, sometimes notes off to one side. Three arguments handle nearly all of it. skip ignores a given number of lines from the top, so the header row is found correctly. na lets you declare which strings should count as missing, and a dash or an empty cell often should. range reads one rectangle only, which is how you ignore notes scattered elsewhere on the sheet. And col_names FALSE for when there is genuinely no header.</p>
+</details>
+<!-- ADDED (B3): entire tab. Real spreadsheets almost never start with a clean
+     header in cell A1, and the original assumed they do. -->
+<p>Spreadsheets made by people rarely start with a tidy header row. Useful arguments:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">read_excel</span>(</span>
+<span id="cb30-2"><a></a>  <span class="st">"corn_yields.xlsx"</span>,</span>
+<span id="cb30-3"><a></a>  <span class="at">sheet =</span> <span class="st">"2008"</span>,</span>
+<span id="cb30-4"><a></a>  <span class="at">skip  =</span> <span class="dv">3</span>,               <span class="co"># a title and a blank row above the header</span></span>
+<span id="cb30-5"><a></a>  <span class="at">na    =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"-"</span>) <span class="co"># what counts as missing</span></span>
+<span id="cb30-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><code>range = "B3:F120"</code>: read one rectangle only, ignoring notes elsewhere on the sheet</li>
+<li><code>col_names = FALSE</code>: there is no header row at all</li>
+</ul>
+</div>
+<div id="tabset-4-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.</p>
+</details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
+</div>
+</div>
+<p>The data comes in as a <strong>tibble</strong>, the same object <code>read_csv()</code> produces.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="read-a-stata-data-file-.dta" class="slide level2">
+<h2>Read a STATA data file (.dta)</h2>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Syntax and Examples</a></li><li><a href="#tabset-5-2">Note</a></li><li><a href="#tabset-5-3">Labelled columns</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. There is nothing more to the basic case than that. The two tabs after this one cover the two things about STATA files that do occasionally surprise people.</p>
+</details>
+<p>Use the <code>read_dta()</code> function from the <code>haven</code> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">library</span>(haven)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- CHANGED (A3): the original had this twice, once with eval=FALSE to show and
+     once with echo=FALSE to actually run. One visible chunk that runs does the
+     same job with half the code. -->
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"corn_yields.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-5-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Check the class and you will see three things listed: tbl_df, tbl, and data.frame. So what did you actually get? A tibble, the same as everywhere else. The reason data.frame appears at the end of that list is explained in the callout, and it is worth understanding properly because it causes real confusion. A tibble is built on top of a data.frame, with extra behaviour layered over it, so it truthfully reports that it is also a data.frame. Seeing data.frame in that list does not mean you have a plain data.frame.</p>
+</details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
+</div>
+</div>
+<p><code>read_dta()</code> returns a <strong>tibble</strong>, just like <code>read_csv()</code> and <code>read_excel()</code>.</p>
+<!-- CHANGED (A1): THIS IS THE IMPORTANT ONE. The original said "Notice that the
+     data is converted into a data.frame object, not a tibble." That is wrong.
+     Verified by running it: class() returns
+     "tbl_df" "tbl" "data.frame", which is a tibble. A tibble always reports
+     data.frame as its last class because it is built on one, and that is
+     probably what caused the confusion. -->
+<div title="Why data.frame still shows up in the class">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Why data.frame still shows up in the class</strong></p>
+</div>
+<div class="callout-content">
+<p>A <code>tibble</code> reports three classes: <code>tbl_df</code>, <code>tbl</code>, and <code>data.frame</code>. The last one is there because a tibble <strong>is</strong> a data.frame underneath, with extra behavior layered on top. Seeing <code>data.frame</code> in the list does not mean you have a plain data.frame.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-5-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>One genuine oddity of STATA files. STATA lets you attach labels to variables, and haven preserves them, which means a column can come back as a special labelled type rather than a plain number. Most of the time this is invisible and harmless. But occasionally a column will refuse to behave in arithmetic or will plot strangely, and the labels are why. The fix is one function, zap_labels, which strips them off and leaves you with ordinary columns. Worth filing away, because when it happens the symptoms are baffling if you have never heard of it.</p>
+</details>
+<!-- ADDED: STATA files carry variable labels, which surprise people the first
+     time a column refuses to behave like a plain number. -->
+<p>STATA files often carry labels that R keeps as a <code>haven_labelled</code> column. If a column will not cooperate in arithmetic or plotting, strip the labels:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">zap_labels</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="read-an-rds-file" class="slide level2">
+<h2>Read an <strong>rds</strong> file</h2>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Instruction</a></li><li><a href="#tabset-6-2">Syntax and Examples</a></li><li><a href="#tabset-6-3">Note</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>The last format is R’s own, the rds file, and it is different in kind from the others. An rds file stores a single R object exactly as it is, and only R can read it. Note the wording carefully: a single R object, not necessarily a dataset. That distinction matters, and we come back to it when we export. Reading one needs no packages at all, because readRDS is built into R. This is the format you will use for saving your own intermediate results.</p>
+</details>
+<ul>
+<li><p>An <strong>rds</strong> file stores a single R object exactly as it is, and is read only by R. <!-- CHANGED (A9): the original glossed rds as "r data set", which is misleading
+     in a way the lecture then contradicts two slides later when it saves a
+     list. An rds file holds any single R object, not just a dataset. --></p></li>
+<li><p>You can use the <code>readRDS()</code> function to read an <strong>rds</strong> file.</p></li>
+<li><p>No special packages are necessary.</p></li>
+</ul>
+</div>
+<div id="tabset-6-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>The syntax is the simplest of the lot: readRDS, and a path. No sheet to specify, no package to load, no column types to worry about. That is because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. Which is exactly the point of the format, and it leads directly into the note on the next tab.</p>
+</details>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a><span class="fu">readRDS</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p><strong>Example</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>corn_yields <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"corn_yields.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-6-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Check the class here and you get a tibble again, but for a completely different reason than before. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
+</details>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
+</div>
+</div>
+<p><br></p>
+<p>The imported dataset is already a <code>tibble</code>. That is because the object that was saved into <strong>corn_yields.rds</strong> was a <code>tibble</code>, and an rds file gives you back exactly what was put in.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="export-an-r-object" class="slide level2">
+<h2>Export an R object</h2>
+<div class="panel-tabset">
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Instruction</a></li><li><a href="#tabset-8-2">Syntax and Examples</a></li><li><a href="#tabset-8-3">Notes on RDS</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Exporting is the mirror image of importing, and pleasantly the naming follows the same pattern, so you already half know it. write_csv for csv, write_dta for STATA, and saveRDS for rds. That last one also has a tidyverse-style alternative, write_rds, which does exactly the same thing with the arguments in tidyverse order. Pick whichever reads better to you. The general shape is the same across all of them, which is the next tab.</p>
+</details>
+<ul>
+<li><p>Exporting datasets works much the same way as importing them.</p></li>
+<li><p>Here is the list of functions that let you export a <code>data.frame</code> or <code>tibble</code> in different formats:</p>
+<ul>
+<li><strong>csv</strong>: <code>write_csv()</code></li>
+<li><strong>dta</strong>: <code>write_dta()</code></li>
+<li><strong>rds</strong>: <code>saveRDS()</code> (or <code>write_rds()</code> from <code>readr</code>, which is the same thing with tidyverse-style argument order)</li>
+</ul></li>
+</ul>
+</div>
+<div id="tabset-8-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>The syntax for every export function is the same: the object you want to save, then the file name to save it as. Object first, destination second. The examples show all three formats writing the same data. Now read the callout about Excel, because it is a genuine recommendation rather than a preference. A spreadsheet is a thing for people to look at, not a thing for code to read; saving results into one puts them somewhere that is harder to verify and trivially easy for somebody to edit by hand without leaving a trace. If a supervisor genuinely requires one, write_xlsx exists.</p>
+</details>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="fu">export_function</span>(object_name, <span class="st">"file name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- CHANGED (A10): "obeject" -> "object". -->
+<p><br></p>
+<p><strong>Examples</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co">#--- export as csv ---#</span></span>
+<span id="cb44-2"><a></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(corn_yields, <span class="st">"corn_yields_exp.csv"</span>)</span>
+<span id="cb44-3"><a></a></span>
+<span id="cb44-4"><a></a><span class="co">#--- export as dta ---#</span></span>
+<span id="cb44-5"><a></a>haven<span class="sc">::</span><span class="fu">write_dta</span>(corn_yields, <span class="st">"corn_yields_exp.dta"</span>)</span>
+<span id="cb44-6"><a></a></span>
+<span id="cb44-7"><a></a><span class="co">#--- export as rds ---#</span></span>
+<span id="cb44-8"><a></a><span class="fu">saveRDS</span>(corn_yields, <span class="st">"corn_yields_exp.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- CHANGED (A11): the csv filename was "corn_yields_exp_rownames.csv". There
+     are no row names involved anywhere here; write_csv has no such concept.
+     It was a leftover from an older write.csv(row.names = ...) example and only
+     confused things. -->
+<div title="Writing Excel files">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Writing Excel files</strong></p>
+</div>
+<div class="callout-content">
+<p>Avoid writing Excel files. A spreadsheet is for people to look at, not for code to read, and saving results into one puts them in a format that is harder to check and easy to edit by hand. If you genuinely need one, use <code>writexl::write_xlsx()</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- CHANGED: replaced the bare "# just don't do it" comment with the reason,
+     plus the function to use when the requirement is real (a supervisor or a
+     journal asking for a spreadsheet). -->
+</div>
+<div id="tabset-8-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two things worth knowing about rds specifically, in the tabs here. The first is that it preserves any R object, not just datasets. The example saves a list containing both a character vector and a whole dataset, and gets the identical list back. Try to do that with a csv and you cannot even begin. The second tab answers the practical question of which format to choose. rds is smallest, but size is the least interesting consideration. The real trade-off is that csv can be opened by anything in twenty years but forgets every type, while rds preserves everything perfectly but only R can read it. The callout gives a sensible default: keep raw data as csv, save intermediate results as rds.</p>
+</details>
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Object type preservation</a></li><li><a href="#tabset-7-2">Which format should you use?</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
+<p>You can export any kind of R object as an <strong>rds</strong> file, not just a dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>a_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="st">"R"</span>, <span class="st">"rocks"</span>), <span class="at">b =</span> corn_yields)</span>
+<span id="cb45-2"><a></a></span>
+<span id="cb45-3"><a></a>rds_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"a_list.rds"</span>)</span>
+<span id="cb45-4"><a></a></span>
+<span id="cb45-5"><a></a><span class="fu">saveRDS</span>(a_list, rds_path)</span>
+<span id="cb45-6"><a></a></span>
+<span id="cb45-7"><a></a><span class="fu">readRDS</span>(rds_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$a
+[1] "R"     "rocks"
+
+$b
+# A tibble: 161 × 9
+    Year State  FIPS County_name State_name Commodity `Data item`      Irrigated
+   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;                &lt;int&gt;
+ 1  2008    31 31019 BUFFALO     NEBRASKA   CORN      CORN, GRAIN - Y…         0
+ 2  2008    31 31019 BUFFALO     NEBRASKA   CORN      CORN, GRAIN, IR…         1
+ 3  2008    31 31041 CUSTER      NEBRASKA   CORN      CORN, GRAIN - Y…         0
+ 4  2008    31 31041 CUSTER      NEBRASKA   CORN      CORN, GRAIN, IR…         1
+ 5  2008    31 31047 DAWSON      NEBRASKA   CORN      CORN, GRAIN - Y…         0
+ 6  2008    31 31047 DAWSON      NEBRASKA   CORN      CORN, GRAIN, IR…         1
+ 7  2008    31 31077 GREELEY     NEBRASKA   CORN      CORN, GRAIN - Y…         0
+ 8  2008    31 31077 GREELEY     NEBRASKA   CORN      CORN, GRAIN, IR…         1
+ 9  2008    31 31079 HALL        NEBRASKA   CORN      CORN, GRAIN - Y…         0
+10  2008    31 31079 HALL        NEBRASKA   CORN      CORN, GRAIN, IR…         1
+# ℹ 151 more rows
+# ℹ 1 more variable: Yield &lt;int&gt;</code></pre>
+</div>
+</div>
+<!-- CHANGED (C2): the original wrote a_list.rds into the lecture folder every
+     time the document rendered, and that file is now sitting in the repository.
+     Writing to tempdir() demonstrates exactly the same point and cleans up
+     after itself. -->
+<p>A list goes in, and a list comes back out, with every column type intact.</p>
+</div>
+<div id="tabset-7-2">
+<!-- CHANGED (C4): the original tab asked "Which one is the smallest?" and then
+     simply stopped, leaving the question hanging. Here is the answer, plus the
+     part that actually matters more than size. -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="fu">data.frame</span>(</span>
+<span id="cb47-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
+<span id="cb47-3"><a></a>  <span class="at">KB   =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(dir_ch3,</span>
+<span id="cb47-4"><a></a>           <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>))) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
+<span id="cb47-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             file   KB
+1 corn_yields.csv 14.7
+2 corn_yields.dta  8.8
+3 corn_yields.rds  1.5</code></pre>
+</div>
+</div>
+<p><strong>rds</strong> is the smallest, because it is compressed and stores R’s own representation.</p>
+<p>But size is the least important consideration:</p>
+<ul>
+<li><strong>csv</strong>: anyone can open it, in any software, in 20 years. But it forgets every type: dates come back as text, factors come back as text.</li>
+<li><strong>rds</strong>: gives you back the exact object, types and all. Only R can read it.</li>
+<li><strong>dta</strong>: use it when you need to hand data to someone working in STATA.</li>
+</ul>
+<div title="A reasonable default">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>A reasonable default</strong></p>
+</div>
+<div class="callout-content">
+<p>Keep your <strong>raw</strong> data as csv, so it stays readable by anything. Save <strong>intermediate results</strong> as rds, so the types survive between scripts.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/">back to the lecture slides on the course website</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

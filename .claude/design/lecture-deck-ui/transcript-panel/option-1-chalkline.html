@@ -1,0 +1,118 @@
+<!-- @dsCard group="Transcript panel" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Transcript panel — Chalkline rail</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* CHALKLINE transcript — a right rail on an opaque card, with a scrim.
+   Three changes from today:
+     1. type up from 10.56px to 13px (0.68em) — readable while talking
+     2. an opaque card + a light scrim over the slide, so the panel is clearly
+        ON TOP rather than tangled with the content it half-covers
+     3. the panel is anchored to the tab row by a CSS custom property the deck
+        sets once, not by a hard-coded 17% derived from one slide in 02-2 */
+.sys-chalkline h2 { font-size: var(--t-h2); color: var(--ink); font-weight: 600;
+                    margin: 0 0 10px; padding-bottom: 7px;
+                    border-bottom: 2px solid var(--accent); }
+.tabs { display:inline-block; border-bottom:1px solid var(--rule); margin-bottom:14px;
+        white-space:nowrap; }
+.tabs span { display:inline-block; font-size:var(--t-tab); padding:3px 11px;
+             color:var(--ink-muted); border-bottom:2px solid transparent;
+             margin-bottom:-1px; }
+.tabs span.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:700; }
+
+/* collapsed: an ink marker, not a green capsule. It no longer reads as a tab. */
+.tr { position:absolute; top:34px; right:42px; z-index:20; text-align:left;
+      font-size:13px; line-height:1.5; }
+.tr > .sum { display:inline-block; padding:2px 9px 3px; background:var(--tint);
+             color:var(--ink); font-weight:700; font-size:11.5px;
+             letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+             border:0; border-bottom:2px solid var(--accent); border-radius:2px 2px 0 0; }
+
+/* the scrim: only present when open */
+.scrim { position:absolute; inset:0; background:rgba(255,255,255,.62); z-index:15; }
+
+/* open: full-height rail, anchored below the tab row */
+.tr.open { top: var(--tabrow-bottom, 118px); right:0; bottom:52px; width:352px;
+           padding:14px 18px 14px 16px; background:var(--paper);
+           border-left:3px solid var(--accent); overflow:hidden;
+           box-shadow:-10px 0 26px rgba(0,0,0,.10); }
+.tr.open > .sum { display:block; background:transparent; border-bottom:1px solid var(--rule);
+                  border-radius:0; padding:0 0 7px; margin-bottom:9px;
+                  color:var(--accent); }
+.tr.open p { margin:0 0 9px; color:var(--ink); }
+.tr.open code { font-size:12.5px; }
+.ok { color:#0f6b4a; font-weight:600; }
+.note { font-size:13px; color:#52616b; max-width:1050px; margin:10px 0 0; }
+</style>
+
+<h1 class="page">Chalkline — a right rail, opaque, at readable size</h1>
+<p class="page">
+  Type goes from 10.56px to <b>13px</b>. The panel sits on an opaque card over a
+  light scrim, so it is unambiguously an overlay rather than something tangled
+  into the slide. It starts at <code>--tabrow-bottom</code>, a value the deck sets
+  once, replacing the 17% magic number.
+</p>
+
+<p class="caption"><b>1 · Collapsed.</b> An ink marker under a short accent rule.
+  It is a different shape, weight and colour from a tab, in the same corner.</p>
+<div class="stage sys-chalkline safeline">
+  <div class="tr"><span class="sum">Transcript</span></div>
+  <h2>Summarizing by group</h2>
+  <div class="tabs"><span>Syntax</span><span class="on">Example</span><span>Your turn</span></div>
+  <p>Chain the verbs together with the pipe:</p>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>2 · Open.</b> Same two-column slide as
+  <code>current.html</code>. The plot is still covered — a rail cannot avoid that
+  — but the scrim makes it read as "put aside", and the tab row stays above the
+  panel and clickable.</p>
+<div class="stage sys-chalkline safeline">
+  <h2>Yields by county</h2>
+  <div class="tabs"><span>Code</span><span class="on">Plot</span></div>
+  <div class="two-col">
+    <div>
+<pre class="src"><span class="fn">ggplot</span>(county_means) +
+  <span class="fn">geom_col</span>(
+    <span class="fn">aes</span>(x = county, y = mean_yield)
+  ) +
+  <span class="fn">theme_bw</span>()</pre>
+    </div>
+    <div style="background:#eef1f4;height:250px;display:grid;place-items:center;
+                color:#8a8f98;font-size:15px;border:1px solid #dde1e6">[ plot output ]</div>
+  </div>
+  <div class="scrim"></div>
+  <div class="tr open">
+    <span class="sum">Transcript</span>
+    <p>So the pipe is the thing to get comfortable with today. Read
+       <code>%&gt;%</code> as "and then". We take the corn data, and then we keep
+       only Nebraska, and then we split it by county, and then we take a mean.</p>
+    <p>Notice I never assigned anything to an intermediate variable. That is the
+       whole point — you can read the chain top to bottom as a sentence.</p>
+    <p>If you have used base R you might be reaching for nested function calls.
+       Resist that for now; we will come back to when nesting is the clearer
+       choice in Chapter 5.</p>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+<p class="note">
+  <span class="ok">Marker text is ink #1a1f24 on #eef5f1 — 13.9:1.</span>
+  Panel body 13px ink on white. Rail is 352px against today's 378px (36%), and it
+  runs the full height instead of stopping at 79%, so more of the transcript is
+  visible at once despite the larger type.
+</p>

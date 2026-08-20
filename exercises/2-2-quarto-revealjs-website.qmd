@@ -1,0 +1,471 @@
+---
+title: "Ex-2-2: Revealjs Slides and Websites"
+abstract: "Quarto"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+All of these are done in RStudio. Work in the `quarto-practice` project from
+[Ex-2-1](2-1-quarto-basics.qmd), and keep your `quarto-examples` clone open in
+a Finder or Explorer window, because two exercises copy files out of it.
+
+# Turn a report into a deck
+
+A revealjs deck is not a different kind of document. It is the same document
+with a different output format, and this exercise exists to make that concrete.
+
+**Task.**
+
+1. Copy `first.qmd` from Ex-3-1 to `slides.qmd`.
+2. Change `format: html` to `format: revealjs`, and render.
+3. Look at what happened to your headings.
+4. Take your longest slide and split it in two with a second `##`.
+5. Add a `#` heading somewhere, and note how it differs from `##`.
+
+::: {.callout-important title="It worked if"}
+The deck opens in a browser, the arrow keys move between slides, and pressing
+`o` shows every slide at once.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+---
+title: "Corn yields in Nebraska"
+format: revealjs
+---
+```
+
+Every `##` became the title of a new slide, and everything beneath it became
+that slide's content. A single `#` produces a section-divider slide instead.
+
+That is the entire slide-breaking rule, and it has a useful consequence:
+restructuring a deck is just moving headings around. There is no slide object to
+drag, no master to fight with.
+:::
+
+::: {.callout-warning collapse="true" title="If you got a blank first slide"}
+Anything between the YAML header and the first `##` becomes its own untitled
+slide. A stray HTML comment, a `<style>` block, a leftover sentence. Move it
+below a heading or delete it.
+
+While you are here, press `o` and check the whole deck for blank slides. They
+are easy to miss when you are paging through one at a time.
+:::
+
+# Fit two things side by side
+
+**Task.** Build one slide with a figure on the left and the bullets explaining
+it on the right, roughly two thirds / one third. Then make the bullets appear
+one at a time as you press the arrow key.
+
+::: {.callout-important title="It worked if"}
+Nothing overflows the bottom of the slide, and the first arrow press reveals a
+bullet rather than jumping to the next slide.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+## Yields by irrigation status
+
+:::: {.columns}
+
+::: {.column width="65%"}
+```{r}
+#| echo: false
+ggplot(corn) + geom_boxplot(aes(x = factor(Irrigated), y = Yield))
+```
+:::
+
+::: {.column width="35%"}
+::: {.incremental}
+- Irrigated fields yield more
+- The gap widens in dry years
+- The spread is narrower under irrigation
+:::
+:::
+
+::::
+````
+
+Two things to notice. The outer `::::` has four colons because it wraps the two
+three-colon column blocks; the outer fence always needs strictly more colons
+than the ones inside it. Getting this wrong produces a slide where the columns
+do not appear and your content stacks vertically instead.
+
+And `.incremental` wraps the *list*, not the slide, because it is a property of
+the list.
+:::
+
+# Reveal things in an order you choose
+
+`.incremental` walks down a list in order. Fragments let you decide what appears
+when, and in what sequence.
+
+**Task.**
+
+1. Make a slide with three separate paragraphs, revealed one at a time.
+2. Make one of them appear **second** even though it is written third.
+3. Make one of them fade out again after being shown.
+
+::: {.callout-important title="It worked if"}
+The middle paragraph on screen is not the middle paragraph in your source file.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+## Fragments
+
+::: {.fragment}
+This appears first.
+:::
+
+::: {.fragment .fade-out}
+This appears next, then fades away.
+:::
+
+::: {.fragment fragment-index=1}
+This is written last but appears second.
+:::
+````
+
+`fragment-index` sets the order explicitly and overrides source order. Other
+useful variants are `.fade-in`, `.fade-out`, `.highlight-red`, and
+`.semi-fade-out` for dimming a point rather than removing it.
+
+Use these sparingly. One well-chosen reveal focuses attention; six of them make
+an audience wait for a machine.
+:::
+
+# Rescue a slide with too much on it
+
+**Task.**
+
+1. Deliberately overload a slide: paste in a long code chunk and a large table
+   so the content runs off the bottom.
+2. Fix it two different ways, one slide each: shrink everything on the slide,
+   and let the slide scroll.
+3. Say which you would use for a table of results, and which for one long code
+   chunk.
+
+::: {.callout-important title="It worked if"}
+In one version everything is visible at a smaller size. In the other the content
+stays full size and scrolls with the mouse.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```markdown
+## A slide with a lot on it {.smaller}
+
+## A slide with a lot on it {.scrollable}
+```
+
+`.smaller` is right when the audience needs the whole thing at once, for example
+a results table where the comparison across rows *is* the point.
+
+`.scrollable` is right when they only need one part at a time, for example
+walking through a long function line by line.
+
+`.scrollable` is a quiet trap in a live talk: anything below the fold is
+invisible to everyone who is not driving, and presenters routinely forget it is
+there. If the content genuinely does not fit, the honest fix is usually two
+slides.
+:::
+
+# Walk an audience through code
+
+Showing thirty lines of code at once tells an audience nothing. Highlighting
+three lines at a time tells them everything.
+
+**Task.**
+
+1. Put a chunk of eight to ten lines on a slide, code only, not run.
+2. Make it step through: first the whole thing dimmed, then lines 1 to 2, then
+   line 5, then lines 7 to 9.
+3. Add line numbers.
+
+::: {.callout-important title="It worked if"}
+Pressing the arrow key moves the highlight without advancing the slide.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| eval: false
+#| code-line-numbers: "|1-2|5|7-9"
+corn <-
+  read_csv(here("data", "corn_yields.csv"))
+
+corn_summary <-
+  corn %>%
+  filter(Year == 2008) %>%
+  group_by(Irrigated) %>%
+  summarize(mean_yield = mean(Yield)) %>%
+  arrange(desc(mean_yield))
+```
+````
+
+The pipes in `code-line-numbers` separate the steps. A leading `|`, as here,
+means "start with nothing highlighted", which is usually what you want so the
+audience sees the shape of the code before you start pointing at it.
+
+This is the single most useful revealjs feature for teaching code, and it is
+worth reaching for whenever a chunk is longer than about five lines.
+:::
+
+# Tabsets
+
+**Task.** Put three versions of the same figure on one slide, in tabs, so you
+can flip between them while talking rather than jumping between slides.
+
+::: {.callout-important title="It worked if"}
+Clicking a tab changes the figure and the slide does not advance.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+## Three ways to show the same thing
+
+::: {.panel-tabset}
+
+### Boxplot
+
+```{r}
+#| echo: false
+ggplot(corn) + geom_boxplot(aes(x = factor(Irrigated), y = Yield))
+```
+
+### Histogram
+
+```{r}
+#| echo: false
+ggplot(corn) + geom_histogram(aes(x = Yield))
+```
+
+### Density
+
+```{r}
+#| echo: false
+ggplot(corn) + geom_density(aes(x = Yield, fill = factor(Irrigated)))
+```
+
+:::
+````
+
+The `###` headings inside the tabset become the tab labels. Tabsets are how
+these lecture notes fit a whole section onto one slide, and they are the main
+tool for keeping a deck from sprawling.
+
+One warning: tabs are invisible in a PDF export. Everything flattens into one
+long slide. If the deck has to work as a handout, use them lightly.
+:::
+
+# Make the figures the right size
+
+Figure sizing on slides confuses everybody once, because there are two different
+things you can change and they do different jobs.
+
+**Task.**
+
+1. Put a figure on a slide and render. It is probably too big.
+2. Shrink it by changing how large the *image file* is drawn.
+3. Undo that, and shrink it instead by changing how much of the *slide* it
+   occupies.
+4. Compare the two results, looking specifically at the axis text.
+
+::: {.callout-important title="It worked if"}
+In one version the text shrinks with the figure. In the other it stays the same
+size and the figure gets smaller around it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| fig-width: 5
+#| fig-height: 3
+#| echo: false
+ggplot(corn) + geom_point(aes(x = FIPS, y = Yield))
+```
+
+```{r}
+#| out-width: "60%"
+#| echo: false
+ggplot(corn) + geom_point(aes(x = FIPS, y = Yield))
+```
+````
+
+`fig-width` and `fig-height` are in inches, and they set the size of the canvas
+R draws on. Text is drawn at a fixed point size on that canvas, so a smaller
+canvas means *relatively larger* text.
+
+`out-width` scales the finished image on the slide, shrinking everything
+together, text included.
+
+For slides you almost always want `fig-width`/`fig-height`, because tiny axis
+labels are the most common defect in a student deck and scaling with
+`out-width` makes them worse. Draw a smaller figure rather than shrinking a
+large one.
+:::
+
+# Make it look like the course decks
+
+**Task.**
+
+1. Copy `templates/custom.scss` and `templates/nebraska-n.jpg` from your
+   `quarto-examples` clone into `quarto-practice`.
+2. Apply the stylesheet to `slides.qmd`.
+3. Add the image as a logo, and a footer with your name.
+4. Open `custom.scss` in RStudio, change one colour, and re-render.
+
+::: {.callout-important title="It worked if"}
+The logo appears on every slide, including ones you never touched, and your
+colour change is visible.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+---
+title: "Corn yields in Nebraska"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    logo: nebraska-n.jpg
+    footer: "Your Name | AECN 896-05"
+---
+```
+
+`theme: [default, custom.scss]` means "start from the default theme, then apply
+my changes on top of it". Writing `theme: custom.scss` on its own throws the
+default away, and most things immediately stop looking like anything.
+
+Inside the scss file, the block between `/*-- scss:defaults --*/` and
+`/*-- scss:rules --*/` is where variables like `$body-bg` and `$link-color`
+live. Changing a variable there is usually easier than writing a new rule.
+:::
+
+# Speaker notes and a PDF
+
+**Task.**
+
+1. Add speaker notes to two slides.
+2. Present the deck and open the speaker view. Confirm your notes appear there
+   and not on the slide.
+3. Export the whole deck to PDF.
+
+::: {.callout-important title="It worked if"}
+The PDF has one page per slide and your speaker notes are not in it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+## A slide
+
+Some content everyone can see.
+
+::: {.notes}
+Remember to explain why the 2012 drought shows up so clearly here.
+:::
+````
+
+Press `s` while presenting for the speaker view. It opens a second window with
+your notes, a preview of the next slide, and a timer. Put that on your laptop
+and the deck on the projector.
+
+For the PDF: add `?print-pdf` to the end of the deck's URL in Chrome, then use
+the browser's print dialog and save as PDF. Incremental content and fragments
+flatten onto a single page, which is usually what you want in a handout but is
+worth checking before you distribute it.
+:::
+
+# Share a deck that survives the trip
+
+**Task.**
+
+1. Render the deck, then move **only** `slides.html` to your Desktop and open
+   it.
+2. Fix the problem, re-render, and repeat.
+
+::: {.callout-important title="It worked if"}
+The deck opens on the Desktop with its theme, logo, and figures intact, and no
+folder alongside it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+format:
+  revealjs:
+    embed-resources: true
+```
+
+Same lesson as the html report in Ex-3-1, and it bites harder here, because a
+deck depends on the reveal.js library itself and not just on your figures.
+Without it, a deck sent by email arrives as a column of unstyled text.
+:::
+
+::: {.callout-warning collapse="true" title="If your deck is blank apart from the footer"}
+You are opening the file directly off your disk and the browser is refusing to
+load the scripts the deck needs. This is a browser security rule, not a mistake
+on your part.
+
+Either add `embed-resources: true`, or use `quarto preview slides.qmd` while you
+are working, which serves the deck properly and reloads it every time you save.
+:::
+
+# Websites: add a page and wire it up
+
+Start a fresh project for this one.
+
+**Task.**
+
+1. `File -> New Project -> New Directory -> Quarto Website`. Render it and look
+   at the two pages you were given.
+2. Open `_quarto.yml` and find the navbar section.
+3. Create `analysis.qmd` with a heading, a sentence, and a figure.
+4. Add it to the navbar so it appears in the menu.
+5. Render the whole site and click your new link.
+
+::: {.callout-important title="It worked if"}
+Your page is reachable by clicking, not by typing its filename into the address
+bar.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+website:
+  title: "My site"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: about.qmd
+        text: About
+      - href: analysis.qmd
+        text: Analysis
+```
+
+Creating the file is not enough. `_quarto.yml` is what decides the structure of
+the site, and a `.qmd` that nothing links to is a page nobody can find.
+
+Notice also that the rendered site goes to a separate output folder. You edit
+the `.qmd` files and never the rendered output, because the next full render
+overwrites all of it.
+:::
+
+::: {.callout-tip collapse="true" title="Two extras worth trying"}
+Group pages under a dropdown:
+
+```yaml
+      - text: Results
+        menu:
+          - href: analysis.qmd
+            text: Analysis
+          - href: robustness.qmd
+            text: Robustness
+```
+
+And add `freeze: auto` under `execute:` in `_quarto.yml`. Without it, every
+render re-runs every page on the site, which becomes unbearable at about page
+ten.
+:::

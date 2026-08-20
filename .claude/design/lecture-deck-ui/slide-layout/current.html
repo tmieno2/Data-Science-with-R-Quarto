@@ -1,0 +1,116 @@
+<!-- @dsCard group="Slide layouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Slide layout — current</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* Today's values, measured from the rendered 03-1 deck. Nothing here is a
+   proposal — this is what ships. */
+.sys-today {
+  --paper: #fff;  --ink: #222;  --ink-muted: #52616b;
+  --accent: #06a666;  --accent-2: #760dd8;  --accent-sub: #f59219;
+  --tint: #f1f7f4;  --tint-2: #fdf6ec;
+  --rule: #ddd;  --code-bg: #F7FDFF;  --out-bg: #f8f2f6;  --radius: 4px;
+}
+.sys-today h1 { font-size: var(--t-h1); color: #222; font-weight: 600;
+                margin: 0 0 18px; }
+.sys-today h2 { font-size: var(--t-h2); color: #f59219; font-weight: 600;
+                margin: 0 0 12px; }
+.sys-today h3 { font-size: var(--t-h3); margin: 0 0 10px; }
+.sys-today strong { color: #d60da1; }
+.sys-today hr { height: .5px; border: 0; background: #da792a; margin: 14px 0; }
+
+/* the shipped folder tabs */
+.t-list { display: inline-block; border-bottom: 2px solid #06a666;
+          margin-bottom: 9.6px; white-space: nowrap; }
+.t-tab  { display: inline-block; font-size: var(--t-tab); padding: 2.448px 8.976px;
+          color: #52616b; border: 1px solid transparent; border-bottom: none;
+          border-radius: 5px 5px 0 0; margin-bottom: -2px; }
+.t-tab.on { background: #06a666; border-color: #06a666; color: #fff;
+            font-weight: 600; }
+
+/* the shipped transcript pill */
+.pill { position: absolute; top: 34px; right: 42px; font-size: var(--t-trans);
+        color: #06a666; border: 1px solid #06a666; border-radius: 999px;
+        background: #fff; font-weight: 600; padding: 1.584px 7.392px;
+        white-space: nowrap; }
+
+.title-slide { display: flex; flex-direction: column; justify-content: center;
+               height: 100%; text-align: center; padding-bottom: 60px; }
+</style>
+
+<h1 class="page">Slide layout — what ships today</h1>
+<p class="page">
+  Faithful reproduction at true size, from computed styles measured in the
+  rendered <code>03-1-input-output.html</code>. The dashed red line marks 640px,
+  leaving 60px for footer and breathing room.
+</p>
+
+<p class="caption"><b>1 · Title slide.</b> h1 40px, centred.</p>
+<div class="stage sys-today">
+  <div class="title-slide">
+    <h1>03-1: Importing and Exporting Datasets</h1>
+    <div style="font-size:var(--t-body);color:#52616b">
+      Chapter 3: Data Wrangling<br>Taro Mieno · University of Nebraska–Lincoln
+    </div>
+  </div>
+  <div class="logo tr">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption">
+  <b>2 · Concept slide.</b> The orange h2 is the measured <code>#f59219</code>
+  on white — <b>2.13:1</b>, below the 3:1 floor for large text.
+</p>
+<div class="stage sys-today safeline">
+  <span class="pill">▸ Lecturer transcript</span>
+  <h2>Importing and Exporting Datasets</h2>
+  <div class="t-list">
+    <span class="t-tab on">Objectives</span>
+    <span class="t-tab">read.csv()</span>
+    <span class="t-tab">Working directory</span>
+    <span class="t-tab">Exercise</span>
+  </div>
+  <ul>
+    <li>Read a <code>.csv</code> file into R as a <strong>data.frame</strong></li>
+    <li>Understand what the <strong>working directory</strong> is, and why a path
+        that works on your machine will not work on mine</li>
+    <li>Write a dataset back out to disk</li>
+    <li>Know when to reach for <code>readRDS()</code> instead</li>
+  </ul>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption">
+  <b>3 · Code + output slide.</b> The most common shape in the course, and the
+  one that runs out of room. Code block 16px on <code>#F7FDFF</code>, printed
+  output 14.4px on <code>#f8f2f6</code>.
+</p>
+<div class="stage sys-today safeline">
+  <span class="pill">▸ Lecturer transcript</span>
+  <h2>Summarizing by group</h2>
+  <div class="t-list">
+    <span class="t-tab">Syntax</span>
+    <span class="t-tab on">Example</span>
+    <span class="t-tab">Your turn</span>
+  </div>
+  <p>Chain the verbs together with the pipe:</p>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+  &lt;chr&gt;         &lt;dbl&gt;
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+  <p>Each <code>%>%</code> passes the result on the left into the function on the
+     right as its first argument.</p>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>

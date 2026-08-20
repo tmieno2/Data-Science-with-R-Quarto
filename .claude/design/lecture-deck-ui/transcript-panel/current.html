@@ -1,0 +1,107 @@
+<!-- @dsCard group="Transcript panel" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Transcript panel — current</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* Faithful to lectures/transcript-support.html at measured values. */
+.sys-today {
+  --paper:#fff; --ink:#222; --ink-muted:#52616b; --accent:#06a666;
+  --accent-2:#760dd8; --tint:#f1f7f4; --rule:#ddd;
+  --code-bg:#F7FDFF; --out-bg:#f8f2f6; --radius:4px;
+}
+.sys-today h2 { font-size: var(--t-h2); color:#f59219; font-weight:600; margin:0 0 12px; }
+
+.t-list { display:inline-block; border-bottom:2px solid #06a666; margin-bottom:9.6px;
+          white-space:nowrap; }
+.t-tab  { display:inline-block; font-size:16.32px; padding:2.448px 8.976px;
+          color:#52616b; border:1px solid transparent; border-bottom:none;
+          border-radius:5px 5px 0 0; margin-bottom:-2px; }
+.t-tab.on { background:#06a666; border-color:#06a666; color:#fff; font-weight:600; }
+
+/* collapsed pill: absolute top-right, 10.56px */
+.tr { position:absolute; top:34px; right:42px; font-size:10.56px; line-height:1.45;
+      text-align:left; z-index:20; }
+.tr > .sum { display:inline-block; padding:1.584px 7.392px; border:1px solid #06a666;
+             border-radius:999px; background:#fff; color:#06a666; font-weight:600;
+             white-space:nowrap; }
+
+/* open: top 17%, width 36%, max-height 79% */
+.tr.open { top:17%; right:0; width:36%; max-height:79%; overflow:hidden;
+           padding:.55em .85em .7em; background:#f4fbf8; border:1px solid #06a666;
+           box-shadow:0 6px 22px rgba(0,0,0,.16); border-radius:6px; }
+.tr.open > .sum { display:block; padding:0 0 .4em 0; border:none; border-radius:0;
+                  background:transparent; }
+.tr.open p { margin:.35em 0; }
+.ratio { font-size:13px; color:#c81e1e; font-weight:600; margin:10px 0 0; }
+</style>
+
+<h1 class="page">Transcript panel — what ships today</h1>
+<p class="page">
+  Reproduced from <code>lectures/transcript-support.html</code> at measured
+  values. 348 of these exist across 12 decks.
+</p>
+
+<p class="caption"><b>1 · Collapsed.</b> The pill, in the top-right corner, a few
+  pixels from a row of tabs in the same green.</p>
+<div class="stage sys-today safeline">
+  <div class="tr"><span class="sum">▸ Lecturer transcript</span></div>
+  <h2>Summarizing by group</h2>
+  <div class="t-list">
+    <span class="t-tab">Syntax</span><span class="t-tab on">Example</span
+    ><span class="t-tab">Your turn</span>
+  </div>
+  <p>Chain the verbs together with the pipe:</p>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>2 · Open, on a two-column slide.</b> The panel lands on the
+  plot — the material the transcript is describing.</p>
+<div class="stage sys-today safeline">
+  <div class="tr open">
+    <span class="sum">▾ Lecturer transcript</span>
+    <p>So the pipe is the thing to get comfortable with today. Read
+       <code>%&gt;%</code> as "and then". We take the corn data, and then we keep
+       only Nebraska, and then we split it by county, and then we take a mean.</p>
+    <p>Notice I never assigned anything to an intermediate variable. That is the
+       whole point — you can read the chain top to bottom as a sentence.</p>
+    <p>If you have used base R you might be reaching for nested function calls.
+       Resist that for now.</p>
+  </div>
+  <h2>Yields by county</h2>
+  <div class="t-list">
+    <span class="t-tab">Code</span><span class="t-tab on">Plot</span>
+  </div>
+  <div class="two-col">
+    <div>
+<pre class="src"><span class="fn">ggplot</span>(county_means) +
+  <span class="fn">geom_col</span>(
+    <span class="fn">aes</span>(x = county, y = mean_yield)
+  ) +
+  <span class="fn">theme_bw</span>()</pre>
+    </div>
+    <div style="background:#eef1f4;height:250px;display:grid;place-items:center;
+                color:#8a8f98;font-size:15px;border:1px solid #dde1e6">
+      [ plot output ]
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+<p class="ratio" style="max-width:1050px">
+  Pill text #06a666 on white = 2.71:1 (fails). Panel body is 10.56px. The panel
+  covers the right-hand column, which on this slide is the plot.
+</p>

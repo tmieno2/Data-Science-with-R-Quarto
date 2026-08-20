@@ -1,0 +1,1587 @@
+---
+title: "08-1: Making Tables with `flextable`"
+abstract: "Chapter 8: Make Tables"
+format:
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'gt', 'flextable', 'officer', 'tidyr']
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+```{r}
+#| include: false
+library(gt)
+library(tidyr)
+library(flextable)
+library(officer)
+library(flipbookr)
+library(tidyverse)
+
+#--- Quarto-compatible chunk_reveal() ---#
+#--- remotes::install_github("tmieno2/flipbookrq") ---#
+library(flipbookrq)
+```
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks: the stacked lines bottom left for a table of contents, and the letter o for a panel view of every slide. Worth knowing on this deck more than most, because between the sections there are three animated walkthroughs that step through a long pipeline one line at a time. Those take up quite a few slides each. If you are hunting for a specific function rather than watching an animation, the table of contents will get you there far faster than arrowing through. You can always come back to the animations once you know what you are looking for.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes work as usual: blue area is an editor, Run Code runs it, copy button takes it to your machine. One thing particular to this deck, though. Almost every table you see here was built when the slides were rendered, on my machine, rather than in your browser. flextable produces rich output that does not travel well through browser R. So treat the code here as something to copy into RStudio rather than something to run in place. The handful of genuinely live cells on this deck are mostly help pages.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+# Create tables with the `flextable` package 
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+```{r }
+#| label: taste-flextable
+#| cache: false
+#| include: false 
+head(mtcars, 20) %>% #BREAK
+  dplyr::select(am, carb, gear, mpg, drat) %>% #BREAK
+  flextable() %>% #BREAK
+  theme_vanilla() %>% #BREAK 
+  set_header_labels(mpg = "miles per gallon") %>% #BREAK 
+  autofit() %>% #BREAK 
+  merge_v(j = c("am", "carb")) %>% #BREAK 
+  italic(j = 1) %>% #BREAK 
+  bg(bg = "#C90000", part = "header") %>% #BREAK 
+  color(color = "blue", j = 5) %>% #BREAK 
+  color(color = "red", i = 5:10, j = 2) %>% #BREAK 
+  color(color = "white", part = "header") %>% #BREAK 
+  bold(~ drat > 3.2, ~ gear, bold = TRUE) %>% #BREAK 
+  align(j = 1) %>% #BREAK
+  fontsize(i = 12:18, size = 8) %>% #BREAK
+  add_footer_row(values = "blah blah", colwidths = 5) %>% #BREAK
+  border_outer(fp_border(color="red", width = 2)) %>% #BREAK 
+  line_spacing(space = 1.5) %>% #BREAK
+  theme_tron()
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "taste-flextable",
+  title = "Taste of the flextable package",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Create table and modify Parts
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two packages to install before anything else. flextable is the one that makes tables. officer is the one that describes formatting, and it matters more than it looks, because the fp underscore functions you will use all afternoon to specify text, paragraph and cell properties live in officer rather than in flextable. That split catches people out. You will be halfway through a flextable pipeline and reaching for an officer function. Install and load both, and do not be surprised when the help page for something you are using turns out to belong to the other package.
+
+</details>
+
+Install the following packages and library them.
+
+```{r}
+#| eval: false
+#--- install if you have not ---#
+install.packages("flextable")
+install.packages("officer")
+
+#--- library ---#
+library(flextable)
+library(officer)
+```
+
+### Data Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The dataset for the rest of the lecture. It comes from countrypops in the gt package, filtered to ten Pacific and Australasian countries and three years, then pivoted so each year becomes its own column. Ten rows, deliberately small enough that you can see the whole table on a slide and check that your formatting did what you expected. Note the region column built with case when, because we use it repeatedly for row selection later. And the ratio column at the bottom has been renamed: it divides twenty fifteen by twenty oh five, so oh five to fifteen is the honest name.
+
+</details>
+
+```{r}
+#--- Define regions ---#
+Australasia <- c("AU", "NZ")
+Melanesia <- c("NC", "PG", "SB", "VU")
+Polynesia <- c("PF", "WS", "TO", "TV")
+
+library(gt)
+
+#--- create a dataset ---#
+(
+tab_data <- 
+  countrypops %>%
+  dplyr::filter(country_code_2 %in% c(
+    Australasia, Melanesia, Polynesia
+  )) %>%
+  dplyr::filter(year %in% c(1995, 2005, 2015)) %>%
+  mutate(region = case_when(
+    country_code_2 %in% Australasia ~ "Australasia",
+    country_code_2 %in% Melanesia ~ "Melanesia",
+    country_code_2 %in% Polynesia ~ "Polynesia",
+  )) %>%
+  pivot_wider(
+    values_from = population,
+    names_from = year,
+    names_prefix = "y_"
+  ) %>%
+  dplyr::arrange(region, desc(y_2015)) %>%
+  dplyr::select(-starts_with("country_code")) %>%
+  mutate(
+    #--- CHANGED: was named pop_ratio_10_15, but it divides 2015 by 2005 ---#
+    pop_ratio_05_15 = y_2015 / y_2005,
+    date = "2013-11-14"
+  )
+)
+```
+
+
+### Initiate a table
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Turning a data frame into a flextable is one function call. The interesting argument is col keys, which does two jobs at once. It selects which columns appear, and it sets the order they appear in, so you do not need a separate select step beforehand. Then look at the odd string in the example, the one that is clearly not a column name. Naming something that does not exist does not throw an error. It creates a blank column, deliberately, and blank columns are how you put visual gaps between groups of columns in a finished table.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How
+
+We can apply `flextable()` to a `data.frame` to initiate a table:
+
+```{r eval = F}
+flextable(
+  tab_data, 
+  col_keys = 
+    c(
+      "country_name",
+      "lufhierh",
+      "region",
+      "y_1995",
+      "y_2005"
+    )
+ )
+```
+
+where `col_keys` are the list of the name of the variables from the `data.frame` (providing variable names that do not exist in the dataset creates blank columns) 
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+flextable(
+  tab_data,
+  col_keys = 
+    c(
+      "country_name", 
+      "lufhierh", 
+      "region", 
+      "y_1995", 
+      "y_2005"
+    )
+)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+flextable(
+  tab_data,
+  col_keys = c("country_name", "lufhierh", "region", "y_1995", "y_2005")
+)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Selector
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Nearly every formatting function in flextable takes the same two arguments, so learning them once buys you the whole package. i selects rows, j selects columns. What makes them flexible is that each accepts several forms. Rows can be a formula describing a condition, a vector of row numbers, or a vector of TRUEs and FALSEs. Columns can be a formula, column names, or column numbers. And you can mix them freely. The next four tabs work through the combinations, and once you have seen them, the rest of this deck is just naming which property to change.
+
+</details>
+
+Many functions let you choose specifically where you apply changes. Those functions have 
+
++ `i` for selecting rows 
+  * formula 
+  * integer vector 
+  * logical vector
++ `j` for selecting columns
+  * formula
+  * character vector
+  * integer vector
+
+You can use any combinations of the reference methods for `i` and `j`.
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This creates ft, the table object we build on for most of the rest of the lecture. Four columns, ten rows, no formatting yet. Worth pausing on the fact that it is stored in a variable at all. A flextable is just an object, so you can build it once and pipe it into different formatting experiments without rebuilding it each time. Every example from here starts from ft and adds one thing, which makes it easy to see what each function actually did. Run it and look at the plain version, so you have a baseline to compare against.
+
+</details>
+
+We will be building on `ft` created below:
+ 
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+ft <-
+  tab_data %>% 
+  flextable(
+    col_keys = 
+      c(
+        "country_name",
+        "region",
+        "y_1995",
+        "y_2005"
+      )
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### i, j: formula
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The formula form, and it is the one worth defaulting to. For rows you write a tilde and then a condition using the column names directly, so tilde y two thousand five greater than two hundred thousand selects exactly the rows where that holds. For columns you write a tilde and then the column names joined with plus signs. That plus is not addition, it is just formula syntax for listing several things. The appeal is that the selection describes itself. Somebody reading the code later sees which rows and why, rather than numbers they have to work out.
+
+</details>
+
+**Syntax**
+
+```{r eval = F}
+function(
+  i = ~ condition based on variables,
+  j = ~ variable 1 + variable 2 + ...,
+  .
+)
+```
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  color(
+    i = ~ y_2005 > 2e5,
+    j = ~ country_name + region,
+    color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  color(
+    i = ~ y_2005 > 2e5,
+    j = ~ country_name + region,
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+### i, j: integer, character
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same job with plain numbers and plain names. Row numbers as a vector, column names as strings. This works, and sometimes it is the clearest thing to write, particularly when you genuinely do mean the fourth row rather than a row satisfying some condition. The note at the top prefers formulas for columns, and its reason is mostly typing, since a formula avoids the quotes. But there is a stronger argument it does not make. Hard-coded row numbers break silently when your data changes. A formula that says which rows you meant keeps working.
+
+</details>
+
+Using a character vector for `j` is not recommended because using a formula involves less typing.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  color(
+    i = c(2, 4:9),
+    j = c("country_name", "y_1995"),
+    color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  color(
+    i = c(2, 4:9),
+    j = c("country_name", "y_1995"),
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### i, j: logical, integer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the third form: a logical vector for rows, column numbers for columns. The logical vector has to be exactly as long as the table has rows, which is why the example builds ten TRUEs and FALSEs for a ten-row table. Get that length wrong and you get either an error or, worse, a recycled pattern selecting rows you did not intend. This form is most useful when you have computed the condition somewhere else and are carrying it around as a variable. If you are writing the condition inline, the formula version reads better.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  color(
+    i = rep(c(TRUE, FALSE), each = 5),
+    j = c(1, 3),
+    color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  color(
+    i = rep(c(TRUE, FALSE), each = 5),
+    j = c(1, 3),
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### by parts
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A table is not one thing, it is three: a header, a body and a footer. The part argument says which you are formatting, and forgetting it is the single most common reason a formatting call appears to do nothing at all. Note that all really does mean all, footer included; this slide previously said otherwise. Then read the last line carefully, because it is a genuine trap. Different functions default to different parts. So when a change does not appear where you expected it, check the default before concluding the function is broken.
+
+</details>
+
+You can refer to parts of the table using `part =` option. The available options are
+
++ `header`: the header part of the table
++ `footer`: the footer part of the table
++ `body`: the body part of the table
++ `all`: [every]{style="color: blue;"} part of the table -- body, header **and** footer <!-- CHANGED: said "the body and the header parts". Verified by applying color(part="all") to a flextable with a footer row: the footer text turns red too. -->
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  color(
+    part = "header",
+    color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  color(
+    part = "header",
+    color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Different functions have different default values for `part`.
+
+:::
+<!--end of panel-->
+
+## Style
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The style function is the general-purpose way to format a table, and its structure tells you how flextable thinks. You select where with i, j and part, then say what to change using one of three property arguments. pr underscore t for text, pr underscore p for paragraphs, pr underscore c for cells. Each takes a matching function from officer: fp underscore text, fp underscore par, fp underscore cell. The pr stands for property. Hold on to that pairing and the next several tabs are simply working through what each of the three can control.
+
+</details>
+
+You can use the `style()` function to change the style and format of a table.  
+
+**Syntax**
+
+```{r eval = F}
+style(
+  x,
+  i = NULL,
+  j = NULL,
+  pr_t = NULL,
+  pr_p = NULL,
+  pr_c = NULL,
+  part = "body"
+)
+```
+
+We can use `fp_*()` functions from the `officer` package to specify the style of **texts**, **paragraphs**, and **cells**.
+
++ `pr_t = fp_text()`: format texts 
++ `pr_p = fp_par()`: format paragraphs
++ `pr_c = fp_cell()`: format cells <!-- CHANGED: was fp_celll() with three l's. officer has no such function; students copying this line get an error. -->
+
+(`pr` in `pr_* =`  stands for property.)
+
+
+### `fp_text()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first of the three, and the one you will use most. fp underscore text controls anything about the characters themselves: colour, size, bold, italic, underline, the font. The nested Introduction tab points you at the help page rather than listing every option, which is the right instinct, because there are a lot of them and you will look them up every time regardless. Then the example applies red, bold and underlined to three rows of one column at once. Notice that where and what stay separate, which is exactly the separation the selector tabs set up.
+
+</details>
+
+::: {.panel-tabset}
+#### Introduction
+
+`fp_text()` lets you update the appearance of texts, including color, font size, bold or not, etc (see the help page below for the complete list of options).
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?fp_text
+```
+
+#### Example 
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_t = 
+      fp_text(
+        color = "red",
+        bold = TRUE,
+        underlined = TRUE
+      )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_t = 
+      fp_text(
+        color = "red",
+        bold = TRUE,
+        underlined = TRUE
+      )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+:::
+<!--end of panel-->
+
+### paragraph vs cell
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This distinction confuses everybody at first, so look at what the example draws. Inside every cell there is a paragraph, and inside the paragraph there is text. Three nested boxes. So a bottom border on the paragraph and a bottom border on the cell are different lines in different places, which is precisely what the blue and red borders show you. As a rule of thumb: if you are positioning text within its box, that is the paragraph. If you are changing the box itself, its background or its borders, that is the cell.
+
+</details>
+
++ `paragraphs`: rectangular boxes around the texts inside the cells 
++ `cells`: rectangular boxes that contain paragraphs and texts inside 
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    pr_p = fp_par(
+      border.bottom = fp_border(width = 2, color = "blue")
+    ),
+    pr_c = fp_cell(
+      border.bottom = fp_border(width = 2, color = "red")
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  style(
+    pr_p = fp_par(
+      border.bottom = fp_border(width = 2, color = "blue")
+    ),
+    pr_c = fp_cell(
+      border.bottom = fp_border(width = 2, color = "red")
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### `fp_par()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The paragraph properties. This is where text alignment lives, along with shading, paragraph-level borders and spacing. The example sets alignment to left and adds grey shading to three cells in one column. Worth noting that alignment is a paragraph property rather than a text property, which is not obvious until you think about the nesting from the previous tab. Alignment is about where text sits inside its box, so it belongs to the box immediately containing it, and that is the paragraph. If you go looking for alignment in fp underscore text, you will not find it.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`fp_par()` lets you update the appearance of paragraphs <!-- CHANGED: prose said fp_paragraph(), which does not exist in officer. The tab title and the example code both correctly use fp_par(). --> (see the help page below for the complete list of options).
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?fp_par
+```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_p = fp_par(
+      text.align = "left",
+      shading.color = "grey"
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_p = fp_par(
+      text.align = "left",
+      shading.color = "grey"
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### `fp_cell()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third of the three, controlling the cell itself: background colour, margins, vertical alignment, and cell borders. The example sets three of those at once on a small selection. Note that background colour lives here even though shading appeared under paragraphs, which is the sort of overlap that sends you to the help page. In practice you will rarely write the full style call with fp underscore cell, because the convenience functions on the next slide do the common jobs in a single line. Learn this one so you understand what those shortcuts are doing underneath.
+
+</details>
+
+::: {.panel-tabset}
+#### Introduction
+
+`fp_cell()` lets you update the appearance of cells (see the help page below for the complete list of options).
+
+<br>
+
+**Syntax**
+
+```{r}
+?fp_cell
+```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_c = fp_cell(
+      margin = 2,
+      vertical.align = "top",
+      background.color = "red"
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  style(
+    i = 4:6,
+    j = ~ country_name,
+    pr_c = fp_cell(
+      margin = 2,
+      vertical.align = "top",
+      background.color = "red"
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Formatting: convenience functions 
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything you have just learned with style and the fp functions has a shortcut. Rather than building a property object, you call a function named after the thing you want: bg for background, color for text colour, bold, italic, fontsize, align, and so on. The full list is on screen. They all take the same i, j and part selectors, so there is nothing new to learn about where. This is what you will actually write day to day. The style route matters when you want several properties at once, or when no convenience function exists for what you need.
+
+</details>
+
++ Instead of using the `style()` function in combination with `fp_*()` functions, you can easily work on a specific aesthetic feature using convenience functions like below:
+  * `align()`, `align_text_col()`, `align_nottext_col()`: Set text alignment
+  * `bg()`: Set background color
+  * `font()`: Set font
+  * `fontsize()`: Set font size
+  * `italic()`: Set italic font
+  * `bold()`: Set bold font
+  * `color()`: Set font color
+  * `padding()`: Set paragraph paddings
+  * `valign()`: Set vertical alignment
+  * `rotate()`: rotate cell text
+  * `empty_blanks()`: make blank columns as transparent
+
++ You can use the selector syntax to specify where the specified effects take place
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three convenience functions chained together, and this is what real formatting code looks like. One call colours a single cell, one shades a column conditionally on a value, one bumps the font size of a row. Read them and notice each specifies its own where. That is the pattern: a pipeline of small independent instructions, each saying which cells it applies to. And because they are just functions in a pipe, you can comment one out to see what it was doing, which is much the easiest way to debug a table that has come out looking wrong.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  color(
+    i = 1,
+    j = 2,
+    "#fcba03"
+  ) %>%
+  bg(
+    i = ~ y_2005 < 2e5,
+    j = c("region"),
+    bg = "grey"
+  ) %>%
+  fontsize(
+    i = 7,
+    size = 16
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  color(i = 1, j = 2, "#fcba03") %>%
+  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>%
+  fontsize(i = 7, size = 16)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+:::
+<!--end of panel-->
+
+```{r format-flip, cache = F, include = F}
+tab_data %>% #BREAK 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% #BREAK 
+  #--- text color ---#
+  color(i = 1, j = 2, "#fcba03") %>% #BREAK 
+  #--- background ---#
+  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>% #BREAK 
+  #--- font type ---#
+  font(i = 5, j = ~ country_name + y_2005, fontname = "Times") %>% #BREAK 
+  #--- font size ---#
+  fontsize(i = 7, size = 16) %>% #BREAK 
+  #--- italicize ---#
+  italic(j = 2) %>% #BREAK 
+  #--- bold ---#
+  bold(j = 4) %>% #BREAK 
+  #--- vertical text alignment ---#
+  valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% #BREAK 
+  #--- text direction ---#
+  rotate(i = 1, j = 2, rotation = "tbrl") 
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "format-flip",
+  title = "Demonstration: Formatting",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Borders: convenience functions  
+
+::: {.panel-tabset}
+
+### List of functions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Borders get their own family of functions, and the list looks longer than it is. There are really three groups. hline and vline draw lines wherever you select. The top, bottom, left and right variants are shortcuts for the edges. And the inner and outer functions treat the table as a whole. Then two odd ones worth remembering. border remove strips everything, which is often the right first step when you want full control. And fix border issues exists because merging cells can leave the borders in a mess, and this puts them right.
+
+</details>
+
+Here is a list of convenience functions that you can use to draw border lines on a table:
+
++ `hline()`: set horizontal borders
++ `hline_bottom()`: set bottom horizontal border
++ `hline_top()`: set top horizontal border
++ `vline()`: set vertical borders
++ `vline_left()`: set flextable left vertical borders
++ `vline_right()`: set flextable right vertical borders
++ `border()`: Set cell borders
++ `border_inner()`: set vertical & horizontal inner borders
++ `border_inner_h()`: set inner borders
++ `border_inner_v()`: set vertical inner borders
++ `border_outer()`: set outer borders
++ `border_remove()`: remove borders
++ `fix_border_issues()`: fix border issues when cell are merged
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things to combine here. The selector syntax you already know says where the border goes. Then the border argument, taking fp underscore border from officer, says what it looks like: colour, style, width. Note that fp underscore border is another officer function, like fp underscore text and fp underscore cell earlier. That is the consistent division across this package. flextable decides which cells, officer describes the appearance. Keep that split in mind and you will usually guess correctly which of the two packages a function you half remember belongs to.
+
+</details>
+
++ Use the selector syntax to specify where
++ Use the `border = ` option along with `fp_border()` from the `officer` package to specify what kind of borders you would like to draw
+
+**Example**
+
+```{r eval = F}
+hline(
+    i = 3, 
+    j = 1:3, 
+    border = fp_border( 
+      color = "red", 
+      style = "dotted", 
+      width = 4 
+    ) 
+  ) 
+```
+
+
+### `fp_border()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The border description itself, and it takes only a few arguments: colour, style and width. Style is the one worth experimenting with, since dotted, dashed and solid change the character of a table quite a lot. The example draws a thick red dotted line under part of row three. Worth noticing that fp underscore border knows nothing about tables at all. It just describes a line, and flextable applies it wherever you selected. That is why the same border object can be handed to hline, to vline, or to the border function for individual cells.
+
+</details>
+
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`fp_border()` lets you specify the aesthetics of the borders you are drawing.
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?fp_border
+```
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  hline(
+    i = 3, 
+    j = 1:3, 
+    border = fp_border(
+      color = "red",
+      style = "dotted",
+      width = 4
+    )
+  ) 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  hline(
+    i = 3, 
+    j = 1:3, 
+    border = fp_border(
+      color = "red",
+      style = "dotted",
+      width = 4
+    )
+  ) 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+```{r borders-f}
+#| cache: false
+#| include: false
+tab_data %>% #BREAK 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% #BREAK 
+  #--- remove all borders ---#
+  border_remove() %>% #BREAK
+  #--- horizontal lines ---#
+  hline(i = 3, j = 1:3, border = fp_border(color = "red")) %>% #BREAK 
+  #--- horizontal line at the bottom ---#
+  hline_bottom(j = 3:4, border = fp_border(color = "green")) %>% #BREAK 
+  #--- horizontal line at the top ---#
+  hline_top(j = 1:3, border = fp_border(color = "orange")) %>% #BREAK 
+  #--- vertical lines ---#
+  vline(border = fp_border(color = "orange")) %>% #BREAK 
+  #--- vertical on the left edge  ---#
+  vline_left(border = fp_border(color = "grey", width = 2)) %>% #BREAK 
+  #--- vertical on the right edge  ---#
+  vline_right(border = fp_border(color = "red", width = 2)) %>% #BREAK 
+  #--- borders of individual cells ---#
+  border(i = 4, j = 2, 
+    border.top = fp_border(color = "red", width = 3),
+    border.left = fp_border(color = "green", width = 3),
+    border.right = fp_border(color = "black", width = 3),
+    border.bottom = fp_border(color = "pink", width = 3)
+  ) %>% #BREAK 
+  #--- horizontal lines (inner) ---#
+  border_inner_h(border = fp_border(color = "black")) %>% #BREAK 
+  #--- vertical lines (inner) ---#
+  border_inner_v(border = fp_border(color = "black")) %>% #BREAK 
+  border_remove() %>% #BREAK 
+  #--- the outer lines ---#
+  border_outer(border = fp_border(color = "red", width = 4)) 
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "borders-f",
+  title = "Demonstration: Borders",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Headers and footers 
+
+::: {.panel-tabset}
+
+### `add_*_row()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Adding rows above or below the table, and the useful part is colwidths. You give it the values you want, then say how many columns each value spans, so three and one puts a label across the first three columns and another across the last. That is how you build the grouped headers you see in published tables. Then read the callout, because it points you somewhere better for footnotes. add footer row will put text at the bottom, but the footnote function does that and manages the reference symbols for you, which is almost always what you actually want.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+You can use these functions to add a row to the top or the bottom of a table:
+
++ `add_header_row()`
++ `add_footer_row()`
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+add_*_row(flextable, 
+  values = vector of characters, 
+  colwidths = vector of integers 
+)
+```
+
+<br>
+
+**Example**
+
+```{r eval = F}
+add_header_row(
+  values = c("3-column label", "1-column label"),
+  colwidths = c(3, 1)
+)
+```
+
+This code would insert a row where "3-column label" spans for three columns and "1-column label" spans for one column.
+
+<br>
+
+:::{.callout-note}
+You might want to use `footnote()` to create footnotes instead of `add_footer_row()`, as it allows you to generate reference symbols at the same time. <!-- CHANGED: said add_footer_rows, which does not exist. The function is singular. -->
+:::
+  
+#### Example
+
+```{r}
+ft %>% 
+  add_header_row(
+    values = c("3-column label", "1-column label"),
+    colwidths = c(3, 1)
+  ) %>% 
+  align(align = "center", part = "header") %>% 
+  autofit() %>% 
+  add_footer_row(
+    values = "4-column footnote, which is made longer to show it spans across the entire columns.",
+    colwidths = 4
+  )
+```
+:::
+<!--end of panel-->
+
+
+### `footnote()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is that better way. footnote attaches a note to specific cells, and it places the reference symbol both at the cell and beside the note, so the linkage is maintained for you rather than being something you type by hand and then have to keep consistent. Read the two bullets at the bottom, because they are the fiddly parts. The nth value pairs with the nth reference symbol, so order matters. And the values must be wrapped in as paragraph, which is easy to forget and produces an error that does not obviously point at the cause.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+**Explanation**
+
+`footnote()` lets you add footnotes with reference symbols for each of them. 
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?footnote
+```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  footnote(
+    i = 1, j = 1:2, part = "header",
+    value = as_paragraph(
+      c(
+        "This is footnote 1",
+        "This is footnote 2"
+      )
+    ),
+    ref_symbols = c("++", "**")
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  footnote(
+    i = 1, j = 1:2, part = "header",
+    value = as_paragraph(
+      c(
+        "This is footnote 1",
+        "This is footnote 2"
+      )
+    ),
+    ref_symbols = c("++", "**")
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
++ `n`th element in `value` is associated with `n`th value in `ref_symbols`
++ use `as_paragraph(c())` for `value`
+
+:::
+<!--end of panel-->
+
+
+### `set_header_labels()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Column headers default to your variable names, which are usually written for typing rather than for reading. This renames them. You pass a list where the name on the left is the existing column and the string on the right is what gets displayed. Note that this changes only what is shown. The underlying column keys stay the same, so any later formatting call still refers to country underscore name, not to Country Name. That trips people up when they rename first and then try to select by the new label. Rename late, or keep selecting by the original key.
+
+</details>
+
+`set_header_labels()` lets you re-label existing header labels using a named list.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+set_header_labels(
+  values = list( 
+    existing name 1 = "new name 1", 
+    existing name 2 = "new name 2" 
+  )
+)
+```
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>%
+  set_header_labels(
+    values = list(
+      country_name = "Country Name",
+      region = "Region"
+    )
+  ) %>% 
+  autofit() 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>%
+  set_header_labels(
+    values = list(
+      country_name = "Country Name",
+      region = "Region"
+    )
+  ) %>% 
+  autofit() 
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `delete_part()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Deleting the header entirely, which you want more often than you might think, particularly when a table is going into a document that supplies its own column labels. The default part is the header, so calling it with no arguments does exactly that. Then read the Note tab, because it makes the same point the previous tab did, from the other direction. Even with the header gone, you still select columns by their original names. The header was only ever a display layer. The keys underneath it are what the selectors use, and deleting the display does not remove them.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How
+
+**Syntax**
+
+```{r eval = F}
+delete_part(flextable, part = "header")
+```
+
+<br>
+
+The default is to delete the header.
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+ft %>% 
+  delete_part()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ft %>% 
+  delete_part()
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### Note
+
+You can still (or have to) use the original variable names from the dataset for selectors even after you delete the header:
+
+```{r }
+tab_data %>%  
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  delete_part() %>% 
+  hline(
+    i = 3, 
+    j = ~ country_name + region, 
+    border = fp_border(color = "red", style = "dotted", width = 4 
+    ) 
+  )  
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Layout
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Layout is about the geometry of a table rather than its appearance: which cells are merged, how wide columns are, how tall rows are. The full list is on screen, but we work through only three, which are the three you will actually use. Merging vertically, autofitting, and setting an explicit width. Read the callout at the bottom too. Horizontal merging exists and is rarely wanted, and the honest admission that the instructor has never needed it is more useful to you than a complete tour of functions you will never reach for.
+
+</details>
+
+**List of functions**
+
+Here is a list of functions you can use to change the layout of a table:
+
++ `merge_at()`: Merge flextable cells into a single one
++ `merge_h()`: Merge flextable cells horizontally
++ `merge_h_range()`: rowwise merge of a range of columns
++ `merge_v()`: Merge flextable cells vertically
++ `height()`, `height_all()`: Set flextable rows height
++ `width()`: Set flextable columns width
++ `hrule()`: Set flextable rule for rows heights
++ `autofit()`: Adjusts cell widths and heights
++ `fit_to_width()`: fit a flextable to a maximum width
++ `as_grouped_data()`: grouped data transformation
+
+
+Use the selector syntax to specify where just like the other functions we have seen. We will look at `merge_v()`, `autofit()`, and `width()`. 
+
+<br>
+
+:::{.callout-note}
+I have not encountered cases where I need to merge cells horizontally. It works in a similar manner to the way `merge_v()` works except that it works on rows instead of columns.
+:::
+
+### `merge_v()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Vertical merging collapses adjacent cells in a column that hold the same value into one tall cell. Look at the before and after: the region column goes from repeating Australasia twice and Melanesia four times to a single merged cell for each group. That is exactly the convention published tables use for grouped rows, and it is one function call. Note the sentence about the i argument. merge v does not take one, because which cells merge is decided entirely by which adjacent values are equal. Which also means sorting your data first is what controls the grouping.
+
+</details>
+
+`merge_v()` merges vertically the adjacent cells with the same values. It does not accept `i` (rows) argument.
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Before**
+
+```{r }
+ft 
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**After**
+
+```{r }
+ft %>%  merge_v(j = ~ region)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `autofit()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Autofit adjusts column widths to suit the content. The example makes the point by putting an absurdly long country name into the first column and showing before and after. Before, the text wraps badly. After, the column has widened so more fits on a single line. Read the last sentence carefully though, because it is the useful caveat. Autofit will not let the whole table exceed the page width. So it is balancing the columns against each other within a fixed budget, rather than simply making each one as wide as its content would like.
+
+</details>
+
+`autofit()` adjusts the height and width of cells.
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Before**
+
+```{r}
+tab_data %>%
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  merge_v(j = ~ region)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**After**
+
+```{r }
+tab_data %>%
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  merge_v(j = ~ region) %>% autofit()
+```
+
+It adjusted the width of the 1st column so that more texts are displayed in a single row. But, the width of the entire table does not go over the limit of the paper.
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `width()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+When autofit does not give you what you want, set the width yourself. This sets one column to a specific width in inches. Notice the example calls autofit first and then overrides a single column, which is the practical pattern. Let the automatic layout do the bulk of the work, then correct the one or two columns it got wrong. Setting every width by hand is tedious and tends to break as soon as your content changes. Setting one, after autofit, usually fixes the specific problem you were actually looking at.
+
+</details>
+
+`width()` sets the width of columns to the length you specify.
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Before**
+
+```{r}
+ft %>%
+  autofit()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**After**
+
+```{r}
+ft %>% 
+  autofit() %>% 
+  width(j = ~ country_name, width = 1)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+
+## Output 
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far produces a table object. This section is about getting it out of R and into whatever you are actually writing. Three destinations: Word, PowerPoint, and an image file. Word matters most for this audience, because a flextable saved to docx arrives as a real editable Word table rather than a picture, which means a coauthor can adjust it and a journal can typeset it. That is the main practical argument for building tables this way at all. The cell here just builds a plain table to demonstrate with.
+
+</details>
+
+We can save the table in various formats.
+
++ `save_as_docx()`: docx (WORD)
++ `save_as_pptx()`: pptx (Power Point)
++ `save_as_image()`: image (png, pdf, jpeg) with help from the `webshot2` package
+
+Let's create a table for demonstration:
+
+```{r}
+table_temp <- 
+  tab_data %>%  
+  flextable(col_keys = c("country_name", "region", "y_1995", "y_2005")) 
+```
+
+### Word or Power Point
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two functions, one line each. Save as docx for Word, save as pptx for PowerPoint. There is little to say about the syntax, so let me say the important thing instead. What arrives at the other end is a native table, not an image. You can click into a cell in Word and edit the text. You can restyle it with Word's own tools. That is the whole reason to build tables this way rather than exporting a picture, and it is what makes the workflow survive contact with a coauthor who does not use R.
+
+</details>
+
+**WORD**
+
+```{r word, eval = F}
+save_as_docx(table_temp, path = "temp_table.docx")
+```
+
+<br>
+
+**Power Point**
+
+```{r power-point, eval = F}
+save_as_pptx(table_temp, path = "temp_table.pptx")
+```
+
+### Image
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And saving as an image, for when you need a picture rather than an editable table, typically for slides or a preprint. This route needs the webshot2 package, which drives a headless browser to take the screenshot. Note the install line has been updated: webshot2 is on CRAN now, so a plain install packages call is all you need rather than pulling it from GitHub. For pdf output, look at the zoom argument in the last example. Raising it increases the resolution, which matters if the image is going anywhere near print.
+
+</details>
+
+First install the `webshot2` package.
+
+```{r eval = F}
+#--- install ---#
+#--- CHANGED: was remotes::install_github("rstudio/webshot2"). webshot2 has
+#--- been on CRAN since 2021 (currently 0.1.2), so no GitHub install needed.
+install.packages("webshot2")
+
+#--- library ---#
+library(webshot2)
+```
+
+<br>
+
+**png**
+
+```{r eval = F}
+save_as_image(table_temp, path = "temp_table.png") 
+```
+
+<br>
+
+**pdf**
+
+```{r eval = F}
+save_as_image(table_temp, path = "temp_table.pdf", zoom = 10, webshot = "webshot2") 
+```
+:::
+<!--end of panel-->

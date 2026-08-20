@@ -1,0 +1,44 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+    - "!assignments/"
+    - "!sample-project/"
+    - "!lectures/Chapter-0/logistics.qmd"
+    - "!lectures/Chapter-4-Data-Visualization/04-4-Misc.qmd"
+    - "!lectures/Chapter-8-Table/test-quarto-live-table.qmd"
+    - "!sample-project-reproducible/code/main/*.qmd"
+    - "!sample-project-reproducible/writing/*.qmd"
+    # - "!lectures/Chapter-8-Table/08-2-modelsummary.qmd"
+    - "!templates/"
+
+website:
+  title: "Data Science with R (AECN 896-05)"
+  open-graph: true # https://quarto.org/docs/websites/website-tools.html#open-graph
+  page-footer: "Made with Quarto"
+  navbar:
+    right:
+      - text: Syllabus
+        href: syllabus/syllabus_26.qmd
+      - text: Calendar
+        href: syllabus/calendar_26.qmd
+      - text: Lecture Notes
+        href: lectures/index.qmd
+      - text: Assignments
+        href: assignments.qmd
+      - text: Exercises
+        href: exercises/index.qmd
+      # - text: Slides
+      #   menu:
+      #     - text: 01 - Univariate Regression
+      #       href: lectures/univariate/univariate_regression_x.rmd
+format:
+  html:
+    mainfont: sans-serif
+    # monofont: system-ui
+    # fontsize: 24px
+    # linestretch: # space between lines
+    # max-width:
+    page-layout: full
+    theme: [cosmo, styles.scss]

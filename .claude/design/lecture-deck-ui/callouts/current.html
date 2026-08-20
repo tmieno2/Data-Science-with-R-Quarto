@@ -1,0 +1,70 @@
+<!-- @dsCard group="Callouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Callouts — current</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+.sys-today { --paper:#fff; --ink:#222; --ink-muted:#52616b; --accent-2:#760dd8;
+             --code-bg:#F7FDFF; --out-bg:#f8f2f6; --radius:4px; }
+.spec { width:966px; background:#fff; padding:24px; box-sizing:border-box;
+        box-shadow:0 2px 14px rgba(0,0,0,.14); margin-bottom:6px;
+        font-size:var(--t-body); color:#222; }
+.spec .lbl { font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+             color:#8a8f98; margin-bottom:14px; }
+
+/* Quarto callout, callout-icon: false. Title 1.4rem, body 1.2rem. */
+.co { border:1px solid #dee2e6; border-left-width:3px; border-radius:.25rem;
+      margin-bottom:1rem; overflow:hidden; }
+.co .ttl { font-size:22.4px; font-weight:600; padding:.4rem .6rem;
+           background:rgba(0,0,0,.03); }
+.co .bd  { font-size:19.2px; padding:.5rem .6rem; }
+.co.note { border-left-color:#4582ec; }
+.co.warn { border-left-color:#f0ad4e; }
+.co.imp  { border-left-color:#d9534f; }
+.co.tip  { border-left-color:#02b875; }
+
+/* Answer box exactly as custom.scss sets it */
+.ans { border:1px solid #aaa; border-radius:4px; padding:.5em .5em 0; }
+.ans > .sum { font-weight:bold; margin:-.5em -.5em 0; padding:.5em; display:block; }
+.ans.open { padding:.5em; }
+.ratio { font-size:13px; color:#c81e1e; font-weight:600; margin:12px 0 0; }
+.h { font-size:13px; color:#52616b; margin:12px 0 0; }
+</style>
+
+<h1 class="page">Callouts and answer boxes — what ships today</h1>
+<p class="page">
+  Quarto defaults with <code>callout-icon: false</code>, plus the
+  <code>// Answer box</code> block from <code>custom.scss</code>. Specimen width
+  966px.
+</p>
+
+<div class="spec sys-today">
+  <div class="lbl">1 · The four callout types, icons off</div>
+  <div class="co note"><div class="ttl">Note</div>
+    <div class="bd">The same idea appeared in Chapter 2 when we set the YAML header.</div></div>
+  <div class="co warn"><div class="ttl">Warning</div>
+    <div class="bd">A path that works on your machine will not work on mine.</div></div>
+  <div class="co imp"><div class="ttl">Important</div>
+    <div class="bd">Run <code>getwd()</code> before you do anything else.</div></div>
+  <div class="co tip"><div class="ttl">Tip</div>
+    <div class="bd">Use <code>here::here()</code> and stop thinking about paths.</div></div>
+  <p class="ratio">Four meanings, one shape. The only difference is 3px of colour
+     at the left edge — and the most important block ("a path that works on your
+     machine…") has no more presence than the aside above it.</p>
+  <p class="h">Vertical cost: ~90px each, ~360px for the four. Over half a slide.</p>
+</div>
+
+<div class="spec sys-today">
+  <div class="lbl">2 · Answer box, collapsed and open</div>
+  <details class="ans"><summary class="sum">Answer</summary></details>
+  <div style="height:14px"></div>
+  <div class="ans open">
+    <div class="sum" style="margin:-.5em -.5em .5em">Answer</div>
+<pre class="src">corn_data <span class="fn">%>%</span> <span class="fn">filter</span>(state == <span class="str">"NE"</span>)</pre>
+  </div>
+  <p class="ratio">#aaa on white is the conventional look of a disabled control.
+     This is the one block students are meant to click.</p>
+  <p class="h">It also shares nothing with the callouts above, though "Answer" is
+     the fourth member of the same family.</p>
+</div>

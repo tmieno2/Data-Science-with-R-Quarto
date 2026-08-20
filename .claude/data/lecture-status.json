@@ -1,0 +1,837 @@
+{
+  "_comment": [
+    "Status of every lecture deck in lectures/, on three axes.",
+    "Countable fields are generated - run .claude/scripts/refresh-lecture-status.py",
+    "after any substantial deck edit, or --check to detect drift. Edit the",
+    "`status` and `notes` fields by hand; the script preserves them.",
+    "docs/ is generated output and is never scanned."
+  ],
+  "updated": "2026-08-18",
+  "generator": ".claude/scripts/refresh-lecture-status.py",
+  "axes": {
+    "transcripts": "Collapsible lecturer transcripts. See .claude/docs/lecture-transcripts.md. Convention: one per outer tab, one per untabbed content slide.",
+    "notebook_theme": "lectures/notebook.scss present as the last entry of the deck's revealjs `theme:` list. See .claude/prompts/replicate-notebook-theme.md.",
+    "side_by_side_output": "Side-by-side code/output for WebR cells. Since lectures/webr-layout.html was adopted (2026-08-18) this is APPLIED AUTOMATICALLY to every eligible cell in any deck that includes ../webr-layout.html; see the 'WebR code/output layout in lecture slides' rule in CLAUDE.md. The counts below therefore measure only the MANUAL `::: {.side-out}` opt-in, which remains available for deliberately chosen cells. A status of 'not_started' means no manual regions, NOT that the deck lacks side-by-side layout."
+  },
+  "status_values": {
+    "complete": "Done, and reviewed as done for this deck.",
+    "partial": "Applied to some of the deck; more would be appropriate.",
+    "not_started": "Not applied, and it would be appropriate to apply.",
+    "not_applicable": "Deliberately out of scope for this deck; the notes say why.",
+    "unknown": "Added by the generator; a human has not judged it yet."
+  },
+  "decks": [
+    {
+      "path": "lectures/Appendix-1-data.table/data.table.qmd",
+      "title": "A-1: `data.table` package for data wrangling",
+      "chapter": "A1",
+      "on_website": true,
+      "slides": 10,
+      "tabsets": 11,
+      "transcripts": {
+        "status": "not_started",
+        "count": 0,
+        "support_included": false,
+        "notes": "Never scheduled. Not listed as deliberately skipped in .claude/docs/lecture-transcripts.md either, so this is the one genuinely undecided deck."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 56,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 10,
+        "knitr_cells_in_side_out": 0,
+        "notes": "56 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-0/logistics.qmd",
+      "title": "Course Logistics",
+      "chapter": 0,
+      "on_website": false,
+      "slides": 4,
+      "tabsets": 0,
+      "transcripts": {
+        "status": "not_applicable",
+        "count": 0,
+        "support_included": false,
+        "notes": "Excluded from the _quarto.yml render list, so it never reaches the website."
+      },
+      "notebook_theme": {
+        "status": "not_applicable",
+        "in_theme_list": false,
+        "notes": "Excluded from the _quarto.yml render list, so it never reaches the website."
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 0,
+        "knitr_cells_in_side_out": 0,
+        "notes": "No executable cells on this deck."
+      }
+    },
+    {
+      "path": "lectures/Chapter-1-Introduction/01-Introduction.qmd",
+      "title": "01-1: Introduction to R",
+      "chapter": 1,
+      "on_website": true,
+      "slides": 25,
+      "tabsets": 11,
+      "transcripts": {
+        "status": "complete",
+        "count": 52,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 46,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 9,
+        "knitr_cells_in_side_out": 0,
+        "notes": "46 WebR cells, none wrapped. Plot cells still get the automatic two-column layout from custom.scss; the narrow-output cells are the opportunity."
+      }
+    },
+    {
+      "path": "lectures/Chapter-2-Quarto/02-0-Github-sublime-merge.qmd",
+      "title": "02-0: Clone Github Repositories",
+      "chapter": 2,
+      "on_website": true,
+      "slides": 3,
+      "tabsets": 2,
+      "transcripts": {
+        "status": "complete",
+        "count": 5,
+        "support_included": true,
+        "notes": "Short deck; 5 covers it."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 0,
+        "knitr_cells_in_side_out": 0,
+        "notes": "No executable cells on this deck."
+      }
+    },
+    {
+      "path": "lectures/Chapter-2-Quarto/02-1-Quarto-introduction.qmd",
+      "title": "02-1: Introduction to Quarto",
+      "chapter": 2,
+      "on_website": true,
+      "slides": 10,
+      "tabsets": 11,
+      "transcripts": {
+        "status": "complete",
+        "count": 38,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 6,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Most fenced chunks here are verbatim teaching examples, not live cells. Only 6 cells actually run."
+      }
+    },
+    {
+      "path": "lectures/Chapter-2-Quarto/02-2-Quarto-revealjs.qmd",
+      "title": "02-2: Using Quarto to Create Presentations",
+      "chapter": 2,
+      "on_website": true,
+      "slides": 11,
+      "tabsets": 16,
+      "transcripts": {
+        "status": "complete",
+        "count": 31,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 9,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Same as 02-1: mostly verbatim examples."
+      }
+    },
+    {
+      "path": "lectures/Chapter-2-Quarto/02-3-Quarto-website.qmd",
+      "title": "02-3: Introduction to Using Quarto to Create a Website",
+      "chapter": 2,
+      "on_website": true,
+      "slides": 2,
+      "tabsets": 3,
+      "transcripts": {
+        "status": "complete",
+        "count": 5,
+        "support_included": true,
+        "notes": "Short deck; 5 covers it."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 1,
+        "knitr_cells_in_side_out": 0,
+        "notes": "One live cell."
+      }
+    },
+    {
+      "path": "lectures/Chapter-2-Quarto/02-4-Quarto-article.qmd",
+      "title": "02-4: Writing a Journal Article Using Quarto",
+      "chapter": 2,
+      "on_website": true,
+      "slides": 7,
+      "tabsets": 10,
+      "transcripts": {
+        "status": "complete",
+        "count": 16,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 6,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Mostly verbatim examples."
+      }
+    },
+    {
+      "path": "lectures/Chapter-3-DataWrangling/03-1-input-output.qmd",
+      "title": "03-1: Importing Files and Exporting to Files",
+      "chapter": 3,
+      "on_website": true,
+      "slides": 7,
+      "tabsets": 8,
+      "transcripts": {
+        "status": "complete",
+        "count": 29,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "partial",
+        "side_out_regions": 1,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 40,
+        "knitr_cells_in_side_out": 1,
+        "notes": "One .side-out .tight region (the class() comparison). The rest of the deck prints wide tibbles, where side-out is the wrong call."
+      }
+    },
+    {
+      "path": "lectures/Chapter-3-DataWrangling/03-2-data-wrangling-dplyr.qmd",
+      "title": "03-2: Data wrangling with `tidyverse`: The Basics",
+      "chapter": 3,
+      "on_website": true,
+      "slides": 11,
+      "tabsets": 31,
+      "transcripts": {
+        "status": "complete",
+        "count": 49,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "complete",
+        "side_out_regions": 16,
+        "webr_cells": 72,
+        "webr_cells_in_side_out": 16,
+        "knitr_cells": 30,
+        "knitr_cells_in_side_out": 0,
+        "notes": "16 regions, all WebR. Applied where output is narrow; wide-tibble cells left stacked on purpose."
+      }
+    },
+    {
+      "path": "lectures/Chapter-3-DataWrangling/03-3-reshape-merge.qmd",
+      "title": "03-3: Reshaping and Merging",
+      "chapter": 3,
+      "on_website": true,
+      "slides": 7,
+      "tabsets": 19,
+      "transcripts": {
+        "status": "complete",
+        "count": 30,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 75,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 14,
+        "knitr_cells_in_side_out": 0,
+        "notes": "75 WebR cells, none wrapped. Reshaping output is often wide, but the merge examples use small toy frames that would suit side-out well."
+      }
+    },
+    {
+      "path": "lectures/Chapter-4-Data-Visualization/04-1-data-visualization-basics.qmd",
+      "title": "04-1: Data Visualization with `ggplot2`: Basics",
+      "chapter": 4,
+      "on_website": true,
+      "slides": 7,
+      "tabsets": 11,
+      "transcripts": {
+        "status": "complete",
+        "count": 29,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "complete",
+        "side_out_regions": 18,
+        "webr_cells": 29,
+        "webr_cells_in_side_out": 18,
+        "knitr_cells": 4,
+        "knitr_cells_in_side_out": 0,
+        "notes": "18 regions."
+      }
+    },
+    {
+      "path": "lectures/Chapter-4-Data-Visualization/04-2-more-information.qmd",
+      "title": "04-2: Data Visualization with `ggplot2`: More in One",
+      "chapter": 4,
+      "on_website": true,
+      "slides": 5,
+      "tabsets": 15,
+      "transcripts": {
+        "status": "complete",
+        "count": 18,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "complete",
+        "side_out_regions": 24,
+        "webr_cells": 34,
+        "webr_cells_in_side_out": 24,
+        "knitr_cells": 4,
+        "knitr_cells_in_side_out": 0,
+        "notes": "24 regions."
+      }
+    },
+    {
+      "path": "lectures/Chapter-4-Data-Visualization/04-3-fine-tuning.qmd",
+      "title": "04-3: Data Visualization with `ggplot2`: Fine Tuning",
+      "chapter": 4,
+      "on_website": true,
+      "slides": 14,
+      "tabsets": 24,
+      "transcripts": {
+        "status": "complete",
+        "count": 55,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "complete",
+        "side_out_regions": 29,
+        "webr_cells": 63,
+        "webr_cells_in_side_out": 29,
+        "knitr_cells": 9,
+        "knitr_cells_in_side_out": 0,
+        "notes": "29 regions."
+      }
+    },
+    {
+      "path": "lectures/Chapter-4-Data-Visualization/04-4-Misc.qmd",
+      "title": "Data visualization with `ggplot2`: More in One",
+      "chapter": 4,
+      "on_website": false,
+      "slides": 6,
+      "tabsets": 1,
+      "transcripts": {
+        "status": "not_applicable",
+        "count": 0,
+        "support_included": false,
+        "notes": "Excluded from the _quarto.yml render list, so it never reaches the website."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": "Theme is applied even though the deck is unpublished."
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 84,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Excluded from the _quarto.yml render list, so it never reaches the website."
+      }
+    },
+    {
+      "path": "lectures/Chapter-5-function-loop-parallel/05-1-function-loop-parallel.qmd",
+      "title": "05-1: User-defined Function, Loop, and Parallelization",
+      "chapter": 5,
+      "on_website": true,
+      "slides": 14,
+      "tabsets": 17,
+      "transcripts": {
+        "status": "complete",
+        "count": 59,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 59,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 24,
+        "knitr_cells_in_side_out": 0,
+        "notes": "59 WebR cells, none wrapped. Loop and function returns are usually short — a good candidate deck."
+      }
+    },
+    {
+      "path": "lectures/Chapter-6-HowCodeProject/06-1-code_project_RStudio.qmd",
+      "title": "06-1: How to write R codes, manage Projects, work with RStudio",
+      "chapter": 6,
+      "on_website": true,
+      "slides": 8,
+      "tabsets": 9,
+      "transcripts": {
+        "status": "complete",
+        "count": 24,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 0,
+        "knitr_cells_in_side_out": 0,
+        "notes": "No executable cells on this deck."
+      }
+    },
+    {
+      "path": "lectures/Chapter-7-Date-String/07-1-date-string.qmd",
+      "title": "07-1: Date and String Management",
+      "chapter": 7,
+      "on_website": true,
+      "slides": 5,
+      "tabsets": 12,
+      "transcripts": {
+        "status": "complete",
+        "count": 19,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 38,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 17,
+        "knitr_cells_in_side_out": 0,
+        "notes": "38 WebR cells, none wrapped. Date and string results are short vectors — the best remaining candidate deck."
+      }
+    },
+    {
+      "path": "lectures/Chapter-8-Table/08-1-make_table_flextable.qmd",
+      "title": "08-1: Making Tables with `flextable`",
+      "chapter": 8,
+      "on_website": true,
+      "slides": 9,
+      "tabsets": 17,
+      "transcripts": {
+        "status": "complete",
+        "count": 32,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 4,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 59,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Output here is wide printed tables; side-out halves the available width, so it is probably wrong for most of these cells. Needs a judgment call, not a sweep."
+      }
+    },
+    {
+      "path": "lectures/Chapter-8-Table/08-2-modelsummary.qmd",
+      "title": "08-2: Make Regression and Summary Tables with `modelsummary`",
+      "chapter": 8,
+      "on_website": true,
+      "slides": 7,
+      "tabsets": 10,
+      "transcripts": {
+        "status": "complete",
+        "count": 25,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 47,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Output here is wide printed tables; side-out halves the available width, so it is probably wrong for most of these cells. Needs a judgment call, not a sweep."
+      }
+    },
+    {
+      "path": "lectures/Chapter-8-Table/test-quarto-live-table.qmd",
+      "title": "A Quarto Live Document",
+      "chapter": 8,
+      "on_website": false,
+      "slides": 2,
+      "tabsets": 0,
+      "transcripts": {
+        "status": "not_applicable",
+        "count": 0,
+        "support_included": false,
+        "notes": "Scratch file, excluded from the render list."
+      },
+      "notebook_theme": {
+        "status": "not_applicable",
+        "in_theme_list": false,
+        "notes": "Scratch file."
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 2,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 2,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Scratch file."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L01_vector_basics.qmd",
+      "title": "09-1: R as GIS: Vector Data Basics with the sf package",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 16,
+      "tabsets": 25,
+      "transcripts": {
+        "status": "complete",
+        "count": 57,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 85,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 22,
+        "knitr_cells_in_side_out": 0,
+        "notes": "71 WebR cells, none wrapped. sf print output is wide; maps get the automatic layout already."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L02_raster_basics.qmd",
+      "title": "09-2: R as GIS: Raster Data Basics",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 6,
+      "tabsets": 14,
+      "transcripts": {
+        "status": "complete",
+        "count": 18,
+        "support_included": true,
+        "notes": ""
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 40,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 22,
+        "knitr_cells_in_side_out": 0,
+        "notes": "40 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L03_create_map.qmd",
+      "title": "09-3: R as GIS: Creating maps from vector and raster data",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 9,
+      "tabsets": 17,
+      "transcripts": {
+        "status": "not_started",
+        "count": 29,
+        "support_included": true,
+        "notes": "Needs include-in-header: ../transcript-support.html added as well."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 48,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 4,
+        "knitr_cells_in_side_out": 0,
+        "notes": "48 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L04_1_vector_interactions.qmd",
+      "title": "09-4-1: R as GIS: Interaction of Vector Datasets I",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 5,
+      "tabsets": 10,
+      "transcripts": {
+        "status": "not_started",
+        "count": 16,
+        "support_included": true,
+        "notes": "Needs include-in-header: ../transcript-support.html added as well."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 49,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 8,
+        "knitr_cells_in_side_out": 0,
+        "notes": "49 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L04_2_vector_spatial_join.qmd",
+      "title": "09-4-2: R as GIS: Interaction of Vector Datasets II",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 9,
+      "tabsets": 8,
+      "transcripts": {
+        "status": "not_started",
+        "count": 33,
+        "support_included": true,
+        "notes": "Needs include-in-header: ../transcript-support.html added as well."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 41,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 7,
+        "knitr_cells_in_side_out": 0,
+        "notes": "41 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L05_vector_raster_interaction.qmd",
+      "title": "09-5: R as GIS: Interaction of Vector and Raster Datasets",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 5,
+      "tabsets": 11,
+      "transcripts": {
+        "status": "not_started",
+        "count": 15,
+        "support_included": true,
+        "notes": "Needs include-in-header: ../transcript-support.html added as well."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 34,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 13,
+        "knitr_cells_in_side_out": 0,
+        "notes": "31 WebR cells, none wrapped."
+      }
+    },
+    {
+      "path": "lectures/Chapter-9-Spatial-Data/L06_get_spatial_data.qmd",
+      "title": "09-6: R as GIS: Download Spatial Datasets using R",
+      "chapter": 9,
+      "on_website": true,
+      "slides": 6,
+      "tabsets": 12,
+      "transcripts": {
+        "status": "not_started",
+        "count": 22,
+        "support_included": true,
+        "notes": "Needs include-in-header: ../transcript-support.html added as well."
+      },
+      "notebook_theme": {
+        "status": "complete",
+        "in_theme_list": true,
+        "notes": ""
+      },
+      "side_by_side_output": {
+        "status": "not_started",
+        "side_out_regions": 0,
+        "webr_cells": 3,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 37,
+        "knitr_cells_in_side_out": 0,
+        "notes": "Mostly knitr cells; only 3 WebR cells because most examples download data."
+      }
+    },
+    {
+      "path": "lectures/final_project.qmd",
+      "title": "Final Project Expectations and Regulations",
+      "chapter": null,
+      "on_website": true,
+      "slides": 4,
+      "tabsets": 1,
+      "transcripts": {
+        "status": "not_started",
+        "count": 0,
+        "support_included": false,
+        "notes": "Administrative deck, 4 slides. Probably does not want transcripts, but nothing has decided that."
+      },
+      "notebook_theme": {
+        "status": "not_started",
+        "in_theme_list": false,
+        "notes": "theme: [default, custom.scss] only. Adding ../notebook.scss here is a one-line change; the file sits in the same directory, so the path is notebook.scss with no ../."
+      },
+      "side_by_side_output": {
+        "status": "not_applicable",
+        "side_out_regions": 0,
+        "webr_cells": 0,
+        "webr_cells_in_side_out": 0,
+        "knitr_cells": 0,
+        "knitr_cells_in_side_out": 0,
+        "notes": "No executable cells on this deck."
+      }
+    }
+  ]
+}

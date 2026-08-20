@@ -1,0 +1,132 @@
+<!-- @dsCard group="Transcript panel" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Transcript panel — Ledger drawer</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* LEDGER transcript — the control docks into the title band; the panel opens as
+   a BOTTOM DRAWER across the full slide width.
+
+   The drawer is the argument. A right rail can never avoid the right-hand column,
+   and on a two-column code/plot slide the right-hand column is the plot. A drawer
+   comes up from the bottom edge, where the only thing it covers is the tail of
+   the content and the footer — and it cannot collide with the tab row by
+   construction, so the 17% magic number disappears rather than being replaced.
+
+   Full width also buys type size: 966px of measure means 15px text still fits
+   three paragraphs in 31% of the slide height. */
+.sys-ledger { padding: 0; }
+.lg-band { background:var(--accent); color:var(--band-fg); padding:13px 42px 0;
+           position:relative; }
+.lg-band .row { display:flex; align-items:baseline; gap:14px; }
+.lg-band h2 { font-size:30px; font-weight:600; margin:0; color:var(--band-fg);
+              line-height:1.15; }
+.lg-band .chap { margin-left:auto; font-size:14px; letter-spacing:.1em;
+                 text-transform:uppercase; opacity:.82; white-space:nowrap; }
+.lg-tabs { display:flex; gap:3px; margin-top:11px; white-space:nowrap;
+           align-items:flex-end; }
+.lg-tabs span.tab { font-size:var(--t-tab); padding:5px 13px; color:rgba(255,255,255,.8);
+                    background:rgba(255,255,255,.11); }
+.lg-tabs span.tab.on { background:var(--paper); color:var(--accent); font-weight:700; }
+.lg-body { padding:20px 42px 0; }
+
+/* collapsed: a control ON the band, so it is plainly deck furniture and not a tab.
+   It rides at the far right of the TAB LINE rather than the title line — the
+   title line already ends with the chapter label, and an absolutely positioned
+   control there lands on top of it. */
+.tr-btn { margin-left:auto; align-self:center; font-size:11.5px; font-weight:700;
+          letter-spacing:.08em; text-transform:uppercase; color:var(--band-fg);
+          border:1px solid rgba(255,255,255,.6); padding:3px 10px; white-space:nowrap; }
+.tr-btn.on { background:var(--band-fg); color:var(--accent); border-color:var(--band-fg); }
+
+/* open: the drawer */
+.drawer { position:absolute; left:0; right:0; bottom:0; height:31%;
+          background:var(--paper); border-top:3px solid var(--accent);
+          box-shadow:0 -10px 26px rgba(0,0,0,.13); padding:11px 42px 12px;
+          z-index:20; overflow:hidden; box-sizing:border-box; }
+.drawer .hd { font-size:11.5px; font-weight:700; letter-spacing:.08em;
+              text-transform:uppercase; color:var(--accent);
+              border-bottom:1px solid var(--rule); padding-bottom:6px; margin-bottom:8px; }
+.drawer p { font-size:15px; line-height:1.45; margin:0 0 7px; color:var(--ink);
+            max-width:none; }
+.drawer code { font-size:14px; }
+.ok { color:#0b5c3f; font-weight:600; }
+.note { font-size:13px; color:#52616b; max-width:1050px; margin:10px 0 0; }
+</style>
+
+<h1 class="page">Ledger — a bottom drawer, full width</h1>
+<p class="page">
+  A drawer cannot collide with the tab row, so the hard-coded <code>17%</code>
+  offset is deleted rather than re-tuned. Full width gives 966px of measure, which
+  lets the type go to <b>15px</b> — the largest of the three directions — while
+  still occupying under a third of the slide.
+</p>
+
+<p class="caption"><b>1 · Collapsed.</b> The control sits on the title band, at
+  band level. Nothing about it suggests a tab.</p>
+<div class="stage sys-ledger safeline">
+  <div class="lg-band">
+    <div class="row"><h2>Summarizing by group</h2><span class="chap">Ch 3 · Data Wrangling</span></div>
+    <div class="lg-tabs"><span class="tab">Syntax</span><span class="tab on">Example</span
+      ><span class="tab">Your turn</span><span class="tr-btn">Transcript</span></div>
+  </div>
+  <div class="lg-body">
+    <p>Chain the verbs together with the pipe:</p>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>2 · Open.</b> The same two-column slide. The plot stays
+  visible — this is the one direction where the transcript and the thing it
+  describes are on screen together.</p>
+<div class="stage sys-ledger safeline">
+  <div class="lg-band">
+    <div class="row"><h2>Yields by county</h2><span class="chap">Ch 3 · Data Wrangling</span></div>
+    <div class="lg-tabs"><span class="tab">Code</span><span class="tab on">Plot</span
+      ><span class="tr-btn on">Transcript</span></div>
+  </div>
+  <div class="lg-body">
+    <div class="two-col">
+      <div>
+<pre class="src"><span class="fn">ggplot</span>(county_means) +
+  <span class="fn">geom_col</span>(
+    <span class="fn">aes</span>(x = county, y = mean_yield)
+  ) +
+  <span class="fn">theme_bw</span>()</pre>
+      </div>
+      <div style="background:#eef1f4;height:190px;display:grid;place-items:center;
+                  color:#8a8f98;font-size:15px;border:1px solid #dde1e6">[ plot output ]</div>
+    </div>
+  </div>
+  <div class="drawer">
+    <div class="hd">Lecturer transcript</div>
+    <p>So the pipe is the thing to get comfortable with today. Read <code>%&gt;%</code>
+       as "and then". We take the corn data, and then we keep only Nebraska, and then
+       we split it by county, and then we take a mean.</p>
+    <p>Notice I never assigned anything to an intermediate variable. That is the whole
+       point — you can read the chain top to bottom as a sentence, in the order the
+       work actually happens.</p>
+    <p>If you have used base R you might be reaching for nested function calls. Resist
+       that for now; we come back to when nesting is clearer in Chapter 5.</p>
+  </div>
+  <div class="logo">N</div>
+</div>
+<p class="note">
+  <span class="ok">Control: white on #0b5c3f = 7.44:1 closed, inverted when open.</span>
+  Drawer body 15px, ~42% larger than today. Cost: it covers the footer while open,
+  and a very tall slide loses its last two lines — acceptable, since the drawer is
+  only open when the lecturer is talking rather than pointing.
+</p>

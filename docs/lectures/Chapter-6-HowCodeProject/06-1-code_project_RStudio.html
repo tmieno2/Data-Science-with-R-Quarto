@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.31">
+
+  <title>Data Science with R (AECN 896-05) – 06-1: How to write R codes, manage Projects, work with RStudio</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <!--
+    Support for collapsible "Transcript" panels in revealjs decks.
+
+    Include it from a deck's YAML header, with the path relative to the qmd:
+
+        format:
+          revealjs:
+            include-in-header: ../transcript-support.html
+
+    Then add a transcript anywhere inside a slide (or inside a single tab of a
+    tabset, which is the usual case):
+
+        <details class="transcript">
+        <summary>Transcript</summary>
+
+        What the lecturer says about this tab.
+
+        </details>
+
+    It must live in the header rather than the body of a qmd: raw HTML placed
+    above the first "##" heading becomes its own untitled slide.
+
+    <details> is a native HTML element, so the collapse/expand works with no
+    JavaScript at all, including in a self-contained (embed-resources) file. The
+    script at the bottom adds one behaviour on top: collapsing an open panel when
+    the reader moves on. Without it everything still works, panels just keep their
+    open state.
+  -->
+  <style>
+  /* The panel is positioned against the slide rather than sitting in its normal
+     flow. That is the whole point: collapsed it costs the slide no vertical
+     space, and opened it overlays the content instead of pushing it off the
+     bottom edge. Each panel lives inside its own tab, and hidden tabs do not
+     render, so only the visible tab's transcript is ever shown. */
+  .reveal details.transcript {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 20;
+    width: auto;
+    font-size: 0.55em;
+    line-height: 1.45;
+    text-align: left;
+    border-radius: 6px;
+    /* custom.scss styles every bare <details> as an "answer box" (grey border
+       plus padding) for Quarto's folded-code blocks. Opt out of both here so the
+       collapsed pill is not sitting inside a grey rectangle. */
+    border: none;
+    padding: 0;
+  }
+
+  /* Collapsed: a small pill that hugs the top-right corner. */
+  .reveal details.transcript > summary {
+    display: inline-block;
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+    /* custom.scss pulls every bare <summary> with a negative margin; undo it. */
+    margin: 0;
+    padding: 0.15em 0.7em;
+    border: 1px solid #06a666;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #06a666;
+    font-weight: 600;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .reveal details.transcript > summary::-webkit-details-marker { display: none; }
+  .reveal details.transcript > summary::before { content: "\25B8\00A0"; }
+  .reveal details.transcript[open] > summary::before { content: "\25BE\00A0"; }
+
+  /* Opened: a tall, narrow panel down the right-hand side, where slide content
+     rarely reaches. It starts below the tab bar (which ends at 16.4% of slide
+     height on the busiest slide in 02-2) so tab names stay clickable while a
+     transcript is open, and runs down to just above the footer. */
+  .reveal details.transcript[open] {
+    top: 17%;
+    width: 36%;
+    max-height: 79%;
+    overflow-y: auto;
+    padding: 0.55em 0.85em 0.7em;
+    background: #f4fbf8;
+    border: 1px solid #06a666;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+  }
+  .reveal details.transcript[open] > summary {
+    display: block;
+    padding: 0 0 0.4em 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  .reveal details.transcript p { margin: 0.35em 0; }
+
+  /* The logo defaults to the bottom-right, exactly where the transcript panel
+     runs. Move it to the bottom-left so the whole right-hand column stays free.
+     The 56px offset clears reveal's menu button, which occupies x 8-43px. */
+  .reveal .slide-logo {
+    right: auto !important;
+    left: 56px !important;
+  }
+  </style>
+
+  <script>
+  // Collapse any open transcript when the reader moves to another slide or
+  // another tab, so a panel left open never reappears over unrelated content.
+  (function () {
+    function closeAll() {
+      document.querySelectorAll("details.transcript[open]")
+        .forEach(function (d) { d.open = false; });
+    }
+
+    // Slide changes come from reveal, which is not ready when this runs.
+    function hookReveal() {
+      if (window.Reveal && typeof Reveal.on === "function") {
+        Reveal.on("slidechanged", closeAll);
+        Reveal.on("overviewshown", closeAll);
+        return true;
+      }
+      return false;
+    }
+    if (!hookReveal()) {
+      var tries = 0;
+      var timer = setInterval(function () {
+        if (hookReveal() || ++tries > 100) clearInterval(timer);
+      }, 100);
+    }
+
+    // Tab changes are plain clicks; capture so this runs before the tab switches.
+    document.addEventListener("click", function (e) {
+      var el = e.target;
+      if (el && el.closest && el.closest('.panel-tabset [role="tab"]')) closeAll();
+    }, true);
+  })();
+  </script>
+<meta property="og:title" content="06-1: How to write R codes, manage Projects, work with RStudio – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Chapter 6: Reproducibility">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">06-1: How to write R codes, manage Projects, work with RStudio</h1>
+
+<div class="quarto-title-authors">
+</div>
+
+</section>
+<section id="tips-to-make-the-most-of-the-lecture-notes" class="slide level2">
+<h2>Tips to make the most of the lecture notes</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Interactive navigation tools</a></li><li><a href="#tabset-1-2">Running and writing codes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two navigation tricks before we start. The three stacked lines in the bottom left corner open a table of contents, so you can jump straight to a section. And pressing the letter o gives you a panel view of every slide at once. This deck works as a reference more than most of the others, because it is full of folder layouts and keyboard shortcuts you will want to come back to when you are actually setting up a project rather than sitting in class. So it is worth knowing how to find a specific slide quickly, because you will be doing exactly that in a few weeks.</p>
+</details>
+<ul>
+<li><p>Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want</p></li>
+<li><p>Hit letter “o” on your keyboard and you will have a panel view of all the slides</p></li>
+</ul>
+</div>
+<div id="tabset-1-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>The usual note about the code boxes. The faintly blue area is an editor, Run Code executes it, and you can run part of it by highlighting and pressing Command Enter, or Control Enter on Windows. The copy button in the top right corner puts the code on your clipboard for pasting into RStudio, and the reload button restores the original if you have edited yourself into a mess. This particular chapter has less runnable code than most, because much of what we cover happens in the RStudio interface rather than in the console. Where there is code, though, it behaves the same way.</p>
+</details>
+<ul>
+<li>The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the “code area”).</li>
+<li>Hit the “Run Code” button to execute all the code inside the code area.</li>
+<li>You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).</li>
+<li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
+<li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
+</ul>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="learning-objectives" class="slide level2">
+<h2>Learning objectives</h2>
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Three objectives, and this chapter is different in character from the others. There is very little code to run. What we are covering is how to arrange your work: where files go, how code is structured inside a file, and a set of RStudio habits that make everything else faster. It can feel like housekeeping compared with learning dplyr or ggplot. It is not. Most of the pain in a research project comes from disorganization rather than from difficulty, and the difference between a project you can pick up after three months and one you cannot is almost entirely what this chapter covers.</p>
+</details>
+<ul>
+<li>Learn how to organize your project: folder, codes, data files, etc</li>
+<li>Learn how to organize R codes</li>
+<li>Learn how to use various RStudio tips for efficient programming</li>
+</ul>
+</section>
+<section>
+<section id="reproducibility" class="title-slide slide level1 center">
+<h1>Reproducibility</h1>
+
+<div style="float:left">
+
+</div>
+<hr color="#EB811B" size="1px" width="1000px">
+
+</section>
+<section id="reproducibility-1" class="slide level2">
+<h2>Reproducibility</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">What is it?</a></li><li><a href="#tabset-2-2">How</a></li><li><a href="#tabset-2-3">High v.s. low quality</a></li><li><a href="#tabset-2-4">Why high-quality reproducible research</a></li><li><a href="#tabset-2-5">Check list</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two words that get used interchangeably and should not be. Read both callouts carefully, because the distinction turns on what stays the same. Reproducible means somebody uses your materials and your procedure and gets your results. Replicable means somebody applies your procedure to different materials and reaches the same conclusion. So reproducibility is about whether your work can be checked, and replicability is about whether your finding is real. Both matter, but they are different questions, and this lecture is only about the first. If you cannot reproduce your own results in six months, nothing downstream of that is worth much.</p>
+</details>
+<p>First of all, you may have heard of “reproducibility” and “replicability.” While they sometimes are used interchangeably, they mean different things. Here are commonly used definitions of the two terms (Cacioppo et al.&nbsp;2015).</p>
+<p><br></p>
+<div title="Definition: Reproducibility">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Definition: Reproducibility</strong></p>
+</div>
+<div class="callout-content">
+<p>A research study is <strong>reproducible</strong> if anybody (including the author of the study) can generate exactly the same results by using the same materials (e.g., data) and procedures used in the study.</p>
+</div>
+</div>
+</div>
+</div>
+<p><br></p>
+<div title="Definition: Replicability">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Definition: Replicability</strong></p>
+</div>
+<div class="callout-content">
+<p>A research study is <strong>replicable</strong> if other teams reach the same conclusion by applying the same procedure to the different materials (e.g., data).</p>
+</div>
+</div>
+</div>
+</div>
+<p>This lecture focuses only on reproducibility and does not deal with replicability.</p>
+</div>
+<div id="tabset-2-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Here is the minimum bar, and it is lower than people expect. Every action is documented well enough that somebody else can follow it. That is all. Read the paragraph underneath, because it corrects a common misunderstanding. Reproducibility does not require that everything be automated. If you delete rows in Excel by hand, that is still reproducible, provided you write down that you did it and you keep the original file. Discouraged, certainly, but still reproducible. The thing that actually breaks reproducibility is the hidden action, the step you took and did not record, because nobody can repeat what nobody knows about.</p>
+</details>
+<div title="Minimum Requirement">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Minimum Requirement</strong></p>
+</div>
+<div class="callout-content">
+<p>Every single action taken during the entire research process is documented in a way that anybody can follow to implement the same actions (no hidden actions) to produce exactly the same results.</p>
+</div>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>Note that this does not necessarily mean every single action needs to be computer-programmed and automated. Even if you manually delete rows of data on Excel (highly discouraged), this does not make your research non-reproducible as long as this action is recorded and the original data (before deletion of the rows) are provided because anybody can implement this action.</p>
+</div>
+<div id="tabset-2-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Meeting the minimum makes a project reproducible. It does not make it good. If reproducing your work takes somebody three weeks of puzzling, you have technically satisfied the requirement and helped no one. The three characteristics on screen are what separate the two. An organized folder so files can be found, automation through annotated programs so the workflow can be run rather than reconstructed, and documentation covering the data, the methods, and the steps. Notice that all three are about somebody else’s time. And be clear who that somebody usually is: you, six months from now, having forgotten everything.</p>
+</details>
+<p>A project can be considered reproducible if the minimum requirements are met. However, it is still low-quality if reproducing it requires excessive time or resources. A high-quality reproducible project, on the other hand, demonstrates the following characteristics:</p>
+<p><br></p>
+<p><strong>Organized Project Folder</strong></p>
+<p>A well-structured folder system makes it easy to locate files and navigate the project.</p>
+<p><br></p>
+<p><strong>Streamlined Automation</strong></p>
+<p>Workflows are automated through clearly annotated programs, making replication straightforward and ensuring transparency in the process.</p>
+<p><br></p>
+<p><strong>Comprehensive Documentation</strong></p>
+<p>Thorough documentation—including details on data, methods, and reproduction steps—saves time and enhances clarity for anyone reproducing the work.</p>
+</div>
+<div id="tabset-2-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Who actually benefits, and the letters in brackets are the point. Scientific integrity benefits the community. Educational value benefits your team and the community. But look at the last three. Repeatability, transferability and reducing errors all carry Y and M, meaning you and your team. That is the argument worth internalising. Reproducibility is often presented as a duty you owe the profession, which makes it sound like unpaid overhead. Most of the payoff is actually yours. You are the one who will need to rerun this with one variable changed, hand it to a coauthor, or find the error before a referee does.</p>
+</details>
+<p>The main beneficiaries of reproducible research include:</p>
+<ul>
+<li>You (Y)</li>
+<li>Members of your team (M)</li>
+<li>The scientific community (S)</li>
+</ul>
+<p><br></p>
+<p>Here are some of the benefits of high-quality reproducible research with their beneficiaries:</p>
+<ul>
+<li>Scientific Integrity (S)</li>
+<li>Educational Value (MS)</li>
+<li>Repeatability (YM)</li>
+<li>Transferability (YM)</li>
+<li>Reducing Errors (YM)</li>
+</ul>
+</div>
+<div id="tabset-2-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A checklist to run against your own work, and I would genuinely use it. Six items: organized folders, documented data, everything programmed rather than done by hand, code that is annotated and organized, an instruction saying what to run and in what order, and no junk files lying around. That fifth one is the most commonly missed. People produce beautiful code and never write down which script runs first, which leaves the next person guessing. And the sixth matters more than it sounds, because a folder full of abandoned experiments makes it impossible to tell what is actually part of the project.</p>
+</details>
+<ul class="task-list">
+<li><label><input type="checkbox">The project has organized folder system and all the files (code, manuscript, journal articles in pdf) are placed where they should be</label></li>
+<li><label><input type="checkbox">Data is clearly documented</label></li>
+<li><label><input type="checkbox">All the actions (data processing, analysis, figure and table creation) are computer-programmed without any manual procedures (e.g., deleting rows of a CSV file on Microsoft Excel)</label></li>
+<li><label><input type="checkbox">The computer programs are well annotated and organized</label></li>
+<li><label><input type="checkbox">An instruction to reproduce (what computer programs to run in what order) is provided</label></li>
+<li><label><input type="checkbox">There are no unnecessary files in the project folder</label></li>
+</ul>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section></section>
+<section>
+<section id="how-to-organize-your-project" class="title-slide slide level1 center">
+<h1>How to organize your project</h1>
+
+<div style="float:left">
+
+</div>
+<hr color="#EB811B" size="1px" width="1000px">
+
+</section>
+<section id="how-to-organize-your-project-1" class="slide level2">
+<h2>How to organize your project</h2>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Motivation</a></li><li><a href="#tabset-4-2">RStudio project</a></li><li><a href="#tabset-4-3">Folder organization</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Why one dedicated folder per project. Two reasons on screen, and the first is the one that bites. If you work across several projects in one session, you will eventually have two objects with the same or similar name and use the wrong one. That produces results which are wrong but not obviously wrong, which is the worst kind of error. The second reason is memory, carrying around objects irrelevant to what you are doing. The deeper point is that a project should be a self-contained thing you can open, work in and close, with nothing leaking in from elsewhere.</p>
+</details>
+<p>You should have a single dedicated folder for a research project. This will avoid</p>
+<ul>
+<li><p>confusions between objects of the same or similar name (accidentally using the one you do not intend to use)</p></li>
+<li><p>wasting memory by holding objects on the global environment that are completely irrelevant to your working project</p></li>
+</ul>
+</div>
+<div id="tabset-4-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Now the mechanics, in three steps in the nested tabs. Work through them, but understand what you are creating. An RStudio project is really just a folder with a dot Rproj file in it. What that file buys you is that opening it starts a fresh R session whose working directory is that folder. So your paths become relative to the project rather than to wherever your machine happens to be pointing, which means the whole thing can be moved, zipped, or handed to somebody else and still work. That is the entire value, and it is a large one.</p>
+</details>
+<p>We can initiate an RStudio project with a dedicated folder from within RStudio.</p>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Step 1</a></li><li><a href="#tabset-3-2">Step 2</a></li><li><a href="#tabset-3-3">Step 3</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<div class="columns">
+<div class="column" style="width:30%;">
+<p>At the top right corner of RStudio, navigate through:</p>
+<p><br></p>
+<p><strong>Project (None)</strong></p>
+<p>-&gt; <strong>New Project…</strong></p>
+<p>-&gt; <strong>New Directory</strong></p>
+<p>-&gt; <strong>New Project</strong></p>
+</div><!--end of the 1st column--><div class="column" style="width:70%;">
+<p><img data-src="RStudio-project.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-3-2">
+<div class="columns">
+<div class="column" style="width:30%;">
+<ul>
+<li>type in a directory name</li>
+<li>select the directory in which the project folder (directory) is going to be created</li>
+<li>hit the <em>create folder</em> button</li>
+</ul>
+</div><!--end of the 1st column--><div class="column" style="width:70%;">
+<p><img data-src="New-Project.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+<div id="tabset-3-3">
+<div class="columns">
+<div class="column" style="width:30%;">
+<p>You will be automatically taken to a new R session inside the newly-created RStudio project.</p>
+<p>In this folder you just created, you have a single file named <strong><directory-name>.Rproj</directory-name></strong> (here, it is <strong>test.Rproj</strong>). It holds information about this project, but you do not have to touch it.</p>
+</div><!--end of the 1st column--><div class="column" style="width:70%;">
+<p><img data-src="RStudio-project-initial.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-4-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data is the thing you can never regenerate, so it lives somewhere you only ever read from. Everything else can be rebuilt by rerunning your scripts.</p>
+</details>
+<p>Here is a recommended folder organization. You should modify/add folders as you see fit.</p>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li><strong>Code</strong>: all the codes go in here
+<ul>
+<li><strong>DataPrep</strong>:</li>
+<li><strong>Analysis</strong>:</li>
+</ul></li>
+<li><strong>Data</strong>
+<ul>
+<li><strong>Raw</strong>: place raw datasets here</li>
+<li><strong>Processed</strong>: save intermediate datasets here</li>
+</ul></li>
+<li><strong>Literature</strong>: journal articles and other relevant documents</li>
+<li><strong>Results</strong>: results (regression, figures, tables)</li>
+<li><strong>Writing</strong>: qmd, WORD, Latex files</li>
+</ul>
+</div><!--end of the 1st column--><div class="column" style="width:40%;">
+<p><img data-src="folder-structure.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="files" class="slide level2">
+<h2>Files</h2>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Quarto (.qmd) or R (.R)?</a></li><li><a href="#tabset-6-2">Inside a qmd file</a></li><li><a href="#tabset-6-3">R code style</a></li><li><a href="#tabset-6-4">File placement</a></li><li><a href="#tabset-6-5">File names</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A recommendation you may find surprising: write your analysis code in a qmd file rather than a plain R script. The reasons are on screen. Commenting is far easier, because prose between chunks is just prose rather than a wall of hash marks. Headers give you real structure. And the two practical ones at the bottom are what win people over. Run All Chunks Above rescues you when R crashes partway through, without rerunning everything by hand. And the navigator at the bottom of the source pane lets you jump between sections, which matters enormously once a file gets long.</p>
+</details>
+<div title="Recommendation">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Recommendation</strong></p>
+</div>
+<div class="callout-content">
+<p>Use a <strong>qmd</strong> file instead of an <strong>R</strong> file whenever you write codes</p>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li><p>It is much easier to make comments in a qmd file than an R file</p></li>
+<li><p>You can better organize your codes with markdown section headers (e.g., #, ##)</p></li>
+<li><p>R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Use <code>Run All Chunks Above</code> button (click on the triangle right to the <code>Run</code> button and select the option, or hit <code>option</code> + <code>command</code> + <code>P</code>).</p></li>
+<li><p>Easily move between sections and subsection using the navigator at the bottom lower corner of the source pane</p></li>
+</ul>
+<p><img data-src="MoveBetweenChunks.png" style="width:60.0%"></p>
+</div>
+<div id="tabset-6-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A recommended structure for the inside of a file, and it is worth adopting as a habit. Start with an objective statement saying what this file does, what it takes in and what it produces. Then setup: working directory, packages, functions. Then the actions, in order. The objective statement is the part people skip and the part that pays. When you come back in six months, the first thing you need to know is what this file is for and what it depends on. And read the note at the bottom: keep it current, because inputs and outputs drift as a project evolves.</p>
+</details>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div title="Recommended Structure">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Recommended Structure</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Objective statement
+<ul>
+<li>state objectives</li>
+<li>input: state input files and datasets</li>
+<li>output: state output files and datasets</li>
+</ul></li>
+<li>Setup
+<ul>
+<li>set the working directory (if necessary)</li>
+<li>load packages</li>
+<li>load functions</li>
+</ul></li>
+<li>Actions
+<ul>
+<li>Action 1</li>
+<li>Action 2</li>
+<li>.</li>
+<li>.</li>
+<li>.</li>
+<li>Action n</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div><!--end of the 1st column--><div class="column" style="width:50%;">
+<p><img data-src="inside-qmd.png"></p>
+</div><!--end of the 2nd column-->
+</div>
+<!--end of the columns-->
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Dynamically edit the “Objective statement” as its objectives, input, and output are likely to change.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Style, in two nested tabs. The honest position is in the first sentence: you can write R however you like, and R will not care. The argument for a style guide is entirely about other people reading your code, and again, that includes you later. The two guides linked here are the common ones, with tidyverse the more widely used in this ecosystem. Then the second tab covers styler, which automates part of it. Do click through the linked examples on naming, spacing and piping rather than just noting that guides exist. Those four pages are most of what you actually need.</p>
+</details>
+<div class="panel-tabset">
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">R code readability</a></li><li><a href="#tabset-5-2"><code>styler</code> package</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1">
+<p>You can write R codes however you would like. But, your code may get more readable to you and others who might read your codes by following a style guideline that is accepted by many R users. There are several popular styles of formatting R codes:</p>
+<ul>
+<li><a href="https://style.tidyverse.org/">tidyverse style</a></li>
+<li><a href="http://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html">Google’s R Style Guide</a></li>
+</ul>
+<p><strong>Examples</strong></p>
+<p>Here are some examples of the <code>tidyverse</code> style:</p>
+<ul>
+<li><a href="https://style.tidyverse.org/syntax.html#object-names">how to name objects</a></li>
+<li><a href="https://style.tidyverse.org/syntax.html#spacing">spacing</a></li>
+<li><a href="https://style.tidyverse.org/syntax.html#long-lines">long lines</a></li>
+<li><a href="https://style.tidyverse.org/pipes.html#introduction">piping</a></li>
+</ul>
+</div>
+<div id="tabset-5-2">
+<p>The <code>styler</code> package can help you partially follow the <code>tidyverse</code> coding style.</p>
+<!-- CHANGED: this said installing styler lets you hit cmd+shift+A to reformat
+to tidyverse style. Two things wrong with that. cmd/ctrl+shift+A is RStudio's
+own built-in "Reformat Code" command -- it works whether or not styler is
+installed, and it does not apply the tidyverse style. And styler ships four
+addins ("Set style", "Style selection", "Style active file", "Style active
+package") in its addins.dcf, none of which declares a keyboard shortcut, because
+RStudio addins never get one by default. Verified against styler 1.10.3. -->
+<p>Highlight the lines you want to restyle, then click <code>Addins</code> in the menu at the top and select <strong>Style selection</strong>.</p>
+<div title="Want a keyboard shortcut?">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Want a keyboard shortcut?</strong></p>
+</div>
+<div class="callout-content">
+<p>Addins have no shortcut out of the box. To give <strong>Style selection</strong> one, go to <span style="color: blue;">Tools</span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Modify Keyboard Shortcuts…</span>, search for “Style selection”, and assign a key of your choosing.</p>
+<p>Do not confuse this with <code>cmd</code> + <code>shift</code> + <code>A</code> (<code>ctrl</code> + <code>shift</code> + <code>A</code> on Windows). That is RStudio’s <strong>own</strong> “Reformat Code” command. It is built in, it works without <code>styler</code>, and it does <span style="color: red;">not</span> follow the tidyverse style guide.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-6-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Four sets of rules, and if you remember only one thing, make it the first. Raw data goes in Data slash Raw, and you never overwrite it. You read from it, you never write to it. Everything else in your project can be regenerated by rerunning code. Raw data cannot, and if you overwrite it you have destroyed the one irreplaceable thing you had. The rest follows the same logic. Processing code in Code slash DataPrep writing to Data slash Processed, analysis code in Code slash Analysis writing to Results, and writing that refers to Results rather than keeping its own copies.</p>
+</details>
+<div title="Rules 1">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Rules 1</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>place all the raw datasets (nothing else) in a designated folder inside the <strong>Data/Raw</strong> folder</li>
+<li>do not ever override them, you only read them and keep them intact</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Rules 2">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Rules 2</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>write R codes to process (transform, merge, etc) the raw data and save all the R codes inside the <strong>Code/DataPrep</strong> folder</li>
+<li>save intermediate R objects or datasets in the <strong>Data/Processed</strong> folder</li>
+<li>do not mix codes and datasets in a single folder</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Rules 3">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Rules 3</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>write R codes to do analysis and save them in <strong>Code/Analysis</strong></li>
+<li>save the results/outputs (regression tables, figures, tables) in the <strong>Results</strong> folder</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Rules 4">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Rules 4</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>if you are using qmd to write a journal article or report, put them in the Writing folder (same goes for WORD)</li>
+<li>refer to figures and tables in the <strong>Results</strong> folder to integrate them in the output document</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two recommendations about naming, and the second is the useful one. Name files for what they do, and put numbers in front to encode the order they should be run in. Look at the example: zero one dash one download weather data, zero one dash two download boundary data, and so on, with data preparation numbered zero one and analysis numbered zero two. That numbering is doing real work. It is the instruction on how to reproduce your project, embedded in the filenames themselves, so anybody sorting the folder alphabetically sees the correct order to run things in.</p>
+</details>
+<div title="Recommendation">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Recommendation</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Name files so that you know what purposes they serve for you</li>
+<li>Place numbers as prefix to indicate the order in which they should be run</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div title="Example">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Example</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Data Collection and Preparation (in <strong>Code/DataPrep</strong>)
+<ul>
+<li>01-1-download-weather-data.R</li>
+<li>01-2-download-political-boundary-data.R</li>
+<li>01-3-summarize-data.R</li>
+<li>01-4-merge-data.R</li>
+</ul></li>
+<li>Data Analysis and Results Preparation (in <strong>Code/Analysis</strong>)
+<ul>
+<li>02-1-regression-analysis.R</li>
+<li>02-2-gen-figures-tables.R</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="example-project" class="slide level2">
+<h2>Example project</h2>
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Rather than take my word for any of this, go and look at one. The link is to a sample project on GitHub built to be reproducible. Clone it and open it, and read it the way somebody reproducing it would. Start at the top level, find the instruction telling you what to run, then follow the numbered files. Ask yourself honestly whether you could rerun the whole thing without needing to ask the author anything. That is the real test of everything in this chapter, and it is a far better way to judge the advice than reading a checklist about it.</p>
+</details>
+<p>Let’s take a look at an example project that is designed to be reproducible. First, Clone <a href="https://github.com/tmieno2/Sample-Reproducible-Project.git">this repository</a>. We will then look at how the project is organized and developed.</p>
+</section></section>
+<section>
+<section id="rstudio-tips" class="title-slide slide level1 center">
+<h1>RStudio tips</h1>
+
+<div style="float:left">
+
+</div>
+<hr color="#EB811B" size="1px" width="1000px">
+
+</section>
+<section id="code-snippets" class="slide level2">
+<h2>Code snippets</h2>
+<div class="panel-tabset">
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">What is it?</a></li><li><a href="#tabset-9-2">Examples</a></li><li><a href="#tabset-9-3">How to add snippets</a></li><li><a href="#tabset-9-4">Context-specificity</a></li><li><a href="#tabset-9-5">Variables</a></li><li><a href="#tabset-9-6">More examples</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Snippets are text expansion inside RStudio. You type a short trigger, hit tab, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. The line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.</p>
+</details>
+<p>Code snippets map a short sequence of letters and symbols to a longer, more complicated one.</p>
+<p><br></p>
+<p><strong>Syntax</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>snippet (combination of letters to invoke)</span>
+<span id="cb1-2"><a></a>  (what you want to print) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div title="Important">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Important</strong></p>
+</div>
+<div class="callout-content">
+<p>You need a tab before <strong>(what you want to print)</strong></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-9-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two examples in the nested tabs, and they are the two worth setting up first. Typing p i then tab gives you the pipe. Typing a s then tab gives you the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Note the parenthetical about hitting enter if there are competing completions. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so you may need one extra keystroke to disambiguate. That is worth knowing before you decide a snippet is broken.</p>
+</details>
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">piping operator</a></li><li><a href="#tabset-7-2">assignment operator</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
+<p><br></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a>snippet pi</span>
+<span id="cb2-2"><a></a>  %&gt;% </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>Once you add this, you can type “pi” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>%&gt;%</code> printed.</p>
+</div>
+<div id="tabset-7-2">
+<p><br></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a></a>snippet as</span>
+<span id="cb3-2"><a></a>  &lt;- </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p>Once you add this, you can type “as” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>&lt;-</code> printed.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-9-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, hit tab, and watch the arrow appear. And remember the tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.</p>
+</details>
+<p>Follow <span style="color: blue;"> Tools </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Global Options </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;"> Code </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;"> Edit Snippets</span> , select R tab, and add snippets.</p>
+<p><br></p>
+<div title="Try yourself">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Try yourself</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Place the following</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a></a>snippet as</span>
+<span id="cb4-2"><a></a>  &lt;-</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>type “as” and hit tab inside an R code chunk</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-9-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Something that confuses people the first time. A qmd file has two contexts. Inside an R chunk you are in R, and outside one you are in Markdown. Snippets are stored per context, so a snippet defined on the R tab only fires inside chunks, and a Markdown one only fires outside them. Look at the example in the second nested tab. A snippet that creates a whole R chunk necessarily belongs in the Markdown list, because you are outside a chunk at the moment you want to make one. And note it is invoked with shift tab there, rather than plain tab.</p>
+</details>
+<div class="panel-tabset">
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">What is it?</a></li><li><a href="#tabset-8-2">Example</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1">
+<p>Suppose you are working on a Quarto document.</p>
+<ul>
+<li>You are in the R context if your cursor is in an R code chunk</li>
+<li>You are in the Markdown context if your cursor is outside of an R code chunk</li>
+</ul>
+<p>Snippets defined in the R (Markdown) tab only work in the R (Markdown) context.</p>
+</div>
+<div id="tabset-8-2">
+<p>This snippet will let you create an R code chunk with typing “rmc”. Place it in the Markdown tab of the snippets list and hit <strong>shift</strong>+<strong>tab</strong> to invoke it.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a></a>snippet rmc</span>
+<span id="cb5-2"><a></a>  `r ''````{r }</span>
+<span id="cb5-3"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Confirm that this snippet does not work in the R environment.</p>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</div>
+<div id="tabset-9-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>This is what makes snippets genuinely powerful rather than just shorter to type. The dollar sign with a number and a label marks a placeholder. Expand this one and your cursor lands in the chunk title; press tab and it jumps to the chunk contents. So a snippet is not simply fixed text, it is a small fill-in-the-blanks form that walks you through the parts you have to supply, in order. Once you see that, the useful snippets to write become obvious. Any structure you type repeatedly where only two or three pieces change each time is a candidate.</p>
+</details>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a></a>snippet rmc</span>
+<span id="cb6-2"><a></a>  `r ''````{r ${1:chunk_title}}</span>
+<span id="cb6-3"><a></a>    ${2:chunk_content}</span>
+<span id="cb6-4"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>$</code> is used as a special character to denote where the cursor should jump (by hitting <code>tab</code>) after completing each section of a snippet.</p>
+</div>
+<div id="tabset-9-6">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and tab and you get a line plot skeleton, with your cursor waiting on the dataset name, then the y variable, then x. Type g d and you get a density plot the same way. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.</p>
+</details>
+<p><strong>ggplot (scatter plot)</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>snippet gl</span>
+<span id="cb7-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
+<span id="cb7-3"><a></a>  geom_line(aes(y = ${2:y}, x = ${3:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<p><strong>ggplot (density plot)</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>snippet gd</span>
+<span id="cb8-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
+<span id="cb8-3"><a></a>  geom_density(aes(x = ${2:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<!--end of panel-->
+</section>
+<section id="resources" class="slide level2">
+<h2>Resources</h2>
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Three places to go next. Efficient R Programming is a full book and much broader than this lecture, worth dipping into rather than reading end to end. The tidyverse style guide is the reference for the styling material we covered, and it is short. And the styler GitHub page is where to look when you want to configure the automatic reformatting rather than accept its defaults. None of these are required reading. But the habits in this chapter are ones you build slowly, and having somewhere to look when a specific question comes up beats trying to absorb it all now.</p>
+</details>
+<ul>
+<li><a href="https://csgillespie.github.io/efficientR/">Efficient R Programming</a></li>
+<li><a href="https://style.tidyverse.org/">tidyverse style guide</a></li>
+<li><a href="https://github.com/r-lib/styler"><code>styler</code> github page</a></li>
+</ul>
+
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/">back to the lecture slides on the course website</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

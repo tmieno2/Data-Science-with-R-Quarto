@@ -1,0 +1,1136 @@
+---
+title: "09-6: R as GIS: Download Spatial Datasets using R"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf', 'terra', 'stars', 'tidyterra', 'prism', 'tidyUSDA', 'tigris'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+```{r, include = FALSE}
+library(sf)
+library(dplyr)
+library(tidyUSDA)
+library(ggplot2)
+library(tidyterra)
+library(terra)
+library(data.table)
+#--- CHANGED: a live USDA-NASS API key was hard-coded here and in the      ---#
+#--- webr setup chunk below. The webr one is shipped to the browser, so it ---#
+#--- was published on the course website. Every getQuickstat() call in this ---#
+#--- deck is eval = F, so nothing here ever used it.                        ---#
+nass_api_key <- Sys.getenv("NASS_API_KEY")
+```
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last deck in the course, and a practical one. Everything so far assumed the data was already sitting on your machine. This is about getting it, without a browser and without clicking through a download form, which matters for two reasons. Downloading by hand does not scale past a few files, and it is not reproducible, so nobody can rerun your work and get your dataset. We cover four sources that between them cover a great deal of applied agricultural economics: administrative boundaries, USDA survey statistics, weather, and satellite-derived land cover.
+
+</details>
+
+<br>
+
+### Learning objectives
+
+Learn how to download publicly available agriculture-related data from within R.
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
+1. [tigris](#sec-tigris)
+2. [USDA-NASS](#sec-usda-nass)
+3. [PRISM](#sec-prism)
+4. [Crop Data Layer (CDL)](#sec-cdl)
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+### Pre-requisite (Links)
+
++ [`ggplot2` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_1_ggplot2_primer.html)
++ [`dplyr` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_2_dplyr_primer.html)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns--> 
+
+
+```{webr-r}
+#| context: setup
+#--- install and library the data package ---#
+#--- Both repos are required. r.spatial.workshop.datasets declares         ---#
+#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#
+#--- repos named here. With the custom repo alone, sf cannot be found and   ---#
+#--- the install never completes, so nothing downstream ever runs.          ---#
+webr::install(
+  "r.spatial.workshop.datasets",
+  repos = c(
+    "https://tmieno2.github.io/rwasm-package/repo",
+    "https://repo.r-wasm.org"
+  )
+)
+
+library(r.spatial.workshop.datasets)
+data(wells_ne_sf)
+data(ne_counties)
+data(treatment_blocks)
+data(corn_yield)
+data(NDRE)
+NDRE <- terra::rast(NDRE)
+data(prism_us)
+prism_us <- terra::rast(prism_us)
+```
+
+## Tips to make the most of the lecture notes 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One important difference on this deck. Most of the code here is shown but not run, because it downloads from servers that will not answer a request coming from inside your browser, and some of it needs an API key that is yours rather than mine. So this deck is closer to a reference you will come back to than a set of cells to click through. Read the syntax, then try it in RStudio on your own machine, where it genuinely works. The pieces that do run in the browser are marked by having a Run button that does something.
+
+</details>
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+## U.S. county and state boundary {#sec-tigris}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+County and state boundaries are the most reused spatial data in applied economics, since almost every administrative dataset is reported by county. The tigris package fetches them straight from the Census Bureau. It does far more than boundaries too, offering roads, water, tracts, block groups and a good deal else, so the link is worth following when you need something specific. The important thing is that a boundary file becomes one line of code rather than a download, an unzip, and a folder you have to remember the location of.
+
+</details>
+
++ U.S. county and state boundary data are commonly used in many scientific studies. 
+
++ The `tigris` package is one of the packages that let you download them from within R.
+
++ It lets you download much more than just county and state boundaries. See the other types of data [here](https://github.com/walkerke/tigris?tab=readme-ov-file)
+
+### How (state)
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One function call. But look closely at the cb argument, because it matters more than it looks. Without it you get the full-detail boundary, which is very large and slow to draw, since it traces every inlet and river bend. With cb set to TRUE you get a generalised version, and for almost any map you will make, that is the right choice. Full detail is worth its cost only if you are doing precise spatial operations near a coastline. Note also progress bar set to FALSE, which just quiets the output.
+
+</details>
+
++ You can use `tigris::states()` to download the state boundary data as an `sf` object.
+
++ By default, the most detailed boundary data is downloaded, which can be quite large
+  + creating map using `ggplot()` can take significantly more time
+  + the map can be quite large in size
+
++ By adding `cb = TRUE`, you will get generalized (less detailed) boundary data, which is usually sufficient.
+
+```{r, cache = TRUE}
+#| message: false
+#| warning: false
+states_sf <- tigris::states(cb = TRUE, progress_bar = FALSE)
+```
+
+<br>
+
+```{r}
+ggplot(states_sf) +
+  geom_sf() +
+  theme_void()
+```
+
+### How (county)
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The counties function works the same way, with a state argument that takes abbreviations or names and accepts several at once. The map at the end is worth a moment: county boundaries drawn underneath, then the two state outlines over the top in blue and thicker. That is the layering from the mapping deck used for something practical, checking that two datasets you downloaded separately actually line up. If the state outlines had not sat exactly on the county edges, you would know something was wrong immediately — usually a mismatched vintage or a mismatched projection.
+
+</details>
+
++ You can use `tigris::counties()` to download the county boundary data as an `sf` object.
+
++ You can specify states by the `state` option.
+
+```{r, cache = TRUE}
+IL_IN_county <- 
+  tigris::counties(
+    state = c("IL", "IN"), 
+    cb = TRUE, 
+    progress_bar = FALSE
+  )
+```
+
+<br>
+
+```{r}
+ggplot() +
+  geom_sf(data = IL_IN_county) +
+  geom_sf(
+    data = dplyr::filter(states_sf, NAME %in% c("Illinois", "Indiana")),
+    fill = NA,
+    color = "blue",
+    linewidth = 1
+  ) +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+
+
+## USDA-NASS {#sec-usda-nass}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Quick Stats is the USDA's statistical warehouse, and it holds a great deal: acres planted and harvested, yields, prices, livestock counts, by state and by county, from both the annual surveys and the five-yearly census. The tidyUSDA package wraps its API. The feature that makes it worth using over the raw API is the geometry argument, which returns the data already joined to boundaries as an sf object, so you can map it or spatially join it immediately, with no separate boundary download and no merge to get wrong. That saves a surprising amount of tedious work.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ [USDA NASS Quick Stats](https://quickstats.nass.usda.gov/) provides a wealth of agriculture-related datasets such as  harvested acres or irrigated acres by crop at different spatial resolutions (e.g., state, county) from both survey and census.
+
++ We use the `tidyUSDA` package to download data from USDA NASS Quick Stats.
+
++ A nice thing about `tidyUSDA` is that it gives you an option to download data as an `sf` object, which means you can immediately visualize the data or spatially interact it with other spatial objects.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three tabs, and the middle one is the reference you will keep coming back to. First, the API key, which you get free from the Quick Stats site. Read the callout about it carefully, because a key is a credential and pasting it into your script publishes it to anyone who sees the file. The third tab solves a real problem: variable names in Quick Stats are long, exact and unguessable, so rather than trying to remember them you search the full list with grep, narrowing by keyword, and copy exactly what you find into your query.
+
+</details>
+
+::: {.panel-tabset}
+
+#### API key
+
++ First thing you want to do is to get an API key from this [website](https://quickstats.nass.usda.gov/api).
+  + click on **obtain an API key**
+  + save the API key somewhere 
+
++ You use this API key every time you download data from R using `tidyUSDA`.
+
+#### Download data
+
+You can download data using `tidyUSDA::getQuickstat()`.
+
+<br>
+
+**Syntax**
+
+```{r, eval = F}
+getQuickstat(
+    key,
+    program,
+    data_item,
+    geographic_level,
+    state,
+    year,
+    geometry
+  )
+```
+<br>
+
++ `key`: API key
++ `program`: either "Survey" or "Census"
++ `data_item`: name of the variable to download
++ `geographic_level`: set the level of geographical unit ("County", "State")
++ `state`: vector of states
++ `year`: vector of years in **character**
++ `geometry`: if TRUE, then the downloaded data will be `sf` with geometry included. If false, a `data.frame` without geometry is returned.
+
+<br>
+
+:::{.callout-note}
++ There are many other options. Run `?getQuickstat` to see all the options.
++ The above options should cover most of your use cases.
+:::
+
+#### Identify data item (variable) name
+
+Sometimes you know what you would like to download, but not the name of the variable for it. In such a case, you can first get a list of all the data item names with this:
+
+```{webr-r}
+all_items <- tidyUSDA::allDataItem
+
+#--- just see a few ---#
+head(all_items)
+```
+
+<br>
+
+You can then narrow down the list using keywords. Suppose you are interested in getting irrigated grain corn yield measured in bu/acre. 
+
+```{webr-r}
+all_items %>%
+  #--- find data items that include CORN ---#
+  grep(pattern = "CORN", ., value = TRUE) %>%
+  #--- find data items that include YIELD ---#
+  grep(pattern = "YIELD", ., value = TRUE) %>%
+  #--- find data items that include IRRIGATED ---#
+  grep(pattern = "IRRIGATED", ., value = TRUE)
+```
+
+<br>
+
+You can now copy the first entry of the results and paste it for `data_item` option.
+
+:::
+<!--end of panel-->
+
+### Demonstration
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A concrete query, and it reads much like the syntax page: the variable, the geography, the states, the years, and geometry set to TRUE. What comes back has a great many columns, most of which you will never use, so the second tab shows the handful that matter. The one to know is Value, which is where the number you actually asked for lives, whatever variable you requested. That naming is a quirk of the API rather than anything sensible, and it catches everyone exactly once. Select the handful of columns you need straight after downloading.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Download
+
+The code below download county-level irrigated grain corn yield (bu/acre) in Illinois and Nebraska from 2000 through 2005.
+
+:::{.callout-important title="Do not paste your key into the script"}
+An API key is a credential. Written into a `.qmd` it ends up in the rendered HTML,
+in your git history, and on any website you publish the deck to. Keep it outside
+the document and read it in:
+
++ `Sys.getenv("NASS_API_KEY")`, with the key set in your `.Renviron`, or
++ `keyring::key_get("usda_nass_qs_api")`, which is what the Caveat 2 tab uses.
+
+Both leave nothing quotable in the file you share.
+:::
+
+```{r, eval = F}
+(
+IL_NE_ir_corn_yield <-
+  tidyUSDA::getQuickstat(
+    key = nass_api_key, # from .Renviron — never the key itself
+    program = "SURVEY",
+    data_item = "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
+    geographic_level = "COUNTY",
+    state = c("ILLINOIS", "NEBRASKA"),
+    year = as.character(2000:2005),
+    geometry = TRUE
+  )
+)
+```
+
+```{r, eval = F, echo = F}
+saveRDS(IL_NE_ir_corn_yield, "Lectures/Data/il_ne_corn_yield.rds")
+```
+
+```{r, include = FALSE}
+IL_NE_ir_corn_yield <- readRDS("Data/il_ne_corn_yield.rds") 
+```
+```{r, echo = FALSE}
+IL_NE_ir_corn_yield
+```
+
+
+#### Select variables
+
+As you saw earlier, it has `r ncol(IL_NE_ir_corn_yield)` columns, most of which are not necessary.
+
+Here is the list of only variables you will probably need:
+
+```{r}
+IL_NE_ir_corn_yield %>%
+  dplyr::select(
+    year, county_name, county_code, state_name,
+    state_fips_code, short_desc, Value
+  )
+```
+
+<br>
+
+:::{.callout-note}
++ The value of the variable of your interest is stored in `Value` column.
+:::
+
+:::
+<!--end of panel-->
+
+### Caveat
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two ways this API will refuse you, both worth knowing before they happen. The first is a hard limit of fifty thousand rows per query, so a request spanning many states and many years simply fails, and the answer is to break it into smaller pieces. The second is subtler: asking for a combination that exists in general but has no observations for your particular state and year returns an error rather than an empty result. That is why an apparently reasonable query can fail, and it is not your syntax.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Caveat 1 {#sec-caveat-num-limit}
+
+::: {.columns}
+
+::: {.column width="70%"}
+You cannot retrieve more than 50,000 (the limit is set by QuickStat) rows of data. The query below requests far more than 50,000 observations, and fails. In this case, you need to narrow the search and chop the task into smaller tasks.
+
+Replace `nass_api_key` with your own API key and run the code on your computer.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{r, eval = F}
+many_states_corn <-
+  getQuickstat(
+    key = nass_api_key,
+    program = "SURVEY",
+    commodity = "CORN",
+    geographic_level = "COUNTY",
+    state = c("ILLINOIS", "COLORADO", "NEBRASKA", "IOWA", "KANSAS"),
+    year = as.character(1995:2018),
+    geometry = TRUE
+  ) 
+```
+
+
+#### Caveat 2
+
+::: {.columns}
+
+::: {.column width="70%"}
+A query returns an error when no observation satisfies your query criteria. For example, even though "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE" does exists as a `data_item`, there is no entry for the statistic in Illinois in 2018. Therefore, the following query fails.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{r, eval = F}
+many_states_corn <-
+  getQuickstat(
+    key = key_get("usda_nass_qs_api"),
+    program = "SURVEY",
+    data_item = "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
+    geographic_level = "COUNTY",
+    state = "ILLINOIS",
+    year = "2018",
+    geometry = TRUE
+  ) 
+```
+
+:::
+<!--end of panel-->
+
+### Loop
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The direct consequence of the row limit. If one query is too big, split it along a dimension and run several, then stack the results. Year is the natural choice here, though state would work as well. The code uses lapply over a vector of years, which is Chapter 5 material applied to something real, and then bind_rows to stitch the pieces back into a single sf object. Note that this is also a courtesy to the server: several modest requests are treated far more kindly than one enormous one.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Motivation
+
++ As mentioned [here](#sec-caveat-num-limit), there is a limit to how much data you can download with one query. 
++ When your target dataset exceeds the limit, you can break it up into pieces and download them one piece at a time.
+
+#### How
+
+There are two dimensions that seem easy to loop over: `state` and `year`. Here, let's loop over year.
+
+We first create a sequence of years to loop over one by one:
+
+```{r, eval = FALSE}
+#--- for the sake of shorter run time, we use 2015:2018 here ---#
+year_list <- as.character(2015:2018)
+```
+
+<br>
+
+We now download the data year by year with `lapply()`:
+
+```{r, eval = FALSE}
+lapply(
+  year_list, # list of objects to loop over
+  \(x) {
+    getQuickstat(
+      key = nass_api_key,
+      program = "SURVEY",
+      commodity = "CORN",
+      geographic_level = "COUNTY",
+      state = c("ILLINOIS", "COLORADO", "NEBRASKA", "IOWA", "KANSAS"),
+      year = x, # use the year 
+      geometry = TRUE
+    )
+  }
+) %>%
+# combine a list of sf into a single sf
+dplyr::bind_rows() 
+```
+
+
+
+:::
+<!--end of panel-->
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three tabs that walk the whole workflow end to end, which is the point of doing them in order. Find the variable name by searching, then download it for two states across five years, then map the result faceted by year. That is the complete arc from not knowing what a thing is called to having a figure. Do run these on your own machine rather than reading the answers, because the searching step in particular feels awkward until you have done it once yourself. After that it is routine, and you will use it every time you touch this API.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Identify `data_item` name
+
+You are interested in getting soybean harvested acres data. Search for the `data_item` name for this variable from `tidyUSDA::allDataItem`
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+tidyUSDA::allDataItem %>%
+  #--- find data items that include SOY ---#
+  grep(pattern = "SOY", ., value = TRUE) %>%
+  grep(pattern = "HARVESTED", ., value = TRUE) 
+
+```
+
+#### Download data
+
+Now, using the `data_item` name you got earlier, download the county-level data for Colorado and Kansas from 1990 through 1994 as an `sf` object.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+
+KS_CO_soy_hacres <-
+  getQuickstat(
+    key = nass_api_key,
+    program = "SURVEY",
+    data_item = "SOYBEANS - ACRES HARVESTED",
+    geographic_level = "COUNTY",
+    state = c("KANSAS", "COLORADO"),
+    year = as.character(1990:1994),
+    geometry = TRUE
+  ) %>%
+  dplyr::select(
+    year, county_name, county_code, state_name,
+    state_fips_code, short_desc, Value
+  )
+```
+
+#### Create a map
+
+Create a map of soybean harvested acres faceted by year.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot() +
+  geom_sf(data = KS_CO_soy_hacres, aes(fill = Value)) +
+  facet_wrap(. ~ year) +
+  theme_void()
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## PRISM {#sec-prism}
+
+::: {.panel-tabset}
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+PRISM is the standard source for United States weather in applied work: daily precipitation and maximum and minimum temperature, modelled onto a four kilometre grid covering the whole country. It is raster data, so everything from the raster deck applies, and the map on this slide is a single day of maximum temperature. If you need weather as a control variable, or you are estimating anything at all about climate and agriculture, this is very likely where your data will come from. It is free, and it covers several decades at daily resolution.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+The [PRISM dataset](https://prism.oregonstate.edu/) provides model-based estimates of daily precipitation, maximum temperature, and minimum temperature for the U.S. at the 4km by 4km spatial resolution.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{r, echo = FALSE}
+# options(prism.path = here::here("Lectures/Data/PRISM"))
+
+# prism::get_prism_dailys(
+#   type = "tmax",
+#   minDate = "2012-08-01",
+#   maxDate = "2012-08-01",
+#   keepZip = FALSE
+# )
+
+prism_temp <- terra::rast(here::here("lectures/Chapter-9-Spatial-Data/Data/PRISM/PRISM_tmax_stable_4kmD2_20120801_bil/PRISM_tmax_stable_4kmD2_20120801_bil.bil"))
+
+ggplot() +
+  geom_spatraster(data = prism_temp) +
+  scale_fill_viridis_c() +
+  theme_void()
+```
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One function fetches a date range, and the four arguments are all it takes. Type is the variable, using the abbreviations listed. The two dates bound the range, in year-month-day order. And keepZip decides whether the compressed downloads are kept after unpacking, which you usually do not want. Read the note about setting the download directory first, and note the modern spelling of it, since older code you find online will use an options call instead. Both do the same job, but the function is the current spelling and is easier to remember.
+
+</details>
+
+You can use `get_prism_dailys()` from the `prism` package to download PRISM data.
+
+<br>
+
+**Syntax**
+
+```{r, eval = FALSE}
+prism::get_prism_dailys(
+  type = variable type,
+  minDate = starting date as character,
+  maxDate = ending date as character,
+  keepZip = TRUE or FALSE
+) 
+```
+
++ `type`: you can select from “ppt” (precipitation), “tmean” (mean temperature), “tmin” (minimum temperature), and “tmax” (maximum temperature). 
++ `minDate`: starting date specified in format **YYYY-MM-DD**
++ `maxDate`: end date specified in format **YYYY-MM-DD** 
++ `keepZip`: if `FALSE`, the zipped folders of the downloaded files will not be kept; otherwise, they will be kept.
+
+<br>
+
+Before you download PRISM data, set the folder the files should be stored in:
+
+```{r, eval = FALSE}
+prism::prism_set_dl_dir("path")
+```
+
+:::{.callout-note title="You will see the old form in older code"}
+Older material sets this with `options(prism.path = "path")`. The `prism` package
+replaced that with `prism_set_dl_dir()`, together with `prism_get_dl_dir()` and
+`prism_check_dl_dir()`, because remembering a function name is easier than
+remembering an option name. If you meet the `options()` form in someone else's
+script, it is the same idea.
+:::
+
+### Try yourself on your computer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This one you genuinely have to run yourself, since it writes files to disk. Five days of precipitation is enough to see the shape of the thing. Pay attention to what you end up with, because it is the reason the next tab exists: one folder per day, each holding several files that share a name and differ only by extension. That is the BIL format from the raster deck, where the values, the header describing the grid, and the projection information all live in separate files that have to stay together in the same folder.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+
+First set the path:
+
+```{r}
+#| eval: false
+library(prism)
+prism_set_dl_dir("lectures/Data/PRISM")
+```
+
+<br>
+
+Now, download:
+
+```{r}
+#| eval: false
+prism::get_prism_dailys(
+  type = "ppt",
+  minDate = "2024-01-01",
+  maxDate = "2024-01-05",
+  keepZip = FALSE
+)
+```
+
+This will create a single folder for each day of the specified date range. Inside each folder you will see a bunch of files sharing one name and differing only in extension.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Read PRISM files 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The practical problem: a year of daily data is three hundred and sixty-five folders, and you are not going to type those paths. So list them programmatically. The code recurses through the folder, keeps only the files ending in bil, and drops the auxiliary ones, which would otherwise sneak in. Then terra reads the whole vector in a single call and gives you one multi-layer object with a layer per day. That last step is the one worth remembering: terra's rast function accepts a whole vector of paths, not just a single one, and stacks them for you.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+As you have seen, we would have many files to open unless the specified date range is very short. Rather than naming them one by one, list them programmatically.
+
+First, the following code gives you the names of all the PRISM files with the **.bil** extension.
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+```{r}
+(
+prism_files_list <- 
+  list.files("Data/PRISM", recursive = TRUE, full.names = TRUE) %>%
+  .[grep("\\.bil", .)] %>%
+  .[!grepl("aux", .)]
+)
+
+```
+
+Just replace `"Data/PRISM"` with your folder path to the PRISM files.
+
+We can now read them using `terra::rast()` like below:
+
+```{r}
+terra::rast(prism_files_list) 
+```
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same three-step arc as the NASS exercise, now for weather: download three days of maximum temperature, read them all back with the listing trick, and facet a map by layer. Note the third answer uses facet_wrap on lyr, which is the raster faceting from the mapping deck. Worth noticing how little of this is new. By this point in the course you are combining pieces you already know rather than learning anything fresh, which is roughly the definition of having learned something. That is a fair note to end the course on.
+
+</details>
+
+::: {.panel-tabset}
+#### Download PRISM data
+
+Download PRISM maximum temperature data from "06-01-2023" to "06-03-2023".
+
+<br>
+
+**Answer**
+
+<br> 
+
+```{r, eval = FALSE}
+#| code-fold: true
+#--- set the path (you need to change the path) ---# 
+prism_set_dl_dir("Data/PRISM/tmax")
+
+#--- download ---#
+prism::get_prism_dailys(
+  type = "tmax",
+  minDate = "2023-06-01",
+  maxDate = "2023-06-03",
+  keepZip = FALSE
+)
+```
+
+#### Read the downloaded files
+
+Read all the maximum temperature data files you just downloaded using `terra::rast()`.
+
+<br>
+
+**Answer**
+
+```{r}
+#| code-fold: true
+prism_files_list <-
+  list.files("Data/PRISM/tmax", recursive = TRUE, full.names = TRUE) %>%
+  .[grep("\\.bil", .)] %>%
+  .[!grepl("aux", .)]
+
+prism_max_temp <- terra::rast(prism_files_list)
+```
+
+#### Create a map
+
+Using the `SpatRaster` object, create a faceted map of maximum temperature.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot() +
+  geom_spatraster(data = prism_max_temp) +
+  facet_wrap(~lyr)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Crop Data Layer {#sec-cdl}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre resolution, classifying every pixel of the contiguous United States by what crop is growing on it, every year back to the late nineties. For agricultural economics it is close to indispensable, since it tells you what was actually growing on a given field rather than what somebody reported at the county level. CropScape is the interactive front end you may have seen in a browser, and the CropScapeR package talks to exactly the same service from R, which is what we use here.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ The Cropland Data Layer (CDL) is a data product produced by the National Agricultural Statistics Service of U.S. Department of Agriculture. 
+
++ CDL provides geo-referenced, high accuracy, 30 (after 2007) or 56 (in 2006 and 2007) meter resolution, crop-specific cropland land cover information for up to 48 contiguous states in the U.S. from 1997 to the present. 
+
++ This data product has been extensively used in agricultural research. CropScape is an [interactive Web CDL exploring system](https://nassgeodata.gmu.edu/CropScape/), and it was developed to query, visualize, disseminate, and analyze CDL data geospatially through standard geospatial web services in a publicly accessible on-line environment (Han et al., 2012).
+
++ This section shows how to use the CropScapeR package (Chen 2020) to download and explore the CDL data. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns--> 
+
+
+### `CropScapeR` package
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The package offers four functions, but one of them does the work. GetCDLData downloads the raw layer, and the other three return it pre-summarised in ways that occasionally match what you want. Learn that one properly and treat the other three as a bonus you may never need. One thing to note before you go looking for it: what comes back is a RasterLayer from the old raster package, not a terra SpatRaster, so you will usually pass it straight through terra's rast function to convert it, exactly as the final exercise does.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ The package implements some of the most useful geospatial processing services provided by the CropScape, and it allows users to efficiently process the CDL data within the R environment. 
+
++ Specifically, the CropScapeR package provides four functions that implement different kinds of geospatial processing services provided by the CropScape. 
+
++ `GetCDLData()` in particular is the most important function as it lets you download the raw CDL data. 
+
++ The other functions provide the users with the CDL data summarized or transformed in particular manners that may suit the need of some users.
+
+<!-- Note: There is a known problem with Mac users requesting CDL data services using the CropScape API, which causes errors when using the functions provided by the package. Please see section 9.2.4 for a workaround. -->
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three arguments, and the fiddly one is type, which tells the service how to interpret the area you gave it. An f means you passed a FIPS code, for a state or a county. A b means a bounding box, and that includes handing it an sf object, since only the box gets used. A p is a single point and ps a polygon of your own coordinates. Read the callout about the class of the returned object too, because forgetting it produces confusing errors two steps later, when some terra function refuses what you hand it.
+
+</details>
+
+`GetCDLData()` allows us to obtain CDL data for any Area of Interest (AOI) in a given year. It requires three parameters to make a valid data request:
+
++ `aoi`: Area of Interest (AOI).
++ `year`: Year of the data to request.
++ `type`: Type of AOI.
+
+The following AOI-type combinations are accepted:
+
++ any spatial object as an sf or sfc object - `type = "b"`
++ county (defined by a 5-digit county FIPS code) - `type = "f"`
++ state (defined by a 2-digit state FIPS code) - `type = "f"`
++ bounding box (defined by four corner points) - `type = "b"`
++ polygon area (defined by at least three coordinates) - `type = "ps"`
++ single point (defined by a coordinate) - `type = "p"`
+
+:::{.callout-important}
+The downloaded raster data is `RasterLayer` defined by the `raster` package, not `SpatRaster` by the `terra` package.
+:::
+
+### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A whole state by FIPS code, Nebraska being thirty-one, with type set to f. The warning about time is not a formality. At thirty metre resolution a state contains an enormous number of cells, and the download and the memory it needs are both substantial. This is exactly why cropping matters, and why the next example takes four counties rather than a state. If you only need part of a state, ask for that part rather than downloading everything and throwing most of it away. Your patience and the server will both benefit.
+
+</details>
+
++ Suppose you are interested in getting CDL data for the entire Nebraska.
+
++ In this case we can use the state FIP code for NE (31) for `aoi` and specify `type` to be `"f"` (Note that this would take some time if you run it.).
+
++ This can take a while. Since the spatial resolution is 30m, the CDL data covering the whole of Nebraska has an enormous number of cells and is memory-intensive.
+
+```{r, eval = FALSE}
+cdl_NE <-
+  CropScapeR::GetCDLData(
+    aoi = 31,
+    year = "2018",
+    type = "f"
+  )
+```
+
+
+### Example 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The more typical case, and the more sensible one. Pull county boundaries with tigris, filter to the four you want, and hand that sf object straight to GetCDLData. Note what the service actually does with it, which is explained on the download tab: it uses only the bounding box, not the outlines, so you get a rectangle containing your counties along with the corners of their neighbours. Trimming that rectangle back to the actual county shapes is masking, from the previous deck, and it is one of the things the final exercise asks you to do.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Area of interest
+
+In this example, we are interested in obtaining CDL data for the following four counties in Illinois: Champaign, Vermilion, Ford, and Iroquois.
+
+Let's first get the county boundary data for them:
+
+```{r, cache = TRUE}
+IL_county <- tigris::counties(state = "IL", cb = TRUE, progress_bar = FALSE)
+
+IL_4_county <- dplyr::filter(IL_county, NAME %in% c("Champaign", "Vermilion", "Ford", "Iroquois"))
+```
+
+<br>
+
+Here is where they are:
+
+```{r, echo = FALSE, cache = TRUE}
+ggplot() +
+  geom_sf(data = IL_county) +
+  geom_sf(data = IL_4_county, fill = "lightblue") +
+  theme_void()
+```
+
+
+#### Download
+
+When you provide `aoi` using an `sf` object, CDL data for the bounding box of the `sf` will be downloaded. So, you should pick `"b"` as the `type`.
+
+```{r, eval = FALSE}
+GetCDLData(
+  aoi = IL_4_county,
+  year = "2018",
+  type = "b"
+)
+```
+:::
+<!--end of panel--> 
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The final exercise of the course, and it pulls in nearly everything. Download a county boundary with tigris, use it to fetch CDL data, convert to a SpatRaster, mask it to the county outline, aggregate it to something a computer can plot, and map the result. That is four decks' worth of material in five steps. One thing to watch in the aggregation: CDL cells hold crop codes rather than quantities, so averaging them is meaningless. Take the most common code in each block instead, with the modal function, exactly as the raster deck warned.
+
+</details>
+
+::: {.panel-tabset}
+
+#### AOI
+
+Using the `tigris` package, download the county boundary for Iowa, and then filter it to keep only the Sioux county. Name the `sf` file `sioux_county`.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+sioux_county <-
+  tigris::counties(state = "IA", cb = TRUE) %>%
+  dplyr::filter(NAME == "Sioux")
+```
+
+#### Download
+
+Using the `CropScapeR::GetCDLData()`, download the 2022 CDL data covering the Sioux County. Then, convert it to a `SpatRaster` object. Name the final product `sioux_cdl_2022`. 
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+sioux_cdl_2022 <-
+  GetCDLData(
+    aoi = sioux_county,
+    year = "2022",
+    type = "b"
+  ) %>%
+  terra::rast()
+```
+
+#### Mask
+
+Mask the CDL data you just downloaded using `sioux_county` using `terra::mask()`.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+sioux_masked <- terra::mask(sioux_cdl_2022, st_transform(sioux_county, crs(sioux_cdl_2022)))
+```
+
+#### Aggregate
+
+Before creating a map from the downloaded CDL layer data, let's aggregate the data by factor of 10 using `terra::aggregate()`. Call it `sioux_aggregated`.
+
+Careful with `fun` here — CDL cells hold **crop codes**, not quantities.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+#--- CHANGED: fun = "modal" added. aggregate() defaults to fun = "mean", and ---#
+#--- averaging land cover codes (1 = corn, 5 = soybeans, ...) produces       ---#
+#--- numbers that are not any crop. "modal" takes the most common code in    ---#
+#--- each block, which is the only sensible summary for a categorical layer. ---#
+sioux_aggregated <- terra::aggregate(sioux_masked, fact = 10, fun = "modal")
+```
+
+#### Map
+
+Create a map of land use type from the aggregated Sioux county CDL data using `tidyterra::geom_spatraster()`.
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+ggplot() +
+  geom_spatraster(data = sioux_aggregated)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+

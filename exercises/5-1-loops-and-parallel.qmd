@@ -1,0 +1,515 @@
+---
+title: "Ex-5-1: Functions, Loops, and Parallelization"
+abstract: "Function and Loop"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+The deck already gives you browser exercises on writing functions and on
+`lapply()`. This handout covers the half that a browser cannot do: reading a
+folder full of files, timing one approach against another, and running things on
+more than one core. All of it happens in RStudio.
+
+Timing is the point of several of these exercises, and timing in a browser is
+meaningless. Parallel processing in a browser is not merely slow, it is
+unavailable.
+
+# Setup {#sec-setup}
+
+1. Find your `quarto-examples` clone from lecture 02-0. It contains
+   `data/data-for-loop-demo/`, which holds 60 files: 30 corn experiments and 30
+   soybean experiments.
+2. Make a project folder `ch5-practice`, open it as an RStudio Project, and copy
+   that whole `data-for-loop-demo` folder into it.
+3. Install what you need:
+
+```{r}
+#| eval: false
+install.packages(c("future.apply", "microbenchmark", "tictoc"))
+```
+
+::: {.callout-important title="It worked if"}
+`length(list.files(here::here("data-for-loop-demo")))` returns 60.
+:::
+
+# Look before you loop
+
+Never write a loop over files you have not opened one of.
+
+**Task.**
+
+1. List the corn files only, with their full paths.
+2. Read the first one and report its dimensions and column names.
+3. Read the first **soybean** file and compare its column names with the corn
+   one. Something is wrong. Say what.
+
+::: {.callout-important title="It worked if"}
+You have 30 corn paths, and you can state the problem with the soybean files
+before you write any loop at all.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+library(tidyverse)
+library(here)
+
+corn_files <-
+  list.files(
+    here("data-for-loop-demo"),
+    pattern    = "corn_experiment",
+    full.names = TRUE
+  )
+
+length(corn_files)   # 30
+
+first <- readRDS(corn_files[1])
+dim(first)           # 1000 4
+names(first)         # "N_rate" "v" "corn_yield" "field_id"
+
+soy_first <- readRDS(here("data-for-loop-demo", "soy_experiment_1.rds"))
+names(soy_first)     # "N_rate" "v" "corn_yield" "field_id"   <- corn_yield!
+```
+
+The soybean files have a column called `corn_yield`. The column holds soybean
+yields; only the name is wrong.
+
+This is worth pausing on, because it is not a trick. Datasets you are handed
+routinely have names inherited from whatever script produced them, and nothing
+in R will ever warn you. If you bound the corn and soybean files together
+trusting the names, you would have 60,000 rows of "corn yield", 30,000 of which
+are soybeans, and every number after that point would be wrong while looking
+entirely plausible.
+
+`full.names = TRUE` matters too. Without it you get bare filenames, which are
+not paths, and every `readRDS()` fails.
+:::
+
+# Read 30 files without writing 30 lines
+
+**Task.**
+
+1. Use `lapply()` to read all 30 corn files into a list.
+2. Combine them into one dataset.
+3. Check the row count, then check how many distinct fields you have.
+4. That last number is wrong. Work out why, and fix it so each row knows which
+   file it came from.
+
+::: {.callout-important title="It worked if"}
+Your combined dataset has 30,000 rows and 30 distinct field identifiers.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+# the naive version
+corn_all <-
+  lapply(corn_files, readRDS) %>%
+  bind_rows()
+
+nrow(corn_all)                       # 30000, correct
+n_distinct(corn_all$field_id)        # 1  <- wrong
+```
+
+Every file contains `field_id = 1`. The identifier is not unique across files,
+so once you bind them you can no longer tell the 30 experiments apart. Thirty
+thousand rows that all claim to be field 1.
+
+The fix is to attach the identifier as you read, because that is the only moment
+you know which file you are holding:
+
+```{r}
+#| eval: false
+read_one <- function(path) {
+  readRDS(path) %>%
+    mutate(
+      source_file = basename(path),
+      field       = parse_number(basename(path))
+    )
+}
+
+corn_all <-
+  lapply(corn_files, read_one) %>%
+  bind_rows()
+
+n_distinct(corn_all$field)   # 30
+```
+
+The general principle: whatever distinguishes one iteration from another has to
+be recorded *inside* the iteration. Once the loop is over, that information is
+gone. This is the single most common bug in file-reading loops, and it is silent.
+:::
+
+::: {.callout-tip collapse="true" title="The tidyverse shortcut"}
+```{r}
+#| eval: false
+corn_all <-
+  corn_files %>%
+  set_names(basename(.)) %>%
+  purrr::map(readRDS) %>%
+  bind_rows(.id = "source_file")
+```
+
+`bind_rows(.id =)` takes the list's names and writes them into a column, which
+handles the identifier problem for you. Worth knowing, but write the explicit
+version at least once first, because the explicit version is what tells you what
+`.id` is actually doing.
+:::
+
+# One function, then loop it
+
+**Task.** Write a function that takes a file path and returns a **one-row**
+summary of that experiment: the field number, the number of observations, the
+mean yield, and the yield at the highest nitrogen rate applied.
+
+Then use it to build a 30-row summary table across all corn fields, and find
+the three fields with the highest mean yield.
+
+::: {.callout-important title="It worked if"}
+The result has exactly 30 rows and one row per file.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+summarize_one <- function(path) {
+  d <- readRDS(path)
+
+  tibble(
+    field      = parse_number(basename(path)),
+    n_obs      = nrow(d),
+    mean_yield = mean(d$corn_yield),
+    yield_at_max_n = d$corn_yield[which.max(d$N_rate)]
+  )
+}
+
+corn_summary <-
+  lapply(corn_files, summarize_one) %>%
+  bind_rows()
+
+corn_summary %>% arrange(desc(mean_yield)) %>% head(3)
+```
+
+Two habits worth copying. The function takes **one** path and returns **one**
+row, so you can test it on a single file before trusting it on thirty. And it
+returns a tibble rather than a vector, so `bind_rows()` produces a proper table
+with named columns.
+
+Test it on one file first, every time:
+
+```{r}
+#| eval: false
+summarize_one(corn_files[1])
+```
+
+If that is wrong, the loop is wrong thirty times over, and it is far harder to
+see the problem in thirty wrong answers than in one.
+:::
+
+# Loop over two things at once
+
+**Task.** Build a summary across **both** crops: 60 rows, one per file, with a
+`crop` column distinguishing them. Do it without copying your loop twice.
+
+While you are at it, rename that misleading `corn_yield` column to `yield`.
+
+::: {.callout-important title="It worked if"}
+60 rows, `count(crop)` gives 30 and 30, and no column is called `corn_yield`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+# every combination of crop and field number
+grid <- expand.grid(
+  crop  = c("corn", "soy"),
+  field = 1:30,
+  stringsAsFactors = FALSE
+)
+
+summarize_case <- function(i) {
+  crop  <- grid$crop[i]
+  field <- grid$field[i]
+
+  path <- here("data-for-loop-demo", paste0(crop, "_experiment_", field, ".rds"))
+
+  readRDS(path) %>%
+    rename(yield = corn_yield) %>%     # the name is wrong in the soy files
+    summarize(
+      crop       = crop,
+      field      = field,
+      mean_yield = mean(yield),
+      .groups    = "drop"
+    )
+}
+
+all_summary <-
+  lapply(seq_len(nrow(grid)), summarize_case) %>%
+  bind_rows()
+
+count(all_summary, crop)   # corn 30, soy 30
+```
+
+The pattern to take away: when you need to loop over combinations, build a
+**data frame of the combinations first**, then loop over its row numbers. Your
+function takes one integer, looks up what that row means, and does the work.
+
+This scales to three or four varying inputs without nesting loops, and it makes
+the parallel version in exercise 7 a one-word change. Nested loops do neither.
+:::
+
+# Do you actually need the loop?
+
+**Task.**
+
+1. Compute profit at 1,000 nitrogen rates using a `for` loop that grows a
+   vector with `c()`.
+2. Do the same with `lapply()`.
+3. Do the same with a single vectorized expression.
+4. Time all three on 1,000 values, then on 100,000.
+
+Yield is `120 + 25 * log(N)`. Profit is `4 * yield - 0.5 * N`.
+
+::: {.callout-important title="It worked if"}
+All three give identical answers, and the gap between them widens dramatically
+when you go from 1,000 to 100,000.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+library(microbenchmark)
+
+profit_of <- function(N) 4 * (120 + 25 * log(N)) - 0.5 * N
+
+N_seq <- seq(1, 300, length = 1000)
+
+#--- 1. grow a vector: the slow way ---#
+loop_grow <- function(N_seq) {
+  out <- c()
+  for (i in seq_along(N_seq)) out <- c(out, profit_of(N_seq[i]))
+  out
+}
+
+#--- 2. lapply ---#
+via_lapply <- function(N_seq) unlist(lapply(N_seq, profit_of))
+
+#--- 3. vectorized ---#
+vectorized <- function(N_seq) profit_of(N_seq)
+
+all.equal(loop_grow(N_seq), vectorized(N_seq))   # TRUE
+
+microbenchmark(
+  loop_grow(N_seq),
+  via_lapply(N_seq),
+  vectorized(N_seq),
+  times = 10
+)
+```
+
+The vectorized version wins by a wide margin, and the margin grows with the
+input, because `profit_of()` was already vectorized. Calling it once on 1,000
+values does the work in compiled code; calling it 1,000 times on one value pays
+R's function-call overhead 1,000 times.
+
+The `c()` version is the worst, and worth understanding separately. Each `c()`
+allocates a **new** vector and copies everything into it, so building a vector
+of length n does work proportional to n². At 1,000 it is merely bad; at 100,000
+you will wait. If you must loop, pre-allocate:
+
+```{r}
+#| eval: false
+out <- numeric(length(N_seq))
+for (i in seq_along(N_seq)) out[i] <- profit_of(N_seq[i])
+```
+
+The rule: before parallelizing anything, check whether you should be looping at
+all. Vectorizing is usually a bigger win than parallelizing, and it is free.
+:::
+
+# Parallelize it
+
+**Task.**
+
+1. Find out how many cores you have.
+2. Set up parallel processing with `plan()`.
+3. Rerun the 60-file summary from exercise 5 with `future_lapply()` instead of
+   `lapply()`, and time both.
+4. Then explain why the speedup is disappointing.
+
+::: {.callout-important title="It worked if"}
+The parallel version produces an identical 60-row result.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+library(future.apply)
+library(tictoc)
+
+parallel::detectCores()
+
+plan(multisession, workers = 6)   # leave yourself a couple of cores
+
+tic()
+seq_ver <- bind_rows(lapply(seq_len(nrow(grid)), summarize_case))
+toc()
+
+tic()
+par_ver <- bind_rows(future_lapply(seq_len(nrow(grid)), summarize_case))
+toc()
+
+all.equal(seq_ver, par_ver)   # TRUE
+```
+
+`lapply` becomes `future_lapply` and nothing else changes. That really is the
+whole API.
+
+Why the speedup disappoints: each of these tasks takes a few milliseconds, and
+starting a worker session, shipping the data to it, and collecting the result
+back costs more than that. Parallelization has a fixed overhead per task, so it
+pays only when each task is slow enough to dwarf it. Sixty fast tasks is exactly
+the case where it does not.
+
+Exercise 8 gives you a workload where it does pay.
+:::
+
+::: {.callout-warning collapse="true" title="The multicore trap"}
+`plan(multicore)` uses forking, which does not exist on Windows and is disabled
+inside RStudio on every platform.
+
+Ask for it where it is unavailable and R does **not** warn you and does **not**
+fall back to something else. It quietly runs everything sequentially. Your code
+works, your timings are unchanged, and you conclude that parallelization is
+overrated.
+
+Use `plan(multisession)`. It works everywhere.
+:::
+
+::: {.callout-tip collapse="true" title="Shut it down"}
+`plan(sequential)` when you are finished. Worker sessions hold memory, and six
+idle copies of a large dataset will make your machine unhappy.
+:::
+
+# Grid search, and a workload worth parallelizing
+
+Recall the problem from the deck. Corn yield responds to nitrogen as
+`120 + 25 * log(N)`, and profit is `Pc * yield - Pn * N`. You want the
+profit-maximizing nitrogen rate.
+
+**Task.**
+
+1. Find the best rate by grid search over `N` from 1 to 300, for `Pc = 4` and
+   `Pn = 0.5`.
+2. Check your answer against the closed-form solution.
+3. Now do it for **every** combination of 40 corn prices and 40 nitrogen prices,
+   sequentially. Time it.
+4. Do the same in parallel. Time it. This time it should pay.
+
+::: {.callout-important title="It worked if"}
+Step 1 gives approximately 200, which is exactly what calculus predicts, and
+step 4 is meaningfully faster than step 3.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+#--- 1. one grid search ---#
+best_n <- function(Pc, Pn, N_grid = seq(1, 300, length = 2000)) {
+  profit <- Pc * (120 + 25 * log(N_grid)) - Pn * N_grid
+  N_grid[which.max(profit)]
+}
+
+best_n(4, 0.5)   # about 200
+```
+
+**Checking it.** Differentiate profit with respect to `N`:
+
+$$
+\frac{d}{dN}\left[P_C(120 + 25\log N) - P_N N\right] = \frac{25 P_C}{N} - P_N = 0
+\quad\Longrightarrow\quad N^* = \frac{25 P_C}{P_N}
+$$
+
+With `Pc = 4` and `Pn = 0.5`, that is `25 * 4 / 0.5 = 200`. Your grid search
+should land within a fraction of a unit of it, and the gap tells you how coarse
+your grid is.
+
+Always check a numerical answer against something you can derive, whenever you
+can derive anything. A grid search that quietly returns the edge of its own grid
+looks exactly like a grid search that worked.
+
+```{r}
+#| eval: false
+#--- 3 and 4. many price combinations ---#
+prices <- expand.grid(
+  Pc = seq(3, 7, length = 40),
+  Pn = seq(0.3, 0.9, length = 40)
+)
+
+solve_row <- function(i) {
+  tibble(
+    Pc = prices$Pc[i],
+    Pn = prices$Pn[i],
+    N_star = best_n(prices$Pc[i], prices$Pn[i],
+                    N_grid = seq(1, 300, length = 20000))
+  )
+}
+
+tic(); seq_res <- bind_rows(lapply(seq_len(nrow(prices)), solve_row));        toc()
+tic(); par_res <- bind_rows(future_lapply(seq_len(nrow(prices)), solve_row)); toc()
+```
+
+1,600 grid searches over 20,000 candidate rates each is enough work per task
+that the overhead stops mattering, and the parallel version wins.
+
+That is the general shape of when to parallelize: many tasks, each slow, none
+depending on the others. If your tasks are fast, vectorize instead. If they
+depend on each other, you cannot parallelize them at all.
+:::
+
+::: {.callout-tip collapse="true" title="Plot the answer"}
+```{r}
+#| eval: false
+ggplot(par_res) +
+  geom_raster(aes(x = Pc, y = Pn, fill = N_star)) +
+  scale_fill_viridis_c() +
+  labs(x = "Corn price ($/bu)", y = "Nitrogen price ($/lb)",
+       fill = "Optimal N\n(lb/acre)")
+```
+
+The result should be a smooth surface. If yours has stripes or blocks in it, the
+grid is too coarse and neighbouring price combinations are snapping to the same
+grid point.
+:::
+
+# Put it together
+
+**Task.** Write one script that, for all 60 experiment files:
+
+- reads each file, attaching crop and field identifiers
+- renames the yield column correctly
+- fits `yield ~ log(N_rate)` for each field separately
+- uses each field's own fitted coefficients to find its profit-maximizing
+  nitrogen rate at `Pc = 4`, `Pn = 0.5`
+- returns one tidy 60-row table
+- runs the expensive part in parallel
+
+Then save the result as an rds and make a figure of optimal rate by crop.
+
+::: {.callout-important title="It worked if"}
+It runs end to end from `Session -> Restart R`, and the sequential and parallel
+versions give identical results.
+:::
+
+::: {.callout-note collapse="true" title="A hint on structure"}
+Build the combination table first, write a function that handles **one** row of
+it, test that function on row 1, and only then wrap it in `future_lapply()`.
+
+That order matters. Debugging inside a parallel loop is genuinely unpleasant:
+error messages come back from a worker session with no context, and printed
+output may not come back at all. Get it right on one case sequentially, then
+parallelize a function you already trust.
+:::

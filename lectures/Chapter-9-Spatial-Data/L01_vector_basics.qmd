@@ -1,0 +1,2484 @@
+---
+title: "09-1: R as GIS: Vector Data Basics with the sf package"
+abstract: "Chapter 9: Spatial Data"
+format:
+  revealjs: 
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    chalkboard: true
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf', 'sp'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Welcome to the spatial half of the course. The objective is narrow and practical: to use R as your GIS, rather than clicking around in ArcGIS. This first deck is about vector data, meaning points, lines and polygons, handled through the sf package. Have a look at the table of contents, because it is a long deck and it moves from the inside out. We start with what an sf object actually is, then how to build one, then how to read and write them, and only at the end what you can compute with them. The prerequisite links on the right are worth a look if projections are unfamiliar.
+
+</details>
+
+<br>
+
+### Learning objectives
+
+The objectives of this chapter are to learn how to use R as GIS, specifically how to handle vector spatial data.
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
+1. [Understanding the data structure of `sf`](#sec-data-structure)
+2. [Simple Feature Geometry(`sfg`)](#sec-sfg)
+3. [Constructing simple feature column (`sfc`) and simple feature (`sf`)](#sec-construct-sfc-sf)
+4. [Reading and writing vector data](#sec-input-output)
+5. [Projection](#sec-projection)
+6. [Quick Visualization](#sec-quick-viz)
+7. [Turning a data.frame of points into an `sf`](#sec-dataframe-sf)
+8. [Conversion to and from `sp` objects](#sec-sf-to-sp)
+9. [Non-spatial Transformation of `sf`](#sec-non-trans)
+10. [Non-interactive geometrical operations](#sec-non-int-spatial-operations)
+11. [Sticky geometry](#sec-sticky-geometry)
+12. [When spatial operations fail](#sec-when-things-fail)
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+
+### Pre-requisite (Links)
+
++ [`ggplot2` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_1_ggplot2_primer.html)
++ [`dplyr` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_2_dplyr_primer.html)
+
+<br>
+
+### Related contents (Links)
+
++ [Create maps from vector data using `ggplot2`](https://tmieno2.github.io/R-as-GIS-workshop/L03_create_map.html)
++ Spatial interaction of vector data
+  + [Topological relations and subset](https://tmieno2.github.io/R-as-GIS-workshop/L04_1_vector_interactions.html)
+  + [Spatial join](https://tmieno2.github.io/R-as-GIS-workshop/L04_2_vector_spatial_join.html)
++ [Vector and raster data interactions](https://tmieno2.github.io/R-as-GIS-workshop/L05_vector_raster_interaction.html)
+  + cropping
+  + masking
+  + value extraction
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+```{r}
+#| include: false
+library("sf")
+library("data.table")
+library("dplyr")
+```
+
+```{webr-r}
+#| context: setup
+nc <-
+  st_read(system.file("shape/nc.shp", package = "sf")) %>%
+  dplyr::select(AREA, NAME, FIPS)
+
+#--- install and library the data package ---#
+#--- Both repos are required. r.spatial.workshop.datasets declares         ---#
+#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#
+#--- repos named here. With the custom repo alone, sf cannot be found and   ---#
+#--- the install never completes, so nothing downstream ever runs.          ---#
+webr::install(
+  "r.spatial.workshop.datasets",
+  repos = c(
+    "https://tmieno2.github.io/rwasm-package/repo",
+    "https://repo.r-wasm.org"
+  )
+)
+
+library(r.spatial.workshop.datasets)
+
+#--- load datasets ---#
+#--- ADDED: fairway_grid, loaded here for explicitness. NOTE: this was not a  ---#
+#--- bug fix. r.spatial.workshop.datasets is LazyData: true, so every dataset ---#
+#--- is available by name as soon as the package is attached, with or without ---#
+#--- a data() call — verified in the WebR runtime, not just locally.          ---#
+data(wells_ne)
+data(fairway_grid)
+```
+
+## Tips to make the most of the lecture notes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two practical notes before we start. The navigation aids are the usual ones: stacked lines bottom left for a table of contents, letter o for a panel view. But the second half of this slide matters more than usual here. Spatial packages are large, and the first time you load one of these decks your browser has to download sf and its dependencies before anything will run. That takes a while, and there is no progress bar worth watching. So open the deck, give it a minute, and judge readiness by whether a cell actually produces output rather than by any status message.
+
+</details>
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+
+## Getting started
+
+::: {.panel-tabset}
+
+###  Prerequisites
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things I am assuming, and both links are worth following if you are unsure. First, that you know roughly what a coordinate reference system is, and what projection means: the business of representing a curved earth on a flat plane, and the fact that you cannot do it without distorting something. Second, that you know the difference between vector and raster. Vector is points, lines and polygons with coordinates. Raster is a grid of cells. This deck is entirely vector; the next one is raster. If the CRS material is new, read that first link before going further, because projections come up repeatedly.
+
+</details>
+
+<br>
+
+::: {.callout-tip title="Prerequisites"}
+You understand  
+
++ What Geographic Coordinate System (GCS), Coordinate Reference System (CRS), and projection are ([this](https://annakrystalli.me/intro-r-gis/gis.html) is a good resource)
+
++ Distinctions between vector and raster data ([this](https://gis.stackexchange.com/questions/57142/what-is-the-difference-between-vector-and-raster-data-models) is a simple summary of the difference)
+:::
+
+
+### Introduction of the `sf` package
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+What the sf package gives you, and the first bullet is the important idea. A simple feature holds the geographic information and the attributes together in one dataset. That sounds obvious, but it is exactly what older R spatial packages did not do, and it is why sf feels natural if you already know data frames. Then the list underneath is a preview of the whole spatial section of this course: projection, reading and writing, non-interactive operations like buffers and areas, and interactive ones like spatial joins. Almost everything you will need for applied work is in that list.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ The `sf` package provides a simple way of storing geographic information and the attributes of the geographic units in a single dataset called simple feature (`sf`).
+
++ The `sf` package allows you to do almost all the spatial operations you would need for your research
+  * Projection
+  * Read/write to spatial datasets in various formats (including shape files)
+  * Non-interactive geometrical operations
+    - create buffers
+    - calculate area 
+    - calculate distance 
+  * Interactive geometrical operations
+    - spatially subset datasets
+    - extracting values from the intersecting spatial objects
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Data preparation 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The dataset for most of this deck. It is North Carolina county boundaries, and it ships inside the sf package itself, which is why the path goes through system dot file rather than pointing at your disk. That makes it a convenient teaching dataset: everybody who has sf has this. We keep three columns, area, name and FIPS code, so the printout stays readable. Then run the class check on the second cell and look carefully at what comes back. It is not one class, it is two, and the next slide is about why.
+
+</details>
+
+Read the North Carolina county boundary data: 
+
+```{webr-r}
+nc <-
+  st_read(system.file("shape/nc.shp", package = "sf")) %>%
+  dplyr::select(AREA, NAME, FIPS)
+```
+
+<br>
+
+Check the class:
+
+```{webr-r}
+class(nc)
+```
+
+:::
+
+
+## Understanding the data structure of `sf` {#sec-data-structure}
+
+::: {.panel-tabset}
+### Inside an sf object
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the object itself, and the annotations on the right are worth reading line by line against the printout. The header tells you there are a hundred features and three fields. Then the body looks exactly like a data frame, rows as counties, columns as attributes, with one exception: that last column called geometry. That is the whole design. An sf object is a data frame that happens to carry a geometry column, which is why every dplyr verb you already know still works on it. Look at the Ashe County example in the callout and match it against the first row.
+
+</details>
+
+:::: {.columns}
+::: {.column width="50%"}
+```{webr-r}
+nc  
+```
+:::
+::: {.column width="50%"}
++ The first line tells you this is a simple feature (`sf`) object with 100 features and 3 attributes (fields)
+
++ So, an `sf` object looks just like a `data.frame` where rows represent observation units and columns represent attributes, except for a special column named `geometry` 
+
++ The `geometry` column stores the geographic information of the observation units (here, county)
+
+
+:::{.callout-note title="Example"}
+Ashe County (1st row) has area of 0.114, FIPS code of 37009, and so on. And the entry in geometry column at the first row represents the geographic information of Ashe County.
+:::
+
+:::
+:::: 
+
+### The `geometry` column 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now zoom in on the geometry column on its own. Each entry is a simple feature geometry, an sfg, holding the shape of one county. Read the bullets on the right for the vocabulary, because these three abbreviations recur throughout the deck and they nest inside each other. An sfg is one shape. A collection of sfgs forms a simple feature geometry column, an sfc. And an sfc attached to a data frame is what makes an sf. Note also that these are all MULTIPOLYGON, because a county can consist of several disconnected pieces.
+
+</details>
+
+:::: {.columns}
+::: {.column width="50%"}
+```{webr-r}
+dplyr::select(nc, geometry)
+```
+:::
+::: {.column width="50%"}
++ An element of the `geometry` column is a simple feature geometry (`sfg`).
+
++ In general, `sfg` represents the geographic information of a single geometric feature (here, county).
+
++ There are different types of `sfg`s (POINT, LINESTRING, POLYGON, MULTIPOLYGON, etc)
+
++ In this example, all the `sfg`s are of type `MULTIPOLYGON`
+
++ A collection of multiple `sfg`s as a column is called simple feature geometry column (`sfc`), which can make a `geometry` column in an `sf` object
+
+:::
+::::
+
+### Simple Feature Geometry (`sfg`) 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And one level deeper still, to see that there is nothing mysterious at the bottom. All those brackets are peeling the structure apart until we reach the raw numbers, and what we find is a matrix. Each row is a point, the first column is longitude, the second is latitude, and connecting the points in order traces the county boundary. That is all a polygon is. It is worth seeing this once, because it demystifies everything that follows: spatial operations are arithmetic on coordinates, not magic, and when something goes wrong it usually went wrong at this level.
+
+</details>
+
+:::: {.columns}
+::: {.column width="60%"}
+Let's see what an `sfg` is made of.
+
+```{webr-r}
+st_geometry(nc[1, ])[[1]][[1]][[1]] %>% head(10)
+```
+
+:::
+
+::: {.column width="40%"}
+<br>
+
++ Each row represents a point 
+	* 1st column: longitude
+	* 2nd column: latitude
+
++ Points are stored in a matrix format
+
++ Connecting all the points forms a polygon
+:::
+::::
+
+:::
+
+
+## Simple Feature Geometry (`sfg`) {#sec-sfg}
+
+```{webr-r}
+#| context: setup
+#--- point ---# 
+a_point <- st_point(c(2, 1))
+#--- line ---#
+s1 <- rbind(c(2, 3), c(3, 4), c(3, 5), c(1, 5))
+a_linestring <- sf::st_linestring(s1)
+#--- polygon ---#
+p1 <- rbind(c(0, 0), c(3, 0), c(3, 2), c(2, 5), c(1, 3), c(0, 0))
+a_polygon <- st_polygon(list(p1))
+#--- polygon with hole ---#
+p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+a_polygon_with_a_hole <- st_polygon(list(p1,p2))
+#--- another polygon ---#
+p3 <- rbind(c(4,0), c(5,0), c(5,3), c(4,2), c(4,0)) 
+#--- multiplolygon ---#
+a_multipolygon <- 
+  st_multipolygon(
+    list(
+      list(p1,p2), # the polygon with a hole
+      list(p3) # the new polygon created above
+    )
+  )
+```
+
+::: {.panel-tabset}
+
+### Different types 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The vocabulary of geometry types, and the examples in brackets are the useful part. A POINT has no area, so it suits a well, a city treated as a location, or a sampling site. A LINESTRING is a path, like a river reach. POLYGON is anything with area, like a county. Then the MULTI versions exist for a single thing made of several pieces: a river with tributaries, or a country with islands. That last one is why the North Carolina data came back as MULTIPOLYGON rather than POLYGON. Some of those counties include islands off the coast.
+
+</details>
+
+Some of the most common types of spatial objects represented by `sfg` are the following:
+
++ `POINT`: area-less feature that represents a point (e.g., well, city, farmland) 
+
++ `LINESTRING`: (e.g., a tributary of a river) 
+
++ `MULTILINESTRING`: (e.g., river with more than one tributary) 
+
++ `POLYGON`: geometry with a positive area (e.g., county, state, country)
+
++ `MULTIPOLYGON`: collection of polygons to represent a single object (e.g., countries with islands: U.S., Japan, etc)
+
+### `POINT`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Starting with the simplest, and building one by hand is the point of the next few tabs. A POINT is just two numbers, so st point of a vector of two values makes one. Run it and look at how it prints: sf shows you the type in capitals followed by the coordinates. Then run the class check, and note that you get two things back, POINT and sfg. That pairing matters. Every geometry you make is an sfg of some particular type, and functions that work on sfg objects work on all of them regardless of type.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+`POINT` is the simplest geometry type and is represented by a vector of two numeric values. An example below shows how a `POINT` feature can be made from scratch:
+
+```{webr-r}
+#--- create a POINT ---#
+(a_point <- st_point(c(2, 1)))
+```
+
+<br>
+
+The `st_point()` function creates a `POINT` object when supplied with a vector of two numeric values. If you check the class of the newly created object,
+
+<br>
+
+```{webr-r}
+#--- check the class of the object ---#
+class(a_point)
+```
+
+you can see that it's indeed a `POINT` object. But, it's also an `sfg` object. So, `a_point` is an `sfg` object of type `POINT`.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `LINESTRING`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A line is a sequence of points, so it needs a matrix rather than a vector. The first cell builds that matrix with rbind, four points, each a pair of coordinates. Then st linestring turns it into a geometry. Run the plot at the bottom and compare it against the numbers in the matrix. Each consecutive pair of points is joined by a straight line, in the order they appear. That ordering matters: shuffle the rows of the matrix and you get a different, probably self-crossing, shape from exactly the same set of points.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+A `LINESTRING` object is represented by a sequence of points in a matrix:  
+
+```{webr-r}
+#--- collection of points in a matrix form ---#
+(s1 <- rbind(c(2,3),c(3,4),c(3,5),c(1,5)))
+```
+
+<br>
+
+You can turn the matrix into a LINESTRING using `sf::st_linestring()`:
+
+```{webr-r}
+#--- create a "LINESTRING" ---#
+a_linestring <- sf::st_linestring(s1)
+
+#--- check the class ---#
+class(a_linestring)
+```
+
+<br>
+
+Let's plot it.
+
+```{webr-r}
+plot(a_linestring)
+```
+
+As you can see, each pair of consecutive points in the matrix are connected by a straight line to form a line. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `POLYGON`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A polygon is also a matrix of points, with one extra requirement stated in the sentence above the code: the first and last points must be identical, so that the boundary closes. Look at the matrix and check that, the first row and the last row are both zero zero. If you leave that out, you have a line rather than a region. Then note that st polygon takes the matrix wrapped in a list, which looks like unnecessary ceremony until the next tab, where the list is exactly what lets a polygon have more than one ring.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+Just like the `LINESTRING` object we created earlier, a `POLYGON` is represented by a collection of points. 
+
+However, the first and last points in the matrix have to be the same to form a polygon 
+
+```{webr-r}
+(p1 <- rbind(c(0,0), c(3,0), c(3,2), c(2,5), c(1,3), c(0,0)))
+```
+
+<br>
+
+You can turn the matrix into a POLYGON using `st_polygon()`, which takes a matrix in a `list()` :
+
+```{webr-r}
+a_polygon <- st_polygon(list(p1))
+
+class(a_polygon)
+```
+
+<br>
+
+Let's plot it.
+```{webr-r}
+plot(a_polygon, col = "red")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+###  `POLYGON` with holes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is why the list mattered. A polygon can have holes, and the rule is in the first sentence: the first matrix in the list is the outer boundary, and every matrix after it is a hole cut out of it. So we reuse p one as the exterior and add p two, a small triangle inside it, as a hole. Run the plot and you can see the gap. This is not an exotic case. Any polygon with a lake in it, or a country surrounding an enclave, needs exactly this structure, and it is the reason st polygon has the interface it does.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+A `POLYGON` can have holes in it. The first matrix of a list becomes the exterior ring, and all the subsequent matrices will be holes within the exterior ring.  
+
+```{webr-r}
+#--- a hole within p1 ---#
+p2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))
+
+#--- create a polygon with hole ---#
+a_polygon_with_a_hole <- st_polygon(list(p1,p2))
+```
+
+<br>
+
+Let's plot it.
+
+```{webr-r}
+#--- see what it looks like ---#
+plot(a_polygon_with_a_hole, col = "red")
+```
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `MULTIPOLYGON`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One more level of nesting, for a single feature made of several separate polygons. The structure is a list of lists: each inner list is one polygon, in the same first-ring-then-holes format from the previous tab. Read the example carefully. The first inner list is the polygon with its hole, the second is a brand new polygon off to the side, and together they form one MULTIPOLYGON. Run the plot and you will see two disconnected shapes that R nonetheless treats as a single geometry. That is precisely how a county with an offshore island is stored.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+To create a `MULTIPOLYGON` object you create a list of lists of matrices, with each inner list representing a polygon.  
+
+```{webr-r}
+#| autorun: true
+#--- create a matrix for another polygon ---#
+p3 <- rbind(c(4,0), c(5,0), c(5,3), c(4,2), c(4,0)) 
+```
+
+<br>
+
+You supply a list of lists of matrices to the `st_multipolygon()` function to make a `MULTIPOLYGON` object.
+
+```{webr-r}
+a_multipolygon <- 
+  st_multipolygon(
+    list(
+      list(p1,p2), # the polygon with a hole
+      list(p3) # the new polygon created above
+    )
+  )
+```
+
+<br>
+
+Each of `list(p1,p2)` and `list(p3)` represents a polygon.
+
+```{webr-r}
+plot(a_multipolygon, col = "red")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Your turn, and these three are deliberately unguided. Build a POINT, a LINESTRING and a POLYGON from scratch. You have seen all three, so this is about whether the structural rules have stuck rather than whether you can recall function names. Two things to watch. A line needs a matrix, not a vector, even if you only want two points. And a polygon needs its first and last rows to match, or sf will object. Plot each one as you make it, because seeing the shape is the quickest way to catch a coordinate you typed wrong.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+####  Create a `POINT`
+
+```{webr-r}
+
+```
+
+<br>
+
+####  Create a `LINESTRING`
+
+```{webr-r}
+
+```
+
+<br>
+
+####  Create a `POLYGON` 
+
+
+```{webr-r}
+ 
+```
+
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+:::
+
+
+## Constructing simple feature column (`sfc`) and simple feature (`sf`) {#sec-construct-sfc-sf}
+
+::: {.panel-tabset}
+### Constructing `sfc` from `sfg`s
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now upward from single geometries to a column of them. An sfg is one shape; an sfc is a list-column of shapes. st sfc is what builds one, and you hand it a list of sfg objects. Look at what we are combining here, though, because it is unusual: a point, a line, a polygon and a multipolygon all in one sfc. Real data almost never mixes types like this, but it demonstrates that an sfc is genuinely just a list and does not require its contents to be uniform. Run the class check and note that sfc appears alongside the types it contains.
+
+</details>
+
++ `sfg` is an object class that represents a single spatial object.
+
++ We can combine multiple `sfg`s as a list to create a simple feature geometry list-column (`sfc`).
+
+---
+
+<br>
+
+To make a simple feature geometry list-column (`sfc`), you can simply supply a list of `sfg` to the `st_sfc()` function as follows:
+
+```{webr-r}
+#--- create an sfc ---#
+sfc_ex <- sf::st_sfc(
+  list(
+    a_point,
+    a_linestring,
+    a_polygon,
+    a_multipolygon
+  )
+)
+```
+
+<br>
+
+Check its class:
+
+```{webr-r}
+class(sfc_ex)
+```
+
+### Constructing an `sf` using an `sfc`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the final step to a full sf object, in two nested tabs. First you make an ordinary data frame of attributes and assign the sfc to a column of it. Run the class check at that point and note what it says: still just a data frame. R does not infer spatialness from a column that happens to contain geometries. Then the second tab does the registration with st as sf, and only after that does the object report itself as an sf. That two-step is worth seeing, because it tells you what st as sf actually does. It sets metadata, not geometry.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Create a `data.frame` with `geometry`
+
+To create an `sf` object, you first add an `sfc` as a column to a `data.frame`.
+
+```{webr-r}
+#--- create a data.frame ---#
+df_ex <- data.frame(
+  name = c('A', 'B', 'C', 'D')
+)
+
+#--- add the sfc as a column ---#
+df_ex$geometry <- sfc_ex 
+```
+
+<br>
+
+At this point, it is not yet recognized as an `sf` by R.
+
+```{webr-r}
+class(df_ex)
+```
+
+#### Register as `sf`
+
+You can register it as an `sf` object using `st_as_sf()`.
+
+```{webr-r}
+#--- let R recognize the data frame as sf ---#
+sf_ex <- st_as_sf(df_ex)
+
+#--- see what it looks like ---#
+sf_ex
+```
+
+<br>
+
+As you can see `sf_ex` is now recognized also as an `sf` object.
+
+```{webr-r}
+#--- check the class ---#
+class(sf_ex)
+```
+:::
+<!--end of panel-->
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two exercises building on each other. The first asks you to make an sfc from the point and polygon you created earlier, which is just st sfc over a list of the two. The second is the more interesting one: turn that sfc into a proper sf object with an id column, giving the point id one and the polygon id two. So you need a data frame with that id, the sfc attached as a column, and then the registration step. If you find yourself unsure whether you have an sf yet, check the class. That is what the previous tab was teaching you.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Exercises 2.1
+
+Create an `sfc` using the `POINT` and `POLYGON` you made earlier.
+
+```{webr-r}
+a_point 
+
+a_polygon
+```
+
+<br>
+
+#### Exercises 2.2
+
+::: {.columns}
+
+::: {.column width="70%"}
+Create an `sf` object using the `sfc` object you created in the previous exercise, where the additional variable in the `sf` object is `id` with the `POINT` and `POLYGON` assigned `id = 1` and `id = 2`, respectively. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+```{webr-r}
+
+```
+:::
+<!--end of panel-->
+
+:::
+
+
+## Reading and writing vector data {#sec-input-output}
+
+::: {.panel-tabset}
+
+### Basics
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A section about file formats, and the first bullet explains why we have to care. Most of the GIS world runs on ArcGIS, whose native format is the shapefile, so your collaborators will send you shapefiles and much public data is published as shapefiles. Then read the list of components, because it is the practical thing to remember. A shapefile is not one file, it is at least four, and all of them are required. Sending somebody the dot s h p on its own gives them something unreadable, which is exactly the annoyance the rest of this section goes on to complain about.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ The vast majority of people still use ArcGIS software to handle spatial data, which has its own system of storing spatial data called [shapefile]{style="color:red"} system. 
+
++ shapefile is a collection of files, of which four are required:
+	* `.shp`: stores geometry information (like `sfg`)
+	* `.shx`: a positional index into the `.shp`
+	* `.dbf`: the attribute table (everything that is not geometry)
+	* `.prj`: projection information
+	<!-- CHANGED: only .shp and .prj were listed. Handing a collaborator a .shp
+	without its .shx and .dbf gives them an unreadable file, which is exactly the
+	annoyance this section goes on to complain about. -->
+
+```{r  echo = F, out.width = "70%", eval = F}
+knitr::include_graphics(here::here("Lectures/assets/shpfiles.png"))
+```
+
++ Chances are that your collaborators use shapefiles.
+
++ There are many GIS data online that are available only as shapefiles.
+
++ So, it is important to learn how to read and write shapefiles 
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Importing a shapefile
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Reading one in is a single function, st read, pointed at the dot s h p file. Note that you name only that one file even though the format needs four; sf finds the siblings itself, provided they are sitting in the same folder with the same base name. That is also the most common way this goes wrong, so if a read fails, check that all the pieces travelled together. Then do the exercise in the callout with the download link. Reading somebody else's shapefile off your own disk is the thing you will actually do first in a real project.
+
+</details>
+
+You can use `sf::st_read()` to read a shapefile. It reads in a shapefile and turns the data into an sf object. 
+
+#### Syntax
+
+```{r}
+#| eval: false
+st_read(file_path)
+```
+
++ `file_path`: the path to the shapefile.
+
+<br>
+
+
+#### Example
+
+```{r}
+#| eval: false
+nc_imported <- st_read("Data/nc_practice.shp") 
+```
+
+Here, a file named `nc_practice.shp` (along with its supporting files) is read from the `Data` folder.
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ download **nc_practice.shp** from [here](https://www.dropbox.com/scl/fo/ljr76u5azr7u4zx7mk55p/AB1RtEs0KyWqL6rKsiJHRKk?rlkey=ogas3pbhuhhhy94kprbd2m553&st=oq35p7rx&dl=0) and other supporting files to where you would like on your computer
++ find and copy the path to the file
++ import the data using `sf::st_read()`
+:::
+
+### Exporting to a shapefile
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Writing is the mirror image, st write, taking the object and a path. The one argument worth knowing is append equals FALSE, which is explained underneath. Without it, writing over an existing shapefile fails rather than replacing it, which is a sensible default that becomes maddening when you are iterating on a script. Setting it to FALSE says overwrite. Then the exercise asks you to write back out the file you just read in, which is worth actually doing, because it is how you will discover whether you had all four component files in the first place.
+
+</details>
+
+You can use the `sf::st_write()` function to write an `sf` object to shape files. 
+
+<br>
+
+#### Syntax
+
+```{r write_nc}
+#| eval: false
+st_write(sf object, file path, append = FALSE)
+```
+
++ `append = FALSE` forces writing the data when the shape files with the same name already exists 
+
+<br>
+
+#### Example
+
+```{r write_nc_error}
+#| eval: false
+st_write(nc_imported, "Data/nc_exported.shp")
+```
+
+This code will export an `sf` object called `nc_imported` as `nc_exported.shp` (along with other supporting files) in the "Data" folder relative to the working directory. 
+
+<br>
+
+:::{.callout-note title="Try yourself"}
++ export the sf object you read earlier using `sf::st_write()` using whatever name you like
+:::
+
+
+### Alternative formats
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the argument that you should mostly not be using shapefiles at all, in four nested tabs. The motivation tab is blunt about it: the format is dominant for historical reasons rather than technical ones, and having four files per dataset is a nuisance. Then the alternatives. GeoJSON is one file and readable as text. GeoPackage is one file and technically the strongest of the three. And rds, if the data is only ever going to be read by R, which is both the simplest and usually the most compact. Read all four, then default to whichever your collaborators can open.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Motivation 
+
+::: {.columns}
+
+::: {.column width="70%"}
++ If your collaborators are using ArcGIS and demanding that they need a shapefile for their work, sure you can write to a shapefile. 
+
++ But, there is really no need to work with the shapefile system if you are not using ArcGIS. 
+
++ Basically, we are using the file system just because ArcGIS is the pioneer of GIS software and many people are still using it, but not because it is the best format available to store spatial objects.
+
++ Indeed, there are some limitations to shape files (see [here](https://carto.com/blog/fgdb-gpkg/)).
+
++ But, first and foremost, it is annoying to have many files for a single spatial object.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### GeoJSON
+
+::: {.columns}
+
+::: {.column width="70%"}
+A format that is increasingly popular is [GeoJSON](https://geojson.org/).
+
++ Unlike the shapefile system, it produces only a single file with **.geojson** extension.
+
++ GeoJSON files can also be read into ArcGIS. 
+
+<br>
+
+**Write**
+
+To write an `sf` object to a GeoJSON file, you simply give the file path to the `dsn` option (note that you do not use the `layer` option unlike the shape files case).
+
+```{r geojson}
+#| eval: false
+#--- write as a geojson file ---#
+st_write(nc, dsn = "Data/nc_exported.geojson")
+```
+
+<br>
+
+**Read**
+
+You can use the `sf::st_read()` function to read a GeoJSON file like below:
+
+```{r eval = F}
+#| eval: false
+nc <- st_read("Data/nc_exported.geojson")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### Geopackage
+
+::: {.columns}
+
+::: {.column width="70%"}
+One of the alternative data formats that is considered superior to the shapefile system is [GeoPackage](https://www.geopackage.org/), which overcomes various limitations associated with shapefile. 
+
++ Unlike the shapefile system, it produces only a single file with **.gpkg** extension.
+
++ GeoPackage files can also be read into ArcGIS. 
+
+<br>
+
+**Write**
+
+To write an `sf` object to a GeoPackage file, you simply give the file path to the `dsn` option (note that you do not use the `layer` option unlike the shape files case).
+
+```{r gpkg}
+#| eval: false
+
+#--- write as a gpkg file ---#
+st_write(nc_imported, dsn = "Data/nc_exported.gpkg")
+```
+
+<br>
+
+**Read**
+
+You can use the `sf::st_read()` function to read a GeoPackage file like below:
+
+```{r eval = F}
+#| eval: false
+nc <- st_read("Data/nc_exported.gpkg")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### R data set (rds) 
+
+::: {.columns}
+
+::: {.column width="70%"}
+Or better yet, if your collaborator uses R (or if it is only you who is going to use the data), then just save the `sf` object as an **.rds** file using `saveRDS()`, which can be of course read using `readRDS()`.
+
+<br>
+
+**Save**
+
+```{r save_read_nc_as_rds, eval = F}
+#--- save as an rds ---#
+saveRDS(nc_imported, "Data/nc_exported.rds")
+```
+
+<br>
+
+**Read**
+
+```{r eval = F}
+#--- read an rds ---#
+nc <- readRDS("Data/nc_exported.rds")
+```
+
+<br>
+
+:::{.callout-note title="Note"}
+The use of rds files can be particularly attractive when the dataset is large because rds files are typically more memory efficient than shape files.
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Projection {#sec-projection}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A short motivation tab, and the reason it is short is that the need is entirely practical. Two spatial datasets can only be combined, joined or plotted together if they share a coordinate reference system. So most of the time you reproject not because you have chosen a projection on its merits, but because something else you are working with is already in one. That is worth saying plainly, because it means the skill you need is not choosing projections well, it is checking and matching them reliably, which is what the next few tabs cover.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+You often need to project or re-project an `sf` using a different coordinate reference system (CRS) because you need it to have the same CRS as an `sf` object that you are interacting it with (spatial join) or mapping it with. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Check the current CRS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Checking what you have, with st crs. Run it and read the output, because it is verbose and mostly ignorable. What you are looking for is the last line, the EPSG code, which here is four two six seven. The bullets explain the surrounding format, Well Known Text, and the EPSG system: a catalogue of numbers standing in for full CRS definitions, so you can write one number instead of a paragraph. Note the caveat at the bottom, though. Only common systems have EPSG codes, so occasionally you will meet a CRS with no number and have to pass the full definition.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+In order to check the current CRS for an `sf` object, you can use the `sf::st_crs()` function. 
+
+```{webr-r}
+st_crs(nc)
+```
+
+<br>
+
++ `sf` uses the **Well Known Text** format to store the coordinate reference system (CRS), which is one of many many formats to store CRS information (See [here](https://spatialreference.org/ref/epsg/nad27/))
+
++ `ID["EPSG", 4267]` means that the EPSG code for this CRS is 4267
+  + EPSG code is a CRS reference system developed by the European Petroleum Survey Group (EPSG) 
+  + You can find the CRS-EPSG number correspondence [here](http://spatialreference.org/ref/epsg/). 
+
++ When you transform an `sf` using a different CRS, you can use its EPSG number if the CRS has an EPSG number
+  + Potential pool of CRS is infinite. 
+  + Only the commonly-used CRS have been assigned EPSG SRID. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Project or re-project `sf` objects
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Reprojecting, in three nested tabs, and the third is the one to read twice. The mechanics are simple: st transform, the object, and an EPSG code. The example moves North Carolina into UTM zone seventeen north, which is the zone the state actually sits in, and then shows the geometry column before and after so you can see the coordinates change from degrees to metres. Then the Caveat tab shows st set crs, which sounds similar and is dangerous. It relabels the data without moving it, so your features stay where they were while claiming to be somewhere else.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `sf::st_transform()` to apply a different projection method to an `sf` object.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+st_transform(sf, EPSG number or CRS in WKT)
+```
+
+<br>
+
+#### Example
+
+Let's transform (reproject) the data using `NAD83 / UTM zone 17N` CRS. Its EPSG number is `26917`.
+
+<!-- CHANGED: was UTM zone 14N (EPSG 26914). North Carolina spans 84.3W to
+75.5W, which falls in UTM zones 17N and 18N. Zone 14N covers 102W-96W, roughly
+the Great Plains. The transform still runs, but the lesson of projecting is to
+pick the zone your data is actually in, so the example now does that. -->
+
+```{webr-r}
+nc_utm <- st_transform(nc, 26917)
+```
+
+<br>
+
+Let's confirm the change in CRS:
+
+```{webr-r}
+st_crs(nc_utm)
+```
+
+<br>
+
+Let's compare the geometry column before and after the transformation (projection):
+
+```{webr-r}
+dplyr::select(nc, geometry)
+```
+
+<br>
+
+```{webr-r}
+dplyr::select(nc_utm, geometry)
+```
+
+#### Caveat
+
+::: {.columns}
+
+::: {.column width="70%"}
++ There is a function that <span style = "color: red;"> sets </span> CRS, namely `sf::st_set_crs()`. 
+
++ This function literally <span style = "color: red;"> sets </span> the CRS, but does not transform geometry accordingly unlike `sf::st_transform()`.
+
++ So, doing this is a terrible mistake and the resulting `sf` object is no longer where it should be.
+
+```{webr-r}
+st_set_crs(nc, 26914)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+
+### Using the CRS of another `sf`  
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small but genuinely useful trick. When you are reprojecting only in order to match another dataset, you do not need to look up its EPSG code at all. Pass st crs of that other object directly to st transform, and the two are guaranteed to agree. The example transforms back to where we started by asking for the CRS of the original. Prefer this over hard-coding numbers whenever the target is another dataset rather than a deliberate choice, because it cannot go subtly wrong the way a mistyped four-digit code can.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ You often need to change the CRS of an `sf` object when you interact (e.g., spatial subsetting, joining, etc) it with another `sf` object. 
+
++ In such a case, you can extract the CRS of the other `sf` object using `st_crs()` and use it for transformation.
+
++ So, you do not need to find the EPSG of the CRS of the `sf` object you are interacting it with.
+
+---
+
+<br>
+
+#### Example
+
+```{webr-r}
+#--- transform ---#
+nc_utm_back_to_original <-
+  st_transform(
+    nc_utm,
+    st_crs(nc)
+  )
+```
+
+<br>
+
+Let's confirm the transformation: 
+
+```{webr-r}
+st_crs(nc_utm_back_to_original)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Exercises 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two short exercises on projection, using the fairway grid dataset, which is now loaded when the deck opens. The first is just st crs, to see what you have. The second asks you to find the EPSG code for NAD eighty three and transform to it, so you have to look the number up rather than being given it. That is deliberate: looking up EPSG codes is a routine part of spatial work and worth doing once here. And note this dataset is in Nebraska, which is why the later exercises use a different UTM zone from the North Carolina examples.
+
+</details>
+
+::: {.panel-tabset}
+#### Check the CRS
+
+Check the CRS of `fairway_grid`.
+
+```{webr-r}
+
+```
+
+<br>
+
+#### Transform
+
+Find the EPSG code for NAD 83, and change the CRS of `fairway_grid` to NAD 83 using the EPSG code.
+
+```{webr-r}
+
+```
+:::
+<!--end of panel-->
+
+
+:::
+
+
+## Quick Visualization {#sec-quick-viz}
+
+::: {.panel-tabset}
+
+### Quick view using `plot()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The fastest possible look at spatial data: plot, with nothing else. Run it and note what you get, which is not one map but several, one per attribute column, each shaded by that column's values. That is occasionally what you want and often surprising. The value of this is purely diagnostic. When you have just read a file or built a geometry, plot tells you in one keystroke whether the shapes are where you expect. It is not for making anything anybody else will see, and the note points forward to the ggplot deck for that.
+
+</details>
+
+The easiest way to visualize an `sf` object is to use `plot()`:
+
+```{webr-r}
+plot(nc) 
+```
+
+<br>
+
++ `plot()` creates a map for each variable where the spatial units are color-differentiated based on the values of the variable
+
++  We will learn how to create more elaborate maps that are of publication-quality using the `ggplot2` package later
+
+
+### Interactive view using `mapView()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One more viewing option, and note the instruction above the code: run this one on your own computer rather than here. mapView gives you an interactive map, a real slippy map you can pan and zoom, with a basemap underneath and your features on top, and clicking a feature shows its attributes. That is enormously useful for checking whether your data is where you think it is, which plot cannot really tell you. It does not run in these slides because the package is not loaded here, so copy it across and try it in RStudio.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+Sometimes it is useful to be able to tell where certain spatial objects are and what values are associated with them on a map. 
+
+The `mapView()` function from the `mapview` package can create an interactive map where you can point to a spatial object and the associated information is revealed on the map.
+
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Run the following codes on your computer.
+
+```{r}
+#| eval: false
+#| message: false
+#| warning: false
+#| out-width: 80%
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+mapview::mapView(nc)  
+```
+:::
+
+## Turning a `data.frame` of points into an `sf` {#sec-dataframe-sf}
+
+::: {.panel-tabset}
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A very common situation, and worth recognising when you are in it. Somebody sends you a csv with latitude and longitude columns. R reads it as an ordinary data frame, because nothing about a numeric column says it is a coordinate. So the data is spatial in principle and not in practice, and no spatial function will work on it until you say which columns are the coordinates. That conversion is one function call, which the next few tabs cover, but you have to know to make it, and you have to know the CRS to supply.
+
+</details>
+
++ Often times, you have a dataset with geographic coordinates as variables in a csv or other formats
+ 
++ It would not be recognized immediately as a spatial dataset by R when it is read into R. 
+
++ In this case, you need to identify which variables represent the geographic coordinates from the data set, and create an `sf` yourself. 
+
++ Fortunately, it is easy to do so using the `sf::st_as_sf()` function.
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The dataset for this section: registered irrigation wells in Nebraska. Run the class check and note that it is a plain data frame, not an sf. The coordinates are sitting in two ordinary columns called longdd and latdd. Then read the callout, because it states the thing nobody can work out for you. You have to know your data's coordinate reference system. It is not recoverable from the numbers, it comes from whoever produced the file, and here it is NAD eighty three, EPSG four two six nine. Guessing this wrong puts your data in the wrong place entirely.
+
+</details>
+
+Let's get a dataset (irrigation wells in Nebraska) to work with:
+
+```{webr-r}
+#--- read irrigation well registration data ---#
+data(wells_ne)
+
+#--- check its class ---#
+class(wells_ne)
+```
+
+<br>
+
+`wells_ne` is a `data.frame` and has `longdd` and `latdd` representing longitude and latitude, respectively. Note that it is NOT an `sf` object. 
+
+
+```{webr-r}
+#--- take a look ---#
+head(wells_ne)
+```
+
+<br>
+
+:::{.callout-note title="Important"}
++ YOU need to know the GRS/CRS of your data because you need to provide R with that information! 
++ The geographic coordinates system of this data is NAD 83 (epsg=4269) for this dataset. 
+:::
+
+### Making an `sf`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the conversion, with st as sf. Three things to supply: the data, the coordinate columns, and the CRS. The one detail worth burning in is the order inside coords: longitude first, then latitude. That is x then y, which is the opposite of how people say it out loud, and getting it backwards is the classic beginner error. It does not throw an error either. Your points simply end up somewhere absurd, often in the ocean, which is at least a recognisable symptom once you have seen it happen.
+
+</details>
+
+We can turn a dataset (e.g., `data.frame`, `tibble`, `data.table`) into an `sf` object using `sf::st_as_sf()`.
+
+#### Syntax
+
+```{r eval = F}
+sf::st_as_sf(
+  data.frame, 
+  coords = c(
+    longitude var name, 
+    latitude var name
+  ),
+  crs = crs
+)
+```
+
+<br>
+
+#### Example
+
+```{webr-r}
+#| context: setup 
+#--- recognize it as an sf ---#
+wells_ne_sf <- sf::st_as_sf(
+  wells_ne,
+  coords = c(
+    "longdd",
+    "latdd"
+  ),
+  crs = 4269
+)
+```
+
+```{webr-r}
+#--- recognize it as an sf ---#
+wells_ne_sf <- sf::st_as_sf(
+  wells_ne,
+  coords = c(
+    "longdd",
+    "latdd"
+  ),
+  crs = 4269
+)
+```
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Your turn with a different dataset. The mower sensor data has columns called LAT and LNG, and you need to turn it into an sf and assign WGS eighty four using its EPSG code. Two things to work out for yourself. Which order those two columns go in, remembering the longitude-first rule from the previous tab, and what the EPSG code for WGS eighty four actually is. That last one is worth memorising, because it is the most common CRS you will meet: it is what GPS devices and web maps use.
+
+</details>
+
+Using the `LAT` (latitude) and `LNG` (longitude) columns, turn the `tibble` into an `sf`, and then assign the CRS of WGS 84 using its EPSG code.  
+
+```{webr-r}
+data(mower_sensor)
+
+#--- write the code below ---#
+
+
+```
+
+:::
+
+## Conversion to and from `sp` objects {#sec-sf-to-sp}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A short historical detour that occasionally matters. The sp package came before sf, by the same author, and while sf has replaced it for new work, a number of established packages still only accept sp objects. Two are named here, one for spatial econometrics and one for geographically weighted regression, and if your research needs either you will need this conversion. So this is not a section to learn deeply, it is one to remember exists, so that when a package rejects your sf object you know what to do about it.
+
+</details>
+
++ The `sp` package is the predecessor of the `sf` package (developed by the same person)
+
++ There are many (older) packages that only accept spatial objects defined by the `sp` package
+	* `spdep`: spatial econometrics
+	* `GWmodel`: runs geographically-weighted regression
+
++ In that case, it is good to know how to convert an `sf` object to an `sp` object, vice versa. 
+
+### `sf` to `sp`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Going from sf to sp, and the syntax is slightly odd because it uses base R's as function with the string Spatial rather than a purpose-named converter. Run it and look at the class you get back. It will be something like SpatialPointsDataFrame, and note that the class name encodes the geometry type, which is a real difference from sf. In sf, one class holds any geometry. In sp, points, lines and polygons are different classes, which is part of why sf is more pleasant to work with once your data has mixed geometry types.
+
+</details>
+
+You can convert an `sf` object to its `sp` counterpart by `as(sf_object, "Spatial")`
+
+```{webr-r}
+wells_ne_sp <- as(wells_ne_sf, "Spatial")
+
+class(wells_ne_sp)
+```
+
+### `sp` to `sf`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And back the other way, which is simpler: st as sf accepts an sp object directly and works out the rest. Run it and check the class returns to sf and data frame. Worth noting that this is the same function you used earlier to turn a data frame of coordinates into an sf. It is doing the same conceptual job in both cases, taking something that holds spatial information in some other form and registering it as a simple feature, which is why it has the name it does.
+
+</details>
+
+You can convert an `sp` object to its `sf` counterpart by `sf::st_as_sf(sp_object)`.
+
+```{webr-r}
+wells_ne_sf_again <- sf::st_as_sf(wells_ne_sp)
+
+class(wells_ne_sf_again)
+```
+
+:::
+
+
+## Non-spatial Transformation of `sf` {#sec-non-trans}
+
+::: {.panel-tabset}
+
+### Note
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A short but important framing tab. Because an sf object is a data frame with an extra column, everything you already know about manipulating data frames applies unchanged. That is not a small convenience, it is the main reason sf displaced its predecessor. You do not need to learn a separate spatial dialect for filtering rows or computing a new variable. The dplyr verbs you spent Chapter three on work here, and the next tab demonstrates it. Anything that is genuinely spatial gets its own st function; everything else is just data manipulation.
+
+</details>
+
++ An important feature of an `sf` object is that it is basically a `data.frame` with geometric information stored as a variable (column). 
+
++ This means that transforming an `sf` object works just like transforming a `data.frame`. 
+
++ Basically, everything you can do to a `data.frame`, you can do to an `sf` as well.
+
++ `dplyr` verbs work well with `sf`
+
+### `dplyr` verbs
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the demonstration. Select, filter and mutate applied to an sf object exactly as you would to a data frame. The one behaviour worth noticing is called out twice: the geometry column survives a select even when you did not ask for it. That is deliberate and it is what you want almost always, since a spatial object without its geometry is not spatial. It does mean select cannot be used to drop geometry, though. That takes a specific function, and the note at the bottom points out that none of this worked with sp objects.
+
+</details>
+
+The following code selects `wellid` variable using `dplyr::select()`:
+
+```{webr-r}
+#--- here is what the data looks like ---#
+dplyr::select(wells_ne_sf, wellid)
+```
+
+Notice that `geometry` column will be retained after `dplyr::select()` even if you did not tell R to keep it above.
+
+<br>
+
+Of course, you can apply other `dplyr` verbs just like you do with a `data.frame`. Here, let's apply `dplyr::select()`, `dplyr::filter()`, and `dplyr::mutate()` in sequence using a piping operator.
+
+```{webr-r}
+#--- do some transformations ---#
+wells_ne_sf %>% 
+  #--- select variables (geometry will always remain after select) ---#
+  dplyr::select(wellid) %>% 
+  #--- removes observations with wellid <= 20000 ---#
+  dplyr::filter(wellid > 20000) %>% 
+  #--- modify wellid ---#
+  dplyr::mutate(wellid = wellid + 20) 
+```
+
+<br>
+
+:::{.callout-note title="Note"}
+You cannot do this with the spatial objects defined by the `sp` package
+:::
+
+:::
+
+
+## Sticky geometry {#sec-sticky-geometry}
+
+::: {.panel-tabset}
+
+### The idea
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is a property of sf objects that is mostly a blessing and occasionally a nuisance. The geometry column will not let go. Select two other columns and geometry comes along uninvited. Filter to ten rows and the right ten shapes follow. That is deliberate and it is the reason sf is safe to use: your shapes cannot drift out of alignment with your attributes, which is exactly the bug that plagued the older way of doing this. But it has consequences worth knowing, and the next few tabs are the ones that catch people. The escape hatch, when you want it, is st_drop_geometry.
+
+</details>
+
+An `sf` object is a `data.frame` with a geometry column that **refuses to be left
+behind**. Select other columns and it comes along. Filter rows and it follows.
+Group and summarise and it does something you may not have asked for.
+
+That stickiness is the point of `sf` — your geometry can never drift out of sync
+with your attributes. But it has consequences, and the next three tabs cover the
+ones that actually catch people.
+
+`sf::st_drop_geometry()` is the escape hatch. It returns an ordinary `data.frame`.
+
+### `summarize()` dissolves
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Group an sf and summarise it, and something happens that no other package would do: the geometries of each group are merged into a single shape. A hundred counties become two rows, and each row's geometry is the union of the counties in its group. Look at the map, where the county lines inside each group have vanished. Whether that is wonderful or annoying depends entirely on what you wanted. If you were dissolving counties into regions, this is the tool and you did not even have to ask for it. If you only wanted a group mean, it is a lot of work you did not want.
+
+</details>
+
+Group an `sf` and summarise it, and the geometries of each group are **unioned into
+one shape**:
+
+```{webr-r}
+#| autorun: true
+nc_grouped <- 
+  nc %>%
+  dplyr::mutate(grp = rep(c("a", "b"), length.out = nrow(.))) %>%
+  dplyr::group_by(grp) %>%
+  dplyr::summarize(mean_area = mean(AREA))
+
+nc_grouped
+```
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = nc_grouped, aes(fill = grp), alpha = 0.5) +
+  theme_void()
+```
+
+<br>
+
+:::{.callout-note title="Sometimes exactly what you want"}
+One hundred counties became two rows, and each row's geometry is the union of the
+counties in that group. If you wanted to dissolve counties into regions, this is a
+gift — it is how you do it, and you did not have to ask.
+
+If you only wanted a mean, it is wasted work, and on a large object it is a lot of
+wasted work. Drop the geometry first and it becomes an ordinary `dplyr` operation.
+:::
+
+### It is slow
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is the price of that convenience. Run the block and compare the two timings — and be patient with the first one, because it is genuinely that slow. Collapsing rows means merging their shapes, so the version that keeps the geometry takes hundreds of times as long as the one that drops it first. Unioning polygons is real geometric computation; averaging a column is almost free. But be careful how you generalise from that, because it is easy to over-learn. Filter, mutate, select and arrange are not slow on an sf. They carry the geometry column along but they never recompute it, so they cost about what they would on a plain data frame. It is summarise specifically that hurts. So do not go dropping geometry everywhere out of superstition. Drop it before a summarise that does not need a shape, and join the result back afterwards on an ID column.
+
+</details>
+
+`summarize()` is where the stickiness costs you: collapsing rows means
+**unioning their polygons**, wanted or not.
+
+<!-- CHANGED: was 1:20. In the browser that made the first call take 26 seconds,
+     which is too long to sit through in a lecture. Five reps shows the same
+     contrast in about six. -->
+
+```{webr-r}
+#--- with geometry ---#
+system.time(
+  for (i in 1:5) {
+    nc %>% dplyr::group_by(NAME) %>% dplyr::summarize(m = mean(AREA))
+  }
+)
+
+#--- without ---#
+system.time(
+  for (i in 1:5) {
+    nc %>% sf::st_drop_geometry() %>% dplyr::group_by(NAME) %>% dplyr::summarize(m = mean(AREA))
+  }
+)
+```
+
+:::{.callout-important title="It is `summarize()`, not `dplyr`"}
+Keeping the geometry costs **hundreds of times** as long — about **400-500x** in
+this browser, roughly **200x** in RStudio — and the gap widens as the data grows.
+
+`filter()`, `mutate()`, `select()` and `arrange()` never rebuild the geometry, they
+only carry it along, so they cost **milliseconds** either way. Drop geometry before
+a `summarize()` that does not need a shape, not defensively everywhere, and join
+the result back on an ID column.
+:::
+
+### Which side keeps the geometry?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This one is genuinely surprising the first time. When you join an sf to a plain data frame, the order of the arguments decides what class comes back. Put the sf first and you get an sf. Put the data frame first and you get a plain data frame, which still contains a column called geometry holding all the right shapes, so it prints perfectly happily and looks fine. But it is not an sf, and geom_sf and every st function will refuse it with an error that does not obviously point here. Put the sf first, or repair it afterwards with st_as_sf.
+
+</details>
+
+When you join an `sf` to a plain `data.frame`, the **order of the arguments decides
+what you get back**.
+
+```{webr-r}
+county_pop <- data.frame(NAME = nc$NAME, pop = seq_len(nrow(nc)))
+
+#--- sf first ---#
+joined_a <- dplyr::left_join(nc, county_pop, by = "NAME")
+class(joined_a)
+
+#--- data.frame first ---#
+joined_b <- dplyr::left_join(county_pop, nc, by = "NAME")
+class(joined_b)
+```
+
+<br>
+
+:::{.callout-important title="The second one is not an `sf`"}
+Put the `data.frame` first and you get a plain `data.frame` back. It still **has** a
+column called `geometry` holding the shapes, so it looks fine when you print it —
+but it is not an `sf`, and `geom_sf()` and every `st_*()` function will refuse it.
+
+Two ways out: put the `sf` first, which is the habit to build, or repair it
+afterwards with `st_as_sf(joined_b)`.
+:::
+
+### Writing to CSV
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last one, and it is the most disappointing to discover late. CSV has no way to represent a polygon, so if you write an sf to CSV the geometry is flattened into a text dump of the raw coordinate list. One county turns into a five-hundred-character line, and nothing on earth will read the shape back out of it. The rule is straightforward. If you want the attributes, drop the geometry and write that. If you want the spatial object, use st_write with a geopackage or geojson extension, which we covered in the reading and writing section earlier in this deck.
+
+</details>
+
+```{webr-r}
+#--- what does the geometry become? ---#
+as.data.frame(nc[1, ]) %>% format() %>% substr(1, 90)
+```
+
+<br>
+
+:::{.callout-important title="Do not `write.csv()` an `sf`"}
+CSV has no way to hold a polygon, so the geometry is flattened into text like
+
+```
+0.114,"Ashe","37009",list(list(c(-81.4727554321289, -81.5408401489258, ...
+```
+
+One county becomes a 524-character line, and nothing can read the shape back. If
+you want the attributes, `st_drop_geometry()` first and write that. If you want the
+spatial object, use `st_write()` with a `.gpkg` or `.geojson` extension, as in the
+[reading and writing section](#sec-input-output).
+:::
+
+:::
+<!--end of panel-->
+
+## Non-interactive geometrical operations {#sec-non-int-spatial-operations}
+
+::: {.panel-tabset}
+
+### Create buffers 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Buffers, in three nested tabs, and the pair of examples together make a point worth more than either alone. The How tab gives the syntax and the crucial hint: distance is in the units of your CRS, and you can check those with st crs of your object dollar units. Then the non-projected example buffers unprojected data. Look at the result and you will see a zig-zag edge, which the note explains and links out about. Then the projected example does it properly, transforming into the local UTM zone first. That is the recommendation to take away: project, then measure.
+
+</details>
+
+
+::: {.panel-tabset}
+
+#### How
+
+You can use `sf::st_buffer()` to create buffers of the specified length around points, lines, and polygons.
+
+<br> 
+
+**Syntax**
+
+```{r, eval = F}
+st_buffer(sf, dist = distance)
+```
+
++ `dist`: provide the distance in the unit of the CRS (run `st_crs(sf)$units` to get the unit)
+
+#### Example (non-projected)
+
+Let's create a buffer of 2000 meter.
+
+```{webr-r}
+#| warning: true
+nc_buffer <- st_buffer(nc[1, ], dist = 2000)
+```
+
+<br>
+
+Here is what it looks like:
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = nc[1, ], color = "red") +
+  geom_sf(data = nc_buffer, fill = "blue", alpha = 0.3)
+```
+
+<br>
+
+Yes, you see zig-zag. You can read up on this [here](https://github.com/r-spatial/sf/issues/1692). For now, I would recommend that you project first and then create a buffer.
+
+
+#### Example (projected)
+
+Let's first project and then create a buffer:
+
+```{webr-r}
+#| warning: true
+nc_buffer <- 
+  #--- project first (to UTM 17N, the zone North Carolina is in) ---#
+  #--- CHANGED: was 32615, UTM zone 15N, which is ~1000km west of NC ---#
+  st_transform(nc[1, ], 32617) %>% 
+  #--- dist in meter ---#
+  st_buffer(dist = 2000)
+```
+
+<br>
+
+Here is what it looks like:
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = nc[1, ], color = "red") +
+  geom_sf(data = nc_buffer, fill = "blue", alpha = 0.3)
+```
+
+:::
+<!--end of panel-->
+
+
+### Find area
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Computing areas, and the second nested tab is the one that catches people. st area gives you the area of every polygon, which is straightforward. But run the class check and note what comes back is not a plain number, it is a units object, carrying square metres around with it. That is genuinely helpful, because it stops you adding metres to feet. It is also a nuisance the moment you want to do ordinary arithmetic, so the Caveat tab wraps the result in as numeric. Do that deliberately rather than by accident, because you are discarding the unit information.
+
+</details>
+
+::: {.panel-tabset}
+#### Example
+
+You can use `st_area()` to calculate the area of all the polygons in an `sf` object.
+
+```{webr-r}
+(
+nc <- 
+  dplyr::mutate(nc, area = st_area(nc)) %>% 
+  dplyr::select(area)
+)
+```
+
+<br>
+
+#### Caveat
+
+By default, area calculated by `st_area()` is `units`. 
+
+```{webr-r}
+class(nc$area)
+```
+
+<br>
+
+So, you want to convert it to a numeric variable like this if you want to subject it to numeric operations later:
+
+```{webr-r}
+nc <- dplyr::mutate(nc, 
+  area = st_area(nc) %>% as.numeric(),
+  ) %>% 
+  dplyr::select(area)
+
+class(nc$area)
+```
+:::
+<!--end of panel-->
+
+
+
+### Find centroid
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Centroids, in two nested tabs. st centroid replaces each polygon with a single point at its middle, which is what you want for labelling a map or computing rough distances between regions. Run the plot and check the points land inside their counties. Then the second tab pulls the raw coordinates out with st coordinates, giving you a plain matrix of x and y, and shows how to bind that onto the original object. That is the standard route when you need coordinates as ordinary columns, for example to pass them to something that is not spatially aware.
+
+</details>
+
+::: {.panel-tabset}
+#### Example
+
+You can use `st_centroid()` to find the centroid of each of all the polygons in an `sf` object.
+
+```{webr-r}
+nc_centroids <- st_centroid(nc)
+```
+
+As you can see, `st_centroid()` returns an `sf` of centroids as points. The centroids look like this:
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = nc) +
+  geom_sf(data = nc_centroids)
+```
+
+<br>
+
+#### Matrix of coordinates
+
+If you want longitude (X) and latitude (Y) of the centroids, you can further apply `st_coordinates()`.
+
+```{webr-r}
+st_centroid(nc_centroids) %>% st_coordinates() %>% head()
+```
+
+<br>
+
+Of course, you can easily add the XY matrix to the original `sf` file using `cbind()`:
+
+```{webr-r}
+cbind(nc, st_coordinates(nc_centroids)) %>% head()
+```
+
+
+:::
+<!--end of panel-->
+
+
+### Calculate distance
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Distances, and there are two things to notice. First the shape of the result: st distance between two sets of features gives you a full matrix, every feature in the first against every feature in the second, not a paired-up vector. Read the description above the code carefully so you know which index is which. Second, and this genuinely surprises people, read the callout. Even though this data is unprojected, in degrees, the distances come back in metres. sf computes them on the sphere rather than treating degrees as if they were a flat grid.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How 
+
+**Syntax**
+
+```{r eval = F}
+st_distance(sf_1, sf_2)
+```
+
+This finds the distance between each of the points in `sf_1` and each of the points in `sf_2`.
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="70%"}
+Get a matrix of distances whose $[i,j]$ element is the distance between the $i$th `sfg` of `st_centroid(nc[1:5, ])` and $j$th `sfg` of `st_centroid(nc[6:15, ])`:
+
+```{webr-r}
+st_distance(
+	st_centroid(nc[1:5, ]),
+	st_centroid(nc[6:15, ])
+)
+```
+
+<br>
+
+:::{.callout-note}
+Notice that, even though `nc` is unprojected, distances returned are in meter.
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### Combine (union) 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last operation: dissolving many geometries into one with st union. The example collapses a hundred counties into a single outline of the state, which is what you want when you need a boundary rather than its subdivisions. Note the warning in the text, though, because it is easy to trip over. What comes back is an sfc, not an sf. The attributes are gone, and reasonably so, since there is no single sensible answer for what the name or area column of a merged object should be. If you need attributes, you have to decide how to aggregate them yourself.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+Sometimes you want to combine all the geometries in a single `sf`. For example, you may want to get the centroid of North Carolina using `nc` (of course, you can alternatively get `sf` of NC state boundary, instead of counties in this case).
+
+You can use `sf::st_union()` to achieve this. Note that the returned object is `sfc`, not `sf`.
+
+```{webr-r}
+nc_one <- st_union(nc)
+class(nc_one)
+```
+
+<br>
+
+Here is what it looks like.
+
+```{webr-r}
+plot(nc_one)
+```
+
+
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+:::
+<!--end of panel-->
+
+## When spatial operations fail {#sec-when-things-fail}
+
+::: {.panel-tabset}
+
+### Why this section
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far has shown you operations that work. This section is about the three ways they usually do not, because you will meet all three within about a week of using real spatial data, and none of them announces itself clearly. Different coordinate systems, broken geometries, and distances in units you did not expect. The reason to spend a slide on each is that the error messages are genuinely unhelpful, and recognising one on sight is the difference between a one-line fix and an afternoon of guessing where you went wrong.
+
+</details>
+
+Three things go wrong far more often than anything else, and all three produce
+error messages that do not obviously say what is wrong. Knowing them by sight
+turns an afternoon of confusion into a one-line fix.
+
++ the two objects are in different CRS
++ one of the geometries is invalid
++ a distance you supplied was measured in units you did not expect
+
+### CRS mismatch
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is far and away the most common failure, and it has a signature. Whenever two objects do not share a coordinate reference system, sf refuses to combine them and says st_crs of x equals st_crs of y is not TRUE. Learn that sentence by sight. It comes from intersection, from joins, from distance, from almost everything that takes two objects. The fix is always a transform, and the only judgement is which object to move. Move vector data rather than raster data, because re-projecting a raster resamples its values and you cannot undo it.
+
+</details>
+
+This is the most common failure by a wide margin, and it has a signature message:
+
+```{webr-r}
+#| autorun: true
+nc_utm <- st_transform(nc, 32617)
+
+#--- both describe North Carolina, in different CRS ---#
+st_crs(nc) == st_crs(nc_utm)
+```
+
+<br>
+
+Now try to combine them:
+
+```{webr-r}
+st_intersection(nc[1:5, ], nc_utm[1:5, ])
+```
+
+<br>
+
+:::{.callout-important title="`st_crs(x) == st_crs(y) is not TRUE`"}
+That exact wording is the one to memorise. `sf` refuses to combine two objects
+unless their CRS match, and you get the same message from `st_intersection()`,
+`st_join()`, `st_distance()` and most of their relatives.
+
+The fix is always the same: transform one object to the other's CRS.
+
+```{r, eval = FALSE}
+st_intersection(nc, st_transform(nc_utm, st_crs(nc)))
+```
+
+Which one should move? Transform the **vector** data, not raster data, and when
+both are vector, transform to whichever CRS the analysis needs. Re-projecting a
+raster resamples its values and cannot be undone.
+:::
+
+### Invalid geometry
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A geometry can be well-formed as data and still describe something impossible. The bowtie here crosses itself, and real downloaded shapefiles contain shapes like it routinely. Watch what happens when we ask for its area, because this is the important part: it returns zero, with no error and no warning, since the two triangles cancel. You would believe that number. Other operations do refuse, with messages about topology exceptions or self-intersections, and the wording varies by version. st_make_valid repairs it, but notice it returns two polygons where there was one. Repair changes your data.
+
+</details>
+
+A geometry can be syntactically fine and still describe something impossible — a
+boundary that crosses itself, for instance. Real downloaded shapefiles contain
+these routinely.
+
+::: {.panel-tabset}
+
+#### A broken shape
+
+```{webr-r}
+#| autorun: true
+#--- a "bowtie": the outline crosses itself in the middle ---#
+bowtie <- 
+  st_sf(
+    name = "bowtie",
+    geometry = st_sfc(
+      st_polygon(list(rbind(c(0, 0), c(2, 2), c(2, 0), c(0, 2), c(0, 0)))),
+      crs = 32617
+    )
+  )
+
+ggplot() +
+  geom_sf(data = bowtie, fill = "red", alpha = 0.3) +
+  theme_void()
+```
+
+<br>
+
+Ask whether it is valid, and why not:
+
+```{webr-r}
+st_is_valid(bowtie)
+
+#--- "Self-intersection[1 1]" — the coordinates where it crosses itself ---#
+st_is_valid(bowtie, reason = TRUE)
+```
+
+#### It answers anyway
+
+Now watch carefully. Ask for its area:
+
+```{webr-r}
+st_area(bowtie)
+```
+
+<br>
+
+:::{.callout-important title="It answered. The answer is wrong."}
+You get **0**, with no error and no warning. The two triangles have equal area with
+opposite orientation, so they cancel exactly. An invalid geometry does not
+necessarily stop your code — it can quietly hand back a number you will believe.
+:::
+
+#### When it does complain
+
+Other operations do refuse:
+
+```{webr-r}
+st_intersection(bowtie, bowtie)
+```
+
+<br>
+
+:::{.callout-note title="What the complaint looks like"}
+`TopologyException`, `side location conflict`, `Self-intersection`,
+`Loop 0 is not valid`, `Edge N crosses edge M` — the exact wording depends on which
+geometry engine handled the call, and differs between `sf` versions and between
+projected and unprojected data. They all mean one thing: **the geometry is broken,
+and it was broken before you touched it.** Do not go hunting for the mistake in
+your own code.
+:::
+
+#### Repairing it
+
+`st_make_valid()` repairs it:
+
+```{webr-r}
+bowtie_fixed <- st_make_valid(bowtie)
+
+st_is_valid(bowtie_fixed)
+st_area(bowtie_fixed)
+```
+
+<br>
+
+:::{.callout-note title="Repairing changes the geometry"}
+Look at what came back. The single self-crossing `POLYGON` is now a `MULTIPOLYGON`
+of **two** triangles, because that is the only sensible reading of the shape. So
+`st_make_valid()` is not a formality — it can change feature counts and areas, and
+you should look at what it did rather than piping straight through it.
+
+One wrinkle worth knowing: on **unprojected** lon/lat data, `st_make_valid()` goes
+through the s2 spherical engine and does not always succeed. If it returns something
+still invalid, project the data first and repair it there.
+:::
+
+:::
+<!--end of nested panel-->
+
+### Units
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last one, and the sneakiest, because nothing errors at all. A number you hand to st_buffer is in the units of the coordinate system, and those are not always metres. Buffer this county by two thousand on a UTM projection and it grows to about fourteen hundred square kilometres. Buffer it by the same two thousand on the North Carolina state plane system, which is measured in survey feet, and it balloons to over thirteen thousand. Same code, same number, different answer. Check st_crs units before passing any distance. Longitude and latitude, oddly, gives you metres.
+
+</details>
+
+A distance you pass to `st_buffer()` or `st_is_within_distance()` is expressed in
+**the units of the CRS**, and those are not always what you assume.
+
+::: {.panel-tabset}
+
+#### Two CRS, two units
+
+```{webr-r}
+#| autorun: true
+nc_1 <- nc[1, ]
+
+#--- UTM zone 17N: units are metres ---#
+nc_metres <- st_transform(nc_1, 32617)
+
+#--- NC State Plane: units are US survey FEET ---#
+nc_feet <- st_transform(nc_1, 2264)
+
+st_crs(nc_metres)$units
+st_crs(nc_feet)$units
+```
+
+<br>
+
+#### Same number, different distance
+
+The same number now means two very different distances:
+
+```{webr-r}
+buf_m  <- st_buffer(nc_metres, dist = 2000)
+buf_ft <- st_buffer(nc_feet,   dist = 2000)
+
+#--- areas in km2 ---#
+c(
+  metres = as.numeric(st_area(buf_m)) / 1e6,
+  feet   = as.numeric(st_area(buf_ft)) / 1e6
+)
+```
+
+<br>
+
+:::{.callout-important title="`dist = 2000` is not a distance until you know the CRS"}
+On the metre-based CRS the county grows to about **1,431 km²**. On the feet-based
+one it grows to about **13,186 km²**, because 2000 US survey feet is only 610
+metres — but the buffer is applied in the coordinate units, so the shape balloons.
+
+Check `st_crs(x)$units` before passing any number as a distance. Plenty of US state
+plane systems are in feet, and nothing warns you.
+:::
+
+#### Lon/lat is the exception
+
+:::{.callout-note title="Longitude/latitude is the helpful exception"}
+You might expect a number to mean *degrees* on unprojected data. It does not.
+`sf` hands lon/lat work to the s2 spherical engine, which measures in metres, so
+`st_buffer(nc, dist = 2000)` on unprojected `nc` really does buffer by 2 km. That
+is convenient, and it is also why unprojected distances quietly work when you
+expected them to fail.
+:::
+
+:::
+<!--end of nested panel-->
+
+:::
+<!--end of panel-->
+
+## Exercise
+
+::: {.panel-tabset}
+
+### Data preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now a sequence of four exercises that chain together, using the fairway grid dataset from a Nebraska golf course. Start here by loading it and looking at it, and do actually plot it before moving on, because each exercise builds on the one before and a mistake early will follow you through all four. The sequence mirrors the whole deck: project, then buffer, then find centroids, then measure distances between them. If you can do those four in order, you can do most of what applied vector work asks for.
+
+</details>
+
+Run the following code to get `fairway_grid` data. Then, inspect the data (e.g., by plotting) to get a good sense of what the data looks like.
+
+```{webr-r}
+data(fairway_grid)
+```
+
+### Exercise 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first exercise, in two parts. Plot the data, then transform it to NAD eighty three UTM zone fourteen north, whose code you are given. Note that fourteen north is correct here even though the North Carolina examples used seventeen north. This dataset is in Nebraska, and the whole point of UTM is that you use the zone your data is in. Getting that habit right is more valuable than remembering any particular number. Name the result exactly as the exercise asks, because the next three exercises all expect to find it under that name.
+
+</details>
+
+First, plot `fairway_grid` to get a sense of what the dataset looks like:
+
+```{webr-r}
+#--- type codes below ---#
+#--- CHANGED: this was a bare plot(), which errors if a student clicks Run ---#
+
+```
+
+<br>
+
+Transform `fairway_grid` so that its CRS is NAD 83/UTM zone 14N (its EPSG code is 26914) and name it `fairway_grid_utm`.
+
+```{webr-r}
+#--- type codes below ---#
+```
+
+<br>
+
+#### Answer codes
+
+```{r}
+#| code-fold: true 
+#| eval: false 
+plot(fairway_grid) 
+
+fairway_grid_utm <- st_transform(fairway_grid, 26914)
+```
+
+
+### Exercise 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second exercise: ten metre buffers around each grid polygon. This is where projecting in the previous exercise pays off, and it is worth pausing on why. Because the data is now in UTM, the units are metres, so distance ten means ten metres and nothing further is needed. Had you skipped the transform and buffered the unprojected data, you would have got the zig-zag edges from the buffers tab. So the order of these two exercises is itself the lesson, rather than an accident of how they happen to be written.
+
+</details>
+
+Create buffers around the grid polygons in `fairway_grid_utm` where the radius of the buffer is 10 meter, and name it `fairway_grid_buffers`.
+
+```{webr-r}
+#--- type codes below ---#
+```
+
+<br>
+
+#### Answer codes
+
+```{r}
+#| code-fold: true 
+#| eval: false 
+fairway_grid_buffers <- st_buffer(fairway_grid_utm, dist = 10)
+```
+
+### Exercise 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third exercise: centroids of the buffers you just made. Mechanically this is one call to st centroid, so it should be quick. Worth thinking about what you expect before you run it, though. The centroid of a buffer around a polygon should sit at essentially the same place as the centroid of the polygon itself, since buffering expands a shape evenly in all directions. If your centroids come out somewhere unexpected, that is a signal that something went wrong back in exercise one or two rather than here in exercise three.
+
+</details>
+
+Find the centroid of each of the buffer polygons you created in Exercise 2, and then name it `buffers_centroids`.
+
+```{webr-r}
+#--- type codes below ---#
+```
+
+<br>
+
+#### Answer codes
+
+```{r}
+#| code-fold: true 
+#| eval: false 
+buffers_centroids <- st_centroid(fairway_grid_buffers)
+```
+
+### Exercise 4
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the last one: distances between those centroids. Note that this is st distance with a single argument rather than two, which computes every pairwise distance within one object. So what you get back is a square matrix with zeros down the diagonal, since every point is zero from itself. That diagonal is a useful sanity check. And because you projected back in exercise one, these distances are in metres from the CRS rather than computed on the sphere, which is exactly what you want for a dataset at the scale of a single field.
+
+</details>
+
+Calculate the distances between the centroids in `buffers_centroids`.
+
+```{webr-r}
+#--- type codes below ---#
+```
+
+<br>
+
+#### Answer codes
+
+```{r}
+#| code-fold: true
+#| eval: false
+st_distance(buffers_centroids)
+```
+
+
+:::
+

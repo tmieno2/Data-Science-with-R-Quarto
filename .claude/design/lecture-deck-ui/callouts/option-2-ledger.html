@@ -1,0 +1,134 @@
+<!-- @dsCard group="Callouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Callouts — Ledger</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* LEDGER callouts — a label chip notched into the top-left of a bordered block.
+   Same device as the title band, one level down: a filled label naming the kind
+   of thing, and square corners. More structural and more emphatic than Chalkline;
+   it costs about 18px more per block, which on a full slide is a real trade. */
+.spec { width:966px; background:var(--paper); padding:24px; box-sizing:border-box;
+        box-shadow:0 2px 14px rgba(0,0,0,.14); margin-bottom:6px;
+        font-size:var(--t-body); color:var(--ink); }
+.spec .lbl { font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+             color:#8a8f98; margin-bottom:14px; }
+
+.cx { border:1px solid var(--rule); border-top:0; margin:0 0 16px;
+      padding:10px 14px 11px; position:relative; }
+.cx .tag { position:absolute; top:0; left:0; transform:translateY(-100%);
+           font-size:11.5px; font-weight:700; letter-spacing:.09em;
+           text-transform:uppercase; padding:3px 11px; color:#fff;
+           background:var(--ink-muted); }
+.cx { margin-top:22px; }
+
+.cx.aside { border-color:var(--rule); color:var(--ink-muted); }
+.cx.aside .tag { background:var(--ink-muted); }
+
+.cx.watch { border:1px solid var(--accent-sub); border-top:0; background:var(--tint-2); }
+.cx.watch .tag { background:var(--accent-sub); }
+
+.cx.tryit { border:1px solid var(--accent); border-top:0; }
+.cx.tryit .tag { background:var(--accent); }
+
+/* answer — same chip, and it opts out of the global <details> rule */
+details.ax { border:1px solid var(--accent); border-top:0; border-radius:0;
+             padding:0; margin:22px 0 16px; position:relative; background:var(--tint); }
+details.ax > summary { margin:0; padding:9px 14px; font-weight:700; font-size:15px;
+                       cursor:pointer; list-style:none; color:var(--accent);
+                       display:flex; align-items:center; gap:8px; }
+details.ax > summary::-webkit-details-marker { display:none; }
+details.ax > summary::before { content:"▸"; font-size:12px; }
+details.ax[open] > summary::before { content:"▾"; }
+details.ax > summary .hint { margin-left:auto; font-weight:600; font-size:12px;
+                             color:var(--ink-muted); }
+details.ax .tag { position:absolute; top:0; left:0; transform:translateY(-100%);
+                  font-size:11.5px; font-weight:700; letter-spacing:.09em;
+                  text-transform:uppercase; padding:3px 11px; color:#fff;
+                  background:var(--accent); }
+details.ax .abody { padding:0 14px 12px; }
+details.ax .abody pre { margin-bottom:0; }
+
+.h { font-size:13px; color:var(--ink-muted); margin:12px 0 0; }
+.ok { color:#0b5c3f; font-weight:600; }
+</style>
+
+<h1 class="page">Ledger — a named chip on every block</h1>
+<p class="page">
+  The chip names the kind of block in words rather than leaving it to a colour,
+  which is the failure mode of the current icons-off callouts. Square corners and
+  filled labels tie it to the title band. It reads harder from the back of a room
+  than Chalkline and costs ~18px more per block — the trade is explicitness
+  against vertical space.
+</p>
+
+<div class="spec sys-ledger">
+  <div class="lbl">1 · The four roles</div>
+
+  <div class="cx aside"><span class="tag">Aside</span>
+    The same idea appeared in Chapter 2 when we set the YAML header.</div>
+
+  <div class="cx watch"><span class="tag">Watch out</span>
+    A path that works on your machine will not work on mine. This is the single
+    most common reason your code runs and my copy does not.</div>
+
+  <div class="cx tryit"><span class="tag">Try it</span>
+    Run <code>getwd()</code> now, and read the result out loud.</div>
+
+  <details class="ax">
+    <span class="tag">Answer</span>
+    <summary>Show the answer <span class="hint">2 lines</span></summary>
+    <div class="abody">
+<pre class="src">corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>)</pre>
+    </div>
+  </details>
+
+  <p class="h"><span class="ok">Chip text is white on its own fill: #b45309 = 4.6:1,
+     #0b5c3f = 7.4:1, #4d5761 = 7.3:1 — all pass.</span> The kind of block is
+     stated in words, so it survives a bad projector and a colour-blind reader.</p>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="lbl">2 · Answer box — closed, and open</div>
+  <details class="ax"><span class="tag">Answer</span>
+    <summary>Show the answer <span class="hint">2 lines</span></summary></details>
+  <details class="ax" open><span class="tag">Answer</span>
+    <summary>Show the answer <span class="hint">2 lines</span></summary>
+    <div class="abody">
+<pre class="src">corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>)</pre>
+    </div>
+  </details>
+  <p class="h">
+    Both states opt out of <code>custom.scss</code>'s global <code>details</code>
+    border and <code>summary</code> negative margin explicitly. The "2 lines" hint
+    is the same idea as in Chalkline: say what opening costs before it is opened.
+  </p>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="lbl">3 · On a slide, at 700px — note how much less room is left
+    than the Chalkline version</div>
+</div>
+<div class="stage sys-ledger safeline">
+  <div style="background:var(--accent);color:#fff;padding:13px 42px 14px">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <h2 style="font-size:30px;margin:0;font-weight:600">Working directories</h2>
+      <span style="margin-left:auto;font-size:14px;letter-spacing:.1em;
+                   text-transform:uppercase;opacity:.82">Ch 3 · Data Wrangling</span>
+    </div>
+  </div>
+  <div style="padding:20px 42px 0">
+    <p>R resolves every relative path against the <strong>working directory</strong>.</p>
+    <div class="cx watch"><span class="tag">Watch out</span>
+      A path that works on your machine will not work on mine.</div>
+<pre class="src"><span class="fn">getwd</span>()
+<span class="fn">read.csv</span>(<span class="str">"data/corn.csv"</span>)   <span class="cmt"># relative — depends on getwd()</span></pre>
+    <div class="cx tryit"><span class="tag">Try it</span>
+      Run <code>getwd()</code> and compare with your neighbour.</div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>

@@ -1,0 +1,952 @@
+---
+title: "03-1: Importing Files and Exporting to Files"
+abstract: "Chapter 3: Data Wrangling"
+format:
+  revealjs:
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+---
+
+<!--
+================================================================================
+REVISED VERSION of 03-1-input-output.qmd
+
+Every change is marked with an HTML comment starting with "CHANGED:", "ADDED:",
+or "REMOVED:". None appear in the rendered slides. Delete once accepted.
+
+NOTE: this block must stay BELOW the YAML header.
+
+Change log at a glance:
+  A. Corrections .......... WRONG CLASS CLAIM for read_dta (it returns a tibble,
+                            the slide said data.frame), hard-coded absolute
+                            paths in chunks that actually execute, old
+                            {r eval = F} chunk headers, "pacakge", "obeject",
+                            dangling modifier in the readxl sentence, the
+                            "rownames" filename, the "r data set" gloss.
+  B. New material ......... here::here(), why setwd() fails in a rendered
+                            document (demonstrated), reading a sheet by name,
+                            excel_sheets(), skip/na for messy spreadsheets,
+                            col_types, reading from a URL, Windows paths, a
+                            "file not found" checklist, and an answer to the
+                            file-size question the original only asked.
+  C. Improvements ......... the Compare tab now shows differences that matter
+                            instead of only class(), the rds demo no longer
+                            writes a stray file into the repo, chunk labels.
+
+REPO HYGIENE (flagged, not changed): past renders committed build artifacts into
+this folder: a_list.rds, corn_yields_exp.csv/.dta/.rds,
+corn_yields_exp_rownames.csv. They are outputs of the lecture, not inputs, and
+could be deleted and gitignored.
+================================================================================
+-->
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(readr)
+library(here)
+```
+<!-- CHANGED (C3): labelled the chunk, and added `here`, which this lecture now
+     teaches instead of only using it invisibly. -->
+
+```{r}
+#| label: paths
+#| include: false
+# every executed example below reads through here(), so the slides build on
+# any machine that has the repository
+dir_ch3 <- here::here("lectures", "Chapter-3-DataWrangling")
+```
+<!-- ADDED (A2): a single place where the data folder is resolved. The original
+     pasted "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into
+     chunks that actually ran, so the lecture only rendered on Taro's computer.
+     Note it also spelled the folder "Lectures" with a capital L while the real
+     folder is "lectures"; that survived only because macOS ignores case. -->
+
+
+# Importing and Exporting Datasets
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+## Importing and Exporting Datasets
+
+::: {.panel-tabset}
+### Objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Before you can wrangle any data you have to get it into R, and getting it out again matters just as much. Three objectives today. First, reading datasets in the four formats you will actually meet: csv, Excel, STATA, and R's own rds. Second, writing R objects back out to files. And third, which is the one people underestimate, understanding where R looks for a file. That third objective is the middle third of this lecture and it is the part that goes wrong in assignments, because code that works on your machine and nowhere else is not much use to anybody.
+
+</details>
+
++ Read datasets in various formats (**csv**, **xlsx**, **dta**, and **rds**) containing corn yields in Nebraska counties
+
++ Write R objects as files in various formats
+
++ Understand where R looks for a file, so that your code runs on someone else's computer too
+<!-- ADDED: the third objective. It is what the middle third of this lecture is
+     really about, and it is the part students get wrong in assignments. -->
+
+### Directions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things to do before we go further. Clone the repository linked here, which holds the datasets this lecture uses, so you can follow along rather than watch. And install two packages: tidyverse, which is a whole collection we will lean on for the rest of the course, and haven, which is what reads STATA files. Install them once now. The callout makes the point that tidyverse does a great deal more than reading and writing files; today we are using one small corner of it.
+
+</details>
+
++ Go [here](https://github.com/tmieno2/data-science-course-supplementary-datasets) and clone the repository that hosts datasets used in this lecture
++ Install the `tidyverse` and `haven` packages, which we will use to read and write files.
+
+```{r}
+#| label: install-packages
+#| eval: false
+install.packages(c("tidyverse", "haven"))
+```
+
+:::{.callout-note}
+The `tidyverse` package does far more than read and write files. We will cover it in much greater depth later.
+:::
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+How do you know which function to use? You look at the file extension, the bit after the final dot, because that tells you how the data is stored. A csv is plain text that essentially every piece of software can open. An xlsx is Excel's own format, and note it can hold more than one sheet, which matters later. A dta is STATA's format, which you will meet constantly if you work around economists. And an rds is R's own. The rule that follows is simple but absolute: you must use the function that matches the format. There is no universal read-this-file function.
+
+</details>
+
+You can tell how a dataset is stored from the file extension, the part that follows the final dot in the file name.
+
++ **corn.csv**: a plain text format that Microsoft Excel and almost everything else supports.
+
++ **corn.xlsx**: Microsoft Excel's own format, which may hold more than one sheet.
+
++ **corn.dta**: a format that STATA supports (software that is immensely popular among economists).
+
++ **corn.rds**: a format that R supports.
+
+To import a dataset, you must use the function appropriate for the format that dataset is stored in.
+
+:::
+<!--end of panel-->
+
+## Read a CSV file
+
+::: {.panel-tabset}
+
+### `read.csv()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Start with csv, and with the function that comes built into R: read.csv, with a dot. You give it a path to a file and it hands you back a data.frame. The syntax block shows the shape, and the example actually runs, reading the corn yields file. Note in passing how the example builds its path rather than typing one out; we come back to why that matters shortly. This function works, it needs no packages, and for a small clean file it is perfectly adequate. But it is not what I am going to recommend.
+
+</details>
+
+You can use `read.csv()` from the `base` package.
+
+<br>
+
+**Syntax**
+
+```{r}
+#| eval: false
+data <- read.csv("path to the file to import")
+```
+<!-- CHANGED (A3): the chunk header was ```{r eval = F}, the old R Markdown
+     style, while 02-1 teaches "#| eval: false". Applied throughout this file.
+     CHANGED: also switched "=" to "<-" for assignment, and quoted the
+     placeholder path so the line is at least syntactically valid R. -->
+
+<br>
+
+**Example**
+
+```{r}
+#| label: read-data-csv
+corn_yields_df <- read.csv(file.path(dir_ch3, "corn_yields.csv"))
+```
+
+### `read_csv()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the alternative: read_csv, with an underscore, from the readr package, which comes with tidyverse. Notice the naming convention, because it runs through the whole tidyverse: underscores rather than dots. The call looks almost identical, you hand it a path and get your data back. The difference is in what you get back and how it behaves, and that is what the next tab is about. When you see both of these in code on the internet, and you will, the underscore version is the modern one.
+
+</details>
+
+You can use `read_csv()` from the `readr` package.
+
+<br>
+
+**Syntax**
+
+```{r}
+#| eval: false
+data <- readr::read_csv("path to the file to import")
+```
+
+<br>
+
+**Example**
+
+```{r}
+#| label: read-data-readr
+#| message: false
+corn_yields_tbl <- readr::read_csv(file.path(dir_ch3, "corn_yields.csv"))
+```
+
+### Compare
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So what actually differs, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.
+
+</details>
+
+<!-- CHANGED (C1): the original Compare tab printed class() for each and stopped
+     there. That tells a student the two objects differ without telling them
+     anything they can act on. The three differences below are the ones that
+     actually change what your code has to look like. -->
+
+**1. What you get back**
+
+::: {.side-out .tight}
+
+```{r}
+#| label: cmp-class
+class(corn_yields_df)
+class(corn_yields_tbl)
+```
+
+:::
+
+**2. How it prints**
+
+A `tibble` shows the first 10 rows and the type of every column. A `data.frame` prints the entire object, which floods the screen for a large dataset.
+
+**3. What happens to awkward column names**
+
+If the file has a column called `county name`, with a space:
+
++ `read.csv()` renames it to `county.name`
++ `read_csv()` keeps it as `county name`, and you refer to it with backticks
+
+:::{.callout-note title="Which should you use?"}
+Use `read_csv()`. It is faster on large files, it does not rename your columns behind your back, and it tells you which type it guessed for each column. This course uses the tidyverse throughout, so `tibble` is the object you want anyway.
+:::
+
+### Awkward files
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now a real-world problem the clean examples hide. read_csv guesses each column's type by looking at the first rows, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.
+
+</details>
+
+<!-- ADDED (B6): entire tab. read_csv guessing a column type wrongly is the most
+     common real-world import problem and the original never mentioned it. -->
+
+`read_csv()` guesses each column's type from the first rows. When it guesses wrong, say a zip code read as a number and stripped of its leading zero, tell it directly:
+
+```{r}
+#| eval: false
+read_csv(
+  "corn_yields.csv",
+  col_types = cols(county_code = col_character())
+)
+```
+
+Other arguments worth knowing:
+
++ `skip = 2`: ignore the first 2 lines, for files with a title above the header
++ `na = c("", "NA", ".")`: treat these strings as missing
++ `col_names = FALSE`: the file has no header row
+
+### From a URL
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small convenience with a warning attached. Anywhere read_csv accepts a file path, it also accepts a web address, so you can read a dataset straight off the internet without downloading it first. That is genuinely useful when you are exploring. But read the callout before you build anything on it: this re-downloads the file every single time you render, which is slow, and more importantly a URL can change or vanish without warning, taking your analysis with it. For anything you actually rely on, download it once, keep it in your project, and read the local copy.
+
+</details>
+
+<!-- ADDED (B7): entire tab. Students find data online constantly and do not
+     realise they can skip the download entirely. -->
+
+`read_csv()` accepts a web address wherever it accepts a file path:
+
+```{r}
+#| eval: false
+corn <- read_csv("https://raw.githubusercontent.com/user/repo/main/corn_yields.csv")
+```
+
+:::{.callout-important}
+This re-downloads the file every time you render. For anything you rely on, download it once, save it in your project, and read the local copy. A URL can change or disappear without warning.
+:::
+
+:::
+<!--end of panel-->
+
+## Where R looks for your files
+
+<!-- CHANGED (B1/B2): this whole section was "Setting the working directory" and
+     taught setwd() as the main tool. That is the wrong default for a course
+     where everything is rendered: setwd() does not survive from one chunk to
+     the next (demonstrated in the "Why setwd fails" tab), and a hard-coded
+     path breaks on every other computer. here() is now the recommendation,
+     matching what 02-1 teaches and what this file already did in its own
+     hidden chunks. -->
+
+::: {.panel-tabset}
+
+### Working directory
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. Once you know that, the simple case makes sense: if the working directory is your project folder and the file is sitting in it, then the bare file name is enough. Everything else in this section is about controlling that folder deliberately rather than by accident.
+
+</details>
+
+R always has one folder it treats as "here", called the **working directory**. A path that does not start from the root of your disk is interpreted relative to it.
+
+```{r}
+#| label: getwd-demo
+getwd()
+```
+
+So if the working directory is your project folder, this is enough:
+
+```{r}
+#| eval: false
+corn_yield <- read.csv("corn_yields.csv")
+```
+
+### Relative paths
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You do not have to keep every file in one folder. A relative path lets you point at nearby folders starting from the working directory. Data slash the filename goes into a subfolder called data. Two dots followed by a slash goes up one level, to the folder containing your working directory. And you can combine them, going up one and then down into a different folder. The callout notes you can repeat the two dots to go up several levels. These are worth being fluent in, because a sensible project has data and code in separate folders, and relative paths are how they find each other.
+
+</details>
+
+You can point at files in nearby folders without writing the whole path:
+
++ `"data/corn_yields.csv"`: the `data` folder inside the working directory
++ `"../corn_yields.csv"`: one folder **up** from the working directory
++ `"../data/corn_yields.csv"`: up one, then into `data`
+
+:::{.callout-note}
+`..` means "the folder above this one". You can repeat it: `"../../corn_yields.csv"` goes up two levels.
+:::
+
+### RStudio projects
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+An R Project is the piece that makes all of this reliable, and if you take one practical habit from this lecture, make it this one. Creating a project sets the working directory for you, automatically, every time you open it, so you are never guessing where R thinks it is. You make one from the blue box with a plus in the upper left of RStudio, either starting a new folder or adopting one you already have. Do the exercise in the callout: make a project, close it, reopen it, and run getwd to confirm. This gives your project a fixed root, which is exactly what the next tab builds on.
+
+</details>
+
+An **R Project** sets the working directory for you, every time you open it.
+
++ Click the blue box with a plus sign at the upper left corner of RStudio
++ Click "New Directory" to start a new folder, or "Existing Directory" to adopt one you already have
+
+:::{.callout-note title="Let's try"}
++ Create an R project
++ Close and reopen it, then run `getwd()` and confirm it points at the project folder
+:::
+
+This is the foundation for the next tab: it gives your project a fixed root that everything else can be measured from.
+
+### `here()` (recommended)
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is the recommendation. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody's computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.
+
+</details>
+
+<!-- ADDED (B1): entire tab. -->
+
+Inside an R Project, the `here` package builds paths from the project root:
+
+```{r}
+#| label: here-demo
+here::here("lectures", "Chapter-3-DataWrangling", "corn_yields.csv")
+```
+
+```{r}
+#| eval: false
+corn <- read_csv(here::here("data", "corn_yields.csv"))
+```
+
+Why this is the one to use:
+
++ It works no matter which subfolder your qmd file sits in
++ It works on any computer, because nothing above the project root is written down
++ It works the same whether you run a chunk by hand or render the document
+
+:::{.callout-note}
+Run `here::here()` on its own to see which folder it decided is the root. It looks for your `.Rproj` file.
+:::
+
+### Avoid `setwd()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You will see setwd in older code and all over the internet, and I want you to avoid it, for two independent reasons. The first is specific to the way we work and it surprises people: when you render a document, R resets the working directory after every single chunk. So calling setwd in one chunk has no effect at all on the next one, and the file-not-found error you get looks completely mysterious. The second reason is more general: the path you would write only exists on your computer, so your code cannot run anywhere else, including wherever it is being graded. getwd is a useful thing to check. setwd is not the way to change it.
+
+</details>
+
+<!-- ADDED (B2): entire tab. The original taught setwd() with no warning. This
+     behaviour was verified by rendering a test document. -->
+
+You will see `setwd()` in older code and on the internet:
+
+```{r}
+#| eval: false
+setwd("/Users/tmieno2/Dropbox/Data-Science-with-R-Quarto")
+```
+
+Avoid it, for two separate reasons.
+
+**1. It does not survive from one chunk to the next.**
+
+When you render, R resets the working directory after **every** chunk. So this does not do what it looks like it does:
+
+````{verbatim}
+```{r}
+setwd("some/other/folder")   # applies only inside this chunk
+```
+
+```{r}
+read_csv("corn_yields.csv")  # back to the original folder. File not found.
+```
+````
+
+**2. The path only exists on your computer.**
+
+Nobody else has `/Users/tmieno2/...`, so your code cannot run anywhere else, including on the computer of whoever is grading it.
+
+:::{.callout-important}
+`getwd()` is useful for checking where you are. `setwd()` is not the way to change it. Use an R Project plus `here()` instead.
+:::
+
+### Windows paths
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.
+
+</details>
+
+<!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
+     first week. -->
+
+Windows shows paths with backslashes, but a backslash means something special inside an R string. Copying a path straight from File Explorer gives you this, which errors:
+
+```{r}
+#| eval: false
+read_csv("C:\Users\taro\data\corn_yields.csv")   # does not work
+```
+
+Two fixes, both fine:
+
+```{r}
+#| eval: false
+read_csv("C:/Users/taro/data/corn_yields.csv")    # forward slashes
+read_csv("C:\\Users\\taro\\data\\corn_yields.csv") # doubled backslashes
+```
+
+:::{.callout-note}
+Using `here()` sidesteps this entirely, because you never write the top part of the path.
+:::
+
+### File not found
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files.
+
+</details>
+
+<!-- ADDED (B9): entire tab. "cannot open file" is the single most common error
+     in this chapter and the original offered no way to diagnose it. -->
+
+The error looks like this:
+
+```
+Error: 'corn_yields.csv' does not exist in current working directory
+```
+
+Work through these in order:
+
+1. `getwd()`: where is R actually looking?
+2. `list.files()`: what does R see in that folder? Compare against the name you typed.
+3. Check the **extension**. Windows hides extensions by default, so `corn_yields.csv` may really be `corn_yields.csv.txt`.
+4. Check spelling and capitalization. `Corn_Yields.csv` and `corn_yields.csv` are different files on some systems.
+
+```{r}
+#| eval: false
+getwd()
+list.files()
+```
+
+:::
+<!--end of panel-->
+
+
+## Read a sheet from an xls(x) file
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now Excel files. The function is read_excel from the readxl package, and there is one wrinkle worth stating clearly because it catches everybody. readxl is installed when you install tidyverse, so you already have it. But it is not loaded when you call library of tidyverse, unlike most of the others. So you have to load it explicitly with its own library call. If you get a could not find function read_excel error despite having tidyverse loaded, this is why.
+
+</details>
+
++ You can use `read_excel()` from the `readxl` package to read data sheets from an **xls(x)** file.
+
++ `readxl` is installed when you install the `tidyverse` package, but it is **not** loaded when you run `library(tidyverse)`.
+
++ So you have to load it yourself:
+<!-- CHANGED (A6/A5): the original sentence read "...to read data sheets from an
+     xls(x) file, which is part of the tidyverse package", where "which" appears
+     to refer to the file rather than to readxl. Also fixed "pacakge" and
+     replaced "you need to library the package", which uses library as a verb. -->
+
+```{r}
+#| label: load-readxl
+library(readxl)
+```
+
+### Syntax and Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The syntax adds one argument you have not needed before: sheet. An Excel workbook can hold many sheets, so you have to say which one you want, and the simplest way is by number, with sheet equals one for the first. The examples show reading two different sheets from the same workbook into two different objects. That is the basic pattern, and it works. But referring to sheets by number has a weakness, which is what the next tab is about.
+
+</details>
+
+**Syntax**
+
+```{r}
+#| eval: false
+read_excel("path to the file", sheet = 1)
+```
+
+**Examples**
+
+```{r}
+#| eval: false
+corn_08 <- read_excel("corn_yields.xls", sheet = 1) # 1st sheet
+corn_09 <- read_excel("corn_yields.xls", sheet = 2) # 2nd sheet
+```
+
+```{r}
+#| label: read-excel-real
+#| echo: false
+corn_08 <- read_excel(file.path(dir_ch3, "corn_yields.xls"), sheet = 1)
+```
+
+### Sheets by name
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is that weakness. Sheet numbers are positional, so the moment somebody inserts a sheet at the front of the workbook, every number shifts by one and your code silently reads the wrong data. Silently is the problem; nothing errors. So use names instead. The function excel_sheets lists every sheet name in a workbook without you having to open Excel at all, which is useful in its own right. Then pass that name to the sheet argument instead of a number. It reads better and it survives somebody reorganizing the file.
+
+</details>
+
+<!-- ADDED (B3): entire tab. Sheet numbers break the moment someone reorders the
+     workbook; names do not. And students need a way to see what the sheets are
+     called without opening Excel. -->
+
+Referring to a sheet by number is fragile: insert a sheet and every number shifts. Use the name instead.
+
+First, list what is in the workbook:
+
+```{r}
+#| label: excel-sheets
+excel_sheets(file.path(dir_ch3, "corn_yields.xls"))
+```
+
+Then read the one you want:
+
+```{r}
+#| eval: false
+corn_08 <- read_excel("corn_yields.xls", sheet = "2008")
+```
+
+### Messy spreadsheets
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And now the reality of spreadsheets made by human beings, which almost never begin with a tidy header in the very first cell. There is usually a title, maybe a blank row, sometimes notes off to one side. Three arguments handle nearly all of it. skip ignores a given number of lines from the top, so the header row is found correctly. na lets you declare which strings should count as missing, and a dash or an empty cell often should. range reads one rectangle only, which is how you ignore notes scattered elsewhere on the sheet. And col_names FALSE for when there is genuinely no header.
+
+</details>
+
+<!-- ADDED (B3): entire tab. Real spreadsheets almost never start with a clean
+     header in cell A1, and the original assumed they do. -->
+
+Spreadsheets made by people rarely start with a tidy header row. Useful arguments:
+
+```{r}
+#| eval: false
+read_excel(
+  "corn_yields.xlsx",
+  sheet = "2008",
+  skip  = 3,               # a title and a blank row above the header
+  na    = c("", "NA", "-") # what counts as missing
+)
+```
+
++ `range = "B3:F120"`: read one rectangle only, ignoring notes elsewhere on the sheet
++ `col_names = FALSE`: there is no header row at all
+
+### Note
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.
+
+</details>
+
+```{r}
+#| label: excel-class
+class(corn_08)
+```
+
+The data comes in as a **tibble**, the same object `read_csv()` produces.
+
+:::
+<!--end of panel-->
+
+## Read a STATA data file (.dta)
+
+::: {.panel-tabset}
+
+### Syntax and Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. There is nothing more to the basic case than that. The two tabs after this one cover the two things about STATA files that do occasionally surprise people.
+
+</details>
+
+Use the `read_dta()` function from the `haven` package.
+
+```{r}
+#| label: load-haven
+library(haven)
+```
+<!-- CHANGED (A3): the original had this twice, once with eval=FALSE to show and
+     once with echo=FALSE to actually run. One visible chunk that runs does the
+     same job with half the code. -->
+
+<br>
+
+**Syntax**
+
+```{r}
+#| eval: false
+haven::read_dta("path to the file")
+```
+
+<br>
+
+**Example**
+
+```{r}
+#| eval: false
+corn_yields <- haven::read_dta("corn_yields.dta")
+```
+
+```{r}
+#| label: read-dta-real
+#| echo: false
+corn_yields <- haven::read_dta(file.path(dir_ch3, "corn_yields.dta"))
+```
+
+### Note
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Check the class and you will see three things listed: tbl_df, tbl, and data.frame. So what did you actually get? A tibble, the same as everywhere else. The reason data.frame appears at the end of that list is explained in the callout, and it is worth understanding properly because it causes real confusion. A tibble is built on top of a data.frame, with extra behaviour layered over it, so it truthfully reports that it is also a data.frame. Seeing data.frame in that list does not mean you have a plain data.frame.
+
+</details>
+
+```{r}
+#| label: dta-class
+class(corn_yields)
+```
+
+`read_dta()` returns a **tibble**, just like `read_csv()` and `read_excel()`.
+
+<!-- CHANGED (A1): THIS IS THE IMPORTANT ONE. The original said "Notice that the
+     data is converted into a data.frame object, not a tibble." That is wrong.
+     Verified by running it: class() returns
+     "tbl_df" "tbl" "data.frame", which is a tibble. A tibble always reports
+     data.frame as its last class because it is built on one, and that is
+     probably what caused the confusion. -->
+
+:::{.callout-note title="Why data.frame still shows up in the class"}
+A `tibble` reports three classes: `tbl_df`, `tbl`, and `data.frame`. The last one is there because a tibble **is** a data.frame underneath, with extra behavior layered on top. Seeing `data.frame` in the list does not mean you have a plain data.frame.
+:::
+
+### Labelled columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One genuine oddity of STATA files. STATA lets you attach labels to variables, and haven preserves them, which means a column can come back as a special labelled type rather than a plain number. Most of the time this is invisible and harmless. But occasionally a column will refuse to behave in arithmetic or will plot strangely, and the labels are why. The fix is one function, zap_labels, which strips them off and leaves you with ordinary columns. Worth filing away, because when it happens the symptoms are baffling if you have never heard of it.
+
+</details>
+
+<!-- ADDED: STATA files carry variable labels, which surprise people the first
+     time a column refuses to behave like a plain number. -->
+
+STATA files often carry labels that R keeps as a `haven_labelled` column. If a column will not cooperate in arithmetic or plotting, strip the labels:
+
+```{r}
+#| eval: false
+corn_yields <- haven::zap_labels(corn_yields)
+```
+
+:::
+<!--end of panel-->
+
+## Read an **rds** file
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last format is R's own, the rds file, and it is different in kind from the others. An rds file stores a single R object exactly as it is, and only R can read it. Note the wording carefully: a single R object, not necessarily a dataset. That distinction matters, and we come back to it when we export. Reading one needs no packages at all, because readRDS is built into R. This is the format you will use for saving your own intermediate results.
+
+</details>
+
++ An **rds** file stores a single R object exactly as it is, and is read only by R.
+<!-- CHANGED (A9): the original glossed rds as "r data set", which is misleading
+     in a way the lecture then contradicts two slides later when it saves a
+     list. An rds file holds any single R object, not just a dataset. -->
+
++ You can use the `readRDS()` function to read an **rds** file.
+
++ No special packages are necessary.
+
+### Syntax and Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The syntax is the simplest of the lot: readRDS, and a path. No sheet to specify, no package to load, no column types to worry about. That is because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. Which is exactly the point of the format, and it leads directly into the note on the next tab.
+
+</details>
+
+**Syntax**
+
+```{r}
+#| eval: false
+readRDS("path to the file")
+```
+
+<br>
+
+**Example**
+
+```{r}
+#| eval: false
+corn_yields <- readRDS("corn_yields.rds")
+```
+
+```{r}
+#| label: read-rds-real
+#| echo: false
+corn_yields <- readRDS(file.path(dir_ch3, "corn_yields.rds"))
+```
+
+### Note
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Check the class here and you get a tibble again, but for a completely different reason than before. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.
+
+</details>
+
+```{r}
+#| label: rds-class
+class(corn_yields)
+```
+
+<br>
+
+The imported dataset is already a `tibble`. That is because the object that was saved into **corn_yields.rds** was a `tibble`, and an rds file gives you back exactly what was put in.
+
+:::
+<!--end of panel-->
+
+## Export an R object
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Exporting is the mirror image of importing, and pleasantly the naming follows the same pattern, so you already half know it. write_csv for csv, write_dta for STATA, and saveRDS for rds. That last one also has a tidyverse-style alternative, write_rds, which does exactly the same thing with the arguments in tidyverse order. Pick whichever reads better to you. The general shape is the same across all of them, which is the next tab.
+
+</details>
+
++ Exporting datasets works much the same way as importing them.
+
++ Here is the list of functions that let you export a `data.frame` or `tibble` in different formats:
+  * **csv**: `write_csv()`
+  * **dta**: `write_dta()`
+  * **rds**: `saveRDS()` (or `write_rds()` from `readr`, which is the same thing with tidyverse-style argument order)
+
+### Syntax and Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The syntax for every export function is the same: the object you want to save, then the file name to save it as. Object first, destination second. The examples show all three formats writing the same data. Now read the callout about Excel, because it is a genuine recommendation rather than a preference. A spreadsheet is a thing for people to look at, not a thing for code to read; saving results into one puts them somewhere that is harder to verify and trivially easy for somebody to edit by hand without leaving a trace. If a supervisor genuinely requires one, write_xlsx exists.
+
+</details>
+
+**Syntax**
+
+```{r}
+#| eval: false
+export_function(object_name, "file name")
+```
+<!-- CHANGED (A10): "obeject" -> "object". -->
+
+<br>
+
+**Examples**
+
+```{r}
+#| label: export-examples
+#| eval: false
+#--- export as csv ---#
+readr::write_csv(corn_yields, "corn_yields_exp.csv")
+
+#--- export as dta ---#
+haven::write_dta(corn_yields, "corn_yields_exp.dta")
+
+#--- export as rds ---#
+saveRDS(corn_yields, "corn_yields_exp.rds")
+```
+<!-- CHANGED (A11): the csv filename was "corn_yields_exp_rownames.csv". There
+     are no row names involved anywhere here; write_csv has no such concept.
+     It was a leftover from an older write.csv(row.names = ...) example and only
+     confused things. -->
+
+:::{.callout-note title="Writing Excel files"}
+Avoid writing Excel files. A spreadsheet is for people to look at, not for code to read, and saving results into one puts them in a format that is harder to check and easy to edit by hand. If you genuinely need one, use `writexl::write_xlsx()`.
+:::
+<!-- CHANGED: replaced the bare "# just don't do it" comment with the reason,
+     plus the function to use when the requirement is real (a supervisor or a
+     journal asking for a spreadsheet). -->
+
+### Notes on RDS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things worth knowing about rds specifically, in the tabs here. The first is that it preserves any R object, not just datasets. The example saves a list containing both a character vector and a whole dataset, and gets the identical list back. Try to do that with a csv and you cannot even begin. The second tab answers the practical question of which format to choose. rds is smallest, but size is the least interesting consideration. The real trade-off is that csv can be opened by anything in twenty years but forgets every type, while rds preserves everything perfectly but only R can read it. The callout gives a sensible default: keep raw data as csv, save intermediate results as rds.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Object type preservation
+
+You can export any kind of R object as an **rds** file, not just a dataset.
+
+```{r}
+#| label: rds-any-object
+a_list <- list(a = c("R", "rocks"), b = corn_yields)
+
+rds_path <- file.path(tempdir(), "a_list.rds")
+
+saveRDS(a_list, rds_path)
+
+readRDS(rds_path)
+```
+<!-- CHANGED (C2): the original wrote a_list.rds into the lecture folder every
+     time the document rendered, and that file is now sitting in the repository.
+     Writing to tempdir() demonstrates exactly the same point and cleans up
+     after itself. -->
+
+A list goes in, and a list comes back out, with every column type intact.
+
+#### Which format should you use?
+
+<!-- CHANGED (C4): the original tab asked "Which one is the smallest?" and then
+     simply stopped, leaving the question hanging. Here is the answer, plus the
+     part that actually matters more than size. -->
+
+```{r}
+#| label: file-size-compare
+data.frame(
+  file = c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds"),
+  KB   = round(file.size(file.path(dir_ch3,
+           c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds"))) / 1024, 1)
+)
+```
+
+**rds** is the smallest, because it is compressed and stores R's own representation.
+
+But size is the least important consideration:
+
++ **csv**: anyone can open it, in any software, in 20 years. But it forgets every type: dates come back as text, factors come back as text.
++ **rds**: gives you back the exact object, types and all. Only R can read it.
++ **dta**: use it when you need to hand data to someone working in STATA.
+
+:::{.callout-note title="A reasonable default"}
+Keep your **raw** data as csv, so it stays readable by anything. Save **intermediate results** as rds, so the types survive between scripts.
+:::
+
+:::
+
+:::
+<!--end of panel-->

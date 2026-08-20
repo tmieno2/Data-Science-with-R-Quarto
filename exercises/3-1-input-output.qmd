@@ -1,0 +1,686 @@
+---
+title: "Ex-3-1: Importing and Exporting Files"
+abstract: "Data Wrangling"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+None of these run in your browser. Reading and writing files is the one thing a
+browser cannot do, so all of this happens in RStudio on your own machine. That
+is the point of the lecture: code that only works on your computer is not much
+use to anybody, and you cannot learn that lesson without a real computer.
+
+Work through these in order. Several exercises use objects built in earlier
+ones, and the last two are the ones that decide whether your assignments run.
+
+# Setup {#sec-setup}
+
+Do this once. Everything below depends on it.
+
+1. Clone <https://github.com/tmieno2/data-science-course-supplementary-datasets>
+   if you have not already. Lecture 02-0 shows you how.
+2. Make a new folder called `ch3-practice` wherever you keep coursework.
+3. In RStudio: `File -> New Project -> Existing Directory`, and choose
+   `ch3-practice`. **This step is what makes `here()` work later.**
+4. Inside `ch3-practice`, make two subfolders, `data` and `analysis`.
+5. Copy these five files from the cloned repository into `ch3-practice/data`:
+   `corn_yields.csv`, `corn_yields.xls`, `corn_yields.dta`, `corn_yields.rds`,
+   and `corn_yields_exp_rownames.csv`.
+
+You should end up with this:
+
+```
+ch3-practice/
+├── ch3-practice.Rproj
+├── analysis/
+└── data/
+    ├── corn_yields.csv
+    ├── corn_yields.dta
+    ├── corn_yields.rds
+    ├── corn_yields.xls
+    └── corn_yields_exp_rownames.csv
+```
+
+The data is corn yields for Nebraska counties: one row per county per
+irrigation status, with `Yield` measured in bushels per acre.
+
+::: {.callout-important title="It worked if"}
+`here::here()` typed in the console prints the path to `ch3-practice`, and
+nothing longer.
+:::
+
+::: {.callout-warning collapse="true" title="If it printed something else"}
+`here()` looks upward from the current folder for a `.Rproj` file. If it printed
+a parent folder, you either opened a different project, or you created the
+project one level up. Close RStudio, double-click `ch3-practice.Rproj`, and
+check again.
+
+If it printed your home folder, you have no project open at all.
+:::
+
+# One dataset, four formats
+
+The same corn yield data is stored four ways. Read all four and confirm you got
+the same thing.
+
+**Task.** In a new script, read each file and report `class()` and `dim()` of
+each object.
+
+::: {.callout-important title="It worked if"}
+Three of them are 161 rows by 9 columns. **One of them is not, and you should
+work out why before opening the answer.**
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+library(tidyverse)
+library(readxl)   # NOT loaded by library(tidyverse)
+library(haven)
+library(here)
+
+corn_csv <- read_csv(here("data", "corn_yields.csv"))
+corn_xls <- read_excel(here("data", "corn_yields.xls"), sheet = 1)
+corn_dta <- read_dta(here("data", "corn_yields.dta"))
+corn_rds <- readRDS(here("data", "corn_yields.rds"))
+
+lapply(list(corn_csv, corn_xls, corn_dta, corn_rds), dim)
+lapply(list(corn_csv, corn_xls, corn_dta, corn_rds), class)
+```
+
+All four come back as 161 by 9 tibbles, so on the face of it nothing is wrong.
+The catch is not visible in this output at all: `corn_yields.xls` has **two**
+sheets, and by asking for `sheet = 1` you silently took half the data. The csv
+holds 2008 only; the workbook holds 2008 and 2009 on separate sheets.
+
+This is the failure mode worth internalising. A wrong file path throws an error
+and you fix it in ten seconds. Reading the wrong *sheet* throws nothing, and you
+find out three weeks later when your regression uses half the sample.
+Exercise 4 deals with it properly.
+:::
+
+::: {.callout-warning collapse="true" title="could not find function \"read_excel\""}
+`readxl` is installed by `tidyverse` but is **not loaded** by
+`library(tidyverse)`, unlike `readr`, `dplyr`, and `ggplot2`. It needs its own
+`library(readxl)`. This catches everybody exactly once.
+:::
+
+# `read.csv()` renames your columns
+
+Open `corn_yields.csv` in a text editor, or in RStudio via
+`File -> Open File`, and look at the seventh column heading. It is
+`Data item`, with a space in it.
+
+**Task.**
+
+1. Read the file with `read.csv()` and with `read_csv()`.
+2. Print `names()` of each and find the difference.
+3. Extract that column from each object.
+
+::: {.callout-important title="It worked if"}
+You can state what `read.csv()` did to the name without being told, and the
+extraction that works on one object fails on the other.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+base_df <- read.csv(here("data", "corn_yields.csv"))
+tidy_tb <- read_csv(here("data", "corn_yields.csv"))
+
+names(base_df)[7]   # "Data.item"  <- renamed behind your back
+names(tidy_tb)[7]   # "Data item"  <- left alone
+
+base_df$Data.item          # works
+tidy_tb$`Data item`        # works, note the backticks
+tidy_tb$Data.item          # NULL: that column does not exist
+```
+
+`read.csv()` replaces characters it considers illegal in a variable name with
+dots. That is convenient right up to the moment you are working from a codebook
+that says the variable is called `Data item` and you cannot find it in your
+data.
+
+`read_csv()` leaves names exactly as they were and you refer to awkward ones
+with backticks. Backticks are worth learning now, because you will need them
+again the moment a dataset has a column called `2008` or `GDP (millions)`.
+:::
+
+::: {.callout-tip collapse="true" title="Cleaning names properly"}
+When every name in a file is awkward, do not fix them one at a time:
+
+```{r}
+#| eval: false
+corn <- janitor::clean_names(read_csv(here("data", "corn_yields.csv")))
+names(corn)   # year, state, fips, county_name, ..., data_item, irrigated, yield
+```
+
+`janitor::clean_names()` converts everything to lowercase with underscores.
+Many people run it on every file they read, and it saves a lot of backticks.
+:::
+
+# A column you did not ask for
+
+`corn_yields_exp_rownames.csv` was written out carelessly. Read it and look at
+what came back.
+
+**Task.**
+
+1. Read it with both `read.csv()` and `read_csv()`. Compare `dim()` against the
+   161 by 9 you got in Exercise 1.
+2. Name the extra column in each case.
+3. Get rid of it.
+4. Work out which line of R code created this file.
+
+::: {.callout-important title="It worked if"}
+You end up with 9 columns, and you can name the argument that would have
+prevented the problem in the first place.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+r_base <- read.csv(here("data", "corn_yields_exp_rownames.csv"))
+r_tidy <- read_csv(here("data", "corn_yields_exp_rownames.csv"))
+
+dim(r_base)        # 161 10  <- one column too many
+names(r_base)[1]   # "X"
+names(r_tidy)[1]   # "...1"
+
+# drop it
+r_tidy <- select(r_tidy, -1)
+```
+
+The file was written with `write.csv(data, "file.csv")` and no
+`row.names = FALSE`, so R wrote the row numbers out as an unnamed first column.
+When it is read back, that column of 1 to 161 becomes a variable.
+
+The fix when writing: use `readr::write_csv()`, which never does this, or pass
+`row.names = FALSE` to `write.csv()`.
+
+Two names for the same problem are worth remembering, because you will meet
+both: `X` from `read.csv()`, and `...1` from `read_csv()`, which is what readr
+calls any column whose header is blank.
+:::
+
+# List the sheets before you read them
+
+**Task.**
+
+1. Run `excel_sheets()` on `corn_yields.xls` **before** reading anything.
+2. Read each sheet by name, not by number.
+3. Stack them into one dataset and check the result.
+
+::: {.callout-important title="It worked if"}
+Your combined dataset has 322 rows and `unique(Year)` returns both 2008 and
+2009.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+excel_sheets(here("data", "corn_yields.xls"))
+#> [1] "corn_yields_08" "corn_yields_09"
+
+corn_08 <- read_excel(here("data", "corn_yields.xls"), sheet = "corn_yields_08")
+corn_09 <- read_excel(here("data", "corn_yields.xls"), sheet = "corn_yields_09")
+
+corn_all <- bind_rows(corn_08, corn_09)
+
+dim(corn_all)            # 322 9
+unique(corn_all$Year)    # 2008 2009
+```
+
+The sheets are called `corn_yields_08` and `corn_yields_09`, which is not what
+anybody would have guessed. That is precisely why `excel_sheets()` comes first.
+
+Note the asymmetry in how the two mistakes fail. Guessing a sheet *name* gets
+you `Error: Sheet '2008' not found`, which is annoying and instantly fixable.
+Guessing a sheet *number* gets you no error at all and half your data missing.
+Always list, then read.
+:::
+
+::: {.callout-tip collapse="true" title="Reading every sheet at once"}
+```{r}
+#| eval: false
+path <- here("data", "corn_yields.xls")
+
+corn_all <-
+  excel_sheets(path) %>%
+  lapply(function(x) read_excel(path, sheet = x)) %>%
+  bind_rows()
+```
+
+This is a preview of Chapter 5. It reads however many sheets there are, so it
+does not break when someone adds 2010 to the workbook.
+:::
+
+# Spreadsheets made by human beings
+
+Real spreadsheets almost never start with a tidy header in cell A1. There is a
+title, a blank row, some notes off to the side, and a few cells containing `-`
+where a number should be.
+
+**Task.** Build one yourself so you can practise the fix.
+
+1. Open `corn_yields.xls` in Excel or Numbers.
+2. Insert three rows above the header. Put a title in the first, leave the
+   second blank, and write a note in the third.
+3. Replace three yield values with `-` and a couple more with `n/a`.
+4. Save it as `corn_messy.xlsx` in your `data` folder.
+5. Read it so that the result is identical in structure to the clean version:
+   right header, and those cells read as `NA` rather than as text.
+
+::: {.callout-important title="It worked if"}
+`Yield` comes back numeric, not character, and `sum(is.na(corn$Yield))` matches
+the number of cells you sabotaged.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+corn_messy <-
+  read_excel(
+    here("data", "corn_messy.xlsx"),
+    sheet = 1,
+    skip  = 3,                        # the title, the blank row, the note
+    na    = c("", "NA", "n/a", "-")   # everything that means "missing"
+  )
+
+class(corn_messy$Yield)          # "numeric"
+sum(is.na(corn_messy$Yield))     # however many cells you sabotaged
+```
+
+The diagnostic to remember: if a column you know is numeric comes back as
+`character`, it is almost always because one cell contains something that is
+not a number. A dash, an `n/a`, a footnote marker, a stray space. One cell in
+ten thousand is enough to turn the whole column into text, and every arithmetic
+operation you then attempt will fail.
+
+Two other arguments worth knowing:
+
+- `range = "B4:J165"` reads one rectangle and ignores notes elsewhere on the
+  sheet
+- `col_names = FALSE` for a sheet with no header at all, which gives you
+  `...1`, `...2`, and so on to rename yourself
+:::
+
+# Stop `read_csv()` guessing
+
+`read_csv()` decides each column's type by looking at the first thousand rows.
+It is usually right. When it is wrong, it is wrong in a way you cannot undo
+afterwards.
+
+**Task.**
+
+1. Create this file to see the problem clearly:
+
+```{r}
+#| eval: false
+writeLines(
+  c("county_id,yield",
+    "01001,158",
+    "01003,164",
+    "31019,173"),
+  here("data", "ids.csv")
+)
+```
+
+2. Read it with `read_csv()` and look at `county_id`.
+3. Read it again so that `county_id` keeps its leading zero.
+4. Now do the same thing for `FIPS` in `corn_yields.csv`, and say why a FIPS
+   code should never be stored as a number.
+
+::: {.callout-important title="It worked if"}
+`county_id` reads `01001`, not `1001`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+bad <- read_csv(here("data", "ids.csv"))
+bad$county_id      # 1001 1003 31019  <- the leading zero is gone forever
+
+good <- read_csv(
+  here("data", "ids.csv"),
+  col_types = cols(county_id = col_character())
+)
+good$county_id     # "01001" "01003" "31019"
+
+# same idea on the real file
+corn <- read_csv(
+  here("data", "corn_yields.csv"),
+  col_types = cols(FIPS = col_character())
+)
+```
+
+A FIPS code is an **identifier**, not a quantity. The average of two FIPS codes
+is meaningless, and `01001` and `1001` are not the same county. Once R has
+stored it as a number the zero is not recoverable, because it was never
+written down.
+
+The general rule: anything that identifies rather than measures should be
+character. County codes, zip codes, well IDs, plot numbers, phone numbers.
+If you would never add two of them together, it is not a number.
+:::
+
+::: {.callout-tip collapse="true" title="Other useful col_types shortcuts"}
+```{r}
+#| eval: false
+# the compact form: one letter per column, in order
+read_csv("file.csv", col_types = "cdid")   # character, double, integer, date
+
+# set the type of a few and let readr guess the rest
+read_csv("file.csv", col_types = cols(FIPS = col_character()))
+
+# read absolutely everything as text, then convert deliberately
+read_csv("file.csv", col_types = cols(.default = col_character()))
+```
+
+The last one is a genuinely useful defensive move with an unfamiliar file.
+:::
+
+# STATA files bring their labels with them
+
+**Task.**
+
+1. Read `corn_yields.dta` with `read_dta()`.
+2. Print `County_name`. Compare it with `County_name` from the csv.
+3. Make the STATA version show county names.
+
+::: {.callout-important title="It worked if"}
+`County_name` reads `BUFFALO`, not `8`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+corn_dta <- read_dta(here("data", "corn_yields.dta"))
+
+head(corn_dta$County_name)
+#> <labelled<double>[6]>: County_name
+#> [1]  8  8 19 19 21 21
+
+head(corn_csv$County_name)
+#> [1] "BUFFALO" "BUFFALO" "CUSTER" "CUSTER" ...
+
+# convert every labelled column in one go
+corn_dta <- haven::as_factor(corn_dta)
+head(corn_dta$County_name)
+#> [1] BUFFALO BUFFALO CUSTER CUSTER ...
+```
+
+STATA stores text variables as integers with a lookup table attached, which is
+efficient and completely invisible inside STATA. `haven` imports both parts
+faithfully, so you get numbers with the labels riding along as an attribute.
+That is the honest translation, but it is not what you want to group by or
+plot.
+
+`as_factor()` applied to the whole tibble resolves every labelled column at
+once. If you ever find yourself grouping by county and getting integers back,
+this is why.
+:::
+
+# Straight from the internet
+
+`read_csv()` accepts a URL anywhere it accepts a file path.
+
+**Task.**
+
+1. Read `corn_yields.csv` directly from the course dataset repository, without
+   downloading it first:
+
+```
+https://raw.githubusercontent.com/tmieno2/data-science-course-supplementary-datasets/master/corn_yields.csv
+```
+
+2. Confirm it matches what you read from disk.
+3. Then give two reasons not to build an analysis this way.
+
+::: {.callout-important title="It worked if"}
+`all.equal()` on the two objects returns `TRUE`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+url <- "https://raw.githubusercontent.com/tmieno2/data-science-course-supplementary-datasets/master/corn_yields.csv"
+
+corn_web <- read_csv(url)
+all.equal(corn_web, corn_csv)   # TRUE
+```
+
+Note it must be the **raw** URL. The ordinary github.com page address gives you
+a web page containing the data, not the data, and `read_csv()` will either
+error or hand you a column of HTML.
+
+Two reasons not to rely on it:
+
+1. It re-downloads on every run, including every time you render. That is slow,
+   and it fails entirely when you are on a plane.
+2. A URL is somebody else's promise. Files get moved, repositories get renamed,
+   agencies redesign their websites. When that happens your analysis stops
+   working and the data you used is gone.
+
+Download once, keep the file in your project, read the local copy, and cite the
+URL in your paper. Reading from a URL is for exploring, not for anything you
+intend to keep.
+:::
+
+# What a csv throws away
+
+**Task.**
+
+1. Take the tibble from `read_csv()` and add a factor column whose levels are
+   deliberately **not** alphabetical.
+2. Write it out twice, once with `write_csv()` and once with `saveRDS()`.
+3. Read both back and compare `class()` and `levels()` of that column.
+
+::: {.callout-important title="It worked if"}
+The two round-trips disagree, and you can say what a csv file is physically
+incapable of storing.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+corn2 <-
+  corn_csv %>%
+  mutate(
+    irrigation = factor(
+      ifelse(Irrigated == 1, "irrigated", "dryland"),
+      levels = c("irrigated", "dryland")   # deliberately not alphabetical
+    )
+  )
+
+write_csv(corn2, here("data", "roundtrip.csv"))
+saveRDS(corn2,   here("data", "roundtrip.rds"))
+
+from_csv <- read_csv(here("data", "roundtrip.csv"))
+from_rds <- readRDS(here("data", "roundtrip.rds"))
+
+class(from_csv$irrigation)    # "character"  <- the factor is gone
+class(from_rds$irrigation)    # "factor"
+levels(from_rds$irrigation)   # "irrigated" "dryland"  <- order survived
+```
+
+A csv is a text file. It stores the *values* and nothing else: no classes, no
+factor level order, no attributes, no dates as dates. An rds stores the R
+object itself, so everything survives exactly.
+
+Use csv when a human or another program has to open it. Use rds for anything
+you are handing back to R, especially intermediate results partway through an
+analysis.
+
+This matters more than it looks. In Chapter 4, the order of a factor's levels
+is the order of the bars in your figure. Round-trip through csv and your
+carefully ordered categories come back alphabetical.
+:::
+
+# rds holds any object, not just data
+
+The lecture says an rds file stores "a single R object, not necessarily a
+dataset". That distinction is worth proving to yourself.
+
+**Task.**
+
+1. Fit a regression of `Yield` on `Irrigated`.
+2. Save the fitted model, not its output, to an rds file.
+3. Restart R (`Session -> Restart R`), so your Environment is empty.
+4. Read the model back and call `summary()` and `predict()` on it.
+5. Then save a list containing the model, the data, and today's date, all in one
+   file, and read that back too.
+
+::: {.callout-important title="It worked if"}
+After restarting R, you get a full regression summary without re-reading the
+data or re-fitting anything.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+model <- lm(Yield ~ Irrigated, data = corn_csv)
+saveRDS(model, here("data", "yield_model.rds"))
+
+# --- Session -> Restart R ---
+
+model <- readRDS(here("data", "yield_model.rds"))
+summary(model)
+predict(model, newdata = data.frame(Irrigated = c(0, 1)))
+
+# a list of several things in one file
+results <- list(
+  model = model,
+  data  = corn_csv,
+  run_on = Sys.Date()
+)
+saveRDS(results, here("data", "results.rds"))
+
+results <- readRDS(here("data", "results.rds"))
+results$model
+results$run_on
+```
+
+This is what makes rds different in kind from the other three formats. csv,
+xlsx, and dta all store *tables*. An rds stores whatever you give it: a model,
+a list, a figure, a function, a list of lists of models.
+
+The practical use comes in Chapter 5. When one step of your analysis takes
+twenty minutes, you run it once, save the result to rds, and every later script
+reads that instead of re-running it.
+:::
+
+# The exercise that decides whether your assignment runs
+
+This one is the whole reason the lecture spends a third of its time on paths.
+
+**Task.**
+
+1. In the console, run `read_csv("data/corn_yields.csv")`. It works.
+2. Run `setwd("~")`, then run the same line again. Read the error.
+3. Restart R (`Session -> Restart R`). Create `analysis/report.qmd` containing a
+   chunk with that same line, and render it. Read the error.
+4. Now rewrite the line using `here()` and confirm it works from the console
+   **and** from the rendered qmd, with no other changes.
+
+::: {.callout-important title="It worked if"}
+One single line of code works from both places. If you had to write the path
+one way in the qmd and another way in the console, you have not finished.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+# breaks depending on where you happen to be standing
+read_csv("data/corn_yields.csv")
+
+# works from anywhere inside the project, including a qmd in a subfolder
+read_csv(here::here("data", "corn_yields.csv"))
+```
+
+Step 3 is the important one, and it surprises nearly everybody. When you render
+a qmd, R sets the working directory to **the folder the qmd is in**, not the
+folder the project is in. So `analysis/report.qmd` looks for
+`analysis/data/corn_yields.csv`, which does not exist.
+
+Your code worked interactively and failed on render. That is the single most
+common way an assignment arrives broken, and it is why "but it works on my
+machine" is not a defence: it did not even work on your machine, it worked in
+your console.
+
+`here()` builds every path from the project root, so it does not care which
+folder the document asking the question lives in.
+:::
+
+::: {.callout-warning collapse="true" title="Why not just setwd() at the top of the qmd?"}
+Two reasons. `setwd()` inside a chunk does not persist the way you expect
+during a render, and knitr resets the directory between chunks. More
+importantly it hard-codes a path that exists on exactly one computer in the
+world, so the first line fails when anyone else opens your file.
+
+An R Project plus `here()` solves both, and requires you to think about it
+exactly once.
+:::
+
+# Read the error, do not guess
+
+No code to write for this one. For each message below, say what it means and
+what the *first* thing you would check is. All four are real messages, copied
+verbatim from R.
+
+**1.**
+```
+Error : 'corn_yields.csv' does not exist in current working directory
+('/Users/taro/ch3-practice/analysis').
+```
+
+**2.**
+```
+Error in read_excel("corn_yields.xls") :
+  could not find function "read_excel"
+```
+
+**3.**
+```
+Error: '\U' used without hex digits in character string (<input>:1:14)
+```
+
+**4.**
+```
+Error in readRDS("corn_yields.csv") : unknown input format
+```
+
+::: {.callout-note collapse="true" title="Answers"}
+**1.** The file is not where R looked. Note that R tells you exactly where it
+looked, in the brackets, and it is the `analysis` folder rather than the project
+root. So this is a rendered qmd, or somebody ran `setwd()`. First check:
+`getwd()`, then rewrite the path with `here()`.
+
+**2.** The function does not exist *as far as R currently knows*. That means one
+of exactly three things: the package is not loaded, the package is not
+installed, or you misspelled the name. Here it is the readxl trap, installed by
+tidyverse but not loaded by it. First check: is there a `library(readxl)` above
+this line? Note that the message never suggests `library()`, so you have to
+know to ask.
+
+**3.** A Windows path written with single backslashes. R reads `\U` as the start
+of an escape sequence, not as a folder separator. First check: the path string.
+Either double the backslashes, `C:\\Users\\...`, or use forward slashes,
+`C:/Users/...`, or stop writing the top of the path at all and use `here()`.
+The character position at the end, `1:14`, points at where R gave up.
+
+**4.** The right function pointed at the wrong format. `readRDS()` opened the
+file, found text where it expected a compressed R object, and gave up. This is
+the lecture's central rule failing in practice: the function must match the
+format, and no function reads everything. First check: the file extension
+against the function name. Here it is `.csv`, so it wants `read_csv()`.
+
+Worth noticing how much less helpful this message is than the first three. It
+does not name the file, does not say what format it expected, and does not
+suggest anything. Some errors tell you what to do and some only tell you that
+something is wrong; the second kind is why the extension-to-function mapping is
+worth memorising rather than guessing at.
+:::

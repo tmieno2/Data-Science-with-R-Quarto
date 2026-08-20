@@ -1,0 +1,435 @@
+---
+title: "Ex-7-1: Working with Dates"
+abstract: "Date and String"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'lubridate', 'gt']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+These run in your browser. Click **Run Code** in a cell to execute it, or
+highlight part of it and press `cmd`/`ctrl` + Enter.
+
+We use `pizzaplace` from the `gt` package: a year of pizza orders from 2015,
+with a date, a time, a name, a size, and a price. It is a good dataset for this
+lecture because its `date` column arrives as **text**, which is exactly the
+problem the whole chapter exists to solve.
+
+# Data
+
+Run this first. Every exercise below uses `pizza`.
+
+```{webr-r}
+#| autorun: true
+data(pizzaplace, package = "gt")
+
+pizza <- pizzaplace
+
+pizza
+```
+
+# It looks like a date, but it is not
+
+**Task.**
+
+1. Check the class of `pizza$date`.
+2. Try to find the earliest and latest order date with `min()` and `max()`. Look
+   carefully at whether the answer is trustworthy.
+3. Try to work out how many days the shop was open by subtracting one from the
+   other. Read the error.
+4. Convert the column to a real `Date` and repeat step 3.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+class(pizza$date)          # "character"
+
+min(pizza$date)            # "2015-01-01" -- looks right!
+max(pizza$date)            # "2015-12-31"
+
+max(pizza$date) - min(pizza$date)
+#> Error in max(pizza$date) - min(pizza$date) :
+#>   non-numeric argument to binary operator
+
+pizza <- dplyr::mutate(pizza, date = lubridate::ymd(date))
+
+class(pizza$date)                       # "Date"
+max(pizza$date) - min(pizza$date)       # Time difference of 364 days
+```
+
+Step 2 is the trap worth dwelling on. `min()` and `max()` on character strings
+compare them **alphabetically**, and they returned the right answer here only
+because `YYYY-MM-DD` happens to sort the same way alphabetically as it does
+chronologically.
+
+That is luck, not correctness. Had the dates been written `01/01/2015`, the
+alphabetical minimum would have been the first of *January of any year*, and
+your answer would have been silently wrong with no error at all.
+
+Only step 3 tells you something is amiss, and only because subtraction is
+undefined for text. Never trust that a column is a date because it looks like
+one; check `class()`.
+:::
+
+# Date and time together
+
+The `time` column is separate, and also text.
+
+**Task.** Build a single `datetime` column combining `date` and `time`, then find
+the hour of day with the most orders.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+pizza <-
+  pizza %>%
+  dplyr::mutate(datetime = lubridate::ymd_hms(paste(date, time)))
+
+pizza$datetime[1]      # "2015-01-01 11:38:36 UTC"
+
+pizza %>%
+  dplyr::count(hour = lubridate::hour(datetime)) %>%
+  dplyr::arrange(desc(n))
+```
+
+`paste()` glues the two strings, and `ymd_hms()` parses the result. The function
+name is the format: year-month-day hour-minute-second. There is a matching
+function for every ordering you will meet, so a date written `12/31/2015` needs
+`mdy()` and one written `31-12-2015` needs `dmy()`.
+
+That naming scheme is the whole reason `lubridate` is worth loading. In base R
+the same job needs a format string like `"%Y-%m-%d %H:%M:%S"`, which you have to
+look up every time.
+:::
+
+# Pull dates apart
+
+**Task.**
+
+1. Add columns for the month, the day of the week, and the day of the year.
+2. Find the busiest day of the week.
+3. Make the weekday names readable rather than numbers.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+pizza <-
+  pizza %>%
+  dplyr::mutate(
+    month   = lubridate::month(date, label = TRUE),
+    weekday = lubridate::wday(date, label = TRUE),
+    doy     = lubridate::yday(date)
+  )
+
+pizza %>%
+  dplyr::count(weekday) %>%
+  dplyr::arrange(desc(n))
+#> Fri 8242, Sat 7493, Thu 7478, ...
+```
+
+Friday is the busiest, which is the sort of finding that would be invisible while
+the column was still text.
+
+`label = TRUE` is what turns `6` into `Fri`. Without it you get an integer, and
+you then have to remember whether the week starts on Sunday or Monday. With it
+you get an **ordered factor**, which is what you want for plotting, because the
+bars come out Sunday through Saturday rather than alphabetically from Fri to
+Wed.
+:::
+
+# Aggregate by month without losing the date
+
+**Task.** Compute total revenue by month. Do it twice:
+
+1. using `month()`
+2. using `floor_date()`
+
+Then plot revenue over time using each, and say which one you would use for a
+figure.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+#--- 1: month() gives you a label, not a date ---#
+by_month_label <-
+  pizza %>%
+  dplyr::group_by(month = lubridate::month(date, label = TRUE)) %>%
+  dplyr::summarize(revenue = sum(price))
+
+#--- 2: floor_date() gives you a Date ---#
+by_month_date <-
+  pizza %>%
+  dplyr::group_by(month = lubridate::floor_date(date, "month")) %>%
+  dplyr::summarize(revenue = sum(price))
+
+by_month_date
+#> 2015-01-01  69793
+#> 2015-02-01  65160
+#> 2015-03-01  70397 ...
+
+ggplot(by_month_date) +
+  geom_line(aes(x = month, y = revenue))
+```
+
+Use `floor_date()` for anything you intend to plot. It rounds every date down to
+the first of its month while **keeping it a Date**, so `ggplot2` puts it on a
+proper time axis with correctly spaced months.
+
+`month(label = TRUE)` gives you a factor. That is fine for a table and wrong for
+a time-series figure, because a factor axis is evenly spaced categories rather
+than time, and it falls apart the moment your data covers more than one year:
+January 2015 and January 2016 collapse into a single "Jan".
+
+`floor_date()` also takes `"week"`, `"quarter"`, and `"year"`, which is how you
+change the frequency of a figure without touching anything else.
+:::
+
+# Date arithmetic
+
+**Task.**
+
+1. How many days between the first and last order?
+2. How many *distinct* dates appear in the data? Compare with your answer to (1)
+   and explain the gap.
+3. For each order, compute how many days into the year it fell.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+span <- max(pizza$date) - min(pizza$date)
+span                                  # Time difference of 364 days
+as.numeric(span)                      # 364
+
+dplyr::n_distinct(pizza$date)         # 358
+
+pizza %>%
+  dplyr::mutate(
+    days_in = as.numeric(date - lubridate::ymd("2015-01-01"))
+  ) %>%
+  dplyr::select(date, days_in)
+```
+
+The gap is the point. The year spans 365 calendar days, 364 of them between the
+first and last order, but only **358** distinct dates appear. The shop was shut
+on seven days, and the only way to see that is to compare the span against the
+count.
+
+This matters whenever you assume a daily series is complete. Seven missing days
+will not announce themselves: a bar chart just has slightly fewer bars, and a
+mean is computed over whatever rows exist.
+
+Note that subtracting two Dates gives a `difftime`, which prints its units. Wrap
+it in `as.numeric()` when you want a plain number to do arithmetic with.
+:::
+
+::: {.callout-tip collapse="true" title="Finding the missing days"}
+```{r}
+#| eval: false
+all_days <- seq(min(pizza$date), max(pizza$date), by = "day")
+setdiff(all_days, unique(pizza$date)) %>% as.Date(origin = "1970-01-01")
+```
+
+Building the complete sequence and comparing against what you have is the
+general technique for finding gaps in any time series.
+:::
+
+# Adding a month is not what you think
+
+This is the exercise most worth doing slowly.
+
+**Task.**
+
+1. Take the date `2015-01-31` and add one month with `+ months(1)`.
+2. Look at the result.
+3. Now do the same for `2015-01-30`, `2015-01-29`, and `2015-01-28`.
+4. Find the operator that does what you meant.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+library(lubridate)
+
+ymd("2015-01-31") + months(1)
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+ymd("2015-01-31") + months(1)      # NA
+ymd("2015-01-30") + months(1)      # NA
+ymd("2015-01-29") + months(1)      # NA
+ymd("2015-01-28") + months(1)      # "2015-02-28"
+
+#--- what you meant ---#
+ymd("2015-01-31") %m+% months(1)   # "2015-02-28"
+ymd("2015-01-31") %m-% months(1)   # "2014-12-31"
+```
+
+Adding one month to 31 January asks for 31 February, which does not exist, so
+`lubridate` returns `NA`. It is being honest: there is no correct answer, and
+guessing one would be worse.
+
+`%m+%` and `%m-%` say "roll back to the last valid day of the target month"
+instead, giving 28 February.
+
+Why this deserves an exercise rather than a footnote: imagine building a monthly
+panel by repeatedly adding a month to a start date. Every month whose start is
+the 29th, 30th, or 31st becomes `NA`. Your panel quietly loses about a third of
+its rows, and `NA` propagates silently through every mean you compute afterwards.
+
+Use `%m+%` for anything involving months or years. Plain `+` is fine for days
+and weeks, which have no such ambiguity.
+:::
+
+# Rounding and leap years
+
+**Task.**
+
+1. Round the timestamps to the nearest hour, and separately round them down.
+   Compare.
+2. Which of 2000, 2001, 2004, and 2100 are leap years? Predict before running.
+3. Explain the two that surprise people.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+round_date(pizza$datetime[1], "hour")   # 11:38:36 -> 12:00:00
+floor_date(pizza$datetime[1], "hour")   # 11:38:36 -> 11:00:00
+
+leap_year(c(2000, 2001, 2004, 2100))
+#> TRUE FALSE TRUE FALSE
+```
+
+2000 is a leap year and 2100 is not, which catches nearly everybody. The rule is
+divisible by 4, **except** centuries, **except** centuries divisible by 400. So
+2000 qualifies through the exception to the exception, and 2100 does not.
+
+Use `floor_date()` for binning, because it is what puts every observation in the
+interval it actually falls in. `round_date()` moves half your 11:38s into the
+noon bucket, which is wrong if you are counting orders per hour.
+:::
+
+# Put it together
+
+**Task.** Produce a figure showing average daily revenue by weekday, split by
+pizza size, starting from the raw `pizzaplace` data.
+
+You will need to: parse the date, aggregate to daily revenue by size, then
+average those daily totals within each weekday. Think about the order of those
+last two steps, because doing them the other way round answers a different
+question.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+daily <-
+  pizzaplace %>%
+  dplyr::mutate(date = lubridate::ymd(date)) %>%
+  dplyr::group_by(date, size) %>%
+  dplyr::summarize(revenue = sum(price), .groups = "drop")
+
+by_weekday <-
+  daily %>%
+  dplyr::group_by(weekday = lubridate::wday(date, label = TRUE), size) %>%
+  dplyr::summarize(mean_revenue = mean(revenue), .groups = "drop")
+
+ggplot(by_weekday) +
+  geom_col(aes(x = weekday, y = mean_revenue, fill = size),
+           position = "dodge") +
+  labs(x = NULL, y = "Mean daily revenue ($)")
+```
+
+The order matters. Aggregating to daily totals **first** and then averaging gives
+you the average revenue on a Friday. Averaging prices directly by weekday gives
+you the average price of a pizza sold on a Friday, which is a different quantity
+and a much less interesting one.
+
+Getting this backwards is a genuine analysis error rather than a coding one, and
+no error message will appear. When you group twice, say out loud what one row of
+each intermediate result represents.
+
+Note also that `weekday` comes out correctly ordered Sunday to Saturday, because
+`label = TRUE` produced an ordered factor. That is the payoff from exercise 3.
+:::

@@ -1,0 +1,2068 @@
+---
+title: "03-2: Data wrangling with `tidyverse`: The Basics"
+abstract: "Chapter 3: Data Wrangling"
+format:
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'nycflights13']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+<!--
+================================================================================
+REVISED VERSION of 03-2-data-wrangling-dplyr.qmd
+
+Changes are marked with HTML comments starting "CHANGED:" / "ADDED:". None
+appear in the rendered slides. Delete once accepted.
+
+NOTE: this block must stay BELOW the YAML header.
+
+  A. Corrections .......... "mtcars is a tibble" (it is a data.frame), the gsub
+                            example that overwrote a_string, wrong answer key in
+                            filter Exercise 2, a duplicated condition in the
+                            %in% comment, filter Exercise 3 asking for a column
+                            flights_mini does not have, an EMPTY answer block,
+                            a leftover xaringan "#<<" marker, a sentence
+                            referring to highlighting that does not exist,
+                            across(..., mean, na.rm) deprecated since dplyr
+                            1.1.0, data(weather) missing its package, typos.
+  B. New material ......... why [, "mpg"] differs between the two classes,
+                            n() for counting, the grouping that survives
+                            summarize(), and the native pipe |>.
+================================================================================
+-->
+
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Before we begin, two navigation tricks for these notes, because this is a long lecture and you will want to move around in it. The three stacked lines in the bottom-left corner open a table of contents, so you can jump straight to a section rather than arrowing through everything. And pressing the letter o gives you an overview of every slide at once, which is the fastest way to find something you half remember. Worth knowing now rather than discovering in week ten.
+
+</details>
+
++ Click the three stacked horizontal lines in the bottom-left corner of the slide to open the table of contents, then jump to whichever section you want
+
++ Press the "o" key to see an overview of every slide at once
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These notes are interactive, which is unusual and worth explaining. The box with the pale blue background is a live code area: you can type in it and run it right here in the browser, with no R installation involved. Hit Run Code to run everything in the box, or highlight part of it and use command-enter on a Mac or control-enter on Windows to run just that part. The two-sheets icon in the top-right copies the code so you can paste it into your own R session. And the reload button next to it puts the original code back when you have experimented your way into a mess.
+
+</details>
+
++ The box with the pale blue background is where you write code. We refer to it below as the "code area".
++ Hit the "Run Code" button to execute all the code inside the code area.
++ To run only part of the code, highlight the part you want and press Command + Enter on a Mac, or Ctrl + Enter on Windows.
++ To run the code on your own computer, click the icon of two stacked sheets of paper in the top-right corner of the chunk. That copies the contents of the code area, which you can then paste into R.
++ Click the reload button, just to the left of the copy button, to revert to the original code.
+
+:::
+<!--end of panel-->
+
+## `tidyverse` package
+
+::: {.panel-tabset}
+
+### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The tidyverse is not one package but a collection bundled together, and the list shows the members we care about: readr for reading files, dplyr for manipulating them, tidyr for reshaping, ggplot2 for plots, and stringr for text. Today is mostly dplyr. Two honest caveats. These are not the only way to do any of this; base R can do all of it, and data.table does much of it faster. We use the tidyverse because it is easy to learn and easy to read. And because it is enormously popular, help is easy to find, which matters more than elegance when you are stuck.
+
+</details>
+
++ The `tidyverse` is a collection of packages bundled together. Some of the packages it includes are
+
+  - `readr`: read datasets in various formats
+  - `dplyr`: manipulate and merge datasets
+  - `tidyr`: reshape datasets 
+  - `ggplot2`: data visualization 
+  - `stringr`: character string operations
+
++ These packages are by no means the only way to do the operations we cover today. We use them because they are easy to work with. 
+
++ They are also easy to learn and to find help for, because they are extremely popular and very well documented. Go to the [tidyverse website](http://www.tidyverse.org/) and click the icon of the package you want to learn about for its documentation. 
+ 
++ Searching for the package name online will also turn up plenty of introductions and tutorials.
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Install tidyverse once, if you have not already, and then load it. Pay attention to what appears when you run library of tidyverse: it prints a list of the packages it has attached on your behalf. That is the point of the bundle, one call loading nine or ten packages. It also prints something about conflicts, which looks alarming the first time and is the subject of the next tab.
+
+</details>
+
+Install the package if you have not.
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+<br>
+
+When you load the `tidyverse` package, it automatically loads many of the packages contained in it.
+
+```{r, message = TRUE}
+library(tidyverse)
+```
+
+### Conflicts?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So what are those conflicts it warned you about? Sometimes two packages define a function with the same name, and R has to decide which one you meant. The rule is simple: the package loaded later wins, and its version masks the earlier one. The classic case is filter, which exists in both dplyr and base R's stats package. This is why you will see me write dplyr colon colon filter throughout these notes. Those two colons say explicitly which package's version I want, and they remove all doubt.
+
+</details>
+
+Sometimes two packages define functions with the same name. 
+
+When both are loaded, the name conflicts, and the function from the package loaded later masks the one from the package loaded earlier.
+:::
+<!--end of panel-->
+
+# `data.frame` and `tibble`
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+## `data.frame` and `tibble`
+
+::: {.panel-tabset}
+
+### What are they?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two closely related object types, and you will meet both constantly. A data.frame is the traditional R class for two-dimensional data, rows and columns, and it has been there since the beginning. A tibble is a newer class that does the same job with some modest improvements, and it comes from the tibble package inside the tidyverse. The important thing to hold onto is that they are far more alike than different. Nearly everything works on both. The next several slides are about the handful of places where they diverge.
+
+</details>
+
+`data.frame`
+
++ The traditional (most common) class of two-dimensional data (rows and columns) supported by R.
+
+<br>
+
+`tibble` 
+
++ A newer class of two-dimensional data that adds some modest improvements over `data.frame`.
+
++ `tibble` is defined by the `tibble` package, which is part of the `tidyverse` package.
+
+### Objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two objectives for this section. Learn the basic operations that work on both classes, which is most of what you need. And see the differences between them, of which there are only a few that matter. Note the parenthetical, because it sets the right expectation: they are almost interchangeable, so you rarely have to stop and think about which one you are holding. I am showing you the differences so that when something behaves oddly you recognize why, not because you will be choosing between them every day.
+
+</details>
+
++ Learn basic operations on `data.frame` and `tibble` 
+
++ Highlight some differences between the two (they are almost interchangeable, so you rarely need to think about which one you have)
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+We will work with mtcars, which comes with R so you already have it. Run it, and check its class: it is a plain data.frame. Then we make a tibble version with as_tibble and call it mtcars_tbl. Now we have one of each, built from identical data, which is exactly what we need in order to compare them fairly. Note carefully which is which, because the rest of this section puts them side by side: mtcars is the data.frame, mtcars_tbl is the tibble.
+
+</details>
+
+We use the `mtcars` dataset, which is available to you already.
+
+```{webr-r}
+mtcars
+
+class(mtcars)
+```
+
+<br>
+
+You can convert a `data.frame` into a `tibble` using `as_tibble()`:
+
+```{webr-r}
+#| autorun: true
+mtcars_tbl <- as_tibble(mtcars)
+```
+
+<br>
+
+`mtcars_tbl` is a `tibble` (and also a `data.frame`). `mtcars` itself is still a plain `data.frame`.
+<!-- CHANGED (A1): the original read "`mtcars` is a `tibble` (and also a
+     `data.frame`)". Verified by running it: class(mtcars) is "data.frame" only.
+     The object that is a tibble is mtcars_tbl, created just above. -->
+
+::: {.side-out}
+
+```{webr-r}
+class(mtcars_tbl)
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+## display method
+
+::: {.panel-tabset}
+
+### `data.frame`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Print the data.frame and look at what happens: all thirty-two rows dump into the output. With mtcars that is merely annoying. With a dataset of a hundred thousand rows it floods your console and you have to scroll back up to find whatever you were doing. This is the default behaviour of a data.frame, and it is the first thing tibbles improve on.
+
+</details>
+
+```{webr-r}
+mtcars
+```
+
+### `tibble`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the same data as a tibble. Three differences to notice. It prints only the first ten rows, and tells you how many more there are. It reports the dimensions at the top. And under every column name it shows the type: double, character, and so on. That last one is genuinely useful, because a surprising number of data problems are really type problems, and here the type is in front of you without your having to ask.
+
+</details>
+
+```{webr-r}
+mtcars_tbl
+```
+:::
+<!--end of panel-->
+
+## Accessing parts of the data
+
+::: {.panel-tabset}
+
+### Numerical index
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You can subset either object with square brackets, exactly as you did with a matrix in Chapter 1: rows before the comma, columns after. The example takes rows two through eight and columns three and five, from both objects side by side. Compare the two outputs. At this level they behave the same way, which is reassuring. The differences appear on the next two tabs, when we start picking out single columns.
+
+</details>
+
+Subsetting a data.frame works in much the same way as subsetting a matrix:
+
+```{r eval = F}
+matrix[rows of interest, columns of interest]
+```
+
+**Example:**
+
+2nd to 8th rows, the 3rd and 5th columns
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+::: {.side-out}
+
+```{webr-r}
+mtcars[2:8, c(3,5)]
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+`tibble`
+
+::: {.side-out}
+
+```{webr-r}
+mtcars_tbl[2:8, c(3,5)]
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Variable names
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Selecting columns by number works, but I want to talk you out of it. The numbers carry no meaning: three and five tell a reader nothing about what those columns contain, including you in a month. Worse, they are fragile, because if the dataset gains a column at the front, every number shifts and your code quietly does something different. Referring to columns by name is better on both counts. Now look carefully at the two outputs on this slide, because they are not the same kind of thing, and the subsection underneath explains why that matters.
+
+</details>
+
+Subsetting by numerical index is not recommended, however, because it is not obvious to you, or to anyone else reading your code, what those numbers refer to.
+
+Instead, the following is better:
+
+```{r eval = F}
+data[, c("variable 1", "variable 2", ...)]
+```
+
+**Examples:** 
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+::: {.side-out}
+
+```{webr-r}
+head(mtcars[, "mpg"])
+```
+
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+`tibble`
+
+::: {.side-out}
+
+```{webr-r}
+head(mtcars_tbl[, "mpg"])
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+<br>
+
+#### What just happened?
+
+<!-- ADDED (B1): the original showed these two outputs side by side and moved
+     on. This IS the main practical difference between the two classes, and it
+     is the one that breaks student code, so it is worth naming. Verified:
+     class(mtcars[, "mpg"]) is "numeric", class(as_tibble(mtcars)[, "mpg"]) is
+     "tbl_df" "tbl" "data.frame". -->
+
+Look carefully: the two results are not the same kind of object.
+
++ `data.frame`: selecting a **single** column with `[ , ]` quietly hands back a plain **vector**, not a table
++ `tibble`: always hands back a **tibble**, even when it holds one column
+
+:::{.callout-important title="Why this matters"}
+A tibble never changes what type of object it is based on how many columns you asked for. A `data.frame` does, and that inconsistency is a common source of code that works on a five-column dataset and then breaks when you narrow it to one.
+
+Use `$` or `dplyr::pull()` when you genuinely want a vector, so your intent is written down.
+:::
+
+### Using $
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third way to get a column is the dollar sign, which works because a data.frame is a special kind of list, exactly as we saw in Chapter 1. Note that on both classes the dollar sign gives you a plain vector. That consistency is precisely why the callout on the previous tab recommended it: when you want a vector, say so with the dollar sign or with pull, and then it does not matter which class you are holding or how many columns it has.
+
+</details>
+
+Alternatively, you can access a column with `$`, as below (recall that a `data.frame` is a special kind of `list`).
+
+**Examples:** 
+
+::: {.columns}
+
+::: {.column width="50%"}
+`data.frame`
+
+::: {.side-out}
+
+```{webr-r}
+head(mtcars$mpg)
+```
+
+:::
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+`tibble`
+
+::: {.side-out}
+
+```{webr-r}
+head(mtcars_tbl$mpg)
+```
+
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+
+# Data manipulation using the `dplyr` package
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+## Data Preparation
+
+<!-- CHANGED: the line below sat between ::: {.panel-tabset} and the first tab.
+     Content in that position is silently dropped from the rendered deck. -->
+
+We will use the following data throughout this lecture:
+
+::: {.panel-tabset}
+
+### `flights`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+We need real data to work with, and we are using flights from the nycflights13 package, which records every flight out of the New York airports in 2013. It is a good teaching dataset because it is big enough to be realistic and about something everybody understands. The code makes a slimmer version keeping six columns, because the full thing has nineteen and that is a lot to look at on a slide. Do not worry about the select call yet; that is what we are about to learn.
+
+</details>
+
+We use `flights`, which is from the `nycflights13` package.
+
+```{webr-r}
+#| autorun: true
+#--- get data ---# 
+data(flights, package = "nycflights13") 
+
+#--- make it slim ---#
+(
+flights_slim <- dplyr::select(flights, year, month, origin, carrier, arr_delay, dep_delay)
+)
+```
+
+### `flights_mini`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+We also build a second, much smaller dataset called flights_mini, and the code that makes it uses several functions you have not met. Do not try to decode it now. The line underneath is the important instruction: you are not expected to understand this yet, and you will understand all of it by the end of the lecture. For the moment just run it and look at the result, so you know what columns it has and roughly what is in it, because most of the examples that follow use it.
+
+</details>
+
+We also use `flights_mini`, which is created by running the code below.
+
+```{webr-r}
+#| autorun: true
+(
+  flights_mini <-
+    dplyr::distinct(flights, month, day, .keep_all = TRUE) %>%
+    dplyr::filter(day %in% c(1, 2)) %>%
+    dplyr::arrange(month) %>%
+    dplyr::select(year, month, day, dep_time, dep_delay, arr_time, arr_delay, air_time, origin)
+)
+```
+
+<br>
+
+You do not have to understand the code just yet. You will, once you have completed the lecture. Just inspect the data and familiarize yourself with it.
+
+:::
+<!--end of panel-->
+
+## Piping with `%>%` {#sec-piping}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the pipe, which changes how you write R more than any other single thing in this course. The rule is very simple: x pipe f is the same as f of x. The thing on the left becomes the input to the function on the right. Run both lines in the box and confirm they give the same answer. That is genuinely all the pipe does. It looks pointless on one function, and its value only becomes obvious when you chain four of them, which we get to shortly. The callout notes it comes from magrittr, which arrives with dplyr, so you never install it separately.
+
+</details>
+
+Let `f()` be a function and `x` an R object that `f()` accepts. Then, 
+
+`x %>% f()` is the same as `f(x)`
+
+Run the following and confirm that both return the same result:
+
+::: {.side-out}
+
+```{webr-r}
+#--- not piped ---#
+mean(seq(1, 99, by = 2))
+
+#--- piped ---#
+seq(1, 99, by = 2) %>% mean()
+```
+
+:::
+
+<br>
+
+:::{.callout-note}
+The piping operator `%>%` actually comes from the `magrittr` package, but it is loaded automatically when you load `dplyr`.
+:::
+
+### More generally
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the general case, where the function takes several arguments. If your function normally takes x1, x2, and some options, then piping something into it makes that thing the first argument, and everything you write in the parentheses fills in from the second onward. Read the callout, because it is the whole rule in one sentence: the object before the pipe becomes the first argument of the function after it. Every dplyr function is designed to take data as its first argument, which is exactly why they chain together so neatly.
+
+</details>
+
+Suppose the function takes more than one argument, like this:
+
+```{r eval = F}
+f(x1, x2, option 1, option 2)
+```
+
+<br>
+
+Then,
+
+```{r eval = F}
+z %>% f(x2, option 1, option 2)
+```
+
+<br>
+
+is equivalent to
+
+```{r eval = F}
+f(z, x2, option 1, option 2) 
+```
+
+<br>
+
+::: {.columns}
+::: {.column width="70%"}
+:::{.callout-important}
+That is, in general, an R object that precedes the piping operator (`%>%`) becomes the <span style="color:red"> first </span> argument of the function that comes after the piping operator.
+:::
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### Refer to the preceding object
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So what happens when the thing you are piping is not supposed to be the first argument? gsub is the example, because its first argument is the pattern to look for, not the data. Piping a string into it therefore fails, and the code shows why: it becomes gsub of the string, then a space, then nothing, which is not what you meant. The fix is the dot. A dot inside the function call means put the piped object here instead, so you can direct it to whichever argument you actually want. You will not need this often, but when you do, nothing else will work.
+
+</details>
+
+What if the object before the piping operator is not the first argument of the subsequent function? 
+
+::: {.side-out}
+
+```{webr-r}
+a_string <- "I do not like space"
+
+gsub(" ", "", a_string)
+```
+
+:::
+
+<br>
+
+This does not work:
+
+::: {.side-out}
+
+```{webr-r}
+a_string %>%  gsub(" ", "") 
+```
+
+:::
+
+<br>
+
+because the above is equivalent to
+
+```{r}
+#| eval: false
+gsub(a_string, " ", "")
+```
+<!-- CHANGED (A2): the original was a runnable webr chunk containing
+     `a_string <- gsub(a_string, " ", "")`. Two problems: the assignment is not
+     part of the equivalence being shown, and because the chunk RAN, a student
+     who clicked it overwrote a_string with garbage, so the next example (the
+     one that is supposed to work) then produced nonsense. It is now a display
+     only chunk. -->
+
+<br>
+
+You can refer to the preceding object by `.` like this:
+
+::: {.side-out}
+
+```{webr-r}
+a_string %>% gsub(" ", "", .)  
+```
+
+:::
+
+### `|>` vs `%>%`
+
+<!-- ADDED (B2): R gained a pipe of its own in version 4.1, and students meet it
+     constantly in documentation and on the internet. The original never
+     mentioned it, so `|>` looked like a different language. -->
+
+Since R 4.1 there is a second piping operator built into R itself, written `|>`. You will meet it constantly in documentation and online, so it is worth knowing where the two differ.
+
+:::: {.panel-tabset}
+
+#### Everyday use
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+There are two pipes in R and you will meet both, so let us be clear about the difference. The one we have been using, percent-greater-than-percent, comes from magrittr and arrives with dplyr. Since version 4.1, R has its own pipe built in, written as a vertical bar and a greater-than sign, and it needs no package at all. For an ordinary chain they behave identically, as these two lines demonstrate. Where they part company is everything else, which is what the next three tabs are about.
+
+</details>
+
+For an ordinary chain the two behave the same:
+
+::: {.side-out}
+
+```{webr-r}
+seq(1, 99, by = 2) %>% mean()
+
+seq(1, 99, by = 2) |> mean()
+```
+
+:::
+
++ `%>%` comes from the `magrittr` package, and arrives with `dplyr`
++ `|>` is part of R itself, so it needs no package at all
+
+#### Placeholder
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You just met the dot, which lets you send the piped object somewhere other than the first argument. The native pipe has the same idea, written as an underscore, but it is far more restricted, and this is where people get caught. Two restrictions. First, the underscore has to be attached to a named argument: you cannot just drop it in positionally the way you can with a dot. Second, it may appear only once in the call, so anything where you need the piped object in two places is simply out of reach. Both of those are errors, not silent misbehaviour, so at least you find out immediately.
+
+</details>
+
+You just used `.` to send the piped object somewhere other than the first argument. `|>` has the same idea, written `_`, but with two restrictions:
+
+```{r}
+#| eval: false
+a_string %>% gsub(" ", "", .)      # magrittr: positional is fine
+a_string |> gsub(" ", "", x = _)   # native: must be a NAMED argument
+```
+
++ `_` must attach to a **named** argument. `gsub(" ", "", _)` is an error.
++ `_` may appear **only once**. `%>%` lets you write `rep(., .)`; `|>` cannot.
+
+#### Gotchas
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two more places the native pipe is stricter, and both produce errors that read oddly the first time you see them. One: the right-hand side has to be an actual function call, with parentheses. With magrittr you can pipe into a bare function name, mean with no brackets, and it works. With the native pipe that is a syntax error. Two: magrittr lets you pipe into a braces block, which is occasionally handy for a quick calculation on the piped object. The native pipe does not support that at all. Neither of these is a disaster; they are just the kind of thing that makes borrowed code fail in a way you cannot immediately explain.
+
+</details>
+
+`|>` is stricter about what may sit on its right:
+
+| | `%>%` | `\|>` |
+|---|---|---|
+| Bare function name | `x %>% mean` works | error, needs `mean()` |
+| Placeholder unnamed | `gsub(" ", "", .)` | error, needs `x = _` |
+| Placeholder twice | `rep(., .)` works | error, once only |
+| A `{ }` block | `x %>% {sum(.) * 10}` | not supported |
+| Extract with `$` | `.$a` works | `_$a` works (R 4.3+) |
+
+#### Which one
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So which should you use? This course uses the magrittr pipe throughout, and every example you see from me will use it, so that is what I would like you writing in your assignments. In your own work afterwards either is defensible. The one rule I would hold you to is not to mix them inside a single chain, because a reader then has to keep two sets of placeholder rules in their head at once for no benefit at all.
+
+</details>
+
+:::{.callout-important title="What to use in this course"}
+This course uses `%>%` throughout, and it is what you should write in your assignments.
+
+In your own code afterwards either is fine, but **do not mix them in one chain** — a reader would have to track two sets of placeholder rules at once.
+:::
+
+::::
+<!--end of panel-->
+
+### Chaining
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is where the pipe earns its keep. Four operations, chained, each line handing its result to the next: start with the data, select three columns, move one to the front, keep the early months. Read it top to bottom and it describes exactly what happens, in the order it happens. The callout states the rule formally, and the sentence after it is worth following through: relocate does not receive flights_mini, it receives whatever select produced. Each step sees the output of the step above it, and nothing else.
+
+</details>
+
+You can keep piping like this:
+
+::: {.side-out}
+
+```{webr-r}
+flights_mini %>% 
+  dplyr::select(year, month, dep_time) %>% 
+  dplyr::relocate(dep_time) %>% 
+  dplyr::filter(month <= 3)
+```
+
+:::
+
+<br>
+
+:::{.callout-important}
+Everything to the left of the piping operator is evaluated first, and the resulting object is passed to the function on the right.
+:::
+
+For example, in the code above, `relocate(dep_time)` receives as its first argument whatever `flights_mini %>% select(year, month, dep_time)` produced. Each line hands its result to the next.
+<!-- CHANGED (A8): the original sentence ended with "the highlighted parts of
+     the code below", but there is no highlighting and no code below it. It was
+     left over from the xaringan version of these slides, where a #<< marker
+     highlighted the relevant lines. -->
+
+### Why?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This tab makes the case for the pipe by showing you the alternatives, and it is worth clicking through all three. The first does it with intermediate objects, a1 and a2, which work but litter your environment with things you do not care about and will not remember the meaning of. The second nests the calls inside each other, which creates no clutter but has to be read inside out, in the reverse of the order it executes. The third uses the pipe, and reads in the order things happen. Look at all three and decide for yourself which one you would rather come back to in six months.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Setup
+
+Consider the following sequence of actions:
+
+```{webr-r}
+a1 <- dplyr::filter(flights_mini, month <= 3)
+
+a2 <- dplyr::select(a1, year, month, dep_time)
+
+a3 <- dplyr::relocate(a2, dep_time)
+```
+
+<br>
+
++ Notice that you generated two intermediate datasets (`a1` and `a2`) to obtain the dataset you wanted (`a3`). 
+
++ These intermediate objects are generated only for the purpose of generating the final dataset.
+
++ It is easy to see how you would soon accumulate a great many unnecessary intermediate objects.
+
+#### Alternative 1
+
+Alternatively, you can do the following:
+
+```{webr-r}
+a3 <- dplyr::relocate(
+  dplyr::select(
+    dplyr::filter(flights_mini, month <= 3)
+    , year, month, dep_time
+  ), 
+  dep_time
+)
+```
+
+<br>
+
++ Unlike the first example, this creates no intermediate objects. 
+
++ However, it can be difficult to understand the code because the order of execution is the reverse of the order in which the functions are written when you read the code from left to right.
+
+#### Alternative 2 (with piping)
+
+Taking advantage of the piping operator, 
+
+```{webr-r}
+a3 <- 
+  flights_mini %>% 
+  dplyr::filter(month <= 3) %>% 
+  dplyr::select(year, month, dep_time) %>% 
+  dplyr::relocate(dep_time)
+```
+
+<br> 
+
++ This is much easier to read, because the order of execution matches the order in which the functions are written.
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Data wrangling with the `dplyr` package {#sec-dplyr-wrangle}
+
+::: {.panel-tabset}
+
+### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the core of the lecture: five dplyr verbs that between them do most of what data wrangling consists of. filter picks rows that meet a condition. select picks columns. mutate creates new variables or overwrites existing ones. rename changes variable names. arrange sorts. That is the whole vocabulary, and it is deliberately small. The callout is honest that there are more functions, but these five plus grouping will carry you through the rest of this course. Learn these properly rather than skimming a longer list.
+
+</details>
+
+The `dplyr` package provides a set of functions for transforming data. 
+
++ `filter()`: select rows that satisfy user-specified conditions
++ `select()`: keep (remove) only the variables the user specified
++ `mutate()`: create (over-write) a variable based on user-specified formula
++ `rename()`: rename variables
++ `arrange()`: sort by variables specified by the user
+
+:::{.callout-note}
+There are other useful functions, but we limit our attention to those above, which are enough to follow the main lectures.
+:::
+
+### `filter`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+filter is for choosing rows. You hand it the data and one or more logical conditions, and you get back only the rows where those conditions are true. The mental model to hold is that filter works down the dataset, testing each row and keeping or discarding it. Nothing about the columns changes. The tabs inside cover the basic syntax, examples, how to combine several conditions, and then exercises, so work through them in order.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`dplyr::filter()` subsets data row-wise using logical conditions based on variables.
+
+<br>
+
+**Syntax** 
+
+```{r eval = F}
+#--- syntax ---# 
+dplyr::filter(dataset, condition 1, ..., condition K)
+```
+
+#### Examples
+
+Observations where `month` is 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month == 4) 
+```
+
+<br>
+
+Observations where `month` is NOT 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month != 4) 
+```
+
+<br>
+
+Observations where `month` is less than 4:
+
+```{webr-r}
+dplyr::filter(flights_mini, month < 4) 
+```
+
+#### multiple conditions
+
+::: {.panel-tabset}
+
+##### and (`&`)
+
+```{webr-r}
+dplyr::filter(flights_mini, month >= 9 & month <= 11) 
+
+#--- alternatively ---#
+# dplyr::filter(flights_mini, month >= 9, month <= 11)
+```
+
+
+##### or (`|`)
+
+```{webr-r}
+dplyr::filter(flights_mini, month >= 11 | month <= 1) 
+```
+
+##### in any of (`%in%`)
+
+This is very useful when you have many values to check.  
+
+```{webr-r}
+dplyr::filter(flights_mini, month %in% c(1, 2, 3)) 
+
+#--- equivalently ---#
+# dplyr::filter(flights_mini, month == 1 | month == 2 | month == 3)
+```
+
+:::
+<!--end of panel-->
+
+#### Exercises
+
+<!-- CHANGED: the line below sat between ::: {.panel-tabset} and the first tab,
+     so it was dropped — these exercises rendered with no dataset named. -->
+
+Use the `flights_mini` dataset.
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Find the observations in June and July.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_mini, month %in% c(6, 7))
+```
+
+##### Exercise 2
+
+Find the observations in January, April, July, September, and December.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_mini, month %in% c(1, 4, 7, 9, 12))
+```
+
+##### Exercise 3
+
+Using `flights_slim` this time, find the observations by carrier "US"
+
+<!-- CHANGED (A5): the exercise said to use flights_mini, but flights_mini has
+     no `carrier` column (it is built from year, month, day, dep_time,
+     dep_delay, arr_time, arr_delay, air_time, origin). Both the exercise and
+     its answer key errored. flights_slim does have carrier, so the exercise now
+     names it explicitly. -->
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::filter(flights_slim, carrier == "US")
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+### `select`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Where filter chooses rows, select chooses columns, and the syntax is pleasingly simple: the data, then the names of the columns you want, unquoted. The other half of this tab is the minus sign, which inverts the request: rather than naming what to keep, you name what to drop and everything else stays. That is much less typing when you have twenty columns and want to lose one, and it is more robust too, because it keeps working when new columns arrive.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+You can select a subset of variables using `dplyr::select()`. 
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::select(dataset, variable 1, variable 2, ...)
+```
+
+<br>
+
+---
+
+<br>
+
+If you want to drop a few variables and keep everything else, you can use the `-` operator:
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::select(dataset, - variable 1, - variable 2, ...)
+```
+
+#### Examples
+
+Select `arr_delay`:
+
+::: {.side-out}
+
+```{webr-r}
+dplyr::select(flights_mini, arr_delay)
+```
+
+:::
+
+<br>
+
+Select `month`, `arr_delay`, and `dep_delay`:
+
+::: {.side-out}
+
+```{webr-r}
+dplyr::select(flights_mini, month, arr_delay, dep_delay)
+```
+
+:::
+
+<br>
+
+Deselect (remove) `year` and `month`:
+
+```{webr-r}
+dplyr::select(flights_mini, - year, - month)
+```
+
+#### Exercises
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Select all the columns except `arr_delay`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::select(flights_mini, - arr_delay)
+```
+
+##### Exercise 2
+
+Select `arr_delay` and `month`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::select(flights_mini, month, arr_delay)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+### `relocate`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+relocate is a small convenience that you will use more than you expect. It changes the order of columns: whichever ones you name move to the front, and everything else keeps its existing order behind them. This matters purely for readability. When a dataset has twenty columns and you have just computed the one you care about, it lands at the far right where you cannot see it, and relocate brings it into view. That is why nearly every example in this lecture ends with a relocate.
+
+</details>
+
+You can use `relocate()` to change the column order. 
+
+```{webr-r}
+relocate(flights_mini, dep_time, dep_delay)
+```
+
+<br>
+
+The chosen variables move to the front, and the order of the remaining variables is unchanged.
+
+
+### `mutate`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+mutate is how you create new variables, and it is probably the verb you will use most in real work. The syntax is the data, then the name of the new variable, an equals sign, and an expression that computes it. That expression can use any of the existing columns. Note the parenthetical in the introduction: if you give it a name that already exists, it overwrites that column rather than adding one, which is sometimes exactly what you want and occasionally a nasty surprise.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+You can use `mutate()` to create a new variable (or overwrite the existing one) in the dataset:
+
+<br>
+
+**Syntax** 
+
+```{r eval = F}
+dplyr::mutate(data, new variable name = expression)
+```
+
+#### Example
+
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(gain = arr_delay - dep_delay) %>%
+  dplyr::filter(month <= 2) %>%
+  dplyr::relocate(gain)
+```
+
+#### Multiple variables
+
+You can define multiple variables within a single `mutate()` function.
+
+You can also define a new variable in terms of one you created earlier in the same `mutate()` call.
+
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(
+    gain = arr_delay-dep_delay,
+    loss = dep_delay- arr_delay,
+    gain_per_hour = gain / (air_time / 60)
+  ) %>% 
+  dplyr::filter(month <= 2) %>% 
+  dplyr::relocate(gain, gain_per_hour)
+```
+
+#### Function
+
+You can apply functions to variables when creating new variables:
+
+```{webr-r}
+flights_mini %>%
+  dplyr::mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  dplyr::filter(month <= 1) %>%
+  dplyr::relocate(avg_arr_delay)
+```
+
+<br>
+
+:::{.callout-note}
+The function you apply has to accept a vector (a variable column).
+:::
+
+#### Selective mutation
+
+Sometimes you want to alter the values of a variable only for rows that satisfy certain conditions.
+
+::: {.panel-tabset}
+
+##### Example
+
+
+Suppose you found out that `dep_time` for all the flights from `JFK` was misreported so that `dep_time` is 10 minutes earlier than the true departure times. 
+
+So we want to add 10 minutes to every flight out of `JFK`.
+
+You can use `ifelse()` like this:
+
+```{webr-r}
+flights_mini %>% 
+  dplyr::mutate(
+    dep_time_correct = ifelse(origin == "JFK", dep_time + 10, dep_time)
+  ) %>% 
+  dplyr::relocate(origin, dep_time, dep_time_correct) %>% 
+  dplyr::arrange(origin) 
+```
+
+##### dichotomous
+
+Suppose you want to label flights with `arr_delay > 0` as `time-loss`, and all others as `time-gain`:
+
+You can use `ifelse()` for defining a dichotomous variable like this:
+
+```{webr-r}
+flights_mini %>% 
+  dplyr::mutate(
+    loss_or_gain = ifelse(arr_delay > 0, "time-loss", "time-gain")
+  ) %>% 
+  dplyr::relocate(arr_delay, loss_or_gain)
+```
+
+##### more than two cases
+
+The `case_when()` function is useful if you have more than two cases.
+
+**Syntax**:
+
+```{r eval = F}
+case_when(
+  condition 1 ~ value to assign,
+  condition 2 ~ value to assign,
+  condition 3 ~ value to assign,
+  ...
+)
+```
+
+---
+
+**Example**:
+
+```{webr-r}
+flights_mini %>% 
+  dplyr::mutate(origin = case_when(
+    origin == "JFK" ~ "John F. Kennedy",
+    origin == "EWR" ~ "Newark Liberty International", 
+    origin == "LGA" ~ "LaGuardia" 
+    )
+  ) %>% 
+  dplyr::relocate(origin)
+```
+
+:::
+<!--end of panel-->
+
+#### Exercises
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Find the mean value of `arr_delay` in April and May (combined) and define it as a new variable named `avg_arr_delay`
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights_mini %>%
+  filter(month %in% c(4, 5)) %>%
+  mutate(avg_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  relocate(avg_arr_delay)
+```
+
+:::
+<!--end of panel-->
+
+##### Exercise 2
+
+Find the sum of `dep_delay` in January, February, and December (combined) and define it as a new variable named `sum_dep_delay`, and then move the variable to the first column of the dataset.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights_mini %>%
+  dplyr::filter(month %in% c(1, 2, 12)) %>%
+  dplyr::mutate(sum_dep_delay = sum(dep_delay, na.rm = TRUE)) %>%
+  dplyr::relocate(sum_dep_delay)
+```
+
+:::
+<!--end of panel-->
+
+
+:::
+
+:::
+<!--end of panel-->
+
+### `rename`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+rename does what its name says, and the only thing to get right is the direction, which people reliably get backwards. It is new name equals old name. The new one goes on the left, which matches how assignment works everywhere else in R, but reads oddly the first time because you are naming the thing that does not exist yet. The example puts the renamed and the original side by side so you can check the correspondence. When it goes wrong, it is almost always because the order was reversed.
+
+</details>
+
+You can rename variables using `dplyr::rename()`.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+rename(data, new variable name = old variable name, ...)
+```
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+Renamed:
+
+```{webr-r}
+#| autorun: true
+dplyr::rename(
+  flights_mini, 
+  departure_delay = dep_delay,
+  departure_time = dep_time
+) %>% 
+  dplyr::select(month, departure_time, departure_delay) %>% 
+  head()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+Original:
+
+```{webr-r}
+#| autorun: true
+flights_mini %>% 
+  dplyr::select(month, dep_time, dep_delay) %>% 
+  head()
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `arrange`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+arrange sorts rows by the values of one or more variables. By default it sorts ascending, smallest first, which the first inner tab shows. To go the other way you wrap the variable in desc, on the second tab. Two things worth knowing beyond the basics: you can give several variables and it sorts by the first, breaking ties with the second, and missing values go to the bottom regardless of direction. Sorting is often how you answer a question, since which is the largest is just arrange plus looking at the top.
+
+</details>
+
+You can use `arrange()` to reorder rows based on the value of variables.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+#--- Syntax (NOT RUN) ---#
+arrange(flights_mini, variable name)
+```
+
+<br>
+
+::: {.panel-tabset}
+
+#### Example (ascending)
+
+The default is ascending order. 
+
+```{webr-r}
+dplyr::arrange(flights_mini, dep_delay) %>% head()
+```
+
+#### Example (descending)
+
+To sort in descending order, use the `desc()` function:
+
+```{webr-r}
+dplyr::arrange(flights_mini, desc(dep_delay)) %>% head()
+```
+
+:::
+<!--end of panel-->
+
+
+### Important
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This slide is short and important, so do not skip past it. Every operation we have done has left the original data completely unchanged. filter did not remove rows from flights_mini; it produced a new object with fewer rows and handed it to you. That is true of every dplyr verb without exception. The practical consequence is on the slide: if you want to keep a result, you must assign it to something. If you run a long pipe and then wonder why your data looks the same, this is why. Nothing was saved because nothing was assigned.
+
+</details>
+
+Notice that the original data `flights_mini` was not affected by the `dplyr::filter()` operations in the previous slides.
+
+This is consistent across all the verbs in `dplyr`. Whatever actions you take, the original data is unaltered.
+
+To keep the transformed data for later use, assign it to a new object (or overwrite the original, if that is acceptable):
+
+```{webr-r}
+flights_mini_filtered <- dplyr::filter(flights_mini, month == 4) 
+
+flights_mini_filtered
+```
+
+:::
+<!--end of panel-->
+
+
+## Grouped Operations {#sec-group-operation}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now grouped operations, which is where dplyr becomes genuinely powerful. The motivating question is the kind you actually ask of data: not what is the average delay, but what is the average delay for each carrier, so you can compare them. That is a group-wise operation, and it is two functions working together. group_by declares which variable defines the groups, and summarize then computes one row of results per group. Those two, used as a pair, answer an enormous share of real research questions.
+
+</details>
+
+Group-wise operations, such as the mean arrival delay by carrier, are very useful for understanding differences across groups. 
+
+The `group_by()` function, used together with `summarize()`, does exactly that.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+#--- group by variables ---#
+group_by(dataset, variable to group by, variable to group by, ...)  
+
+#--- summarize ---#
+summarize(grouped dataset, expression)  
+```
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The tabs here take it in two steps and then put them together, which is worth following carefully because the first step is confusing on its own. Grouping a dataset appears to do nothing: the printed output looks the same as before. All group_by has done is attach a note saying that subsequent operations should happen group by group, and the only visible sign is a Groups line in the printed header. The work happens on the second step, when summarize sees that note and produces one row per group instead of one row overall. The third tab writes the whole thing as a single pipe, which is how you will actually write it.
+
+</details>
+
+::: {.panel-tabset}
+
+
+#### Step 1: grouping
+ 
+You first use `group_by()` to set the group for a dataset:
+
+```{webr-r}
+flights_carrier <- dplyr::group_by(flights_slim, carrier)  
+
+flights_carrier
+```
+
+`flights_carrier` looks no different from `flights_slim`. All `group_by()` did was tell R that whatever you do next should be done group by group, which is why the printed output now carries a "Groups" line.
+
+#### Step 2: summarizing
+ 
+Once the grouping is set, we can perform operations by carrier. Let us find the mean `arr_delay` for each carrier, so we can see which ones perform better than others. `summarize()` does this. 
+
+```{webr-r}
+dplyr::summarize(flights_carrier, mean_arr_delay = mean(arr_delay, na.rm = TRUE)) 
+```
+
+
+#### Piped
+
+Using the piping operator,
+
+```{webr-r}
+flights_slim %>% 
+  dplyr::group_by(carrier) %>% 
+  dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) 
+```
+
+:::
+<!--end of panel-->
+
+### Other summarizing functions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+summarize is not limited to means. Anything that takes a vector and returns a single value works: minimum, maximum, median, standard deviation, a quantile. The example computes three different summaries in one call, which is the normal way to use it, because you almost always want more than one number per group. Note that each gets a name on the left of an equals sign, and those names become the column names of the result. Name them descriptively; you will be reading them later.
+
+</details>
+
+You can apply any function that works on a vector (a single column) 
+
+```{webr-r}
+flights_slim %>%  
+  dplyr::group_by(carrier) %>% 
+  dplyr::summarize(
+    mean_arr_delay = mean(arr_delay, na.rm = TRUE),
+    min_arr_delay = min(arr_delay, na.rm = TRUE),
+    quantile_arr_delay = quantile(arr_delay, prob = 0.9, na.rm = TRUE)
+  ) 
+```
+
+### Counting with `n()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One function deserves its own tab because you should use it almost every time: n, which counts the rows in each group and takes no arguments at all. Read the callout, because this is a point about doing statistics honestly rather than about R. A carrier with three flights and a carrier with thirty thousand flights both produce a mean arrival delay, and those two means are not equally trustworthy. Reporting the group size alongside the group mean lets your reader, and you, see which comparisons are worth anything. Get into the habit now.
+
+</details>
+
+<!-- ADDED (B3): counting rows per group is the most common thing anyone does
+     after group_by, and the original never showed it. -->
+
+`n()` counts the rows in each group. It takes no arguments.
+
+::: {.side-out}
+
+```{webr-r}
+flights_slim %>%
+  dplyr::group_by(carrier) %>%
+  dplyr::summarize(
+    n_flights = n(),
+    mean_arr_delay = mean(arr_delay, na.rm = TRUE)
+  )
+```
+
+:::
+
+:::{.callout-note}
+This is always worth reporting alongside a group mean. A carrier with 3 flights and one with 30,000 flights both produce a mean, but only one of those means is worth anything.
+:::
+
+### The group does not go away
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the single most common source of wrong dplyr answers, so please read it properly. When you group by two variables and then summarize, dplyr removes only the last grouping variable. The result is still grouped by the first one. It does tell you, in a message and in the Groups line of the output, but it is a message people learn to skim past. The consequence is that everything you do next silently happens by carrier rather than on the whole dataset, and your numbers are wrong in a way that looks perfectly plausible. Two fixes: pass dot groups equals drop to summarize, or call ungroup afterwards. And the habit in the callout: when a dplyr result looks strange, check the Groups line first.
+
+</details>
+
+<!-- ADDED (B4): after group_by + summarize the result is STILL grouped by the
+     remaining variables, and dplyr says so in a message that students learn to
+     ignore. It then silently changes what every later verb does. This is the
+     single most common source of wrong dplyr answers. -->
+
+When you group by more than one variable, `summarize()` peels off only the **last** one. The result stays grouped, and dplyr tells you so:
+
+```{webr-r}
+flights_slim %>%
+  dplyr::group_by(carrier, month) %>%
+  dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE))
+```
+
+Notice the `# Groups: carrier` line in the output. Anything you do next still happens **by carrier**, which is usually not what you meant.
+
+Two ways to stop it:
+
+```{r}
+#| eval: false
+# say what you want when summarizing
+dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE), .groups = "drop")
+
+# or drop the grouping afterwards
+... %>% dplyr::ungroup()
+```
+
+:::{.callout-important}
+If a `dplyr` result looks strange, check whether the data is still grouped. Printing a tibble shows a `# Groups:` line whenever it is.
+:::
+
+### New variable
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is an important variation. Everything so far paired group_by with summarize, which collapses each group down to a single row. If you use mutate instead, the group calculation is computed and then attached back to every original row. So each flight keeps all its own information and gains a column holding its carrier and month average. That is what you want whenever you need to compare an observation against its own group, which is a very common thing to want: deviations from a group mean, shares of a group total, and so on.
+
+</details>
+
+You can assign the results of the grouped operations to new variables using `mutate()`
+
+```{webr-r}
+flights_new <- 
+  flights_slim %>% 
+  dplyr::group_by(carrier, month) %>% 
+  dplyr::mutate(
+    mean_arr_delay = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  dplyr::relocate(mean_arr_delay)
+
+flights_new
+```
+
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now some exercises, and they build. The first asks which carrier had the worst average departure delay in a particular stretch of months, which is filter, then group_by, then summarize, then arrange, all four verbs in one chain. Then there is an instruction tab that loads a weather dataset for the New York airports, and the last two exercises work on that. Do them in order, because exercise three uses the object you create in exercise two. Every one has a folded answer, but genuinely try it first; reading a solution creates a much weaker memory than producing one.
+
+</details>
+
+::: {.panel-tabset}
+
+
+#### Exercise 1
+
+Using `flights`, find the carrier with the longest average departure delay (`dep_delay`) from May through August.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights %>%
+  dplyr::filter(month %in% 5:8) %>%
+  dplyr::group_by(carrier) %>%
+  dplyr::summarize(mean_dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  dplyr::arrange(desc(mean_dep_delay))
+```
+<!-- CHANGED (A6): this answer block was completely empty in the original, so
+     the exercise had no solution. Answer verified by running it: carrier OO,
+     with a mean departure delay of 63 minutes. -->
+
+:::
+<!--end of panel-->
+
+
+#### Instruction
+
+The remaining exercises use the weather data for the three New York airports. Load it first and get familiar with it.
+
+```{webr-r}
+#| autorun: true
+#--- load the weather data ---#
+data(weather, package = "nycflights13")
+
+#--- omit observations with NA in any of the variables ---#
+weather <- na.omit(weather)
+
+#--- take a look ---#
+weather
+```
+
+#### Exercise 2
+
+Find the daily mean temperature (`temp`), humidity (`humid`), wind speed (`wind_speed`), and precipitation (`precip`) for each airport of origin. Remember to name each of the resulting variables.
+
+::: {.panel-tabset}
+
+##### Work here
+
+```{webr-r}
+
+```
+
+##### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+(
+daily_weather <- 
+  weather %>%
+  dplyr::group_by(origin, month, day) %>%
+  dplyr::summarize(
+    temp = mean(temp),
+    humid = mean(humid),
+    wind_speed = mean(wind_speed),
+    precip = mean(precip)
+  )
+) 
+```
+:::
+<!--end of panel-->
+
+
+#### Exercise 3
+
+Subset the daily weather data you obtained in exercise 2 so that it contains weather information only in Nov, Dec, Jan, and Feb for flights that depart from “EWR”.
+
+::: {.panel-tabset}
+
+##### Work here
+
+```{webr-r}
+
+```
+
+##### Answer
+
+```{r, eval = FALSE}
+#| code-fold: true
+daily_weather %>%
+  dplyr::filter(month %in% c(11, 12, 1, 2)) %>%
+  dplyr::filter(origin == "EWR")
+```
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+
+
+# Extensions (may be helpful occasionally)
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+
+## `across()`
+
+::: {.panel-tabset} 
+
+### What
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This last section is labelled extensions, and the honest framing is that you do not need it today but you will be glad of it later. across lets you apply the same operation to many columns at once. It works inside summarize and mutate, and it exists because the alternative is writing out the same expression once per column, which is tedious to type and worse to read. If you ever find yourself copying and pasting a mean call four times and changing only the variable name, this is the tool you wanted.
+
+</details>
+
++ `across()` lets you apply the same operation (function) to multiple columns at the same time.
+
++ It is used with `summarize()` and `mutate()`
+
++ It is useful when you want to apply the same function to many variables.
+
+### Syntax and Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The syntax has two parts: which columns to apply the function to, and which function to apply. The function is written in a slightly odd-looking way, as a backslash and then x in parentheses, which is R's shorthand for an anonymous function, meaning a function with no name defined on the spot. So backslash x, mean of x with na.rm true, means apply this particular version of mean. The reason for that wrapper is that it gives you somewhere to put the na.rm argument, which you almost always need with real data.
+
+</details>
+
+**Syntax** 
+
+```{r}
+#| eval: false
+across(which variables to apply the function, function to apply)
+```
+
+The function is written as `\(x) f(x, options)`, an anonymous function:
+
+```{r}
+#| eval: false
+across(c(arr_delay, dep_delay), \(x) mean(x, na.rm = TRUE))
+```
+<!-- CHANGED (A9): rewritten from `across(cols, mean, na.rm = TRUE)` to
+     `across(cols, \(x) mean(x, na.rm = TRUE))`. Passing extra arguments through
+     `...` has been deprecated since dplyr 1.1.0; verified by running the old
+     form, which emits "The `...` argument of `across()` is deprecated". The old
+     form still works today but warns, and students copy what they see. -->
+
+**Examples** 
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(
+      c(arr_delay, dep_delay, air_time, time_hour),
+      \(x) mean(x, na.rm = TRUE)
+    )
+  ) %>% head()
+```
+
+Note: `na.rm = TRUE` is an option for the `mean()` function, passed inside the anonymous function `\(x) mean(x, na.rm = TRUE)`.
+
+### Compare
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This tab makes the case by showing both versions of the same thing. Without across, four nearly identical lines, differing only in a variable name, with all the copy-paste errors that invites. With across, one expression naming four columns. They produce the same answer. Beyond the typing saved, the second version states the intent more clearly: take the mean of these four columns, rather than here are four separate calculations that happen to be the same. That clarity is the real argument.
+
+</details>
+
+Without `across()`
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    mean_arr_delay = mean(arr_delay, na.rm = TRUE),
+    mean_dep_delay = mean(dep_delay, na.rm = TRUE),
+    mean_air_time = mean(air_time, na.rm = TRUE),
+    mean_time_hour = mean(time_hour, na.rm = TRUE)
+  ) 
+```
+
+<br>
+
+With `across()`
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(
+      c(arr_delay, dep_delay, air_time, time_hour),
+      \(x) mean(x, na.rm = TRUE)
+    )
+  )
+```
+
+:::
+
+# `across()` with pattern functions
+
+::: {.panel-tabset} 
+
+### What
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+across becomes much more useful when combined with helper functions that select columns by pattern rather than by name. The list shows four: is.numeric and is.character select by column type, and starts_with and ends_with select by name pattern. The reason this matters is robustness. If you name four columns explicitly and someone adds a fifth, your code silently misses it. If you said all the numeric columns, it does not.
+
+</details>
+
+<br>
+
+You can use `across()`, and other `dplyr` functions, together with helper functions that select variables matching a pattern you specify:
+
++ `is.numeric()`  
++ `is.character()`  
++ `starts_with()`  
++ `ends_with()`  
+
+### numeric
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first pattern is by type. Wrapping is.numeric inside where gives you every numeric column, so this computes the mean of all of them at once, whatever they happen to be called and however many there are. Note the where wrapper, because it is required and easy to forget: is.numeric is a test applied to a column, and where is what tells across to use it as a selector rather than as the function to apply.
+
+</details>
+
+<br>
+
+Applying the same function to all numeric variables using `where(is.numeric)`:
+
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(
+      where(is.numeric),
+      \(x) mean(x, na.rm = TRUE)
+    )
+  ) %>% head()
+```
+
+### character
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same idea for character columns, but note that the function applied is different, and sensibly so. Taking the mean of a text column is meaningless, so instead we use n_distinct, which counts how many unique values there are. That is genuinely informative: it tells you how many carriers, or how many airports, appear in each group. This is a good habit generally, asking how many distinct values a text column contains, because it tells you quickly whether something is a category or free text.
+
+</details>
+
+<br>
+
+Applying the same function to all character variables using `where(is.character)`:
+
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(
+      where(is.character),
+      n_distinct
+    )
+  ) %>% head()
+```
+
+
++ `n_distinct()` counts the number of unique values.
+
+### end with
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now selection by name pattern. ends_with of delay picks up every column whose name ends in delay, which in this dataset gets you both arrival and departure delay without naming either. starts_with does the mirror image for prefixes. This is why consistent variable naming pays off: if all your outcome variables end in the same word, you can operate on the whole family in one line, and it keeps working when you add another one next month.
+
+</details>
+
+<br>
+
+Applying the same function to all the variables that end with `delay`:
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(
+      ends_with("delay"),
+      \(x) mean(x, na.rm = TRUE)
+    )
+  ) %>% head()
+
+```
+
++ Use `starts_with()` to apply the same function to every variable beginning with a particular string of characters.
+
+### logical operator
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These selectors are ordinary expressions, so you can negate and combine them with logical operators. The exclamation mark in front of where is.numeric means everything that is not numeric. That is often the tidiest way to say what you want, because describing the small set and inverting it is easier than enumerating the large one. And a note in passing: this is the same logical vocabulary you learned in Chapter 1, being reused in a new place, which is a recurring pattern in R.
+
+</details>
+
+<br>
+
+You can use logical operators:
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(!where(is.numeric), n_distinct)
+  ) %>% head()
+```
+
+### mix
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And finally you can mix approaches freely: name some columns explicitly, use a pattern for others, and use more than one across in a single summarize. The example does exactly that, taking the mean of month and all the delay columns, and counting distinct values in all the character columns, in one call. This is where across stops being a typing shortcut and becomes a way of saying precisely what you mean about a dataset whose exact shape you do not want to hard-code.
+
+</details>
+
+<br>
+
+You can mix explicitly named variables with these helper functions:
+
+```{webr-r}
+flights %>% 
+  group_by(carrier) %>% 
+  summarize(
+    across(c(month, ends_with("delay")), \(x) mean(x, na.rm = TRUE)),
+    across(where(is.character), n_distinct)
+  ) %>% head()
+```
+
+
+:::
+
+
+## `select()` and `relocate()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One last point to close on, and it generalizes everything in the previous section. These pattern-based ways of referring to columns are not special to across; they work in the other dplyr functions too. So you can select all the numeric columns, or select everything ending in delay, or relocate all the character columns to the front, using exactly the same helpers. Try the three examples. Once you notice that the same vocabulary keeps working in new places, dplyr gets a great deal smaller to learn.
+
+</details>
+
+The same ways of referring to variables by pattern work in other `dplyr` functions too:
+
+Try:
+
+```{webr-r}
+flights %>% 
+  select(c(origin, where(is.numeric)))  
+```
+
+<br>
+
+```{webr-r}
+flights %>% 
+  select(ends_with("delay"))  
+```
+
+<br>
+
+```{webr-r}
+flights %>% 
+  relocate(where(is.character))  
+```
+

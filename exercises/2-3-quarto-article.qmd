@@ -1,0 +1,447 @@
+---
+title: "Ex-2-3: Writing an Article in Quarto"
+abstract: "Quarto"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+Everything here happens in RStudio. Work in one document, `article.qmd`, and
+build it up exercise by exercise. By the end you will have a small paper with a
+title page, numbered figures and tables, numbered equations, and a bibliography
+that maintains itself.
+
+Several exercises ask you to break something after you have made it work. That
+is because cross-referencing fails **silently**. A broken reference does not
+stop the render and does not produce a warning: it prints `?fig-yield` into your
+text and carries on. If you have never seen that happen on purpose, you will not
+recognise it in your own draft, and neither will you notice it in the version
+you submit.
+
+# Setup {#sec-setup}
+
+1. In your `quarto-practice` project from [Ex-2-1](2-1-quarto-basics.qmd),
+   create `article.qmd`.
+2. Add a hidden setup chunk that loads `tidyverse` and reads `corn_yields.csv`
+   with `here()`.
+3. Render to html and confirm it works before going any further.
+
+::: {.callout-note collapse="true" title="A starting header"}
+```yaml
+---
+title: "Irrigation and corn yields in Nebraska"
+author: "Your Name"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+    embed-resources: true
+---
+```
+:::
+
+# A title page
+
+**Task.**
+
+1. Add an abstract of two or three sentences.
+2. Add a second author with an affiliation and an email address.
+3. Add keywords.
+4. Render to html, then to PDF, and compare how the two lay the same
+   information out.
+
+::: {.callout-important title="It worked if"}
+Both authors appear with their affiliations, and the abstract is set apart from
+the body text rather than running into it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+---
+title: "Irrigation and corn yields in Nebraska"
+author:
+  - name: Your Name
+    affiliations:
+      - name: University of Nebraska-Lincoln
+        department: Agricultural Economics
+    email: you@huskers.unl.edu
+  - name: A Coauthor
+    affiliations:
+      - name: Somewhere Else
+keywords:
+  - irrigation
+  - corn yields
+abstract: |
+  We examine the relationship between irrigation and county-level corn
+  yields in Nebraska. Irrigated fields yield substantially more, and the
+  gap is largest in dry years.
+date: today
+---
+```
+
+Two bits of YAML syntax worth understanding, because they recur everywhere:
+
+- the `|` after `abstract:` means "everything indented below this is one block
+  of text", which is how you write several lines without fighting the quoting
+  rules
+- `author:` takes a list, each entry beginning with `- name:`, and each author
+  can carry their own nested `affiliations:` list
+
+The PDF sets this as a conventional academic title page. The html puts it in a
+header block. You wrote it once.
+:::
+
+# A figure you can refer to
+
+**Task.**
+
+1. Add a chunk drawing a boxplot of `Yield` by irrigation status.
+2. Caption and label it so it appears as "Figure 1" with the caption underneath.
+3. In your prose, refer to it *by reference*, not by typing the number.
+4. Render and confirm the sentence reads "Figure 1".
+5. Now break it: change the label from `fig-yield` to `plot-yield`, leaving the
+   reference alone. Render again.
+
+::: {.callout-important title="It worked if"}
+Step 4 gives you "Figure 1". Step 5 gives you the literal text `?fig-yield` in
+your document and **no error message anywhere**.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: fig-yield
+#| fig-cap: "Corn yield by irrigation status, Nebraska counties, 2008."
+#| echo: false
+ggplot(corn) +
+  geom_boxplot(aes(x = factor(Irrigated), y = Yield))
+```
+
+Irrigated fields out-yield dryland fields in every county (@fig-yield).
+````
+
+Three rules, all of which must hold or the reference fails:
+
+- the label must **start with `fig-`**. Without that prefix Quarto does not
+  treat the chunk as a figure, so there is nothing to reference.
+- labels use **hyphens, never underscores**. `fig-yield_by_county` fails
+  silently.
+- write `@fig-yield`, not `Figure @fig-yield`. The word "Figure" is inserted for
+  you, and typing it yourself gives you "Figure Figure 1".
+
+Step 5 is the important half of this exercise. `?fig-yield` in your output is
+what an unresolved reference looks like, and the only thing standing between it
+and your grader is you reading your own rendered document before you submit it.
+Make that a habit now.
+:::
+
+# Where the figure goes, and how big it is
+
+**Task.**
+
+1. Render your article to PDF. Note where Figure 1 actually appears relative to
+   the paragraph that refers to it.
+2. Make the figure half the width of the page.
+3. Force it to sit exactly where you put it in the source, rather than floating.
+4. Put two figures side by side with a shared caption and sub-captions.
+
+::: {.callout-important title="It worked if"}
+You can state why "the figure below" is a dangerous phrase in a PDF.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: fig-yield
+#| fig-cap: "Corn yield by irrigation status."
+#| out-width: "50%"
+#| fig-pos: "H"
+#| echo: false
+ggplot(corn) + geom_boxplot(aes(x = factor(Irrigated), y = Yield))
+```
+
+::: {#fig-both layout-ncol=2}
+
+![Dryland](dryland.png){#fig-dryland}
+
+![Irrigated](irrigated.png){#fig-irrigated}
+
+Yields under each regime.
+:::
+````
+
+LaTeX *floats* figures. It places them where they fit tidily on the page, which
+may be the top of the next page, or several pages later if the document is
+crowded. This is deliberate typesetting behaviour and not a bug.
+
+It is also exactly why you cross-reference instead of writing "the figure
+below". The figure below might be on page 7.
+
+`fig-pos: "H"` demands the exact position, and needs `\usepackage{float}` in
+some templates. Use it sparingly: fighting LaTeX's float algorithm usually
+produces worse-looking pages than letting it work.
+
+The sub-figure block references as `@fig-both` for the pair and `@fig-dryland`
+for one of them, and numbers them 1a and 1b automatically.
+:::
+
+# A table you can refer to
+
+**Task.**
+
+1. Build a small summary table: mean yield by irrigation status.
+2. Display it with `flextable`, `kableExtra`, or `gt`.
+3. Caption and label it so it renders as "Table 1", and refer to it in the text.
+4. Break it the same way you broke the figure, and confirm it fails the same
+   way.
+
+::: {.callout-important title="It worked if"}
+The caption appears **above** the table, which is the convention Quarto applies
+automatically, and your sentence says "Table 1".
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Mean corn yield by irrigation status."
+#| echo: false
+corn %>%
+  group_by(Irrigated) %>%
+  summarize(mean_yield = mean(Yield), n = n()) %>%
+  flextable::flextable()
+```
+
+Mean yields differ by roughly nine bushels per acre (@tbl-summary).
+````
+
+Same mechanism as a figure with two letters changed: `tbl-cap` rather than
+`fig-cap`, and the label must begin with `tbl-`.
+
+Mixing them is the classic error, and it is worth doing once on purpose:
+a chunk labelled `fig-summary` carrying a `tbl-cap` produces a table that is
+numbered in the figure sequence, or not numbered at all. The output looks nearly
+right, which is what makes it dangerous.
+
+Note also that figure captions go below and table captions go above. That is
+a publishing convention, Quarto knows it, and you do not have to think about it.
+:::
+
+::: {.callout-tip collapse="true" title="Which table package"}
+`gt` and `flextable` are the most capable but cannot emit LaTeX directly.
+`kableExtra`, `xtable`, and `huxtable` can.
+
+This sounds like a real trade-off and mostly is not, because `gt` and
+`flextable` can both export a table as an image, and LaTeX is perfectly happy
+with images. Learn the more capable package.
+:::
+
+# Equations
+
+**Task.**
+
+1. Write your regression model as a numbered display equation and refer to it
+   from the text.
+2. Underneath, write a two-line aligned derivation where the equals signs line
+   up vertically.
+3. Somewhere in a sentence, define one symbol using inline maths.
+4. Render to html and to PDF, and confirm the equation numbering matches.
+
+::: {.callout-important title="It worked if"}
+The first equation is numbered `(1)` at the right margin, your reference reads
+"Equation 1", and the two lines of the derivation align on the `=`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+We estimate
+
+$$
+Yield_i = \beta_0 + \beta_1 Irrigated_i + \varepsilon_i
+$$ {#eq-model}
+
+where $\beta_1$ is the effect of interest. @eq-model is estimated by OLS.
+
+$$
+\begin{aligned}
+  E[Yield_i \mid Irrigated_i = 1] &= \beta_0 + \beta_1 \\
+  E[Yield_i \mid Irrigated_i = 0] &= \beta_0
+\end{aligned}
+$$
+````
+
+Points worth noting:
+
+- `$$ ... $$` is display maths, `$ ... $` is inline. No space is allowed after
+  the opening `$` of inline maths, or it is treated as an ordinary dollar sign.
+- `{#eq-model}` goes **after** the closing `$$`, on the same line. That is what
+  makes it numbered and referenceable.
+- inside `aligned`, `&` marks the alignment point and `\\` ends a line
+- an unlabelled equation is not numbered, which is usually right for a
+  derivation you never refer back to
+
+If an equation renders as literal dollar signs and backslashes in html, you have
+almost certainly mismatched your `$$` delimiters somewhere earlier in the
+document.
+:::
+
+# Citations that maintain themselves
+
+**Task.**
+
+1. Create `references.bib` in your project folder.
+2. Get two real entries into it **without typing them by hand**. Google
+   Scholar's quotation-mark icon gives you BibTeX, as does nearly every
+   journal's website.
+3. Add an entry for R itself and one for a package. `citation()` and
+   `citation("ggplot2")` print them.
+4. Point your YAML header at the file.
+5. Cite one work in-text, so the author's name is part of your sentence, and one
+   parenthetically.
+6. Add a References heading at the bottom, unnumbered.
+7. Render, and notice that you never wrote the reference list.
+8. Add a fifth entry to the `.bib` that you do not cite. Render again and see
+   what happens to it.
+
+::: {.callout-important title="It worked if"}
+The bibliography contains exactly the works you cited and not the uncited one,
+and you typed none of it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+bibliography: references.bib
+```
+
+````{verbatim}
+Yield responses to irrigation are well documented [@smith2019].
+
+@jones2021 reaches a different conclusion using county-level data.
+
+Several studies agree on this point [@smith2019; @jones2021].
+
+# References {-}
+````
+
+`[@key]` gives a parenthetical citation, `@key` puts the author's name into your
+sentence, and semicolons separate multiple works inside one bracket.
+
+The `{-}` on the heading keeps it out of the section numbering, which matters
+because you turned `number-sections: true` on. Without it your reference list
+arrives as "7 References", which no journal wants.
+
+Step 8 is the point of the exercise. The uncited entry does not appear. The
+bibliography is generated from what you actually cited, so it cannot drift out
+of step with the paper, and you can keep one large `.bib` file for everything
+you have ever read.
+:::
+
+::: {.callout-tip collapse="true" title="Doing this the fast way"}
+RStudio's visual editor, the `Visual` button at the top left of the source pane,
+has `Insert -> Citation`. It searches Crossref by DOI or title, writes the
+`.bib` entry for you, and inserts the citation. Ten minutes learning this will
+save you hours.
+:::
+
+# Change every citation at once
+
+**Task.**
+
+1. Go to <https://www.zotero.org/styles> and download the style file for a
+   journal you might realistically submit to.
+2. Put the `.csl` file in your project and point the YAML at it.
+3. Render, then swap it for a very different style and render again.
+
+::: {.callout-important title="It worked if"}
+Both the in-text citations and the entire bibliography reformat, and you changed
+exactly one line to do it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+bibliography: references.bib
+csl: qje.csl
+```
+
+Swap `qje.csl` for `pnas.csl` and the citations change from `(Smith 2019)` to a
+numbered style, with the bibliography reordered to match.
+
+This is the argument for never formatting a reference by hand. The format is not
+a property of your paper, it is a property of the journal, and journals desk-
+reject on formatting. When the first journal says no, changing one line is the
+entire cost of resubmitting elsewhere.
+:::
+
+# Same source, three outputs
+
+**Task.**
+
+1. Render `article.qmd` to PDF.
+2. Render the same file to Word.
+3. Compare all three against the html, looking specifically at figure placement,
+   table appearance, and equation rendering.
+
+::: {.callout-important title="It worked if"}
+You can name one thing that looks worse in Word and one thing that is easier in
+html.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```yaml
+format:
+  html:
+    toc: true
+    embed-resources: true
+  pdf:
+    documentclass: article
+  docx: default
+```
+
+With several formats listed, the Render button becomes a dropdown.
+
+Things worth having noticed:
+
+- **PDF** floats figures, so yours may not be where you put it. Normal LaTeX
+  behaviour, and the reason cross-references exist.
+- **Word** is weakest on mathematics; anything beyond a simple equation tends to
+  degrade. It is also the format most journals and most coauthors actually want.
+- **html** is the only one where a table can scroll and a figure can be
+  interactive, and the only one nobody will accept for submission.
+
+For journal submission the realistic choice is LaTeX PDF or Word, and it is
+usually the journal's choice rather than yours. The point of writing in Quarto
+is that this stops being a decision you have to make before you start writing.
+:::
+
+::: {.callout-warning collapse="true" title="If the PDF render fails"}
+You need a LaTeX installation. Run this once in the Terminal:
+
+```
+quarto install tinytex
+```
+
+Then restart RStudio and try again. If it still fails, read the last few lines
+of the LaTeX log rather than the first: the real complaint is at the bottom.
+:::
+
+# Put it together
+
+**Task.** Produce a four-page paper on the corn yield data containing:
+
+- a title page with an abstract and at least one affiliation
+- one cross-referenced figure and one cross-referenced table
+- one numbered, cross-referenced equation
+- at least three citations from a `.bib` file, in a named journal's style
+- an unnumbered References section
+- at least two numbers reported inline rather than typed
+
+Render it to both html and PDF. Then read the **rendered** document from top to
+bottom looking for `?fig-`, `?tbl-`, and `?eq-`.
+
+::: {.callout-important title="It worked if"}
+There is not a single question mark reference anywhere in either output, and the
+figure and table numbers in your prose match the ones on the figure and table.
+:::

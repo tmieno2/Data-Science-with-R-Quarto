@@ -1,0 +1,227 @@
+---
+title: "Ex-8-1: Make tables with `flextable`"
+abstract: "Tables"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'datasets', 'flextable']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+filters:
+  - webr
+---
+
+```{r}
+#| include: false 
+library(dplyr)
+library(ggplot2)
+library(flextable)
+```
+
+## Exercise 1
+
+**Dataset:** `mtcars`
+
+1.  Load the `mtcars` dataset into R.
+2.  Use the `flextable` package to create a table that displays the first 10 rows of the dataset for `mpg`, `cyl`, `disp`, and `hp`.
+3.  Apply styles to the table to make
+    1. the texts in the header bold using `bold()`
+    2. the texts of the `cyl` column center-aligned including the `cyl` in the header using `align()`
+    3. the texts of the `hp` column colored red using `color()`
+    4. the font size of the texts of the `mpg` 18 if the value of `disp` is greater than 200 using `fontsize()`.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(
+    mtcars[1:10, ],
+    col_keys = c("mpg", "cyl", "disp", "hp")
+  ) %>%
+  bold(part = "header") %>%
+  align(j = 2, align = "center", part = "all") %>%
+  color(j = 4, color = "red") %>%
+  fontsize(i = ~ disp > 200, j = 1, size = 18)
+) 
+```
+
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+#| results: asis
+data(mtcars)
+
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Create a simple flextable
+ft <- 
+  flextable(
+    mtcars[1:10, ],
+    col_keys = c("mpg", "cyl", "disp", "hp")
+  ) %>%
+  bold(part = "header") %>%
+  align(j = 2, align = "center", part = "all") %>%
+  color(j = 4, color = "red")
+```
+
+:::
+
+
+## Exercise 2
+
+**Dataset:** `iris`
+
+1.  Load the `iris` dataset.
+2.  Create a `flextable` that displays the first 10 rows of the dataset.
+3.  Apply conditional formatting: 
+    1.  Change the background color of the  cells in the `Sepal.Length` column where their values are greater than 5.0 in blue using `color` using `bg()`.
+    2.  Draw orange borders at the bottom of  the cells in the `Sepal.Width` column if their values are less than 3.0 using `border()`.
+    3.  Draw red borders at both sides of the cells in the `Sepal.Width` column if their corresponding values of `Petal.Width` are less than 1.5 using `border()`.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(iris[1:10,]) %>%
+  # Apply conditional formatting to Sepal.Length column
+  bg(i = ~ Sepal.Length > 5, j = "Sepal.Length", bg = "blue") %>%
+  border(i = ~ Sepal.Width > 3, j = ~ Sepal.Width, border.bottom = officer::fp_border(color = "orange"))
+)
+```
+
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load iris dataset
+data(iris)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Create flextable for first 10 rows
+ft <- 
+  flextable(iris[1:10,]) %>%
+  # Apply conditional formatting to Sepal.Length column
+  bg(i = ~ Sepal.Length > 5, j = "Sepal.Length", bg = "blue") %>%
+  border(i = ~ Sepal.Width > 3, j = ~ Sepal.Width, border.bottom = officer::fp_border(color = "orange"))
+```
+
+:::
+
+
+## Exercise 3: Merging and Grouping Columns
+
+**Dataset:** `airquality`
+
+1.  Load the `airquality` dataset and filter the data so that you have only the first 10 days of May and June.
+2.  Create a flextable using selected columns: `Month`, `Day`, `Ozone`, `Wind`.
+3.  Group the table by the `Month` column and merge the cells of the `Month` column using `merge_v()`.
+4.  Draw a black border to separate May and June observations
+5.  Draw a black line at the bottom of the table which was somehow lost in step 3 using `fix_border_issues()`.
+6.  Add a caption to the table using `set_caption()`.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  airquality %>%
+  dplyr::filter(Month %in% c(5, 6) & Day <= 10) %>%
+  .[, c("Month", "Day", "Ozone", "Wind")] %>%
+  # Create flextable
+  flextable() %>%
+  # Merge Month column
+  merge_v(j = "Month") %>%
+  border(i = 10, border.bottom = officer::fp_border(color = "black")) %>%
+  fix_border_issues() %>%
+  # Add a caption
+  set_caption("Airquality Data Table with Grouped Month")
+) 
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load airquality dataset
+data(airquality)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+# Select columns
+ft <- 
+  airquality %>%
+  dplyr::filter(Month %in% c(5, 6) & Day <= 10) %>%
+  .[, c("Month", "Day", "Ozone", "Wind")] %>%
+  # Create flextable
+  flextable() %>%
+  # Merge Month column
+  merge_v(j = "Month") %>%
+  border(i = 10, border.bottom = officer::fp_border(color = "black")) %>%
+  fix_border_issues() %>%
+  # Add a caption
+  set_caption("Airquality Data Table with Grouped Month")
+```
+
+:::
+
+## Exercise 4: Custom Header and Footer
+
+**Dataset:** `iris`
+
+1.  Load the `iris` dataset.
+2.  Create a table with the first 10 rows of the dataset.
+3.  Modify the header by renaming columns `Sepal.Length` and `Sepal.Width` to `Sepal Length` and `Sepal Width`, respectively.
+4.  Add a custom footer explaining what the dataset represents.
+
+Here is the finished table you are trying to make:
+
+```{r}
+#| echo: false
+(
+ft <- 
+  flextable(iris[1:10,]) %>%
+  # Modify header labels
+  set_header_labels(Sepal.Length = "Sepal Length", Sepal.Width = "Sepal Width") %>%
+  # Add a footer
+  add_footer_lines("Iris dataset: Measurements of iris flowers from three species") 
+)
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+# Load iris dataset
+data(iris)
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+ft <- 
+  flextable(iris[1:15,]) %>%
+  # Modify header labels
+  set_header_labels(Sepal.Length = "Sepal Length", Sepal.Width = "Sepal Width") %>%
+  # Add a footer
+  add_footer_lines("Iris dataset: Measurements of iris flowers from three species")
+```
+
+:::

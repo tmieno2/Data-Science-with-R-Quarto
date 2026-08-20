@@ -1,0 +1,91 @@
+/* ===========================================================================
+   Lecture Deck UI — shared mockup frame
+
+   .stage is exactly 1050 × 700, reveal's logical slide for these decks.
+   overflow:hidden is deliberate: a layout that does not fit must be seen not
+   to fit. `scrollable: true` in the real decks hides this, which is how
+   several slides ended up at exactly 700px of content.
+   =========================================================================== */
+
+body {
+  margin: 0;
+  padding: 34px 34px 60px;
+  background: #e9ecef;
+  font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+  color: #1a1f24;
+}
+
+h1.page { font-size: 26px; margin: 0 0 4px; font-weight: 600; }
+p.page  { font-size: 15px; color: #52616b; margin: 0 0 26px; max-width: 1050px;
+          line-height: 1.5; }
+
+.caption { font-size: 14px; color: #52616b; margin: 26px 0 8px; max-width: 1050px;
+           line-height: 1.5; }
+.caption b { color: #1a1f24; }
+
+.stage {
+  position: relative;
+  width: 1050px;
+  height: 700px;
+  overflow: hidden;
+  background: var(--paper, #fff);
+  color: var(--ink, #222);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, .18);
+  box-sizing: border-box;
+  padding: 34px 42px 0;
+}
+
+/* reveal's own furniture, at measured positions */
+.stage .footer {
+  position: absolute; left: 0; right: 0; bottom: 8px;
+  text-align: center; font-size: var(--t-foot); color: #6f6f6f;
+}
+.stage .footer a { color: #6f6f6f; }
+.stage .logo {
+  position: absolute; bottom: 12px; left: 56px;   /* moved by transcript-support */
+  width: 100px; height: 100px;
+  display: grid; place-items: center;
+  background: #d7262a; color: #fff;
+  font-size: 46px; font-weight: 700; font-family: Georgia, serif;
+  border-radius: 3px; opacity: .92;
+}
+.stage .logo.tr { left: auto; right: 12px; }      /* default corner, pre-move */
+
+/* optional guide: how much room is left below 640px */
+.stage.safeline::after {
+  content: "640px";
+  position: absolute; left: 0; right: 0; top: 640px;
+  border-top: 1px dashed rgba(200, 30, 30, .55);
+  font-size: 11px; color: #c81e1e; text-align: right;
+  padding-right: 4px; letter-spacing: .04em;
+}
+
+/* ------------------------------------------------------------- shared bits */
+.stage code { font-family: var(--font-mono); font-size: var(--t-body);
+              color: var(--accent-2); }
+
+.stage pre.src, .stage pre.out {
+  font-family: var(--font-mono);
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  white-space: pre;
+  overflow: hidden;
+}
+.stage pre.src { font-size: var(--t-code); background: var(--code-bg);
+                 line-height: 1.35; }
+.stage pre.out { font-size: var(--t-out);  background: var(--out-bg);
+                 color: var(--ink-muted); line-height: 1.35; }
+
+.stage .fn  { color: var(--accent-2); }
+.stage .str { color: #0b6b53; }
+.stage .cmt { color: #8a8f98; font-style: italic; }
+
+.stage ul { margin: 0 0 12px; padding-left: 1.15em; }
+.stage li { margin-bottom: 7px; }
+.stage p  { margin: 0 0 12px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }

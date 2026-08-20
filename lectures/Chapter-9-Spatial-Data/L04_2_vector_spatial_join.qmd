@@ -1,0 +1,1186 @@
+---
+title: "09-4-2: R as GIS: Interaction of Vector Datasets II"
+abstract: "Chapter 9: Spatial Data"
+format: 
+  revealjs: 
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ./../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['ggplot2', 'dplyr', 'sf'] # Install R packages on document open
+# autoload-packages: false       # Disable automatic loading of packages
+# show-startup-message: false    # Disable displaying status of webR initialization
+  cell-options:
+    editor-font-scale: 0.7
+filters:
+  - webr
+---
+
+```{r, include = FALSE}
+library(sf)
+library(dplyr)
+library(data.table)
+```
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Last deck told you which features are related to which. This one puts that to work. A spatial join takes the attributes of one layer and attaches them to another based on where things are, rather than on a shared identifier. That is the operation that turns spatial data into something you can regress. You have county-level nitrogen use and watershed-level water quality with no common key between them, only geography, and a spatial join is what marries the two. We work through every combination of points and polygons, then two refinements: doing the join and the summary in one step, and weighting by how much area actually overlaps.
+
+</details>
+
+<br>
+
+### Learning objectives
+
+The objective of this chapter is to learn spatial operations that involve two `sf` objects. Specifically,
+
++ overlay an `sf` object on another `sf` object to extract (or join) values from the `sf` object
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+### Table of contents
+
+1. [Spatial join](#sec-spatial-join)
+2. [Points against polygons](#sec-point-polygon)
+3. [Polygons against points](#sec-polygon-point)
+4. [Polygons against polygons](#sec-polygon-polygon)
+5. [Other topological relations](#sec-point-point-distance)
+6. [Join and summarise with `aggregate()`](#sec-aggregate)
+7. [Cropping join](#sec-cropping-join)
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+### Pre-requisite (Links)
+
++ [`ggplot2` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_1_ggplot2_primer.html)
++ [`dplyr` primer](https://tmieno2.github.io/R-as-GIS-workshop/LA_2_dplyr_primer.html)
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+
+```{webr-r}
+#| context: setup
+#--- install and library the data package ---#
+#--- Both repos are required. r.spatial.workshop.datasets declares         ---#
+#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#
+#--- repos named here. With the custom repo alone, sf cannot be found and   ---#
+#--- the install never completes, so nothing downstream ever runs.          ---#
+webr::install(
+  "r.spatial.workshop.datasets",
+  repos = c(
+    "https://tmieno2.github.io/rwasm-package/repo",
+    "https://repo.r-wasm.org"
+  )
+)
+
+library(r.spatial.workshop.datasets)
+
+#--- Irrigation wells in Nebraska as sf ---#
+data(wells_ne)
+wells_ne <-
+  sf::st_as_sf(
+    wells_ne,
+    coords = c(
+      "longdd",
+      "latdd"
+    ),
+    crs = 4269
+  )
+
+#--- Nebraska county boundary ---# 
+data(ne_counties, package = "r.spatial.workshop.datasets")
+
+#--- Iowa corn acres ---#
+data(ia_nitrogen)
+
+#--- HUC units ---#
+data(huc_ia)
+```
+
+## Tips to make the most of the lecture notes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same arrangement as always. One habit that pays off particularly on this deck: after every join, print the result and count the rows. Joins change the shape of your data in ways that are easy to miss, and a join that silently multiplied your dataset fivefold will quietly ruin everything downstream. Several slides here exist precisely to make you look at row counts. Take them seriously rather than skimming to the next piece of syntax, because knowing what a join did to your data is most of the skill. The other thing worth doing is reading the row counts against the counts you started with, every time.
+
+</details>
+
+<br>
+
+::: {.columns}
+
+::: {.column width="70%"}
+### Interactive navigation tools
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+<br>
+
+### Running and writing codes
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+
+:::
+::: {.column width="30%"}
+:::
+:::
+
+## Spatial join {#sec-spatial-join}
+
+::: {.panel-tabset}
+
+### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Read the two definitions carefully, because target and source are the vocabulary for the whole deck and they are easy to mix up. The target is the layer you want to end up with, the one you are adding columns to. The source is where the values come from. The little coloured words in the callouts are the hint: values go to the target, from the source. And note the third bullet in the list, about summarising if necessary. That is the part people forget. When several source features match one target feature, you have to decide what to do with them, and that decision is yours.
+
+</details>
+
+Spatial join involves all of the following:
+
++ overlay one spatial layer (target layer) onto another spatial layer (source layer) 
++ for each of the observation in the target layer
+  * identify which objects in the source layer it geographically intersects (or a different  topological relation) with  
+  * extract values associated with the intersecting objects in the source layer (and summarize if necessary), 
+  * assign the extracted value to the object in the target layer
+
+:::{.callout-note title="Definitions: target layer"}
+The `sf` layer that has `sfg`s <span style = "color: blue;"> to </span> which you would like to assign the values of attributes from the source layer. 
+:::
+
+:::{.callout-note title="Definitions: source layer"}
+The `sf` layer that has `sfg`s <span style = "color: blue;"> from </span> which you would like to assign the values of its attributes to the target layer. 
+:::
+
+### Classification
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four combinations exist, since either layer can be vector or raster, but you only need two of them. Vector against vector is this deck. Vector against raster, meaning extracting raster values to points or polygons, is the next deck and is enormously common in practice, since weather and soil data are rasters. The other two have a raster as the target, and the honest reason we skip them is that your unit of analysis is essentially never a grid cell. It is a field, a county, a farm, a well. Those are vectors.
+
+</details>
+
+We can classify spatial join into four categories by the type of the underlying spatial objects:
+
++ <span style = "color: red;"> vector-vector: vector data (target) against vector data (source) </span>
++ vector-raster: vector data (target) against raster data (source)  
++ raster-vector: raster data (target) against vector data (source)  
++ raster-raster: raster data (target) against raster data (source)  
+
+Among the four, our focus here is the first case (the second case will be discussed later). 
+
+We will not cover the third and fourth cases in this course because it is almost always the case that our target data is a vector data (e.g., city or farm fields as points, political boundaries as polygons, etc).  
+
+### Sub-classification
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Within vector against vector there are nine combinations of points, lines and polygons, and we cover three. Lines get dropped, and the reasoning is worth hearing: lines are rarely the thing you observe and rarely the thing you extract values from. A road is context, not an observation. That leaves points into polygons, polygons into points, and polygons into polygons, and the next three sections take one each. All three use the same function. What changes is what comes back — one row per target feature in the first case, and potentially many in the other two — and that difference is really the substance of this deck.
+
+</details>
+
+As noted earlier, we will look at vector-vector interactions in this lecture.
+
+This category can be further broken down into different sub categories depending on the type of spatial object (point, line, and polygon). 
+
+Here, we will ignore any spatial joins that involve lines. This is because objects represented by lines are rarely observation units in our analysis nor the source data from which we will extract values. 
+
+Here is the list of the types of spatial joins we will learn.  
+
+1. points (target) against polygons (source)
+2. polygons (target) against points (source)
+3. polygons (target) against polygons (source)
+:::
+
+
+## Spatial join: points (target) vs polygons (source) {#sec-point-polygon}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first and simplest case. Every point falls in exactly one polygon, so every point gets exactly one set of values, and the join adds columns without adding rows. That is the easy case and the one people wrongly assume is typical. The function is st_join, target first and source second, and that argument order is the whole interface. As with subsetting last deck, the default relation is intersects, and for points there is nothing to worry about there, because a point either is inside a polygon or is not.
+
+</details>
+
+**What?**
+
+For each of the observations (points) in the target points data,
+
++ finds which polygon in the source polygons data it intersects with
++ assigns the value associated with the intersected polygon to the point
+
+**How?**
+
+In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:
+
+```{r syntax_st_join, eval = FALSE}
+st_join(points_sf, polygons_sf)
+```
+
+<br>
+
+**Note**
+
+Similar to spatial sub-setting, the default topological relation is `st_intersects()`
+
+### Data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Nebraska irrigation wells as the target, county boundaries as the source. The map shows the setup: thousands of points scattered over ninety-odd polygons. The question this join answers is which county each well is in, which sounds trivial and is exactly the sort of thing you would otherwise do by hand or get wrong. Notice you are not told which county any well belongs to anywhere in the data. That information exists only in the coordinates, which is exactly the point of a spatial join. Any other kind of join would need a shared column, and here there simply is not one to use.
+
+</details>
+
+We use `wells_ne` (points) and `ne_counties` (polygons) data for illustration. Here is the map:
+
+```{webr-r}
+#| autorun: true
+ggplot() +
+  geom_sf(data = ne_counties) +
+  geom_sf(data = wells_ne) +
+  theme_void()
+```
+
+### Code
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One line. Target first, source second, and the wells come back carrying their county's attributes. Worth saying explicitly what did not happen: the number of rows did not change. You had one row per well before and you have one row per well after, just with more columns. Hold on to that, because the very next section does something different and the contrast is the thing to learn. If this were all a spatial join ever did, it would be a much less interesting and much less dangerous operation. Print the object and confirm the row count for yourself before moving on.
+
+</details>
+
+For each of the points (wells) in `wells_ne`, the code below will find the polygon (county) in which the point (well) is located, and attach the value of the variables of the polygon (county) to the point (well).
+
+```{webr-r}
+wells_joined_with_county <- st_join(wells_ne, ne_counties)
+```
+
+### Inspect the results
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Print the result and you will see statefp, countyfp and name appended to each well. Then do the check on this slide, which is the habit worth forming: filter to one county according to the join, pull that county's boundary separately, and plot the two together. If the join worked, every point lands inside the outline. If it did not, you will see it instantly. Verifying a spatial join visually costs about four lines and catches the mistakes that are otherwise invisible, particularly mismatched coordinate systems, which produce a join that runs happily and returns nothing but missing values.
+
+</details>
+
+```{webr-r}
+wells_joined_with_county
+```
+
+Evaluate `wells_joined_with_county` and you will see that `statefp`, `countyfp`, and `name` variables are appended.
+
+Let's check if the two datasets are indeed joined based on their spatial locations.
+
+```{webr-r}
+#--- get wells in Adams county according to st_join() ---#
+wells_in_Adams <- dplyr::filter(wells_joined_with_county, name == "Adams")
+
+#--- get Adams county boundary ---#
+adams_county <- dplyr::filter(ne_counties, name == "Adams")
+
+#--- visualize ---#
+ggplot() +
+  geom_sf(data = adams_county) +
+  geom_sf(data = wells_in_Adams) +
+  theme_void()
+```
+
+:::
+
+## Spatial join: polygons (target) vs points (source) {#sec-polygon-point}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now turn it around. Counties are the target, wells the source, and the difference is not cosmetic. A point sits in one polygon, but a polygon can contain any number of points, so this direction is one-to-many. Same function, same argument order rule, target first. What changes is what you get back, and the Inspect tab is where that becomes clear. Note the goal stated on the Data tab: average groundwater extraction by county. Getting there needs a second step after the join, which is the last tab of this section.
+
+</details>
+
+**What?**
+
+For each of the observations (polygons) in the target data,
+
++ find which points in the source file it intersects
++ assign the values associated with the points to the polygon. 
+
+**How?**
+
+In order to achieve this, we can use the `st_join()` function, whose syntax is as follows:    
+
+```{r syntax_st_join-2, eval = FALSE}
+st_join(polygons_sf, points_sf)
+```
+
+<br>
+
+**Note**
+
+Similar to spatial sub-setting, the default topological relation is `st_intersects()`
+
+### Data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same two layers, swapped round. The extraction figures are invented, generated with runif, since the real ones are not public, but they behave like the real thing for our purposes. What matters is the goal: an average per county. Right now that number does not exist anywhere. Extraction is recorded per well, counties have no extraction figure at all, and the only thing linking them is position. Two steps get you there. The join is the first, attaching every well's extraction figure to the county it sits in, and the summarise is the second. Neither step is spatial on its own.
+
+</details>
+
+We use `ne_counties` (polygons) and `wells_ne` (points) data for illustration. Here is the map:
+
+```{webr-r}
+#| autorun: true
+ggplot() +
+  geom_sf(data = ne_counties) +
+  geom_sf(data = wells_ne) +
+  theme_void()
+```
+
+<br>
+
+We create a fake variable that represents groundwater extraction (acre-feet) from the aquifer.
+
+```{webr-r}
+#| autorun: true
+wells_ne <- 
+  wells_ne %>%
+  dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))
+```
+
+<br>
+
+Our goal is to find average groundwater extraction by county.
+
+### Code
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Identical syntax to before, arguments swapped. That is the whole change. It is worth appreciating how little the interface asks of you: the same function handles both directions and works out what to do from the geometries themselves. But do not let the sameness of the code fool you into expecting the same kind of result. Print what comes back before reading on, and look at how many rows it has compared with the ninety-three counties you started with. If that number surprises you, the next tab explains exactly why, and it is the thing most worth understanding in this deck.
+
+</details>
+
+For each of the polygons (counties) in `ne_counties`, the code below will find all the points (wells) that are located inside the county, and attach the value of the variables of the points (wells) to the polygon (county).
+
+```{webr-r}
+county_joined_with_wells <- st_join(ne_counties, wells_ne)
+```
+
+### Inspect the results
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the one-to-many consequence, and it is the most important slide in the section. Each county now appears once per well inside it. Loup county, the first row, has no wells, so it appears once with missing values. Adams county has fifty-three wells, so it appears fifty-three times, with the identical county geometry repeated in every one of those rows. The identical check at the bottom proves that. This is normal and expected for a one-to-many join, but if you did not know to look, you would think your data had been corrupted.
+
+</details>
+
+Evaluate `county_joined_with_wells` and you will see that `wellid` and `gw_extraction` variables are appended.
+
+```{webr-r}
+county_joined_with_wells
+```
+
+<br>
+
+One thing that is different from the previous case is that 
+
++ For each of the polygons (counties), the resulting dataset has as many observations as the number of wells that intersect with the polygon (county).
+
++ If a polygon has no wells inside, then you will simply have a single row of data for that polygon.
+
+For example, the first row is `countyfp` 115 (Loup county), which has no wells inside it. So we get a single row with `wellid` and `gw_extraction` missing. But `countyfp` 001 (Adams county) has 53 wells inside it, and so appears 53 times.
+
+```{webr-r}
+#--- CHANGED: was countyfp == "129", which is Nuckolls county, not Adams. The ---#
+#--- surrounding text called it Adams throughout. Adams is 001.               ---#
+(
+adams_county <- dplyr::filter(county_joined_with_wells, countyfp == "001") 
+)
+```
+
+<br>
+
+All the rows there have exactly the same geometry, which is the `MULTIPOLYGON` that represents the boundary of Adams county.
+
+```{webr-r}
+identical(adams_county[1, "geometry"], adams_county[2, "geometry"])
+```
+
+### Post-join processing
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second step: group by county and summarise, which is ordinary dplyr with nothing spatial about it. Now read the two bullets, because they explain something you will hit constantly. Summarising an sf object is slow, and the reason is that geometry travels with the data, so summarise unions the geometries of each group as well as averaging the numbers. That is real work you did not ask for. Uncomment the line that drops the geometry and it becomes a plain data frame operation. Drop the geometry whenever you do not need it back.
+
+</details>
+
+Since we joined the two layers, we can now do calculations that were not possible before. Here, we will calculate the average groundwater extraction by county.
+
+```{webr-r}
+county_joined_with_wells %>%
+  # sf::st_drop_geometry() %>%
+  dplyr::group_by(countyfp) %>%
+  #--- CHANGED: was sum(gw_extraction); the text promises an average ---#
+  dplyr::summarize(mean_gw_extraction = mean(gw_extraction))
+```
+
+<br>
+
++ `dplyr::summarize()` takes a long time when it is applied to an `sf` object, because the geometry travels with the data and `summarize()` **unions the geometries of each group** as well as summarising the attributes.
++ Uncomment `sf::st_drop_geometry()` and it becomes an ordinary `data.frame` operation, which is far faster. Drop the geometry whenever you do not need it back.
+
+Of course, it is just as easy to get other types of statistics by simply modifying the `summarize()` part.
+
+:::
+
+
+## Spatial join: polygons (target) vs polygons (source) {#sec-polygon-polygon}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third and messiest combination. Polygons against polygons is one-to-many like the last case, but with a complication that points do not have: overlap is a matter of degree. A county might lie almost entirely inside a watershed or barely clip its corner, and st_join treats those two cases identically. It records that they intersect and nothing more. That limitation is real, and this section builds towards it deliberately rather than hiding it, so keep it in mind as we work through the example. The final section of the deck is the fix.
+
+</details>
+
+For each of the observations (polygons) in the target data,
+
++ find which observations (polygons) in the source data it intersects
++ then, assign the values associated with the intersecting polygons from the source data to the polygon 
+
+### Data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two Iowa datasets that share no key at all. Nitrogen use is recorded by county; the hydrologic units, the watersheds, follow rivers and ignore county lines entirely. There is no column you could join these on. Plot them and you can see the problem: the two sets of boundaries cut across each other with no relationship whatsoever. The nitrogen figures are simulated, but the geography is real, and that mismatch between administrative boundaries and natural ones is among the most common reasons anyone needs a spatial join at all. Data is collected on the units that are convenient to collect on, not the units you want to analyse.
+
+</details>
+
+Nitrogen use (lb/acre) by county in Iowa (Note: this is a fake dataset that is generated using R):
+
+```{webr-r}
+ia_nitrogen
+
+ggplot() +
+  geom_sf(data = ia_nitrogen, aes(fill = nitrogen_rate))
+```
+
+<br>
+
+Hydrologic units that cover Iowa:
+
+```{webr-r}
+huc_ia
+
+ggplot() +
+  geom_sf(data = huc_ia)
+```
+
+### Story
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the research question that motivates the whole section. You want to know whether nitrogen use affects water quality. Water quality is measured by watershed. Nitrogen use is recorded by county. To run any regression at all you need both variables on the same rows, and geography is the only thing that can put them there. Look at the overlaid map and think about what a sensible answer would even be for a watershed that spans eight counties. That question, what a sensible answer looks like when one watershed spans eight different counties, is exactly where this section ends up.
+
+</details>
+
+You are interested in understanding the impact of nitrogen use for agricultural production on water quality.
+
++ You observe water quality for each of the hydrologic units (`huc_ia`)
++ You observe nitrogen use (lb/acre) at the county level (`ia_nitrogen`)
+
+You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of corn production on water quality.
+
+```{webr-r}
+ggplot() + 
+  geom_sf(
+    data = ia_nitrogen,
+    alpha = 0.6,
+    aes(fill = nitrogen_rate)
+  ) +
+  geom_sf(
+    data = huc_ia,
+    alpha = 0
+  ) +
+  theme_void() +
+  theme(legend.position = "bottom") 
+```
+
+### Demonstration
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The join itself, one line as always, and then the row counts tell the story. The watershed with code 07060004 intersects eight counties, so it comes back as eight rows, each carrying the identical watershed geometry and one county's nitrogen figure. Then the summarise gives you a mean per watershed. Notice that this treats all eight counties as equal, which is the assumption the next tab attacks. For now the mechanics are what matter: join, then group, then summarise, exactly the same three steps as the previous section. The assumption buried in that mean is what the next tab is about.
+
+</details>
+
+Let's join the two:
+
+```{webr-r}
+huc_joined_with_acres <- st_join(huc_ia, ia_nitrogen)
+```
+
+<br>
+
+Here, for each of the HUC units from `huc_ia`, all the intersecting counties from `ia_nitrogen` are matched. 
+
+For example, `HUC_CODE == "07060004"` intersects eight counties.
+
+```{webr-r}
+(
+  huc_07060004 <- dplyr::filter(huc_joined_with_acres, HUC_CODE == "07060004")
+)
+```
+
+<br>
+
+All eight rows carry exactly the same geometry, the one representing the HUC unit with `HUC_CODE == 07060004`.
+
+We can now find the average nitrogen use (lb/acre) by HUC unit:
+
+```{webr-r}
+#--- CHANGED: two faults here. The pipe after as.data.frame() was missing, so ---#
+#--- the cell errored with "object 'HUC_CODE' not found". And ia_nitrogen has ---#
+#--- no `acres` column at all — its variable is nitrogen_rate.                ---#
+huc_joined_with_acres %>%
+  sf::st_drop_geometry() %>%
+  dplyr::group_by(HUC_CODE) %>%
+  dplyr::summarize(avg_nitrogen_rate = mean(nitrogen_rate))
+```
+
+### But,
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The catch, and it is a serious one. The join told you that eight counties intersect this watershed and nothing whatsoever about how much of each. A county contributing ninety percent of the area and one clipping a corner both count once in that mean. Look at the map: the sizes of the overlaps are obviously wildly different. So a simple average of the eight is not a defensible number for a regression. The fix is area weighting, which needs a different function, and that is the final section of the deck.
+
+</details>
+
+:::{.callout-important}
+Note that the resulting dataset does not tell you the nature of intersections. The only thing we know from `huc_joined_with_acres` is which counties the HUC units are intersecting with no matter how small or large the overlapping area are.
+:::
+
+<br>
+
+```{webr-r}
+ggplot() +
+  geom_sf(data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp)) +
+  geom_sf(data = huc_07060004)
+```
+
+<br>
+
+We simply take the average of the value of `nitrogen_rate` of the intersecting counties. But, this does not take into account the degree of the overlaps between the intersecting counties and the HUC unit. Later, we will talk about how to find area-weighted average of `nitrogen_rate` [this section](#sec-cropping-join).
+
+:::
+
+## Spatial Join: other topological relations {#sec-point-point-distance}
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Intersects is the default relation but not the only one. The join argument takes a little function of two arguments describing whichever relation you want. Read the callout carefully, because the mistake it describes is easy to make: anything the relation needs, like a distance, goes inside the function you write, not next to it. Passing dist to st_join directly is an error, since st_join has no such argument to receive it. The syntax looks fussy the first time you write it, but it buys you every relation sf offers, and the next few slides put it to work on a problem that intersects cannot solve at all.
+
+</details>
+
+Spatial join with `st_join()` uses `st_intersects()` as the default topological relationship for joining. You can pick a different one with the `join` argument.
+
+**Syntax**
+
+```{r, eval = FALSE}
+st_join(sf_1, sf_2, join = \(x, y) st_*(x, y, ...))
+```
+
+where `st_*` is the function that determines the topological relationship between `sf_1` and `sf_2`.
+
+:::{.callout-note title="Extra arguments go *inside* the function"}
+Anything the relation needs, such as `dist`, belongs inside the little function you
+write, not alongside it. `st_join(..., dist = 5)` is an error — `unused argument
+(dist = 5)` — because `st_join()` has no `dist` argument of its own to receive it.
+:::
+
+### Data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two point layers from an on-farm experiment: soybean yield measured by the combine, and seed rate recorded by the planter. Both are dense clouds of GPS readings over the same field. The reason this needs a distance relation rather than intersects is worth pausing on. These are two machines making separate passes over the same ground, so no yield point ever sits exactly on a seed rate point. Intersects would match nothing whatsoever, and you would get a dataset of missing values with no error to tell you why. Proximity is the only relation that can work here.
+
+</details>
+
+We use soy bean yield (points) data and as-applied seed rate (points) data.
+
+```{webr-r}
+#--- soybean yield ---#
+data(soy_yield)
+
+#--- seed rate ---#
+data(as_applied_s_rate)
+```
+
+### Story and Objective
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The economic question is whether planting more seed raises yield, and answering it means having both numbers on the same row. Look at the plot of red and blue points and you can see they interleave without ever coinciding. So the rule becomes: for each yield point, take the seed rate points within ten metres. That threshold is a judgement call about how far apart two readings can be and still describe the same patch of ground, and it is the sort of choice you should be prepared to defend.
+
+</details>
+
+You have run an on-farm field experiment to understand the impact of seed rate on soybean yield. Both are available as points data. 
+
+```{webr-r}
+ggplot() +
+  geom_sf(
+    data = soy_yield,
+    size = 0.4,
+    color = "red"
+  ) +
+  geom_sf(
+    data = as_applied_s_rate,
+    size = 0.4,
+    color = "blue"
+  ) +
+  theme_void()
+```
+
+<br>
+
+You want to merge them together based on their proximity so that you can run statistical analysis. Specifically, for each of the yield points, we would like to link the seed rate points that are within 10-meter from the yield point.
+
+
+### Demonstration
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The join with a distance relation, written as a small anonymous function with the ten metre threshold inside it. Then the summarise, because this is one-to-many again and a yield point may match several seed rate points. Note the commented-out line dropping the geometry, which is the same performance point from earlier and applies just as much here. The result is one average seed rate per yield point, which is the dataset you would actually run a regression on. Everything before this was getting the two machines' readings onto the same rows.
+
+</details>
+
+Let's join using `st_join()`:
+
+```{webr-r}
+soy_seed <- 
+  st_join(
+    soy_yield,
+    as_applied_s_rate, 
+    join = \(x, y) st_is_within_distance(x, y, dist = 10)
+  )
+```
+
+<br>
+
+We can now summarize the joined data like below:
+
+```{webr-r}
+soy_seed %>%
+  # st_drop_geometry() %>%
+  group_by(yield_id) %>%
+  summarize(avg_seed_rate = mean(seed_rate))
+```
+
+### Inspect and verify
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The verification, and this is the tab worth spending time on. The first yield point matched nothing, so its seed rate is missing, which happens whenever nothing lies within the threshold. The second matched two points. Rather than take that on trust, the code draws it: the yield point in red, a ten metre circle around it, and the nearby seed rate points labelled with their identifiers. Count what falls inside the circle. This is the same verify-by-picture habit from the first join, and it is how you catch a wrong threshold or a wrong CRS.
+
+</details>
+
+```{webr-r}
+soy_seed
+```
+
+<br>
+
++ According to the join, the 1st yield point from `soy_yield` did not have any seed rate data points from `as_applied_s_rate` within its 10 meter radius, so `NA` in `seed_rate`.
+
++ The second yield point from `soy_yield` is matched with two seed rate points from `as_applied_s_rate`: `seed_id` = 1 and `seed_id` = 558. Are they indeed less than 10 metres from the second yield point?
+
+<br>
+
+```{webr-r}
+#--- get all the points within 20 meter of the second yield point ---#
+seed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20), ]
+
+#--- visualize ---#
+ggplot() +
+  #--- second yield point ---#
+  geom_sf(data = soy_yield[2, ], color = "red") + 
+  #--- 10 meter buffer around the second yield point ---#
+  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = "blue", fill = NA) + 
+  #--- seed_id printed where each seed rate point sits ---#
+  geom_sf_text(data = seed_rates_around_2nd, aes(label = seed_id), size = 6) +
+  theme_void()
+```
+
+:::
+
+## Spatial join and summary in one step with `aggregate()` {#sec-aggregate}
+
+::: {.panel-tabset}
+
+### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A shortcut. Every one-to-many example so far took two steps, join and then summarise, and aggregate does both at once. Watch the argument order, because it is the opposite of st_join and that is a genuine trap: here the thing being aggregated comes first and the thing you are grouping by comes second. The function you pass as FUN is applied to every column of the source layer, which is convenient and occasionally silly, as the demonstration on the next tab shows. Intersects is the default relation here too, and as with st_join you can change it.
+
+</details>
+
+In the example of finding average groundwater use by county (go [here](#sec-polygon-point) to remind yourself of this example), we took a two-step procedure to do so. 
+
++ spatial-join two layers with `st_join()`
++ apply `dplyr::summarize()` to the joined object
+
+However, this can actually be done in one step using `aggregate()`, in which you specify how you want to aggregate with the `FUN` option:
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+aggregate(points_sf, polygons_sf, FUN = function)
+```
+
+<br>
+
+Here, for each of the rows of the second `sf` (here, `polygons_sf`), all the intersecting points in `points_sf` are found and then the average of <span style = "color: blue;"> all </span> the columns of `points_sf` are calculated. Yes, `st_intersects()` is the default topological relationship just like spatial sub-setting with `sf1[sf2, ]` and `st_join()`. 
+
+### Demonstration
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The one-liner, and then the reason to be careful with it. Look at the output: the well identifier has been averaged along with the extraction figures, giving a meaningless number in a column that looks perfectly respectable. That is what applying one function to every column gets you. The fix is on the same slide, selecting the column you actually want before aggregating. The general lesson is worth keeping: an operation that quietly does something to every column will do it to the columns you were not thinking about.
+
+</details>
+
+```{webr-r}
+aggregate(wells_ne, ne_counties, FUN = mean)
+```
+
+<br>
+
+Note that `wellid` was also averaged by county. We could just do this:
+
+```{webr-r}
+aggregate(dplyr::select(wells_ne, gw_extraction), ne_counties, FUN = mean)
+```
+
+### Another demonstration
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same shortcut applied to the soybean example, which shows that aggregate is not limited to intersects — the join argument works here exactly as it did with st_join. Note the warning in the bullets about argument order, because the code looks almost identical to the earlier version while meaning something different. Also be aware that this cell overwrites the soy_seed object you built a few slides ago with a different result, so if you go back and re-read that tab, you will not be looking at what it made.
+
+</details>
+
+`aggregate()` is a fairly general procedure of spatial joining and summarization, and you can use it for many other cases including our example of soybean yield and seed rate (go [here](#sec-point-point-distance) for the example).
+
+Here is the code:
+
+```{webr-r}
+soy_seed <-
+  aggregate(
+    as_applied_s_rate, # what you are aggregating
+    soy_yield, # based on 
+    FUN = mean,
+    join = \(x, y) st_is_within_distance(x, y, dist = 10)
+  )
+```
+
+<br>
+
++ This looks almost identical with the code to spatial join the two `sf` layers. However, the order of the `sf` objects is flipped.
+
++ You are aggregating the columns of first `sf` for each of the geometry in the second `sf` (here yield point).   
+
+:::
+
+## Cropping Join {#sec-cropping-join}
+
+::: {.panel-tabset}
+
+### Motivation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Back to the problem the polygons-against-polygons section left open. A simple average across eight counties ignores how much of each one actually falls inside the watershed, and we want a weighted one. The insight is that if you can get the geometry of each overlapping piece, you can measure its area, and area is exactly the weight you need. Everything left in this deck is about producing those pieces of geometry, and it turns out that a single function does it. The weighting itself is then just arithmetic you already know how to do.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
++ In the example of finding average nitrogen use by HUC unit using `st_join()`, we had a problem of not knowing how much of each of the intersecting counties shares the same area with the HUC unit.
+
++ If we can get the geometry of the intersecting part of the HUC unit and the county, then we can calculate its area, which in turn allows us to find area-weighted averages of joined attributes.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The function is st_intersection, and the name is confusingly close to st_intersects, so hold the difference clearly. Intersects, ending in s, asks a yes-or-no question and returns indices. Intersection, ending in tion, actually cuts the geometry and hands you back the overlapping pieces themselves, with the non-overlapping parts removed. It also carries the attributes across from both layers. That combination — real geometry you can measure, plus the attributes of both layers on the same row — is precisely what makes area weighting possible. The next two tabs show it on data small enough to check by eye.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+For these purposes, we can use `sf::st_intersection()`.
+
++ While `st_intersects()` returns the indices of intersecting objects, `st_intersection()` returns intersecting spatial objects with the non-intersecting parts of the `sf` objects cut out. 
+
++ Moreover, attribute values of the source `sf` will be merged to its intersecting `sfg` in the target `sf`. 
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### lines vs polygons
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Back to the small made-up data from last deck, because with three polygons and two lines you can check the answer by eye. Intersecting the lines with the polygons gives you the line segments that fall inside each polygon, and every segment is one row labelled with which line and which polygon produced it. Compare the two figures side by side: on the left the full lines running out past the polygon edges, on the right only the parts inside, cut cleanly at the boundary. That cutting is the whole difference from subsetting.
+
+</details>
+
+```{webr-r}
+#| context: setup 
+#--- create points ---#
+point_1 <- st_point(c(2, 2))
+point_2 <- st_point(c(1, 1))
+point_3 <- st_point(c(1, 3))
+
+#--- combine the points to make a single  sf of points ---#
+points <- list(point_1, point_2, point_3) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(point_name = c("point 1", "point 2", "point 3"))
+
+#--- create lines ---#
+line_1 <- st_linestring(rbind(c(0, 0), c(2.5, 0.5)))
+line_2 <- st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))
+
+#--- combine the points to make a single  sf of points ---#
+lines <- list(line_1, line_2) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(line_name = c("line 1", "line 2"))
+
+#--- create polygons ---#
+polygon_1 <- st_polygon(list(
+  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)) 
+))
+
+polygon_2 <- st_polygon(list(
+  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5)) 
+))
+
+polygon_3 <- st_polygon(list(
+  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5)) 
+))
+
+#--- combine the polygons to make an sf of polygons ---#
+polygons <- list(polygon_1, polygon_2, polygon_3) %>% 
+  st_sfc() %>% 
+  st_as_sf() %>% 
+  mutate(polygon_name = c("polygon 1", "polygon 2", "polygon 3"))
+```
+
+The following code gets the intersection of the lines and the polygons.
+
+```{webr-r}
+#| autorun: true
+(
+intersections_lp <- st_intersection(lines, polygons) %>% 
+  mutate(int_name = paste0(line_name, "-", polygon_name))
+)
+```
+
+<br>
+
+:::: {.columns}
+::: {.column width="50%"}
+
+Here is how the lines and polygons look like:
+
+```{webr-r}
+#| context: output
+#| out-width: 120%
+ggplot() +
+  geom_sf(
+    data = polygons,
+    aes(fill = polygon_name),
+    alpha = 0.3
+  ) +
+  scale_fill_discrete(name = "Polygons") +
+  geom_sf(
+    data = lines,
+    aes(color = line_name)
+  ) +
+  scale_color_discrete(name = "Lines") +
+  theme_void()
+```
+:::
+
+::: {.column width="50%"}
+Here is how the intersections and polygons look like.
+
+```{webr-r}
+#| context: output
+#| out-width: 120%
+ggplot() +
+  geom_sf(
+    data = intersections_lp,
+    aes(color = int_name),
+  ) +
+  geom_sf(
+    data = polygons,
+    aes(fill = polygon_name),
+    alpha = 0.3
+  ) +
+  theme_void()
+```
+
+:::
+::::
+
+### polygons vs polygons
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same operation with polygons, which is the case we actually need. Intersecting polygons one and three with polygon two returns the overlapping regions as new polygons, one row each, with attributes from both parents. Look at the figure: the original polygons are filled and faint, and the intersections are outlined in heavy colour, sitting exactly where the shapes overlap. Those outlined pieces are new geometries that existed in neither input. Those outlined pieces are new geometries that existed in neither input, and crucially they have areas you can measure. That is what we came for, and the next tab applies it to the watersheds.
+
+</details>
+
+The following code gets the intersection of polygon 1 and polygon 3 with polygon 2. Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (`polygon 1-polygon 2` and `polygon 3-polygon 2`).
+
+```{webr-r}
+(
+intersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>% 
+  mutate(int_name = paste0(polygon_name, "-", polygon_name.1))
+)
+```
+
+<br>
+
+Just like the lines-polygons case, the non-intersecting part of polygons 1 and 3 are cut out and do not remain in the returned `sf`. 
+
+```{webr-r}
+ggplot() +
+  #--- here are all the original polygons  ---#
+  geom_sf(
+  	data = polygons, 
+  	aes(fill = polygon_name), 
+  	alpha = 0.3
+  ) +
+  #--- here is what is returned after st_intersection ---#
+  geom_sf(
+  	data = intersections_pp, 
+  	aes(color = int_name),
+  	linewidth = 1.5,
+  	alpha = 0
+  ) +
+  theme_void()
+```
+
+### area-weighted average
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here it is applied to the real problem. Intersecting the watersheds with the counties gives one row per watershed-county pair, each with the geometry of that specific overlap. Take the area of each piece, multiply each county's nitrogen rate by its area, add those up and divide by the total area, and you have a properly weighted average in which a county contributing ninety percent of the watershed counts ninety times as much as one contributing one percent. The map at the end shows the pieces one watershed is made of.
+
+</details>
+
+Let's now get back to the example of HUC units and county-level nitrogen use data. We would like to find <span style = "color: blue;"> area-weighted </span> average of nitrogen use instead of the simple average.
+
+Using `st_intersection()`, for each of the HUC polygons, we can find the intersecting counties, and then divide it into parts based on the boundary of the intersecting polygons. 
+
+```{webr-r}
+(
+HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>% 
+  mutate(huc_county = paste0(HUC_CODE, "-", countyfp))
+)
+```
+
+<br>
+
+The key difference from the `st_join()` example is that each observation of the returned data is a unique HUC-county intersection. 
+
+The figure below maps every intersection of the HUC unit `HUC_CODE == 07060004` with the eight counties it overlaps. 
+
+```{webr-r}
+HUC_intersections %>%
+  filter(HUC_CODE == "07060004") %>%
+  ggplot(data = .) +
+  geom_sf(aes(fill = huc_county)) +
+  theme_void()
+```
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Your turn, on a deliberately simple layout: four unit squares in a grid with values one to four, and one square sitting over the middle of all four. Because it is centred, each quadrant contributes the same area, so you can work out the weighted answer in your head before writing any code. That is the point of the setup. Do problem one to get the intersection, then problem two to weight by area, and check your result against the number you predicted. If they disagree, the code is wrong, not your arithmetic.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Data Preparation
+
+```{webr-r}
+#| context: setup
+polygon_1 <- 
+  st_sfc(
+    st_polygon(list(rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)))),
+    st_polygon(list(rbind(c(0, 2), c(2, 2), c(2, 4), c(0, 4), c(0, 2)))),
+    st_polygon(list(rbind(c(2, 2), c(4, 2), c(4, 4), c(2, 4), c(2, 2)))),
+    st_polygon(list(rbind(c(2, 0), c(4, 0), c(4, 2), c(2, 2), c(2, 0))))
+  ) %>%
+  st_sf(geometry = .) %>%
+  dplyr::mutate(value = 1:4)
+
+polygon_2 <- 
+  st_sfc(
+    st_polygon(list(rbind(c(1, 1), c(3, 1), c(3, 3), c(1, 3), c(1, 1))))
+  ) %>%
+  st_sf(geometry = .)
+```
+
+We use `polygon_1` and `polygon_2` in this exercise. Inspect them to familiarize yourself with them:
+
+```{webr-r}
+polygon_1
+polygon_2
+```
+
+<br>
+
+Here is what they look like:
+
+```{webr-r}
+#| autorun: true
+#| out-width: 100%
+ggplot() +
+  geom_sf(data = polygon_1, aes(fill = factor(value)), alpha = 0.5) +
+  geom_sf(data = polygon_2, fill = "red", alpha = 0.5) +
+  theme_void()
+```
+
+#### Problem 1
+
+Find the intersection of the two polygons using `st_intersection()`.
+
+```{webr-r}
+st_intersection()
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+intersection <- st_intersection(polygon_2, polygon_1)
+```
+
+#### Problem 2 
+
+Find the area-weighted average of `value` for `polygon_2`, based on the area it overlaps with each polygon in `polygon_1`.
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+intersection %>%
+  dplyr::mutate(area = as.numeric(st_area(geometry))) %>%
+  dplyr::summarize(value = sum(value * area) / sum(area))
+``` 
+
+:::
+:::
+

@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Ex-6-1: Organizing a Reproducible Project – Data Science with R (AECN 896-05)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-38d9d8fd61e003a5a1c343a80d3dce47.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Ex-6-1: Organizing a Reproducible Project – Data Science with R (AECN 896-05)">
+<meta property="og:description" content="Code Projects">
+<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science with R (AECN 896-05)</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/syllabus_26.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../syllabus/calendar_26.html"> 
+<span class="menu-text">Calendar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../lectures/index.html"> 
+<span class="menu-text">Lecture Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../assignments.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../exercises/index.html"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#build-the-structure" id="toc-build-the-structure" class="nav-link active" data-scroll-target="#build-the-structure"><span class="header-section-number">1</span> Build the structure</a></li>
+  <li><a href="#sort-out-somebody-elses-mess" id="toc-sort-out-somebody-elses-mess" class="nav-link" data-scroll-target="#sort-out-somebody-elses-mess"><span class="header-section-number">2</span> Sort out somebody else’s mess</a></li>
+  <li><a href="#name-files-for-the-order-they-run-in" id="toc-name-files-for-the-order-they-run-in" class="nav-link" data-scroll-target="#name-files-for-the-order-they-run-in"><span class="header-section-number">3</span> Name files for the order they run in</a></li>
+  <li><a href="#make-raw-data-read-only-and-mean-it" id="toc-make-raw-data-read-only-and-mean-it" class="nav-link" data-scroll-target="#make-raw-data-read-only-and-mean-it"><span class="header-section-number">4</span> Make raw data read-only, and mean it</a></li>
+  <li><a href="#read-your-own-code-as-a-stranger" id="toc-read-your-own-code-as-a-stranger" class="nav-link" data-scroll-target="#read-your-own-code-as-a-stranger"><span class="header-section-number">5</span> Read your own code as a stranger</a></li>
+  <li><a href="#stop-typing-the-same-thing" id="toc-stop-typing-the-same-thing" class="nav-link" data-scroll-target="#stop-typing-the-same-thing"><span class="header-section-number">6</span> Stop typing the same thing</a></li>
+  <li><a href="#audit-a-real-project" id="toc-audit-a-real-project" class="nav-link" data-scroll-target="#audit-a-real-project"><span class="header-section-number">7</span> Audit a real project</a></li>
+  <li><a href="#the-only-test-that-counts" id="toc-the-only-test-that-counts" class="nav-link" data-scroll-target="#the-only-test-that-counts"><span class="header-section-number">8</span> The only test that counts</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Ex-6-1: Organizing a Reproducible Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="block-title">Abstract</div>
+    Code Projects
+  </div>
+</div>
+
+
+</header>
+
+
+<p>There is no code to run in most of this. That is not a defect of the exercises: organizing a project is not a coding skill, and you cannot practise it in a browser or on a toy example. What you can do is build a real structure once, deliberately, and then use it for the rest of the course.</p>
+<p>The test that every exercise here is working toward is a single question. <strong>If you sent this folder to a stranger, could they reproduce your results without asking you anything?</strong> Everything below is a way of making the answer yes.</p>
+<section id="build-the-structure" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Build the structure</h1>
+<p><strong>Task.</strong> Create a project called <code>nitrogen-study</code> with the folder layout the lecture recommends.</p>
+<ol type="1">
+<li><code>File -&gt; New Project -&gt; New Directory -&gt; New Project</code>, named <code>nitrogen-study</code>.</li>
+<li>Create the folders below. Make them all now, even the ones you have nothing to put in yet.</li>
+<li>Put a <code>.gitkeep</code> file, or a short <code>readme.md</code>, in each empty folder.</li>
+</ol>
+<pre><code>nitrogen-study/
+├── nitrogen-study.Rproj
+├── Code/
+│   ├── DataPrep/
+│   └── Analysis/
+├── Data/
+│   ├── Raw/
+│   └── Processed/
+├── Literature/
+├── Results/
+└── Writing/</code></pre>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>fs::dir_tree()</code> or the Files pane shows all nine folders, and <code>here::here()</code> prints the <code>nitrogen-study</code> path.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Doing it from the console">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Doing it from the console
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dirs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Code/DataPrep"</span>, <span class="st">"Code/Analysis"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Data/Raw"</span>, <span class="st">"Data/Processed"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Literature"</span>, <span class="st">"Results"</span>, <span class="st">"Writing"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (d <span class="cf">in</span> dirs) <span class="fu">dir.create</span>(<span class="fu">here</span>(d), <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># stop empty folders disappearing when you share the project</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (d <span class="cf">in</span> dirs) <span class="fu">file.create</span>(<span class="fu">here</span>(d, <span class="st">".gitkeep"</span>))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>fs<span class="sc">::</span><span class="fu">dir_tree</span>(<span class="fu">here</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The empty-folder point is not pedantry. Git does not track folders, only files, so an empty <code>Data/Raw</code> will not survive being cloned. Someone who clones your project then gets a script that writes to a folder that does not exist, and a confusing error.</p>
+<p>Why create folders you have nothing for yet? Because the alternative is deciding where something goes at the moment you are busy with it, which is when you will decide badly.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sort-out-somebody-elses-mess" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Sort out somebody else’s mess</h1>
+<p>This is how most projects actually arrive: everything in one folder, named however it happened.</p>
+<p><strong>Task.</strong> Create this mess in a scratch folder, then reorganize it into your structure without looking at the answer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mess <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"mess"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(mess, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data.csv"</span>, <span class="st">"data_v2.csv"</span>, <span class="st">"data_v2_FINAL.csv"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"analysis.R"</span>, <span class="st">"analysis_new.R"</span>, <span class="st">"Untitled1.R"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"plot.png"</span>, <span class="st">"figure for paper.png"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"notes.docx"</span>, <span class="st">"Smith et al 2019.pdf"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cleaned.rds"</span>, <span class="st">"regression output.txt"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"script that makes the map.R"</span>, <span class="st">"final_paper.qmd"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">file.create</span>(<span class="fu">file.path</span>(mess, files))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For each file, decide which folder it belongs in and what it should be called. Three of them you cannot place from the name alone. Identify which, and say what you would need to know.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Every file has a destination and a new name, and you can state the run order of the code files from their names alone.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="One reasonable answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+One reasonable answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Original</th>
+<th>Goes to</th>
+<th>Renamed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>data.csv</code>, <code>data_v2.csv</code>, <code>data_v2_FINAL.csv</code></td>
+<td><code>Data/Raw/</code></td>
+<td><strong>cannot decide from the name</strong></td>
+</tr>
+<tr class="even">
+<td><code>cleaned.rds</code></td>
+<td><code>Data/Processed/</code></td>
+<td><code>nitrogen-cleaned.rds</code></td>
+</tr>
+<tr class="odd">
+<td><code>analysis.R</code>, <code>analysis_new.R</code></td>
+<td><code>Code/Analysis/</code></td>
+<td><strong>cannot decide from the name</strong></td>
+</tr>
+<tr class="even">
+<td><code>Untitled1.R</code></td>
+<td>probably nowhere</td>
+<td>delete, or open it and find out</td>
+</tr>
+<tr class="odd">
+<td><code>script that makes the map.R</code></td>
+<td><code>Code/Analysis/</code></td>
+<td><code>02-3-make-map.R</code></td>
+</tr>
+<tr class="even">
+<td><code>plot.png</code>, <code>figure for paper.png</code></td>
+<td><code>Results/</code></td>
+<td><code>fig-yield-response.png</code></td>
+</tr>
+<tr class="odd">
+<td><code>regression output.txt</code></td>
+<td><code>Results/</code></td>
+<td><code>reg-main.txt</code></td>
+</tr>
+<tr class="even">
+<td><code>Smith et al 2019.pdf</code></td>
+<td><code>Literature/</code></td>
+<td>keep</td>
+</tr>
+<tr class="odd">
+<td><code>notes.docx</code></td>
+<td><code>Literature/</code> or <code>Writing/</code></td>
+<td>keep</td>
+</tr>
+<tr class="even">
+<td><code>final_paper.qmd</code></td>
+<td><code>Writing/</code></td>
+<td><code>manuscript.qmd</code></td>
+</tr>
+</tbody>
+</table>
+<p>The three you cannot place are the three sets of near-duplicates: <code>data</code> / <code>data_v2</code> / <code>data_v2_FINAL</code>, and <code>analysis</code> / <code>analysis_new</code>. Nothing in the names tells you which is current. You have to open them, compare them, and guess, and if the author is not available you may never know.</p>
+<p>That is the actual cost of bad naming, and it is why <code>_FINAL</code> is a warning sign rather than a solution. Two files whose names differ only by <code>_new</code> are a question you have left for your future self, who will have forgotten the answer.</p>
+<p>Note also what disappears once files are named for the order they run in. <code>01-1-</code>, <code>01-2-</code>, <code>02-1-</code> is not decoration: it is the instruction for reproducing the project, written where nobody can lose it.</p>
+<p>Spaces in filenames are a separate small nuisance. They are legal, and they require quoting in every shell command and break some tools outright. Use hyphens.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="name-files-for-the-order-they-run-in" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Name files for the order they run in</h1>
+<p><strong>Task.</strong> Your study needs the following steps. Give each one a filename and put it in the right folder.</p>
+<ol type="1">
+<li>download county-level weather data from an API</li>
+<li>download county boundaries</li>
+<li>clean the nitrogen trial data</li>
+<li>merge trial data with weather</li>
+<li>estimate the main regression</li>
+<li>run a robustness check with a different specification</li>
+<li>produce the figures and tables for the paper</li>
+</ol>
+<p>Then write a <code>readme.md</code> at the project root telling a stranger what to run.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sorting <code>Code/DataPrep</code> and <code>Code/Analysis</code> alphabetically gives you the correct execution order, with no readme required to work it out.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<pre><code>Code/DataPrep/
+  01-1-download-weather-data.R
+  01-2-download-county-boundaries.R
+  01-3-clean-trial-data.R
+  01-4-merge-trial-weather.R
+
+Code/Analysis/
+  02-1-main-regression.R
+  02-2-robustness-alt-spec.R
+  02-3-gen-figures-tables.R</code></pre>
+<p>The numbering carries two pieces of information: the <code>01</code> versus <code>02</code> says which stage, and the <code>-1</code>, <code>-2</code> says the order within it. Alphabetical sort equals execution order, which means the folder listing <em>is</em> the documentation.</p>
+<p>A readme worth writing:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Nitrogen study</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this is</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>Estimates corn yield response to nitrogen using on-farm trial data,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>2020-2023.</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## How to reproduce</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Open <span class="in">`nitrogen-study.Rproj`</span> in RStudio.</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Run <span class="in">`Code/DataPrep/`</span> in filename order. Requires an API key in</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>   <span class="in">`.Renviron`</span> as <span class="in">`NOAA_KEY`</span>.</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Run <span class="in">`Code/Analysis/`</span> in filename order.</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Render <span class="in">`Writing/manuscript.qmd`</span>.</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>Total runtime is about 20 minutes; step 01-1 is most of it.</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="in">`Data/Raw/`</span> is read-only and is not regenerated by any script.</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>See <span class="in">`Data/Raw/metadata.md`</span> for sources and download dates.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The API key line is the sort of thing that gets forgotten and makes a project unreproducible in a way that looks like a bug. Note what is written down and what is deliberately <em>not</em>: the key itself never goes in the repository.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="make-raw-data-read-only-and-mean-it" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Make raw data read-only, and mean it</h1>
+<p>The lecture’s first rule is that you never overwrite raw data. Here you enforce it rather than remembering it.</p>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Put a csv in <code>Data/Raw/</code>. Any of the corn yield files will do.</li>
+<li>Write <code>Data/Raw/metadata.md</code> recording where the file came from, when you downloaded it, and what the columns mean.</li>
+<li>Make the file read-only at the operating-system level.</li>
+<li>Try to overwrite it from R and observe what happens.</li>
+<li>Write a <code>Code/DataPrep</code> script that reads it, changes something, and saves the result to <code>Data/Processed/</code>.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Writing to the raw file <strong>fails with an error</strong>, and your processed file appears in <code>Data/Processed/</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"Data"</span>, <span class="st">"Raw"</span>, <span class="st">"corn_yields.csv"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#--- make it read-only ---#</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.chmod</span>(raw, <span class="at">mode =</span> <span class="st">"0444"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#--- now try to clobber it ---#</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span>), raw)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error: Permission denied</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#--- the right shape for a DataPrep script ---#</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>corn <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(raw)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>corn_clean <span class="ot">&lt;-</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  corn <span class="sc">%&gt;%</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(yield))</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(corn_clean, <span class="fu">here</span>(<span class="st">"Data"</span>, <span class="st">"Processed"</span>, <span class="st">"corn-clean.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Why bother, when you could simply be careful? Because being careful is a promise you make to yourself at the moment you have the least attention. The <code>0444</code> makes it impossible instead of merely inadvisable, and it costs one line.</p>
+<p>Raw data is the only thing in the project you cannot regenerate. Every script, every figure, every processed dataset can be rebuilt by rerunning code. If you overwrite <code>Data/Raw/</code>, you have destroyed the irreplaceable part.</p>
+<p><code>metadata.md</code> is the other half. A csv with no provenance is nearly worthless six months later, because you cannot answer the first question a referee asks: where did this come from and when?</p>
+</div>
+</div>
+</div>
+</section>
+<section id="read-your-own-code-as-a-stranger" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Read your own code as a stranger</h1>
+<p><strong>Task.</strong> Here is some code that works. Reformat it so a person can read it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">"Data/Raw/corn_yields.csv"</span>);d2<span class="ot">&lt;-</span>d[d<span class="sc">$</span>Yield<span class="sc">&gt;</span><span class="dv">100</span><span class="sc">&amp;</span>d<span class="sc">$</span>Irrigated<span class="sc">==</span><span class="dv">1</span>,]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res<span class="ot">=</span><span class="fu">lm</span>(Yield<span class="sc">~</span>Irrigated<span class="sc">+</span>FIPS,<span class="at">data=</span>d);<span class="fu">summary</span>(res)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>Final_Data_2<span class="ot">&lt;-</span><span class="fu">aggregate</span>(d2<span class="sc">$</span>Yield,<span class="at">by=</span><span class="fu">list</span>(d2<span class="sc">$</span>County_name),<span class="at">FUN=</span>mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol type="1">
+<li>Fix it by hand first: one statement per line, spaces around operators, consistent assignment, names that say what things are.</li>
+<li>Then install <code>styler</code> and use <code>Addins -&gt; Style selection</code> on the original.</li>
+<li>Compare. Name two things you fixed that <code>styler</code> did not.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can name something wrong with this code that no automatic tool can fix.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>corn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"Data"</span>, <span class="st">"Raw"</span>, <span class="st">"corn_yields.csv"</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>irrigated_high_yield <span class="ot">&lt;-</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  corn <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Yield <span class="sc">&gt;</span> <span class="dv">100</span>, Irrigated <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>yield_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> Irrigated <span class="sc">+</span> FIPS, <span class="at">data =</span> corn)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(yield_model)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>mean_yield_by_county <span class="ot">&lt;-</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  irrigated_high_yield <span class="sc">%&gt;%</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(County_name) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">mean_yield =</span> <span class="fu">mean</span>(Yield))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>styler</code> fixes spacing, indentation, and line breaks. It will not fix:</p>
+<ul>
+<li><strong>the names.</strong> <code>d</code>, <code>d2</code>, <code>res</code>, and <code>Final_Data_2</code> mean nothing. <code>styler</code> cannot know that <code>d2</code> is the irrigated high-yield subset, so it leaves the name alone. Naming is the part that carries the meaning, and it is entirely on you.</li>
+<li><strong><code>=</code> versus <code>&lt;-</code>.</strong> Mixing them is legal and inconsistent. Pick <code>&lt;-</code>.</li>
+<li><strong>the actual bug.</strong> <code>lm(Yield ~ Irrigated + FIPS)</code> treats <code>FIPS</code> as a <em>number</em>, so the model claims yield rises linearly with county code. It should be <code>factor(FIPS)</code>. No formatter will ever tell you this, and unreadable code is exactly where this kind of error hides.</li>
+</ul>
+<p>That last point is the argument for style. Readable code is not a courtesy, it is how you find your own mistakes.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Setting up styler">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Setting up styler
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"styler"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then highlight code and use <code>Addins -&gt; Style selection</code>. Addins have no keyboard shortcut by default; assign one under <code>Tools -&gt; Modify Keyboard Shortcuts...</code> by searching for “Style selection”.</p>
+<p>Do not confuse this with <code>cmd</code>/<code>ctrl</code> + <code>shift</code> + <code>A</code>, which is RStudio’s own Reformat Code. That is built in, works without <code>styler</code>, and does not follow the tidyverse style.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="stop-typing-the-same-thing" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Stop typing the same thing</h1>
+<p><strong>Task.</strong></p>
+<ol type="1">
+<li>Open <code>Tools -&gt; Edit Code Snippets...</code> and read a few of the R ones.</li>
+<li>Write a snippet <code>hdr</code> that inserts a commented section divider.</li>
+<li>Write a snippet <code>rdd</code> that inserts a <code>readRDS(here(...))</code> call with the cursor left in the right place.</li>
+<li>Write one that inserts your standard qmd setup chunk.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Typing the shortcut and pressing Tab inserts the text with your cursor where you want it.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Answer">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Snippet definitions are indented with <strong>tabs</strong>, not spaces. This is the one thing that goes wrong, and it fails silently.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>snippet hdr</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    # /*=================================================*/</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    #' # ${1:section name}</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    # /*=================================================*/</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>snippet rdd</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    readRDS(here::here("Data", "Processed", "${1:file}.rds"))</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>snippet qsetup</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    ```{r}</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    #| label: setup</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    #| include: false</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    library(tidyverse)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    library(here)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    ```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>${1:name}</code> is a placeholder: the cursor lands there, the text is pre-selected, and Tab moves to <code>${2:...}</code> if there is one. That is what makes a snippet worth more than copy-paste.</p>
+<p>These are per-user, not per-project, so they follow you to every project you open. Ten minutes here is repaid for years.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="audit-a-real-project" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Audit a real project</h1>
+<p><strong>Task.</strong> Clone <a href="https://github.com/tmieno2/Sample-Reproducible-Project" class="uri">https://github.com/tmieno2/Sample-Reproducible-Project</a> and read it the way somebody reproducing it would, not the way an author would.</p>
+<p>Answer these without running anything:</p>
+<ol type="1">
+<li>What is this project about, and how quickly could you tell?</li>
+<li>Where is the instruction telling you what to run, and in what order?</li>
+<li>Which folder holds data you could not regenerate?</li>
+<li>Pick one number in the writing. Trace it back to the code that produced it and the data that fed it.</li>
+<li>What would you need from the author that the repository does not give you?</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You completed step 4. If you cannot trace one number back to its source, either the project is not reproducible or you have not finished reading it.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="What to look for">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What to look for
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Step 4 is the whole exercise. Everything else is orientation.</p>
+<p>Tracing a number backwards is the only test that actually distinguishes a project that <em>looks</em> organized from one that is reproducible. A tidy folder tree proves nothing; a number you can follow from the manuscript, to the script that computed it, to the dataset it came from, proves everything.</p>
+<p>You may also notice <code>renv.lock</code> in the repository. That records the exact version of every package used, so a future R can reinstall the same versions. It is the answer to the failure mode none of the folder structure addresses: your code is fine, your data is fine, and a package changed under you.</p>
+<p>Step 5 is worth being honest about. Almost every real project has a gap: an API key, a licensed dataset, a manual step someone did in Excel once. The point is not that gaps are shameful, it is that they should be <strong>written down</strong> rather than discovered.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-only-test-that-counts" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> The only test that counts</h1>
+<p><strong>Task.</strong> Take a project you have actually done — an assignment from this course will do — and reorganize it into this structure. Then:</p>
+<ol type="1">
+<li>Rename every file so the run order is obvious.</li>
+<li>Make <code>Data/Raw</code> read-only and write its <code>metadata.md</code>.</li>
+<li>Write the root <code>readme.md</code>.</li>
+<li>Delete everything in <code>Data/Processed</code>, <code>Results</code>, and every rendered output.</li>
+<li>Restart R, and rebuild the whole project from raw data by following your own readme.</li>
+<li>Swap projects with a classmate and reproduce each other’s.</li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled" title="It worked if">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+It worked if
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Step 5 rebuilds everything with no manual intervention and no errors, and your classmate gets your numbers in step 6 without messaging you once.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="What usually breaks at step 5">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What usually breaks at step 5
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In rough order of frequency:</p>
+<ul>
+<li>an absolute path (<code>/Users/yourname/...</code>) that exists on one machine</li>
+<li>a script that depends on an object another script left in the Environment, rather than reading it from <code>Data/Processed</code></li>
+<li><code>library()</code> calls for packages that are not installed on a clean machine</li>
+<li>a step that was done by hand once and never written down</li>
+<li>a file in <code>Results/</code> that no script produces, because you made it interactively and forgot</li>
+</ul>
+<p>Every one of these is invisible until you delete the outputs and try again. That is why step 4 is in the list, and why “it runs on my machine” is not evidence of anything.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Made with Quarto</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,962 @@
+---
+title: "04-1: Data Visualization with `ggplot2`: Basics"
+abstract: "Chapter 4: Data Visualization"
+format:
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 70%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two navigation tricks before we start, because this is a long deck. The three stacked lines in the bottom-left corner open a table of contents so you can jump to a section. And the letter o gives you a panel view of every slide at once, which is the quickest way to find something you half remember. Worth knowing now rather than in week ten.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These notes run R in your browser, so you can experiment without touching your own installation. The box with the faintly blue background is a live code area. Run Code executes everything in it, or you can highlight part and use command-enter on a Mac, control-enter on Windows. The two-sheets icon in the top-right copies the code so you can paste it into your own session, and the reload button next to it restores the original when you have experimented your way into a mess. Please do experiment; changing a number and rerunning is the fastest way to learn what an argument does.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Preparation
+
+::: {.panel-tabset}
+
+### `ggplot2` package
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The package we are using is ggplot2, and you may well already have it. If you have installed tidyverse then ggplot2 came with it, and loading tidyverse loads it automatically. If you would rather load just the one package, library of ggplot2 does that. Either is fine. The gg in the name stands for grammar of graphics, which is not just branding: the package is built on the idea that plots have a grammar, with parts that combine according to rules, and once you see that structure the whole thing gets much easier to learn.
+
+</details>
+
+Install the package if you have not.
+
+```{r}
+#| label: ggplot2-install
+#| eval: false
+install.packages("ggplot2")
+```
+<!-- CHANGED: chunk headers were `{r ggplot2-install}` and
+     `{r tidyverse, message = FALSE}`, the old R Markdown style. Lecture 02-1
+     teaches the `#|` form for both labels and options, so the slides now use
+     what they teach. -->
+
+<br>
+
+Or, when you load the `tidyverse` package, it automatically loads it.
+
+```{r}
+#| label: load-tidyverse
+#| message: false
+#--- load ggplot2 along with others in the tidyverse package ---#
+library(tidyverse)
+
+#--- or ---#
+library(ggplot2)
+```
+
+### Dataset
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The data for this lecture is county_yield, which records corn and soybean yields by county across several years, together with drought measures. The three tabs inside cover the dataset itself, what the variables mean, and a derived version. Spend a moment on the variable definitions in particular, because the drought variables have opaque names: d3_5_9 means the fraction of weeks at drought severity three between May and September. Once you know that, the plots we build will actually mean something rather than being shapes on a screen.
+
+</details>
+
+```{webr-r}
+#| context: setup
+
+#--- r.workshop.datasets carries county_yield with no geometry column and ---#
+#--- no dependencies, so one repo is enough. Its spatial sibling imports  ---#
+#--- sf, which drags in eleven more packages before any cell can run.     ---#
+webr::install(
+  "r.workshop.datasets",
+  repos = "https://tmieno2.github.io/rwasm-package/repo"
+)
+
+data(county_yield, package = "r.workshop.datasets")
+```
+
+::: {.panel-tabset}
+
+#### Data
+
+We use `county_yield`, which records corn and soybean yield data by county over multiple years.
+
+```{webr-r}
+#| autorun: true
+county_yield
+```
+
+
+
+#### Variable Definitions
+
++ `soy_yield`: soybean yield (bu/acre)
++ `corn_yield`: corn yield (bu/acre)
++ `d0_5_9`: ratio of weeks under drought severity of 0 from May to September
++ `d1_5_9`: ~ drought severity of 1 from May to September   
++ `d2_5_9`: ~ drought severity of 2 from May to September   
++ `d3_5_9`: ~ drought severity of 3 from May to September   
++ `d4_5_9`: ~ drought severity of 4 from May to September
+
+#### Derived data
+
+We also use the derivative of `county_yield`, which records average corn yield by year.
+
+```{webr-r}
+#| autorun: true
+( 
+mean_yield <-
+  county_yield %>%
+  group_by(year) %>%
+  summarize(
+    corn_yield = mean(corn_yield, na.rm = TRUE)
+  ) %>%
+  filter(!is.na(year))
+)
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel--> 
+
+
+
+# `ggplot2` basics
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## `ggplot2` basics
+
+::: {.panel-tabset}
+
+### Step 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us build a plot one piece at a time, because the structure is the thing worth learning. Step one is always the same: call ggplot and tell it which dataset you are working with. That is it. Now run g_fig and look at what you get: a completely blank panel. That is not a mistake, and it is worth sitting with for a second. You have told R what data to use, but nothing at all about what to do with it, so a blank canvas is the honest response. Every ggplot you ever write starts here.
+
+</details>
+
+The very first job you need to do in creating a figure using the `ggplot2` package is to let R know the dataset you are trying to visualize, which can be done using `ggplot()` like below:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+g_fig <- ggplot(data = county_yield)
+```
+
+<br>
+
+When you create a figure using the `ggplot2` package, `ggplot()` is always the function you call first.
+
+Let's now see what is inside `g_fig`:
+
+<br>
+
+::: {.side-out}
+
+```{webr-r}
+g_fig
+```
+
+:::
+
+<br>
+
+Well, it's blank. Obviously, `g_fig` still does not have enough information to create any kind of figures. You have not told R anything specific about how you would like to use the information in the dataset.
+
+### Step 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step two is telling it what kind of figure you want, which you do with one of the geom functions. Here we use geom_point, which means a scatter plot. But a scatter plot needs to know what goes on each axis, and that is what the aes part supplies: x is the drought variable and y is corn yield. Notice the plus sign. You build a ggplot by adding layers together, and that plus is the grammar in action. Run it now and you have an actual figure, from two lines of code.
+
+</details>
+
+The next thing you need to do is tell `g_fig` what type of figure you want by `geom_*()` functions. For example, we use `geom_point()` to create a scatter plot. To create a scatter plot, R needs to know which variables should be on the y-axis and x-axis. This information can be passed to `g_fig` by the following code:
+
+<br>
+
+```{webr-r}
+#| autorun: true
+g_fig_scatter <- g_fig + geom_point(aes(x = d3_5_9, y = corn_yield))
+```
+
+<br>
+
+Here, 
+
++ `geom_point()` was added to `g_fig` to declare that you want a scatter plot 
++ `aes(x = d3_5_9, y = corn_yield)` inside `geom_point()` tells R that you want to create a scatter plot where you have `d3_5_9` on the x-axis and `corn_yield` on the y-axis
+
+This is what `g_fig_scatter` looks like:
+
+::: {.side-out}
+
+```{webr-r}
+g_fig_scatter
+```
+
+:::
+
+### `aes()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The aes function deserves its own tabs because it is the piece people misunderstand for longest. The short version is in the callout: aes is how you make some visual property of the plot a function of a variable in your data. The word is short for aesthetic. So writing x equals the drought variable inside aes does not mean use this value, it means look up this column in the dataset and map it onto the x axis. The second tab shows what happens when you get this wrong, and it is worth actually running so you recognize the error later.
+
+</details>
+
+::: {.panel-tabset}
+
+#### What does it do?
+
+Going back to the code,
+
+<br>
+
+```{webr-r}
+g_fig_scatter <- g_fig + geom_point(aes(x = d3_5_9, y = corn_yield))
+```
+
+<br>
+
+Note that `x = d3_5_9`, `y = corn_yield` are inside `aes()`. 
+
+<br>
+
+:::{.callout-important}
+`aes()` is used to make the <span style='color:red'>aes</span>thetic of the figure to be a function of variables in the dataset that you told `ggplot` to use (here, `county_yield`).
+:::
+
+<br>
+
+`aes(x = d3_5_9, y = corn_yield)` is telling `ggplot` to use `d3_5_9` and `corn_yield` variables in the `county_yield` dataset for the x-axis and y-axis, respectively. 
+
+#### If not in aes()?
+
+If you do not have `x = d3_5_9`, `y = corn_yield` inside `aes()`, R is going to look for `d3_5_9` and `corn_yield` themselves (but not in `county_yield`), which you have not defined.
+
+Try:
+
+::: {.side-out}
+
+```{webr-r}
+g_fig + geom_point(x = d3_5_9, y = corn_yield)
+```
+
+:::
+:::
+<!--end of panel-->
+
+
+### Summary
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us consolidate, because these four lines are the whole framework and everything else in this chapter is decoration. Call ggplot with your dataset to start. Add a geom to say what kind of figure you want. Use aes to say which variables to use and what role each plays. And put that aes inside the geom. If you can hold onto those four steps, you can read almost any ggplot code you encounter, including code far more elaborate than anything we write today.
+
+</details>
+
++ `ggplot(data = dataset)` to initiate the process of creating a figure
+
++ add `geom_*()` to declare what kind of figure you would like to make 
+
++ specify what variables in the dataset to use and how they are used inside `aes()` 
+
++ place the `aes()` you defined above in the `geom_*()` you specified above
+
+:::
+<!--end of panel-->
+
+# Different types of figures
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Different types of figures
+
+::: {.panel-tabset}
+
+### Figure types
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the range of figures available, which is simply a matter of which geom you add. Histograms and density plots for the distribution of one variable, lines for something over time, boxplots for comparing distributions across groups, bars for magnitudes. The sentence at the bottom is the one to remember as we go through these: how you specify the aesthetics varies by geom. Some need both x and y, some need only x, and getting that wrong is the most common error in this section. So watch what each one asks for.
+
+</details>
+
+<br>
+
+`ggplot2` lets you create lots of different kinds of figures via various `geom_*()` functions.
+
++ `geom_histogram()`/`geom_density()`
++ `geom_line()`
++ `geom_boxplot()`
++ `geom_bar()`
+
+How to specify aesthetics varies by `geom_*()`.
+
+### Histogram
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The histogram is our first example of a geom that needs only x, as the callout points out, and the reason is worth understanding rather than memorizing. You give it one variable, and it works out the y axis itself by counting how many observations fall into each bin. So there is no y to supply; it is computed. This is the first hint of something important, that some geoms transform your data before drawing it rather than plotting it directly.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+g_fig +
+  geom_histogram(aes(x = corn_yield))
+```
+
+:::
+
+:::{.callout-note}
+`geom_histogram()` only needs `x`.
+:::
+
+### Density Plot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A density plot answers the same question as a histogram, what does the distribution look like, but draws a smooth curve instead of bars. Like the histogram it needs only x, and for the same reason: the height is computed for you. Which should you use? A histogram is more honest, because you can see the actual binning, and a density plot is easier to read when you are overlaying several groups. Both are reasonable; be aware that the smoothness of a density plot is a choice made by an algorithm, not a property of your data.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+g_fig +
+  geom_density(aes(x = corn_yield))
+```
+
+:::
+
+:::{.callout-note}
+`geom_density()` only needs `x`.
+:::
+
+### Line plot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A line plot needs both x and y, as the callout notes, and notice something else about this example: it uses a different dataset. We switch to mean_yield, the derived data with one row per year. That is not incidental. A line implies a connection from one point to the next, so it only makes sense when there is exactly one y for each x. Trying to draw a line through the full county-level data, where each year has hundreds of values, would produce a mess. Match the geom to the shape of your data.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = mean_yield) +
+  geom_line(aes(x = year, y = corn_yield))
+```
+
+:::
+
+:::{.callout-note}
+`geom_line()` needs `x` and `y`.
+:::
+
+### Boxplot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Boxplots need x and y, but look closely at the code because there is a wrinkle: the x variable is wrapped in factor. The callout asks why, so let me answer it. Year is stored as a number, and if you hand ggplot a number it treats the axis as continuous and tries to draw one enormous box across the whole range. Wrapping it in factor says treat these as distinct categories, and then you get one box per year, which is what you wanted. That trick of converting a number to a factor for grouping comes up constantly.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = county_yield) +
+  geom_boxplot(
+    aes(x = factor(year), y = corn_yield)
+  )
+```
+
+:::
+
+:::{.callout-note}
++ `geom_boxplot()` needs `x` and `y`.
++ Why `factor(year)`?
+:::
+
+
+### Bar plot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Bar plots need x and y, and here is another wrinkle worth pointing at: the stat equals identity argument sitting outside the aes. By default geom_bar wants one variable and counts how many times each value occurs, like a histogram for categories. But here we already have the numbers we want to display, the mean yields, so we do not want it counting anything. stat identity tells it to use the y values as they are. If you get a bar chart that stubbornly shows counts instead of your values, this is the argument you forgot.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+#| message: false
+#| warning: false
+ggplot(data = mean_yield) +
+  geom_bar(
+    aes(
+      x = year,
+      y = corn_yield
+    ),
+    stat = "identity"
+  )
+```
+
+:::
+
+:::{.callout-note}
+`geom_bar()` needs `x` and `y`
+:::
+
+
+:::
+<!--end of panel-->
+
+
+## Modifying how figures look
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far has been black and white. Now we make things look the way we want, by giving options inside the geom. The list on the slide is the vocabulary: fill and color, size for points and text, linewidth for lines and borders, shape, and linetype. Two warnings underneath which are worth taking seriously. Which options apply depends on the geom, so not everything works everywhere. And the same name can mean different things depending on the geom, which is why the next few tabs go through them one type at a time.
+
+</details>
+
+All the elements in the figures we have created so far are in black and white.
+
+You can change how figure elements look by providing options inside `geom_*()`.
+
+Here is the list of options to control the aesthetics of figures:
+
++ `fill`
++ `color`
++ `size` (for points and text)
++ `linewidth` (for lines and the borders of bars, boxes, etc.)
++ `shape`
++ `linetype`
+
+Elements of figures that you can modify differ by `geom` types
+
+The same element name can mean different things based on `geom` types
+
+:::{.callout-important title="What happens if an option does not apply"}
+`ggplot2` does not stop. It draws the figure and prints a warning:
+
+```
+Warning: Ignoring unknown parameters: `shape`
+```
+
+You will see exactly that on the **histogram** and **line plot** tabs below, where `shape` and `fill` are set on geoms that have no use for them. If an option seems to do nothing, look in the console for this warning before assuming you typed it wrong.
+:::
+
+<!-- ADDED: the histogram tab sets shape and the line plot tab sets fill, on
+     geoms that ignore both, and each emits "Ignoring unknown parameters".
+     Verified against ggplot2 4.0.1. The examples are worth keeping, since they
+     make the "options differ by geom" point concrete, but the warning was
+     unexplained and read as something the student had broken.
+     Note that shape on geom_boxplot is NOT in this category: GeomBoxplot does
+     use shape, for the outlier points, and that tab warns about nothing. -->
+
+
+### scatter plot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For a scatter plot, the three that matter are color, size, and shape. Notice where they sit: outside the aes, but inside geom_point. That placement is the whole lesson of this section, so let me be explicit. Inside aes means make this depend on a variable in the data. Outside aes means set it to this fixed value for everything. Here we want every point red, not red according to some column, so color goes outside. Getting this backwards is the single most common ggplot mistake, and we return to it properly in the next lecture.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+g_fig +
+  geom_point(
+    aes(x = d3_5_9, y = corn_yield),
+    color = "red",
+    size = 0.7,
+    shape = 0
+  )
+```
+
+:::
+
+### histogram
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For a histogram, notice that there are two separate colour options and they do different things. fill is the inside of the bars, and color is their outline. That distinction runs through every geom that draws a shape with an interior: bars, boxes, ribbons, polygons. For points and lines, which have no interior, color is the only one that does anything. Also notice shape in this example, which does nothing at all here, because a bar has no shape to set. Run it and you will get the warning the introduction told you about, saying shape is being ignored. That is the point about options differing by geom, made concrete.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+g_fig +
+  geom_histogram(
+    aes(x = corn_yield),
+    color = "blue",
+    fill = "green",
+    linewidth = 2,
+    shape = 2
+  )
+```
+
+:::
+
+### boxplot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The boxplot example shows the same fill and color pair, with fill filling the boxes and color drawing their outlines and whiskers. linewidth controls the thickness of those lines. Try changing the numbers and rerunning; with a boxplot in particular, a thinner line and a pale fill usually reads better than the defaults, because the eye should be drawn to the position of the boxes rather than to their borders.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = county_yield) + 
+  geom_boxplot(
+    aes(x = factor(year), y = corn_yield),
+    color = "red",
+    fill = "orange",
+    linewidth = 0.2,
+    shape = 1
+  )
+```
+
+:::
+
+### line plot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For a line plot, colour and linewidth do the obvious things, and linetype gives you dotted, dashed, and so on, which is genuinely useful when a figure has to survive being printed in black and white. Notice fill is set here too and has no effect, because a line has no interior to fill. Watch what happens when you run it: ggplot does not stop, but it does warn you, saying it is ignoring an unknown parameter. That is worth recognizing, because it is the message you get whenever you hand a geom an option it has no use for. If an option seems to do nothing, look for that warning.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| autorun: true
+ggplot(data = mean_yield) +
+  geom_line(
+    aes(x = year, y = corn_yield),
+    color = "blue",
+    linewidth = 1.5,
+    fill = "red",
+    linetype = "dotted"
+  )
+```
+
+:::
+
+:::
+<!--end of panel-->
+
+## Exercises
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Time to write some of your own. These exercises use the diamonds dataset, which comes with ggplot2, and the setup code filters it down to premium-cut stones in three colours so the plots are not overwhelming. Run the setup first and look at what you have. Then the two exercises each show you a target figure, and your job is to reproduce it. Working backwards from a picture to the code is a genuinely good way to learn this package, because it forces you to notice details you would otherwise skim.
+
+</details>
+
+This exercise uses the `diamonds` dataset from the `ggplot2` package. First, load the dataset and extract observations with `Premium` cut whose color is one of `E`, `I`, and `F`:
+
+```{webr-r}
+#| autorun: true
+data("diamonds")
+premium <-
+  diamonds %>%
+  dplyr::filter(cut == "Premium" & color %in% c("E", "I", "F"))
+
+#--- take a look ---#
+premium
+```
+
+### Exercise 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first exercise is a scatter plot of price against carat, with red points. Everything you need is on the earlier slides. Think through the four steps: ggplot with the data, add geom_point, put carat and price inside aes, and put the colour outside aes since every point should be red. That last decision is the one to be deliberate about. There is a folded answer, but try it before you open it.
+
+</details>
+
+Using `carat` and `price` variables from `premium`, generate the figure below:
+
+::: {.side-out}
+
+```{webr-r}
+#| context: output
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price), color = "red")
+```
+
+:::
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+
+```
+
+### Answer
+```{r}
+#| code-fold: true
+#| eval: false
+ggplot(data = premium) +
+  geom_point(aes(x = carat, y = price), color = "red")
+```
+
+:::
+
+### Exercise 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second exercise is a histogram of price, and look carefully at the target figure: the bars are white inside with a blue outline. That means both fill and color, and it means getting them the right way round, which is exactly the distinction we drew a few tabs ago. If your bars come out solid blue, you have swapped them. Again, both go outside aes, because they are fixed values rather than functions of a variable.
+
+</details>
+
+Using the `price` variable from `premium`, generate a histogram of `price` shown below:
+
+```{webr-r}
+#| context: output
+ggplot(data = premium) +
+  geom_histogram(aes(x = price), fill = "white", color = "blue")
+```
+
+::: {.panel-tabset}
+### Work here
+```{webr-r}
+
+```
+
+### Answer
+```{r}
+#| code-fold: true
+#| eval: false
+ggplot(data = premium) +
+  geom_histogram(aes(x = price), fill = "white", color = "blue")
+```
+
+:::
+
+
+:::
+<!--end of panel-->
+
+# Other supplementary `geom_*()`s
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Other supplementary `geom_*()`s
+
+::: {.panel-tabset}
+
+### geom_*()
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This last section covers geoms that add something to an existing plot rather than being the plot themselves. Reference lines, vertical, horizontal, or at an arbitrary slope. A smoothed trend line through your points. A shaded region. And two ways of putting text on a figure. These are the things that turn a plot into an argument, because they let you mark the threshold you care about or highlight the pattern you are claiming. We build them all on top of the scatter plot we made earlier, which shows how layering works in practice.
+
+</details>
+
+Here is a list of useful `geom_*()` functions.
+
++ `geom_vline()`: draw a vertical line
++ `geom_hline()`: draw a horizontal line
++ `geom_abline()`: draw a line with the specified intercept and slope
++ `geom_smooth()`: draw an OLS-estimated regression line (other regression methods available)
++ `geom_ribbon()`: create a shaded area
++ `geom_text()` and `annotate()`: add texts in the figure
+
+We will use `g_fig_scatter` to illustrate how these functions work.
+
+### vline and hline
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Vertical and horizontal reference lines, and their arguments are refreshingly simple: xintercept says where to put a vertical line, yintercept where to put a horizontal one. Notice that neither needs an aes, because you are giving a fixed position rather than mapping a variable. These are more useful than they look. A horizontal line at a policy threshold, or at the historical average, gives your reader something to measure against, and that is often what makes a figure persuasive rather than merely informative.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_vline(
+    xintercept = 10,
+    color = "blue"
+  ) +
+  geom_hline(
+    yintercept = 100,
+    color = "red"
+  )
+```
+
+:::
+
+:::{.callout-note}
++ `xintercept` in `geom_vline`: where the vertical line is placed
++ `yintercept` in `geom_hline`: where the horizontal line is placed
+:::
+
+
+
+### abline
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+geom_abline draws a line from an intercept and a slope, following the equation in the callout: y equals a plus b times x. So intercept is a and slope is b. The most common use is drawing a forty-five degree reference line, with intercept zero and slope one, when you are comparing predicted against actual values and want to show where perfect prediction would lie. Note again there is no aes here; you are specifying the line directly rather than deriving it from data.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_abline(
+    #--- a ---#
+    intercept = 50, 
+    #--- b ---#
+    slope = 4,
+    color = "blue"
+  ) 
+```
+
+:::
+
+:::{.callout-note}
+$$y = a + b\times x$$
+
++ `intercept`: $a$
++ `slope`: $b$
+:::
+
+### smooth
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+geom_smooth is different from the others in this section, because it does compute something from your data. It fits a smooth curve through the points and draws it, with a shaded confidence band around it. By default it chooses the smoothing method for you based on how many observations you have. The callout suggests trying method equals lm, and you should, because that gives you the ordinary least squares straight line instead of a wiggly curve. Which you want depends on whether you are claiming a linear relationship or just showing the shape of the data.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_smooth(
+    aes(
+      y = corn_yield, 
+      x = d3_5_9
+    )
+  )
+```
+
+:::
+
+:::{.callout-note}
+Also try adding `method = "lm"`.
+:::
+
+### ribbon
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+geom_ribbon shades the area between an upper and a lower bound, so it needs ymin and ymax rather than a single y. Here we use fixed numbers to keep it simple, and alpha set to zero point three makes it partly transparent so the points still show through. The callout points at the real use: confidence intervals. When you have a fitted line and a band of uncertainty around it, a ribbon is how you draw the band, and drawing that uncertainty rather than hiding it is good practice.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_ribbon(
+    aes(
+      x = d3_5_9, 
+      ymin = 100,
+      ymax = 200
+    ),
+    fill = "green",
+    alpha = 0.3
+  )
+```
+
+:::
+
+:::{.callout-note}
+
++ `ymin`: lower bound of the ribbon
++ `ymax`: upper bound of the ribbon
+
+It is useful when drawing confidence intervals.
+:::
+
+
+### text
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+geom_text puts text on the plot at positions taken from your data. It needs x and y for the position, exactly like a point, plus label saying which column supplies the text. So here every point becomes its state name. Notice that all three are inside aes, because all three come from the data. This is excellent for labelling a handful of notable observations and terrible for labelling hundreds, as this example rather demonstrates: with this many points the labels collide into an unreadable smear.
+
+</details>
+
+::: {.side-out}
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  geom_text(
+    aes(
+      x = d3_5_9,
+      y = corn_yield,
+      label = state_name
+    )
+  )
+```
+
+:::
+
+:::{.callout-note}
++ `x`, `y`: position of where texts are placed
++ `label`: variable to print
+:::
+
+
+
+### annotate
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+annotate is the counterpart to geom_text for when the text does not come from your data. You give it the type of annotation, a fixed x and y position, and the literal text you want, and it draws that one thing. This is what you use for a caption inside the plot area, or to point out the one feature you want your reader to notice. Note the backslash n inside the label, which breaks the text onto a second line. Use annotate rather than geom_text whenever you are adding a single fixed piece of text, because geom_text would draw it once for every row in your data.
+
+</details>
+
+```{webr-r}
+#| out-width: 100%
+g_fig_scatter +
+  annotate(
+    'text',
+    x = 10,
+    y = 50,
+    label = 'Drought hurts \n a lot!!',
+    size = 3,
+    color = "red"
+  )
+```
+
+
+:::{.callout-note}
++ `x`: where on x-axis
++ `y`: where on y-axis
++ `label`: text to print (`\n` breaks the line)
++ `size`: font size
+:::
+
+:::
+<!--end of panel-->

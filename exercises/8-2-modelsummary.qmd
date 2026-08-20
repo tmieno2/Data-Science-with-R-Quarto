@@ -1,0 +1,406 @@
+---
+title: "Ex-8-2: Regression and Summary Tables with `modelsummary`"
+abstract: "Tables"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+These run in RStudio rather than in your browser, because the point of the
+chapter is producing tables that end up in a paper, and that means writing Word
+files and images to disk.
+
+The deliverable is not a table printed in your console. It is a table that lands
+in a document, numbered, captioned, and cross-referenced. Several exercises end
+by putting the table into a qmd, which is where the work from
+[Ex-2-3](2-3-quarto-article.qmd) comes back.
+
+# Setup {#sec-setup}
+
+```{r}
+#| eval: false
+install.packages(
+  "r.spatial.workshop.datasets",
+  repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org")
+)
+
+install.packages(c("modelsummary", "fixest", "flextable", "gt", "sandwich"))
+```
+
+Work in a project with the folder structure from
+[Ex-6-1](6-1-project-organization.qmd) if you have one. Tables belong in
+`Results/`.
+
+```{r}
+#| eval: false
+library(tidyverse)
+library(modelsummary)
+library(fixest)
+library(here)
+
+data(county_yield, package = "r.spatial.workshop.datasets")
+
+#--- the data is spatial; we do not need the polygons here ---#
+cy <- dplyr::select(county_yield, -geometry)
+
+cy
+```
+
+The data is county-level corn and soybean yields for Kansas, Nebraska, and
+Colorado, 2000 to 2018, with drought indicators.
+
++ `corn_yield`, `soy_yield`: yield in bu/acre
++ `d0_5_9` through `d4_5_9`: share of weeks May-September at each drought
+  severity, 0 mildest through 4 most severe
+
+::: {.callout-important title="It worked if"}
+`dim(cy)` is 1956 by 10, and `unique(cy$state_name)` gives three states.
+:::
+
+# Three models, one table
+
+**Task.**
+
+1. Estimate corn yield on `d1_5_9` and `d2_5_9` three ways: pooled, with county
+   fixed effects, and with county and year fixed effects.
+2. Put all three in one table.
+3. Read across the row for `d1_5_9` and say what happens to it.
+
+::: {.callout-important title="It worked if"}
+Your table has three columns, all with 1,956 observations, and R² rising from
+about 0.05 to about 0.54.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+m1 <- feols(corn_yield ~ d1_5_9 + d2_5_9, data = cy)
+m2 <- feols(corn_yield ~ d1_5_9 + d2_5_9 | county_code, data = cy)
+m3 <- feols(corn_yield ~ d1_5_9 + d2_5_9 | county_code + year, data = cy)
+
+modelsummary(list(m1, m2, m3))
+```
+
+In `fixest`, everything after the `|` is a fixed effect, absorbed rather than
+reported. That is why the intercept disappears in columns 2 and 3.
+
+Reading across `d1_5_9`: about -0.22 pooled, -0.25 with county effects, then
+**+0.04** once year effects are added. The coefficient changes sign.
+
+That is what the table is for. Drought years are bad years everywhere, so
+without year effects the coefficient is partly picking up "this was a bad year
+nationally" rather than "this county was in drought". Adding year fixed effects
+removes the common shock, and the mild-drought effect essentially vanishes.
+`d2_5_9`, the more severe category, shrinks but stays negative.
+
+A regression table is not a formality. Putting the specifications side by side
+is what makes a result like this visible.
+:::
+
+# Make it fit for a paper
+
+The default table is for you. This one is for a referee.
+
+**Task.** Take the three models and:
+
+1. rename the coefficients to something a reader understands
+2. show only the number of observations and R², not the eight default statistics
+3. add significance stars
+4. give the columns meaningful headings instead of (1), (2), (3)
+5. add a title and a note explaining the fixed effects
+
+::: {.callout-important title="It worked if"}
+Nothing in the table is named after a variable in your data frame.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+modelsummary(
+  list(
+    "Pooled"        = m1,
+    "County FE"     = m2,
+    "County+Year FE" = m3
+  ),
+  coef_map = c(
+    "d1_5_9"      = "Moderate drought (share of weeks)",
+    "d2_5_9"      = "Severe drought (share of weeks)",
+    "(Intercept)" = "Constant"
+  ),
+  gof_map = c("nobs", "r.squared"),
+  stars   = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+  title   = "Drought exposure and county corn yields, 2000-2018.",
+  notes   = "Standard errors in parentheses. Drought shares measured May-September."
+)
+```
+
+`coef_map` does two jobs at once, and the second is easy to miss: it renames the
+coefficients **and** sets their order, and it **drops anything not listed**. That
+is the cleanest way to suppress a control you estimated but do not want in the
+table.
+
+`gof_map` does the same for the goodness-of-fit rows. The default prints
+everything the model object offers, most of which nobody wants.
+
+Naming the list elements is what names the columns.
+:::
+
+::: {.callout-tip collapse="true" title="Finding the names to use"}
+```{r}
+#| eval: false
+get_gof(m1)          # every available gof statistic and its name
+get_estimates(m1)    # every available coefficient and its name
+```
+
+Use these rather than guessing at what `gof_map` will accept.
+:::
+
+# Change the standard errors, not the model
+
+**Task.** Take `m3` and present it four times in one table, with: default
+standard errors, heteroskedasticity-robust, clustered by county, and clustered
+by county and year. Do it **without re-estimating the model**.
+
+Then say which you would report and why.
+
+::: {.callout-important title="It worked if"}
+The coefficients are identical across all four columns and only the parentheses
+change.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+modelsummary(
+  list(m3, m3, m3, m3),
+  vcov = list(
+    "IID"            = "iid",
+    "Robust"         = "hetero",
+    "Cluster: county" = ~county_code,
+    "Two-way"        = ~county_code + year
+  ),
+  coef_map = c("d1_5_9" = "Moderate drought", "d2_5_9" = "Severe drought"),
+  gof_map  = c("nobs", "r.squared")
+)
+```
+
+The `vcov` argument recomputes the variance-covariance matrix after the fact.
+The point estimates cannot change, because the estimator has not changed, only
+the uncertainty around it.
+
+This is the right way to present a robustness check on inference, and it is
+much better than estimating the same model four times: it makes it obvious that
+the specification is fixed and only the standard errors move.
+
+Which to report: with repeated observations on the same counties over time,
+errors are almost certainly correlated within county, so clustering by county is
+the honest default. Standard errors typically get **larger**, and a result that
+survives clustering is worth more than one that does not.
+:::
+
+# Get it out of R
+
+**Task.** Save your paper-ready table as:
+
+1. a Word document
+2. a png image
+3. an object you can edit further with `flextable`
+
+Put all of them in `Results/`.
+
+::: {.callout-important title="It worked if"}
+You can open the Word file and edit the table as a table, not as a picture.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+tbl <- modelsummary(
+  list("Pooled" = m1, "County FE" = m2, "County+Year FE" = m3),
+  coef_map = c("d1_5_9" = "Moderate drought", "d2_5_9" = "Severe drought"),
+  gof_map  = c("nobs", "r.squared"),
+  output   = here("Results", "tbl-drought-yield.docx")
+)
+
+modelsummary(..., output = here("Results", "tbl-drought-yield.png"))
+
+#--- keep it as an object to modify ---#
+ft <- modelsummary(list(m1, m2, m3), output = "flextable")
+
+ft %>%
+  flextable::bold(i = 1, part = "header") %>%
+  flextable::autofit()
+```
+
+`output =` decides everything. A file path writes a file; `"flextable"` or
+`"gt"` returns an object you can keep styling; `"markdown"` gives you plain text
+useful for pasting into an email.
+
+Word output is worth the trouble because coauthors and journals ask for it, and
+because a real Word table can be edited by someone who does not use R. A png of
+a table cannot, and it also looks wrong next to the document's own fonts.
+
+Use png only when the destination cannot accept anything better, which in
+practice means slides.
+:::
+
+# Summary statistics without writing any code twice
+
+**Task.**
+
+1. Produce a quick summary of every numeric variable.
+2. Then produce a controlled version: yields and the two drought measures only,
+   with mean, standard deviation, minimum, and maximum, with readable row names.
+
+::: {.callout-important title="It worked if"}
+The second table has exactly four rows and four statistic columns.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+#--- 1: the quick look ---#
+datasummary_skim(cy)
+
+#--- 2: the controlled version ---#
+datasummary(
+  (`Corn yield (bu/ac)` = corn_yield) +
+  (`Soy yield (bu/ac)`  = soy_yield) +
+  (`Moderate drought`   = d1_5_9) +
+  (`Severe drought`     = d2_5_9) ~
+  Mean + SD + Min + Max,
+  data = cy,
+  title = "Summary statistics, 2000-2018."
+)
+```
+
+`datasummary()` uses a two-sided formula: **rows on the left, columns on the
+right**, joined by `~`. Once you see that, the syntax stops being mysterious.
+
+Renaming happens inline with `(\`Nice name\` = variable)`, which is convenient
+but does mean the backticks matter. A missing one produces a confusing error
+about an object not being found.
+
+`datasummary_skim()` is for you, during analysis. `datasummary()` is for the
+paper. Do not put a skim table in a manuscript: it reports things nobody asked
+for and omits the units.
+:::
+
+# Statistics by group
+
+**Task.** Extend the summary table so the statistics are shown separately for
+each state, with an "All" column alongside. Then add a count of observations per
+state.
+
+::: {.callout-important title="It worked if"}
+There are four column groups: three states and All.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+datasummary(
+  (`Corn yield` = corn_yield) +
+  (`Soy yield`  = soy_yield) +
+  (`Severe drought` = d2_5_9) ~
+  state_name * (Mean + SD) + (`All` = 1) * (Mean + SD),
+  data = cy,
+  title = "Summary statistics by state."
+)
+```
+
+The `*` is nesting: `state_name * (Mean + SD)` means "for each state, show mean
+and SD". Reading it aloud as "crossed with" makes the syntax behave.
+
+`(\`All\` = 1)` is the idiom for a total column. The `1` is a grouping variable
+that takes the same value for every row, so it produces one group containing
+everything.
+
+This is exactly the table most empirical papers open with, and building it by
+hand with `group_by()` and `pivot_wider()` is an afternoon's work that has to be
+redone every time a variable changes.
+:::
+
+# Two convenience tables
+
+**Task.**
+
+1. Produce a balance table comparing all variables across states.
+2. Produce a correlation matrix of the yield and drought variables.
+3. Say what you would check in each before putting it in a paper.
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+cy %>%
+  dplyr::select(corn_yield, soy_yield, d1_5_9, d2_5_9, state_name) %>%
+  datasummary_balance(~state_name, data = .)
+
+cy %>%
+  dplyr::select(corn_yield, soy_yield, d0_5_9, d1_5_9, d2_5_9, d3_5_9) %>%
+  datasummary_correlation()
+```
+
+What to check in the balance table: whether the groups differ on things they
+should not, and whether the counts per group are wildly unequal. It is designed
+for treatment-versus-control comparisons, so read the differences as
+descriptive here, not causal.
+
+What to check in the correlation matrix: the drought categories are shares of
+the same weeks, so they are mechanically related — more weeks at severity 2
+means fewer at severity 0. Strong negative correlations between adjacent
+categories are structural, not a finding, and putting all five in one regression
+is a collinearity problem rather than a specification.
+
+A correlation matrix is most useful for catching this **before** you estimate,
+which is why it is worth producing early even if it never reaches the paper.
+:::
+
+# Put it in a document
+
+**Task.** Write a short qmd in `Writing/` that:
+
+- reads the data and estimates the three models in a hidden chunk
+- prints the paper-ready regression table with a caption and a `tbl-` label
+- prints the summary statistics table, also labelled
+- refers to both from the prose by cross-reference
+- renders to both html and Word
+
+::: {.callout-important title="It worked if"}
+The rendered document says "Table 1" and "Table 2" in the prose, and no
+`?tbl-` appears anywhere.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: tbl-drought
+#| tbl-cap: "Drought exposure and county corn yields, 2000-2018."
+#| echo: false
+modelsummary(
+  list("Pooled" = m1, "County FE" = m2, "County+Year FE" = m3),
+  coef_map = c("d1_5_9" = "Moderate drought", "d2_5_9" = "Severe drought"),
+  gof_map  = c("nobs", "r.squared"),
+  stars    = TRUE,
+  output   = "flextable"
+)
+```
+
+Severe drought reduces yields substantially, though the effect
+falls once year fixed effects absorb common shocks (@tbl-drought).
+Summary statistics are in @tbl-summary.
+````
+
+Two practical points.
+
+Set `output = "flextable"` or `"gt"` when the table is going into a Quarto
+document. Leave `output` at its default and `modelsummary` picks a format based
+on the destination, which mostly works and occasionally produces something that
+looks wrong in Word.
+
+Do not pass a **file path** as `output` in a chunk you also want to display. That
+writes the file and returns nothing, so your document gets a caption with an
+empty space under it and no error to explain why.
+:::

@@ -1,0 +1,464 @@
+---
+title: "Ex-2-1: Quarto Basics"
+abstract: "Quarto"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+Quarto runs on your machine, not in your browser, so every exercise here is
+something you do in RStudio.
+
+Several of these ask you to **break something on purpose**. That is deliberate.
+Almost everything that goes wrong with Quarto announces itself through an error
+message, and the fastest way to learn those messages is to cause them
+deliberately while you are calm, rather than meet them for the first time at
+eleven o'clock the night before an assignment is due.
+
+# Setup {#sec-setup}
+
+1. You cloned <https://github.com/tmieno2/quarto-examples> in lecture 02-0.
+   Find that folder now and confirm these exist:
+   - `templates/sample_qmd.qmd`
+   - `templates/custom.scss`
+   - `templates/nebraska-n.jpg`
+2. Make a new folder `quarto-practice`, and in RStudio do
+   `File -> New Project -> Existing Directory` on it.
+3. Inside it, make a `data` folder and put a copy of `corn_yields.csv` in it.
+   That file is in the datasets repository from
+   [Ex-3-1](3-1-input-output.qmd).
+
+::: {.callout-important title="It worked if"}
+`here::here()` in the console prints the path to `quarto-practice`.
+:::
+
+::: {.callout-tip collapse="true" title="If you cannot find your clone"}
+Open Sublime Merge, open the repository, then `File -> Open Containing Folder`.
+If you deleted it, clone it again; it takes twenty seconds.
+:::
+
+# Your first render
+
+**Task.**
+
+1. `File -> New File -> Quarto Document`. Save it as `first.qmd` in
+   `quarto-practice`.
+2. Delete everything below the YAML header.
+3. Add a `##` heading, a sentence of ordinary text, and one R chunk that draws a
+   plot from a built-in dataset.
+4. Click **Render**.
+
+```{r}
+#| eval: false
+plot(mtcars$wt, mtcars$mpg)
+```
+
+::: {.callout-important title="It worked if"}
+A file called `first.html` appears **next to** `first.qmd` in the Files pane,
+and your figure is inside it.
+:::
+
+::: {.callout-note collapse="true" title="What just happened"}
+Render did three things, in this order:
+
+1. started a brand new R session and ran every chunk in order, top to bottom
+2. pasted each chunk's results underneath its code
+3. converted the whole thing, text and code and results, into html
+
+The `.qmd` is your source and the `.html` is the output. You edit the first and
+you hand in the second. They are two separate files and they always will be.
+
+This is also the answer to "why not just use Word?". In Word the numbers in your
+document are things you typed. Here they are things your document computed, and
+they cannot disagree with your data.
+:::
+
+# Make the output show what you want
+
+The default shows your code, your results, and every message the packages
+decide to emit. That is almost never what a reader wants.
+
+**Task.** Write a chunk that loads `tidyverse` and draws a plot, then produce
+each of these four outputs. Each needs a different chunk option, and you should
+find them before opening the answer.
+
+a. The figure appears; the code is hidden; no package startup noise.
+b. The code appears, nicely formatted, but does not run.
+c. The chunk runs, but nothing whatever appears in the html.
+d. Everything from (a), applied to every chunk in the document at once, without
+   editing them one by one.
+
+::: {.callout-important title="It worked if"}
+For (c) you can *prove* the chunk ran even though nothing appeared. Define an
+object inside it and use that object in a later, visible chunk.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````
+a.  #| echo: false
+    #| message: false
+    #| warning: false
+
+b.  #| eval: false
+
+c.  #| include: false
+
+d.  in the YAML header:
+
+    execute:
+      echo: false
+      message: false
+      warning: false
+````
+
+The distinction to hold on to:
+
+- `eval` controls whether the code **runs**
+- `echo` controls whether the code is **shown**
+- `include: false` hides everything, code and output both, while still running
+
+`include: false` is exactly what you want for the `library()` chunk at the top of
+a report. It has to run, and nobody wants to read it.
+
+For (d), note that a chunk-level option always beats the global one, so you can
+set a document-wide default and then override it for the two chunks where you
+actually do want to show the code.
+:::
+
+# Label your chunks
+
+**Task.**
+
+1. Give each chunk in `first.qmd` a label describing what it does.
+2. Label the plotting chunk `fig-mpg`, give it a `fig-cap`, and refer to it from
+   your text with `@fig-mpg`.
+3. Now break it: copy a labelled chunk and paste it lower down without changing
+   the label. Render, and read the error.
+4. Break it again: rename `fig-mpg` to `fig_mpg`, with an underscore. Render and
+   look carefully at the cross-reference in the output.
+
+::: {.callout-important title="It worked if"}
+Step 3 stops the render with a clear complaint. Step 4 does **not** stop the
+render, and instead prints `?fig_mpg` into your text.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: fig-mpg
+#| fig-cap: "Fuel economy falls with weight."
+#| echo: false
+plot(mtcars$wt, mtcars$mpg)
+```
+
+Heavier cars are less efficient (@fig-mpg).
+````
+
+Three things labels buy you: the error message names the chunk that failed
+rather than "chunk 7"; the cached results have somewhere to live; and figures
+and tables become cross-referenceable.
+
+Two rules:
+
+- **Labels must be unique.** A duplicate gives
+  `Duplicate chunk label 'fig-mpg'`, and the chunk it blames is the second one
+  even though the real cause is usually that you copy-pasted the first.
+- **Hyphens, never underscores.** `fig_mpg` is a perfectly legal label and the
+  chunk runs fine, but the cross-reference silently fails and prints
+  `?fig_mpg`. Nothing warns you. This is the single most common way a
+  cross-reference breaks.
+:::
+
+# The render does not know what your console knows
+
+**Task.** Break this one on purpose.
+
+1. In the **console**, and only the console, type `secret <- 42`.
+2. In `first.qmd`, add a chunk containing just `secret * 2`. Run it with the
+   green arrow. It works.
+3. Now click Render.
+
+::: {.callout-important title="It worked if"}
+The render fails with `object 'secret' not found`, even though the identical
+line worked when you clicked the green arrow thirty seconds earlier.
+:::
+
+::: {.callout-note collapse="true" title="Why, and what to do about it"}
+Rendering starts a **completely new R session**. Nothing in your Environment
+pane is available to it, not your data, not your packages, not the object you
+made an hour ago and forgot about.
+
+This is a feature rather than an annoyance. It is the guarantee that your
+document contains everything needed to reproduce itself, which is what makes it
+work on my computer as well as yours.
+
+The habit that follows: your qmd must create everything it uses. Load the
+packages, read the data, build the objects, all inside chunks in the document.
+
+The check, which takes ten seconds and should become automatic before you submit
+anything:
+
+```
+Session -> Restart R
+Run -> Run All
+```
+
+If that fails, your document depends on something invisible, and it will fail
+for me too.
+:::
+
+# Diagnose three failed renders
+
+Cause each of these, **read the message before fixing it**, and write down which
+chunk Quarto blamed.
+
+a. Misspell a function name, for instance `libary(tidyverse)`.
+b. Call a function from a package you have not installed, for instance
+   `gganimate::animate()`.
+c. Ask for a column that does not exist, for instance `corn$Yeild`.
+
+Then: make (a) render anyway, printing the error into the document instead of
+stopping.
+
+::: {.callout-note collapse="true" title="What each looks like, and the fix"}
+**a.** `could not find function "libary"`. Quarto names the chunk and the line.
+Fix the spelling. Remember that this exact message also appears when a package
+is not loaded, so "could not find function" always means one of three things:
+typo, not loaded, or not installed.
+
+**b.** `there is no package called 'gganimate'`. Install it. Note this is a
+*different* message from (a), and the difference is informative: it tells you
+the package is missing rather than merely unloaded.
+
+**c.** `object 'Yeild' not found`, wrapped in dplyr's `In argument:` framing if
+you were inside a verb. First check `names()` against what you typed, and watch
+capitalisation: `Yield` and `yield` are different columns.
+
+**Rendering anyway:**
+
+```
+#| error: true
+```
+
+The error is printed into the document and the render continues. These lecture
+notes use it deliberately, to show you what a failure looks like. Do not leave
+it switched on in an assignment: it lets broken code through silently, which is
+worse than failing.
+:::
+
+::: {.callout-tip collapse="true" title="Reading a Quarto error"}
+Work from the bottom up. The last few lines are usually R's actual complaint;
+everything above is Quarto and knitr explaining how they got there. The line
+beginning `Quitting from` names the chunk and line number, and is the fastest
+thing to look for.
+:::
+
+# Caching, and the trap that comes with it
+
+Once a chunk takes real time, you do not want to run it on every render.
+
+**Task.**
+
+1. Add a chunk that deliberately takes a few seconds:
+
+```{r}
+#| eval: false
+slow_result <- {Sys.sleep(5); mean(mtcars$mpg)}
+```
+
+2. Render, and notice how long it takes. Render again, and notice it is no
+   faster.
+3. Turn on caching for that chunk. Render twice more and compare.
+4. Now spring the trap. Put the data in an *earlier* chunk, have the cached
+   chunk use it, then change the earlier chunk. Render.
+5. Fix it two ways.
+
+::: {.callout-important title="It worked if"}
+At step 4 your document reports a number computed from data that no longer
+exists anywhere in the file.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+```{r}
+#| label: prep
+d <- mtcars[mtcars$cyl == 4, ]     # change 4 to 6 at step 4
+```
+
+```{r}
+#| label: slow-bit
+#| cache: true
+slow_result <- {Sys.sleep(5); mean(d$mpg)}
+```
+````
+
+The trap: `cache: true` reruns a chunk when **that chunk's own code** changes.
+Editing `prep` does not change `slow-bit`, so the cache is kept and your
+document silently reports last week's answer. Nothing warns you, and the number
+looks perfectly reasonable.
+
+Two fixes:
+
+```
+#| dependson: prep      # rerun me when prep changes
+```
+
+or delete the `_cache` folder next to your qmd, which throws everything away and
+starts clean. That folder is also the first thing to try when caching behaves
+inexplicably.
+
+The rule of thumb: cache chunks that are slow *and* self-contained. Do not
+cache a chunk that reads data, because the whole point of caching is to not
+notice the data changed.
+:::
+
+::: {.callout-tip collapse="true" title="freeze, for whole documents"}
+On a website, `freeze: auto` in `_quarto.yml` stops Quarto re-running a document
+at all unless its source has changed. That is the right tool for a site with
+thirty pages where only one has been edited. `cache` is per chunk; `freeze` is
+per document.
+:::
+
+# Paths, from inside a render
+
+You met this in [Ex-3-1](3-1-input-output.qmd). It is here again because it
+breaks Quarto documents specifically, and because seeing it twice is how it
+sticks.
+
+**Task.**
+
+1. Make a subfolder `analysis` and create `analysis/report.qmd` inside it.
+2. Add a chunk reading `read_csv("data/corn_yields.csv")`.
+3. Render. It fails.
+4. Read the error carefully. It tells you which folder R looked in.
+5. Fix it so the same line works whether you render from `analysis/` or paste it
+   into the console at the project root.
+
+::: {.callout-important title="It worked if"}
+`report.qmd` renders, and the exact same line also works pasted into the
+console, unchanged.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+read_csv(here::here("data", "corn_yields.csv"))
+```
+
+When Quarto renders `analysis/report.qmd`, the working directory becomes
+`analysis/`, so a relative path looks for `analysis/data/corn_yields.csv`.
+`here()` always builds from the project root, so it does not care where the
+rendering document lives.
+:::
+
+# Make an html you can actually submit
+
+This is the one that decides whether your assignment arrives readable.
+
+**Task.**
+
+1. Render a document containing a figure. Notice that a folder named
+   `something_files` appeared next to your html.
+2. Copy **only** the `.html` file to your Desktop. Not the folder. Open it.
+3. Observe what happened to your figure.
+4. Add `embed-resources: true` under `html:` in the YAML, render again, and
+   repeat step 2.
+
+::: {.callout-important title="It worked if"}
+The second copy shows the figure on the Desktop, with no folder next to it.
+:::
+
+::: {.callout-note collapse="true" title="Answer, and why this matters"}
+```yaml
+---
+title: "My report"
+format:
+  html:
+    embed-resources: true
+---
+```
+
+By default Quarto writes the html plus a `_files` folder holding every figure,
+and the html points at that folder. Separate the two and the figures vanish.
+
+When you email the html on its own, or upload just that file, you have separated
+them. Your document arrives with broken images and you have no way of knowing,
+because on your machine the folder is still sitting right there and everything
+looks perfect.
+
+`embed-resources: true` packs the figures, the styling, and everything else into
+the single html file. It gets bigger. Submit it anyway.
+:::
+
+::: {.callout-tip collapse="true" title="Check it properly"}
+Zip the single html file on its own and mail it to yourself, then open it from
+the download. That is the closest thing to what your grader will actually do,
+and it catches problems that dragging to the Desktop does not.
+:::
+
+# Numbers in your prose that update themselves
+
+**Task.**
+
+1. Give `first.qmd` a proper header: title, your name, today's date, a table of
+   contents, and section numbering.
+2. Read `corn_yields.csv` in a hidden chunk.
+3. Write a sentence in ordinary prose reporting the number of observations and
+   the mean yield, using inline R rather than typing the numbers.
+4. Now filter the data to irrigated observations only, re-render, and watch the
+   sentence change.
+
+::: {.callout-important title="It worked if"}
+You did not retype a single number in step 4.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+````{verbatim}
+---
+title: "Corn yields in Nebraska"
+author: "Your Name"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+    embed-resources: true
+---
+
+The dataset has `r nrow(corn)` observations, with a mean yield of
+`r round(mean(corn$Yield), 1)` bushels per acre.
+````
+
+Inline code is a single backtick, the letter `r`, a space, your expression, and
+a closing backtick. It runs in the same session as your chunks, so it can use
+any object they created.
+
+This one exercise is the whole argument for Quarto over Word. In Word that
+sentence is a number you typed once, and the moment the data changes it quietly
+becomes false. Here it cannot be wrong, because nobody typed it.
+
+Keep the expressions short. If a sentence needs three lines of computation,
+compute it in a hidden chunk and put the resulting object inline.
+:::
+
+# Put it together
+
+**Task.** Produce a short report on the corn yield data, from scratch, that:
+
+- has a title, your name, a date, a table of contents, and numbered sections
+- reads its data with `here()`
+- hides every `library()` call and all package messages
+- contains at least one labelled, captioned figure, cross-referenced from the
+  text
+- reports at least two numbers inline rather than typed
+- renders to a single self-contained html
+
+Then run the real test: `Session -> Restart R`, then Render, then copy only the
+html somewhere else and open it.
+
+::: {.callout-important title="It worked if"}
+It renders from a clean session, and the copy opens correctly somewhere else on
+your disk. That is the standard every assignment in this course has to meet.
+:::

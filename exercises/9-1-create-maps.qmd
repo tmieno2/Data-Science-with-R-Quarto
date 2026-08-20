@@ -1,0 +1,409 @@
+---
+title: "Ex-9-1: Creating Maps with `ggplot2`"
+abstract: "Spatial Data"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+webr:
+  packages: ['dplyr', 'ggplot2', 'sf', 'viridis', 'ggspatial', 'ggrepel']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 90%
+filters:
+  - webr
+---
+
+These run in your browser. The first cell installs the data package, which takes
+a little while on first load; wait for it to finish before running anything
+else.
+
+A map in `ggplot2` is an ordinary figure whose geometry happens to be spatial.
+Everything you know from Chapter 4 — layers, `aes()`, scales, facets, themes —
+works unchanged. The only genuinely new ideas are `geom_sf()`, which knows how
+to draw geometry, and coordinate reference systems, which are where the real
+difficulty lives.
+
+# Data
+
+```{webr-r}
+#| context: setup
+webr::install(
+  "r.spatial.workshop.datasets",
+  repos = c(
+    "https://tmieno2.github.io/rwasm-package/repo",
+    "https://repo.r-wasm.org"
+  )
+)
+
+library("r.spatial.workshop.datasets")
+
+data(wells_ne)
+data(ne_counties)
+data(railroads_ne)
+data(corn_acres_ne)
+```
+
+```{webr-r}
+#| autorun: true
+library(sf)
+library(dplyr)
+library(ggplot2)
+
+ne_counties      # 93 Nebraska counties (polygons)
+corn_acres_ne    # corn acreage by county and year (polygons)
+head(wells_ne)   # 1000 irrigation wells
+```
+
+# Not everything with coordinates is spatial
+
+**Task.**
+
+1. Check the class of `wells_ne` and of `ne_counties`. They are not the same.
+2. Try to plot `wells_ne` with `geom_sf()`. Read the error.
+3. Convert `wells_ne` into an `sf` object. The coordinates are in `longdd` and
+   `latdd`, and the CRS is EPSG 4269, the same as the counties.
+4. Confirm the conversion worked.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+class(wells_ne)     # "data.frame"   <- not spatial
+class(ne_counties)  # "sf" "data.frame"
+
+ggplot(wells_ne) + geom_sf()
+#> Error: stat_sf requires the following missing aesthetics: geometry
+
+wells_sf <-
+  st_as_sf(
+    wells_ne,
+    coords = c("longdd", "latdd"),   # longitude FIRST
+    crs    = 4269
+  )
+
+class(wells_sf)        # "sf" "data.frame"
+st_crs(wells_sf)       # NAD83
+ggplot(wells_sf) + geom_sf()
+```
+
+A data frame with a longitude column and a latitude column is not spatial. It is
+a table with two numbers in it, and R has no idea those numbers mean anything.
+`st_as_sf()` is what promotes it: it folds the two columns into a single
+`geometry` column and attaches a coordinate reference system.
+
+Two things that catch people:
+
+- **longitude comes first** in `coords`. Longitude is the x axis. Everyone says
+  "lat/long" out loud and then writes it in the wrong order, and the result is a
+  map of Nebraska somewhere off the coast of Somalia.
+- **the CRS is not optional.** Without `crs =` the numbers have no meaning, and
+  `sf` cannot combine your points with anything else later.
+:::
+
+# Your first map
+
+**Task.** Draw the counties of Nebraska. Then draw the wells on top of them.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+#--- counties alone ---#
+ggplot(ne_counties) +
+  geom_sf()
+
+#--- wells on top ---#
+ggplot() +
+  geom_sf(data = ne_counties, fill = "white", color = "grey60") +
+  geom_sf(data = wells_sf, color = "blue", size = 0.5, alpha = 0.4)
+```
+
+`geom_sf()` works out for itself whether it is drawing points, lines, or
+polygons, so the same function draws both layers.
+
+Note where `data =` goes. With two different datasets you cannot put one in
+`ggplot()` and expect the other layer to find it, so give each `geom_sf()` its
+own `data` argument and leave `ggplot()` empty. This is the global-versus-local
+data distinction from Chapter 4, and maps are where you need it constantly,
+because a map almost always combines several sources.
+
+`alpha` matters with a thousand overlapping points. At full opacity you see a
+blue smear; at 0.4 you see where the wells actually concentrate.
+:::
+
+# A choropleth
+
+**Task.** Map corn acreage by county for 2023 alone, with counties shaded by
+acreage. Use a viridis scale, and give the legend a readable title.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+corn_2023 <- dplyr::filter(corn_acres_ne, year == 2023)
+
+ggplot(corn_2023) +
+  geom_sf(aes(fill = acre), color = "white", linewidth = 0.1) +
+  scale_fill_viridis_c(option = "magma", labels = scales::comma) +
+  labs(fill = "Corn acres") +
+  theme_void()
+```
+
+The only change from an ordinary bar chart is that the thing being filled is a
+polygon. `aes(fill = acre)` inside `geom_sf()` is doing exactly what
+`aes(fill = ...)` does anywhere else.
+
+`scale_fill_viridis_c` with a `_c` because acreage is continuous. The `_d`
+version is for discrete categories and silently does nothing useful here.
+
+`theme_void()` removes the panel, grid, and axes. Latitude and longitude
+gridlines are rarely informative on a small-area map and mostly add clutter; the
+reader knows where Nebraska is.
+
+Notice that not every county appears — there are 69 counties in 2023, not 93.
+Counties with no reported acreage are simply absent, and they render as holes.
+Whether that is acceptable or misleading depends on whether "not reported" means
+"no corn", and it is worth stating in the caption either way.
+:::
+
+# Facet by year
+
+**Task.** Show all four years at once as a two-by-two grid of maps, sharing one
+colour scale.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(corn_acres_ne) +
+  geom_sf(aes(fill = acre), color = NA) +
+  facet_wrap(~year, nrow = 2) +
+  scale_fill_viridis_c(option = "magma", labels = scales::comma) +
+  labs(fill = "Corn acres") +
+  theme_void() +
+  theme(legend.position = "bottom")
+```
+
+`facet_wrap()` works on maps exactly as it does on scatter plots. There is no
+spatial version of faceting to learn.
+
+The shared colour scale is the entire reason this is better than four separate
+maps: with one scale, a county that is darker in 2023 than in 2020 really did
+grow more corn. Four separately-scaled maps would each be normalised to their
+own range, and comparing across them would be meaningless while looking
+perfectly reasonable.
+
+That is the most common way a multi-panel map misleads, and it is worth checking
+whenever you see one.
+:::
+
+# Make it presentable
+
+**Task.** Take your 2023 choropleth and add:
+
+1. the railroads as a line layer
+2. a scale bar and a north arrow
+3. a title and a source note
+4. county names for the five counties with the most corn acreage, without the
+   labels overlapping
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+library(ggspatial)
+library(ggrepel)
+
+top5 <-
+  corn_2023 %>%
+  dplyr::arrange(desc(acre)) %>%
+  head(5) %>%
+  dplyr::left_join(sf::st_drop_geometry(ne_counties),
+                   by = c("county_code" = "countyfp"))
+
+ggplot() +
+  geom_sf(data = corn_2023, aes(fill = acre), color = "white", linewidth = 0.1) +
+  geom_sf(data = railroads_ne, color = "grey30", linewidth = 0.2, alpha = 0.5) +
+  geom_sf_text(data = top5, aes(label = name), size = 3, color = "white") +
+  scale_fill_viridis_c(option = "magma", labels = scales::comma) +
+  annotation_scale(location = "bl") +
+  annotation_north_arrow(location = "tr", height = unit(1, "cm"),
+                         width = unit(1, "cm")) +
+  labs(
+    title   = "Corn acreage by county, Nebraska, 2023",
+    caption = "Source: USDA NASS",
+    fill    = "Corn acres"
+  ) +
+  theme_void()
+```
+
+Layer order is drawing order. Railroads added after the polygons sit on top of
+them; put them first and the county fills paint over them entirely.
+
+`annotation_scale()` and `annotation_north_arrow()` come from `ggspatial` and
+know how to compute a scale bar correctly for the map's projection, which is why
+you should not draw one by hand.
+
+For labels, `geom_sf_text()` places text at each feature's centroid. When labels
+collide, `ggrepel::geom_text_repel()` pushes them apart, though on an `sf` object
+it needs `stat = "sf_coordinates"` and an `aes(geometry = geometry)`.
+
+A north arrow is conventional rather than always necessary. On a map that is
+obviously north-up of a place the reader recognises, it is decoration; on a
+rotated or unfamiliar extent, it is essential.
+:::
+
+# Zoom without throwing data away
+
+**Task.** Produce a map of the southeastern corner of Nebraska only, showing
+counties and wells. Do it **without** filtering the data.
+
+Then do it by filtering, and say why the first approach is usually better.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot() +
+  geom_sf(data = ne_counties, fill = "white", color = "grey60") +
+  geom_sf(data = wells_sf, color = "blue", size = 0.8, alpha = 0.5) +
+  coord_sf(xlim = c(-98, -95.3), ylim = c(40, 41)) +
+  theme_void()
+```
+
+`coord_sf()` changes the **window**, not the data. Counties that straddle the
+edge are drawn and clipped, so the boundary looks the way a map should.
+
+Filtering instead removes whole features, so a county whose centroid falls
+outside the window vanishes completely, leaving a ragged edge and a hole where
+part of a county should be. The map then implies there is nothing there, which
+is a different claim from "outside the area shown".
+
+Filter when you mean "these are the observations I am analysing". Use
+`coord_sf()` when you mean "this is the part of the map I am showing". They look
+similar and say different things.
+:::
+
+::: {.callout-tip collapse="true" title="Getting the limits"}
+```{r}
+#| eval: false
+st_bbox(ne_counties)
+```
+
+Start from the full bounding box and narrow it, rather than guessing
+coordinates.
+:::
+
+# Put it together
+
+**Task.** Produce a single publication-quality figure answering: **where in
+Nebraska is corn grown, and where are the irrigation wells?**
+
+Requirements:
+
+- corn acreage for the most recent year as the base layer
+- wells on top, visible against the fill
+- a scale bar
+- a title, a legend title, and a source caption
+- no axis clutter
+- a colour scale that stays readable in greyscale
+
+Then say in one sentence what the figure shows that a table could not.
+
+::: {.panel-tabset}
+
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot() +
+  geom_sf(data = corn_2023, aes(fill = acre), color = "white", linewidth = 0.1) +
+  geom_sf(data = wells_sf, color = "white", size = 0.35, alpha = 0.5) +
+  scale_fill_viridis_c(option = "viridis", labels = scales::comma) +
+  annotation_scale(location = "bl") +
+  labs(
+    title    = "Corn acreage and irrigation wells, Nebraska, 2023",
+    subtitle = "Each point is one registered irrigation well",
+    caption  = "Sources: USDA NASS; Nebraska DNR",
+    fill     = "Corn acres"
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+```
+
+On the greyscale requirement: viridis is designed so that its lightness
+increases monotonically, which means it survives being printed in black and
+white and is readable to colour-blind viewers. A red-to-green scale fails both
+tests, and journals still print in greyscale more often than you would expect.
+
+On the white points: the well colour has to be chosen against the fill, not in
+isolation. Blue points on a dark viridis background disappear.
+
+What the figure shows that a table cannot: the *spatial coincidence* of the two
+variables. A table can tell you that wells and corn acres are both concentrated
+in certain counties, but only a map shows you that they follow the river valleys
+together, which is a claim about geography rather than about correlation.
+:::

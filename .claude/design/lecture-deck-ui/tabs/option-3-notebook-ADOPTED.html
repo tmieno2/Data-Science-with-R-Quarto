@@ -1,0 +1,97 @@
+<!-- @dsCard group="Tabs" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Tabs — Notebook</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* NOTEBOOK tabs — index cards on a warm surface.
+   Active is a raised card carrying a solid accent edge on TOP, which is the
+   physical read of a card pulled forward out of a stack. Contrast is carried by
+   ink on paper, not by a fill behind text, so the label is 14.9:1 either way and
+   the state is signalled by edge, elevation and weight. */
+.spec { width: 966px; background: var(--paper); padding: 22px 24px 26px;
+        box-shadow: 0 2px 14px rgba(0,0,0,.14); margin-bottom: 6px;
+        box-sizing: border-box; font-size: var(--t-body); color: var(--ink); }
+.spec .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+             color: #8a8f98; margin-bottom: 12px; }
+
+.tabs { display: flex; gap: 4px; align-items: flex-end; white-space: nowrap;
+        border-bottom: 1px solid var(--rule); margin-bottom: 14px;
+        max-width: 100%; width: max-content; }
+.tabs span { font-size: var(--t-tab); padding: 4px 12px; color: var(--ink-muted);
+             background: var(--tint-2); border: 1px solid var(--rule);
+             border-bottom: none; border-radius: 3px 3px 0 0;
+             border-top: 3px solid transparent; margin-bottom: -1px; }
+.tabs span.on { background: var(--paper); color: var(--ink); font-weight: 700;
+                border-top-color: var(--accent); padding-bottom: 6px;
+                border-bottom: 1px solid var(--paper); }
+.tabs span code { font-size: inherit; color: inherit; }
+
+.tabs.nest { border-bottom: 1px dotted var(--rule); margin-left: 16px; }
+.tabs.nest span { font-size: 14.5px; padding: 2px 9px; background: transparent;
+                  border: none; border-top: 2px solid transparent; }
+.tabs.nest span.on { border-top-color: var(--accent-sub); color: var(--ink);
+                     background: transparent; padding-bottom: 2px; }
+
+.note { font-size: 13px; color: var(--ink-muted); margin: 10px 0 0; }
+.ok { color: #1d4e89; font-weight: 600; }
+</style>
+
+<h1 class="page">Notebook tabs — index cards</h1>
+<p class="page">
+  The active card is paper-coloured against tinted inactive cards, lifted by a
+  3px accent edge along its top. Every label is <span class="ok">ink on a warm
+  ground</span> — 14.9:1 active, 6.6:1 inactive — so no state depends on white
+  text over a mid-tone fill, which is exactly how the current row fails.
+</p>
+
+<div class="spec sys-notebook">
+  <div class="lbl">1 · Normal row — four tabs</div>
+  <div class="tabs">
+    <span class="on">Objectives</span><span>read.csv()</span
+    ><span>Working directory</span><span>Exercise</span>
+  </div>
+  <div>Tab content sits here.</div>
+  <p class="note"><span class="ok">Active ink #22201b on paper = 14.9:1.</span>
+     State is carried by edge, elevation and weight rather than by hue, so it also
+     survives a projector with poor colour.</p>
+</div>
+
+<div class="spec sys-notebook">
+  <div class="lbl">2 · Long row — real headings from 02-2</div>
+  <div class="tabs">
+    <span>YAML</span><span>Creating a new slide</span
+    ><span class="on">Include R codes and results</span><span>Moving around</span
+    ><span>Exporting to PDF</span><span>Speaker notes</span>
+  </div>
+  <div>Six real labels, one line.</div>
+  <p class="note">The most expensive of the three: 24px padding plus a 4px gap per
+     tab, ~810px of the 966px budget. Six long labels is close to the limit — the
+     row must be checked when a seventh tab is added.</p>
+</div>
+
+<div class="spec sys-notebook">
+  <div class="lbl">3 · Labels containing inline code</div>
+  <div class="tabs">
+    <span class="on"><code>echo</code> and <code>eval</code></span
+    ><span>Example: <code>read.csv()</code></span><span><code>readRDS()</code></span>
+  </div>
+  <div>Code in a label inherits size and colour.</div>
+</div>
+
+<div class="spec sys-notebook">
+  <div class="lbl">4 · Nested tabset</div>
+  <div class="tabs">
+    <span class="on">Syntax and Examples</span><span>Your turn</span>
+  </div>
+  <div>
+    <div class="tabs nest">
+      <span class="on">Example 1</span><span>Example 2</span><span>Example 3</span>
+    </div>
+    <div style="padding-top:6px">Inner content.</div>
+  </div>
+  <p class="note">The inner row drops the card entirely and keeps only the top
+     edge, in sienna rather than ink-blue. Cards outside, edges inside — the two
+     levels never look like the same control at different strengths.</p>
+</div>

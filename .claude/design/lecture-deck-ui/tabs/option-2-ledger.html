@@ -1,0 +1,112 @@
+<!-- @dsCard group="Tabs" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Tabs — Ledger</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* LEDGER tabs — keep the folder metaphor, invert which side carries the fill.
+   Today: active is filled, inactive is bare → the active label is white on green
+   at 2.71:1. Here the STRIP is filled and the active tab is cut out of it in
+   paper, so the active label is accent-on-white at 7.44:1 and every inactive
+   label is white-on-accent, which recedes. Same metaphor, opposite contrast. */
+.spec { width: 966px; background: var(--paper); padding: 22px 24px 26px;
+        box-shadow: 0 2px 14px rgba(0,0,0,.14); margin-bottom: 6px;
+        box-sizing: border-box; font-size: var(--t-body); color: var(--ink); }
+.spec .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+             color: #8a8f98; margin-bottom: 12px; }
+
+.tabs { display: flex; gap: 3px; background: var(--accent); padding: 4px 4px 0;
+        margin-bottom: 12px; white-space: nowrap; max-width: 100%;
+        width: max-content; }
+.tabs span { font-size: var(--t-tab); padding: 4px 13px; color: rgba(255,255,255,.82); }
+.tabs span.on { background: var(--paper); color: var(--accent); font-weight: 700; }
+.tabs span code { font-size: inherit; color: inherit; }
+
+/* nested: the strip becomes an outline rather than a fill — one step down in
+   ink weight, not in saturation, so it does not read as disabled. */
+.tabs.nest { background: transparent; border: 1px solid var(--rule);
+             border-bottom: 2px solid var(--accent); padding: 3px 3px 0;
+             margin-left: 14px; }
+.tabs.nest span { font-size: 14.5px; padding: 3px 10px; color: var(--ink-muted); }
+.tabs.nest span.on { background: var(--accent); color: #fff; font-weight: 700; }
+
+.note { font-size: 13px; color: var(--ink-muted); margin: 10px 0 0; }
+.ok { color: #0b5c3f; font-weight: 600; }
+.band-demo { background: var(--accent); padding: 13px 24px 0; margin: -22px -24px 14px; }
+.band-demo h2 { color: #fff; font-size: 30px; margin: 0; font-weight: 600; }
+.band-demo .tabs { margin-bottom: 0; padding-left: 0; }
+</style>
+
+<h1 class="page">Ledger tabs — the strip is filled, the active tab is cut out of it</h1>
+<p class="page">
+  The folder metaphor survives; the contrast is inverted. Active reads
+  <span class="ok">7.44:1</span> as accent-on-paper instead of 2.71:1 as
+  white-on-green, and the inactive labels recede into the strip instead of
+  out-reading the active one. This is the row that docks into the Ledger title
+  band — see the last specimen.
+</p>
+
+<div class="spec sys-ledger">
+  <div class="lbl">1 · Normal row — four tabs</div>
+  <div class="tabs">
+    <span class="on">Objectives</span><span>read.csv()</span
+    ><span>Working directory</span><span>Exercise</span>
+  </div>
+  <div>Tab content sits here.</div>
+  <p class="note"><span class="ok">Active #0b5c3f on paper = 7.44:1 — passes AA.</span>
+     Inactive white-at-82% on #0b5c3f ≈ 5.4:1 — also passes, while still receding.</p>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="lbl">2 · Long row — real headings from 02-2</div>
+  <div class="tabs">
+    <span>YAML</span><span>Creating a new slide</span
+    ><span class="on">Include R codes and results</span><span>Moving around</span
+    ><span>Exporting to PDF</span><span>Speaker notes</span>
+  </div>
+  <div>Six real labels, one line.</div>
+  <p class="note">Costs more than Chalkline: 26px of padding per tab against 22px,
+     so this row measures ~790px of the 966px budget. Seven average labels is the
+     ceiling — worth stating in the authoring notes.</p>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="lbl">3 · Labels containing inline code</div>
+  <div class="tabs">
+    <span class="on"><code>echo</code> and <code>eval</code></span
+    ><span>Example: <code>read.csv()</code></span><span><code>readRDS()</code></span>
+  </div>
+  <div>Code in a label inherits size and colour on both states.</div>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="lbl">4 · Nested tabset</div>
+  <div class="tabs">
+    <span class="on">Syntax and Examples</span><span>Your turn</span>
+  </div>
+  <div>
+    <div class="tabs nest">
+      <span class="on">Example 1</span><span>Example 2</span><span>Example 3</span>
+    </div>
+    <div style="padding-top:6px">Inner content.</div>
+  </div>
+  <p class="note">The inner strip is an outline, not a fill; its active tab takes
+     the solid accent. Fill and outline are the two levels, so neither row is
+     faded and neither reads as disabled.</p>
+</div>
+
+<div class="spec sys-ledger">
+  <div class="band-demo">
+    <h2>Summarizing by group</h2>
+    <div class="tabs">
+      <span>Syntax</span><span class="on">Example</span><span>Your turn</span>
+    </div>
+  </div>
+  <div class="lbl" style="margin-top:0">5 · Docked into the Ledger title band</div>
+  <div>
+    In the Ledger slide layout the strip has no separate existence — it is the
+    bottom edge of the title band, and the active tab is the paper of the slide
+    coming up to meet it. That is where the vertical saving comes from.
+  </div>
+</div>

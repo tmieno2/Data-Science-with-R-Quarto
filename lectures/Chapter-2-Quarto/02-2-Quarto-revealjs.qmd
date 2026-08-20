@@ -1,0 +1,1068 @@
+---
+title: "02-2: Using Quarto to Create Presentations"
+abstract: "Chapter 2: Quarto"
+format:
+  revealjs:
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    logo: nebraska-n.jpg
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+    include-in-header: ../transcript-support.html
+---
+<!-- CHANGED (A8): removed the "filters: - webr" entry. There is not a single
+     webr chunk in this file, so the filter was being loaded for nothing. Same
+     issue the introduction lecture had. -->
+
+<!--
+================================================================================
+REVISED VERSION of 02-2-Quarto-revealjs.qmd
+
+Every change from the original is marked with an HTML comment starting with
+"CHANGED:", "ADDED:", or "REMOVED:". None of them appear in the rendered slides.
+Delete them once you have accepted the changes.
+
+NOTE: this block must stay BELOW the YAML header. An HTML comment above the
+header stops the header being recognised as front matter.
+
+Change log at a glance:
+  A. Corrections .......... empty "Customized themes" tab, wrong lecture number
+                            in the sample YAML, "YAMl" typo, "resources is",
+                            "codes are", stray spaces inside code spans,
+                            unquoted callout title, unused webr filter,
+                            misleading "specify all four options" advice.
+  B. New material ......... presenting and navigating (keyboard keys), exporting
+                            to PDF, sharing one self-contained file, per-slide
+                            classes (.smaller / .scrollable), fragments beyond
+                            lists, highlighting code line by line, slide numbers
+                            and footer, and the Customized themes tab actually
+                            filled in.
+  C. Improvements ......... explained why the column div needs four colons,
+                            separated fig- from out- properly, made the
+                            scrollable demo actually overflow, chunk labels.
+
+SAMPLE FILE: sample_qmd_revealjs.qmd is referenced but is not in the repository.
+Either add it to this folder or drop the reference. Flagged inline below.
+================================================================================
+-->
+
+```{r}
+#| label: setup
+#| include: false
+library(ggplot2)
+library(dplyr)
+```
+<!-- CHANGED (C3): labelled the setup chunk, matching what 02-1 now teaches. -->
+
+## Get Started
+
+::: {.panel-tabset}
+
+### YAML
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The very first thing you need, when you want slides instead of a document, is to tell Quarto which format to produce, and that happens in the YAML header at the top of the file. The one line that matters most here is the format declaration: setting the format to revealjs. That single word is what switches Quarto from producing an ordinary HTML page or a PDF to producing a reveal.js slide deck. Everything indented underneath revealjs is just an option that tweaks how the slides look and behave: the theme, the font size, whether the code is echoed, and so on. Don't try to memorize every option today. The key idea is simply that the format declaration is what turns an ordinary qmd file into a presentation.
+
+</details>
+
+To create a presentation with Quarto, the first thing to do is declare the `revealjs` format in the YAML header of the qmd file, as below:
+
+<br>
+
+````{verbatim}
+---
+title: "02-2 Using Quarto to Create Presentations"
+format:
+  revealjs:
+    theme: [default, ../custom.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+---
+````
+<!-- CHANGED (A2): the sample title said "02-1", but this is lecture 02-2.
+     Also changed fontsize from 1.6em to 1.2em so the example matches what this
+     deck actually uses, since students compare the two. -->
+
+<br>
+
+:::{.callout-note}
++ `format` needs to be specified as `revealjs`
++ You can add `revealjs`-specific options below `revealjs:` (we will look at various options later).
+:::
+
+### Creating a new slide
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Once Quarto knows you want slides, the next question is how you actually make a new slide, and the answer is headers. A level-one header, a single hash, starts a big section-divider slide, with the title sitting centered, like a chapter break. A level-two header, two hashes, starts an ordinary content slide with the title tucked up in the top-left corner. My advice, which you'll also see in the callout, is to use a single hash sparingly, just for the few big transitions in your talk, and a double hash for all the regular slides. The payoff comes when you press the letter o for the overview: your section titles stand out from the ordinary slides, and you can take in the shape of your whole talk at a glance.
+
+</details>
+
+You can start a new slide using either `#` or `##`.
+
+<br>
+
+**Use # (level 1 header)**
+
+````{verbatim}
+# new section title
+````
+
+<br>
+
+By default, this creates a new slide with `new section title` left-aligned and vertically centered.
+
+<br>
+
+**Use ## (level 2 header)**
+
+````{verbatim}
+## new slide title
+````
+
+<br>
+
+By default, this creates a new slide with `new slide title` in the top-left corner.
+
+:::{.callout-note title="Suggestion"}
+Use `#` for the handful of section breaks that divide your talk, and `##` for the ordinary slides inside each section. That way the section titles stand out when you open the overview (press **o**).
+:::
+<!-- ADDED: a reason to choose one over the other. The original explained what
+     each does but never said when to use which, which is the actual question a
+     student has. -->
+
+:::{.callout-note title="Direction"}
+Look at `sample_qmd_revealjs.qmd`.
+:::
+<!-- CHANGED (A7): quoted the callout title, which was "title=Direction". -->
+<!-- NOTE (A/C): sample_qmd_revealjs.qmd is not in this repository. Either add
+     it to this folder and link to it relatively, or remove this callout. -->
+
+### Include R codes and results
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's the reassuring part. You already know how to embed R code and its output from the earlier lectures, and none of that changes just because we're making slides now. You write a code chunk in exactly the same way, the code runs, and its results appear on the slide. The one thing I'd point you to is the recommended settings in the callout: for a research talk you usually want to hide the code itself and silence the messages and warnings, so your audience sees the result — the figure or the table — and not the plumbing behind it. Put echo false, message false, and warning false in your YAML header once, and it applies to the whole deck.
+
+</details>
+
+We have already learned how to do this. The way we include R codes is consistent across different output formats, including presentations with **revealjs**.
+<!-- CHANGED (A5): "The way we include R codes are consistent" -> "is
+     consistent", and trimmed the "!!" to match the tone of the rest. -->
+
+````{verbatim}
+```{r}
+R codes
+```
+````
+
+:::{.callout-note title="Recommended global settings for research presentations"}
+Place the options below in the YAML header. They hide the code, messages, and warnings that your audience does not need to see.
+
+````{verbatim}
+execute:
+  echo: false
+  message: false
+  warning: false
+````
+:::
+
+:::
+<!--end of panel-->
+
+<!-- ADDED (B1): entire slide below. Nothing in the original told students how
+     to actually run a presentation once it is built, which is the whole point
+     of the format. The speaker-view tip was buried in the Speaker Note tab. -->
+## Presenting and navigating
+
+::: {.panel-tabset}
+
+### Moving around
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So you've rendered your slides and you've got an HTML file. Now what? You open it in a browser, and it behaves like any presentation tool you've used. The arrow keys or the space bar move you forward and back. Press f to go full screen so the browser chrome disappears. The two I really want you to remember are o, or escape, which zooms out to show every slide at once so you can click to jump anywhere, and m, which pulls up a menu listing all your slides by title. And if you forget all of this, just press the question-mark key during the talk and reveal.js shows you the complete list. So there's really nothing to memorize here.
+
+</details>
+
+Open the rendered html in a browser and use:
+
++ **arrow keys** or **space**: next / previous slide
++ **f**: full screen
++ **o** or **esc**: overview of every slide at once, click one to jump to it
++ **m**: the menu, which lists all slides by title
+
+:::{.callout-note title="The one to remember"}
+Press **?** during a presentation to see every available key. You do not need to memorize the list.
+:::
+
+### Presenting
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These next two are the ones that make you look like you know what you're doing in front of a room. Press s and reveal.js opens a second window, speaker view, with your notes, a running timer, and a preview of the next slide. You put that on your laptop and the main slides go on the projector. The other one is b, or the period key, which blanks the screen to black. That sounds trivial, but it's genuinely useful: when you want the room to stop reading your slide and actually look at you while you explain something, you black the screen. One caution, in the callout: speaker view opens a pop-up window, so if nothing happens when you press s, your browser has probably blocked it and you need to allow pop-ups for that page.
+
+</details>
+
++ **s**: speaker view, a second window with your notes, a timer, and the next slide
++ **b** or **.**: blank the screen, useful when you want the room looking at you instead of the slides
+
+:::{.callout-important title="Speaker view and pop-ups"}
+Speaker view opens a second browser window. If nothing appears, your browser blocked the pop-up; allow pop-ups for the page and press **s** again.
+:::
+
+### Exporting to PDF
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Sometimes the situation calls for a PDF: a conference wants you to upload one, or a colleague asks you to email your slides and you're not sure they can open reveal.js. The trick is to open the rendered HTML in Chrome specifically, press e to switch into print view — watch how the slides reflow into flat pages — and then just print, choosing Save as PDF as the destination. The one thing to accept, as the callout warns, is that anything animated is lost. Incremental lists show up fully revealed, and code that highlights line by line collapses into a single block. A PDF is a snapshot, not a performance.
+
+</details>
+
+Sometimes you have to hand in or email a PDF rather than the slides themselves.
+
+1. Open the rendered html in **Chrome**
+2. Press **e** to switch to print view (the slides re-flow into pages)
+3. Print the page, and choose **Save as PDF** as the destination
+
+:::{.callout-note}
+Anything that depends on motion is lost in a PDF: incremental lists appear fully revealed, and progressive code highlighting collapses to a single block.
+:::
+
+:::
+<!--end of panel-->
+
+## Useful Tools
+
+::: {.panel-tabset}
+
+### Incremental
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now we get into the features that make slides feel like slides. The first is the incremental list. Instead of your three bullet points all appearing at once — which invites the audience to read ahead and stop listening to you — you wrap the list in a div marked incremental, and now each bullet appears on its own click. You control the pace, and their attention follows your clicks. The code is on the left. The right side is deliberately empty right now — press the right arrow and watch the points arrive one at a time.
+
+</details>
+
+::::: {.columns}
+
+:::: {.column width="50%"}
+**Code**
+
+````{verbatim}
+::: {.incremental}
+- collect data
+- run statistical analysis
+- report
+:::
+````
+::::
+
+:::: {.column width="50%"}
+**Output** — press <kbd>→</kbd>
+
+::: {.incremental}
+- collect data
+- run statistical analysis
+- report
+:::
+::::
+
+:::::
+<!--end of the columns-->
+
+<!-- ADDED (B5): entire tab below. The original covered .incremental, which only
+     works on lists. .fragment is the general version and students ask for it as
+     soon as they want to reveal a figure or a callout one step at a time. -->
+### Fragments
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The incremental trick is great, but it only works on lists. What if you want to reveal a figure, or a callout box, or a single paragraph, one step at a time? That's what fragment is for — it's the general-purpose version. You wrap any element, anything at all, in a div marked fragment, and it stays hidden until you click. Stack several of them and you reveal a slide piece by piece, in whatever order you like. So the rule of thumb is: incremental for lists, fragment for everything else.
+
+</details>
+
+`.incremental` works on lists. To reveal **any** element one step at a time, wrap it in a `.fragment` div:
+
+::::: {.columns}
+
+:::: {.column width="50%"}
+**Code**
+
+````{verbatim}
+::: {.fragment}
+This appears on the first click.
+:::
+
+::: {.fragment}
+This appears on the second click.
+:::
+````
+::::
+
+:::: {.column width="50%"}
+**Output** — press <kbd>→</kbd>
+
+::: {.fragment}
+This appears on the first click.
+:::
+
+::: {.fragment}
+This appears on the second click.
+:::
+::::
+
+:::::
+<!--end of the columns-->
+
+### Columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A very common layout need is two things side by side: a plot on the left and an explanation on the right, or two plots to compare. Reveal.js gives you a columns layout for this. You open an outer columns block, and inside it you put one column div for each column, each with a width. Look closely at the code, because there's a subtlety here that trips up almost everyone, and it's important enough that I gave it its own tab, right next door.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Code
+````{verbatim}
+:::: {.columns}
+
+::: {.column width="40%"}
+
+Plot 1
+
+```{r}
+ggplot(data = mtcars) +
+  geom_point(aes(y = mpg,  x = cyl))
+```
+
+:::
+
+::: {.column width="60%"}
+
+Plot 2
+
+```{r}
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+:::
+
+::::
+````
+
+#### Why four colons?
+
+<!-- ADDED (C1): entire tab. The original showed :::: on the outside and ::: on
+     the inside without a word of explanation. This is the single most common
+     thing students get wrong when they copy the block, and the error it
+     produces (a mangled layout with no message) gives them no clue why. -->
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's the subtlety. Look at the colons. The outer columns block uses four colons, and the inner column blocks use three. That is not a typo and it's not arbitrary. When you nest one of these fenced divs inside another, the outer one has to use more colons than the inner ones, because that's the only way Quarto can tell which closing line belongs to which block. The exact numbers don't matter — five outside and three inside works just as well — only that the outer count is larger. And here's why you should care, which is in the callout: if you use three for both, Quarto matches the wrong closing line, your columns silently collapse into a single column, and there is no error message telling you why. So when your side-by-side layout mysteriously renders as one column, count your colons first.
+
+</details>
+
+Notice the outer block uses **four** colons and the inner blocks use **three**.
+
++ When one of these blocks sits inside another, the outer one must be opened and closed with **more** colons than the inner ones.
++ That is how Quarto knows which closing line belongs to which block.
++ The exact number does not matter, only that the outer count is larger. Five outside and three inside works just as well.
+
+:::{.callout-important}
+If you use three colons for both, Quarto matches the first closing line with the outer block and your columns silently collapse into one. There is no error message, so this is worth remembering.
+:::
+
+#### Output
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+Plot 1
+
+```{r}
+#| label: col-plot-1
+ggplot(data = mtcars) +
+  geom_point(aes(y = mpg,  x = cyl))
+```
+
+:::
+
+::: {.column width="60%"}
+
+Plot 2
+
+```{r}
+#| label: col-plot-2
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+:::
+
+::::
+
+:::
+<!--end of panel-->
+
+### Overflow
+
+<!-- CHANGED (C2 / B4): the original "Scrollable" tab covered only the
+     document-wide option, and its demo ("you / can / see / that / right?") was
+     too short to actually overflow a slide, so the thing it was demonstrating
+     did not visibly happen. This version covers the per-slide versions too,
+     which are what you usually want. -->
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Every so often you'll build a slide that just has too much on it, and content spills off the bottom edge. You have two clean ways to handle it. One: shrink the text on just that slide by adding smaller, in curly braces, after its title. Two: let that one slide scroll by adding scrollable. You can also turn scrolling on for the entire deck from the YAML header, and in fact this presentation does exactly that. But my advice, in the callout, is to prefer the per-slide version. A scrolling slide is easy for an audience to miss content on, so it's better to fix the two or three slides that actually need it than to make every slide scrollable.
+
+</details>
+
+Two ways to deal with a slide whose content does not fit.
+
+**1. Shrink the text on that slide**
+
+````{verbatim}
+## A slide with a lot on it {.smaller}
+````
+
+**2. Let that slide scroll**
+
+````{verbatim}
+## A slide with a lot on it {.scrollable}
+````
+
+Or turn scrolling on for every slide from the YAML header:
+
+````{verbatim}
+format:
+  revealjs:
+    scrollable: true
+````
+
+:::{.callout-note title="Prefer the per-slide version"}
+Turning `scrollable` on for the whole document is convenient, but a scrolling slide is easy for an audience to miss content on. Adding `{.smaller}` or `{.scrollable}` to the two or three slides that need it is usually the better answer.
+:::
+
+:::{.callout-note title="Direction"}
+`scrollable: true` is enabled in this presentation. Add enough text to a slide of your own to push past the bottom edge, and watch the scroll bar appear.
+:::
+
+### Speaker notes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the other half of the speaker-view feature we saw earlier. You attach private notes to any slide by adding a div marked notes. The audience never sees them — go ahead and look, they're invisible on the slide right now — but when you press s for speaker view, your notes appear on your private screen. This is where you put the reminder to yourself: mention that the y-axis is a count, not a share, that kind of thing. The syntax is right there in the code block below, and if you press s now, you'll see the hidden note attached to this very slide.
+
+</details>
+
+```{r}
+#| label: speaker-note-demo
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+
+:::{.notes}
+You do not see me!
+:::
+
+Add notes to any slide with a `.notes` block:
+
+````{verbatim}
+:::{.notes}
+Remind them that the y axis is a count, not a share.
+:::
+````
+<!-- ADDED: the syntax itself. The original demonstrated the effect but never
+     showed students what to type. -->
+
+:::{.callout-note title="Try"}
+Hitting the "**s**" key will generate a pop-up window with speaker view.
+:::
+
+### Logo & footer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three small touches that make a deck look finished, all set from the YAML header. The logo option puts an image in the corner of every slide — this deck uses the Nebraska N, which is why you see it in the bottom-right. The footer option runs a line of text along the bottom of every slide, handy for a course number or your name. And slide-number set to true numbers your slides, which matters more than you'd think in a seminar, because it lets someone say go back to the plot on slide twelve instead of that one from a while ago.
+
+</details>
+
+You can add a logo with the `logo` option under `revealjs:`.
+
+````{verbatim}
+---
+format:
+  revealjs:
+    logo: logo.png
+---
+````
+
+<br>
+
+This presentation uses the code below in its YAML header, which is why the logo appears in the bottom-right corner.
+<!-- CHANGED (A3): "YAMl" -> "YAML". -->
+
+````{verbatim}
+---
+format:
+  revealjs:
+    logo: nebraska-n.jpg
+---
+````
+
+<!-- ADDED (B6): footer and slide-number. This deck already uses a footer in its
+     own YAML header, but never told students the option exists. Slide numbers
+     matter in a seminar, where people ask about "the plot on slide 12". -->
+
+<br>
+
+Two companions to `logo` that are worth knowing:
+
+````{verbatim}
+---
+format:
+  revealjs:
+    footer: "AECN 896-05"
+    slide-number: true
+---
+````
+
++ `footer`: a line of text along the bottom of every slide
++ `slide-number: true`: shows the slide number, so your audience can refer to one
+
+### Tabsets
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's a feature I've been using on you this entire lecture without pointing it out: tabs. Every one of these slides where you click between Code and Output is a tabset. You make one by wrapping your content in a panel-tabset div, and each header inside becomes a tab. The one rule to get right, in the callout, is that the header level inside the tabset has to be exactly one step below the slide's own header. So on a double-hash slide, your tab names use triple-hash. Get that level wrong and, instead of tabs, you'll accidentally create brand-new slides, which is a confusing thing to debug.
+
+</details>
+
+You can create tabs using the following code:
+
+<br>
+
+````{verbatim}
+::: {.panel-tabset}
+
+### Tab A
+
+Content for `Tab A`
+
+### Tab B
+
+Content for `Tab B`
+
+:::
+````
+
+:::{.callout-note}
+The header level inside the tabset must be one step below the slide's own header. On a `##` slide, use `###` for the tab names.
+:::
+<!-- ADDED: the rule that decides whether a tabset works. Getting the level
+     wrong produces new slides instead of tabs, which is confusing to debug. -->
+
+:::
+<!--end of panel-->
+
+<!-- ADDED (B7): entire slide below. This is the most useful revealjs feature
+     for a data science course specifically, and the original did not mention
+     it. Walking a class through a pipeline one line at a time is exactly what
+     this chapter's lectures do. -->
+## Walking through code
+
+::: {.panel-tabset}
+
+### Why
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This next feature is, for a data science course specifically, maybe the most useful one in the whole lecture. The problem it solves is this: when you throw a fifteen-line block of code up on a slide, the audience reads all of it at once, gets ahead of you, and stops listening. What you actually want is to reveal and highlight the code the way you'd explain it, one piece at a time, so their eyes follow your voice. That is exactly what code-line-numbers does.
+
+</details>
+
+When you show a block of code, the audience reads all of it at once and stops listening. `code-line-numbers` lets you reveal and highlight it a piece at a time, so their attention follows yours.
+
+### Code
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The mechanism is a single chunk option, code-line-numbers, and you give it a string where each group separated by a vertical bar is one click. So the string bar-one-bar-two-bar-three means: first show the whole block with nothing highlighted, then highlight line one, then line two, then line three. You can group lines too — one-dash-two-bar-three highlights the first two lines together, then the third. And that leading bar, the one before the first number, means start with nothing highlighted, which gives you a clean first look at the whole block before you begin walking through it.
+
+</details>
+
+Each group separated by `|` is one click.
+
+````{verbatim}
+```{r}
+#| code-line-numbers: "|1|2|3"
+mtcars %>%
+  filter(cyl == 4) %>%
+  summarize(mean_mpg = mean(mpg))
+```
+````
+
++ `"|1|2|3"`: first the whole block unhighlighted, then line 1, then line 2, then line 3
++ `"1-2|3"`: first lines 1 and 2 together, then line 3
++ Leading `|` means "start with nothing highlighted"
+
+### Output
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's the same thing running. Click through it and watch: the whole pipeline appears first, then, line by line, it highlights — the data, then the filter, then the summarize. This is exactly how I'd talk you through a pipeline out loud, and now the highlighting is doing the pointing for me. This is the one feature I'd most encourage you to steal for your own presentations of code.
+
+</details>
+
+```{r}
+#| label: line-numbers-demo
+#| code-line-numbers: "|1|2|3"
+mtcars %>%
+  filter(cyl == 4) %>%
+  summarize(mean_mpg = mean(mpg))
+```
+
+:::
+<!--end of panel-->
+
+## Figure
+
+::: {.panel-tabset}
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+When you put a figure on a slide, the two options you'll reach for most are out-width, which controls how big the figure appears on the slide, and fig-align, which controls whether it sits left, center, or right. Those two get you most of the way. There's a full reference linked here for everything else, but let's look at a few concrete examples so you can see the effect for yourself.
+
+</details>
+
+You can use
+
++ `out-width` to control the size of the figure **as displayed on the slide**
++ `fig-align` to control the alignment of the figure
+
+See [here](https://quarto.org/docs/reference/formats/html.html#figures) for all the options available.
+<!-- CHANGED (A6): removed the stray space inside the code spans, which were
+     written as "`out-width: `" and rendered with a trailing gap. -->
+
+### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's out-width set to 100 percent. The figure fills the full width available on the slide. Flip between the Code tab and the Output tab and just note the relationship: the number in the code, and the size on the slide.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 100%
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+````
+
+#### Output
+
+```{r}
+#| label: fig-ex1
+#| out-width: 100%
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+:::
+<!--end of panel-->
+
+
+### Example 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now out-width is 80 percent and I've added fig-align center. So the figure is a bit smaller than full width, and it's centered on the slide. This is probably the most common combination you'll actually use for a single plot.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 80%
+#| fig-align: center
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+````
+
+#### Output
+
+```{r}
+#| label: fig-ex2
+#| out-width: 80%
+#| fig-align: center
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+
+:::
+<!--end of panel-->
+
+### Example 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here it's shrunk further, to 50 percent, and pushed to the right with fig-align right. I'm showing you the extremes on purpose so the effect is obvious. But notice something as the plot gets smaller: the axis labels are getting harder to read. Hold that thought, because the next tab is about exactly that problem.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Code
+
+````{verbatim}
+```{r}
+#| out-width: 50%
+#| fig-align: right
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+````
+
+#### Output
+
+```{r}
+#| label: fig-ex3
+#| out-width: 50%
+#| fig-align: right
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+
+:::
+<!--end of panel-->
+
+### `fig-` versus `out-`
+
+<!-- CHANGED (A9 / C4): the original tab was titled "To be exact" and said "To
+     set the figure size exactly you can specify all of the four options". That
+     is misleading: the two pairs do different jobs, and setting all four is
+     only needed in the special case where you want the drawn size and the
+     displayed size to be identical. Students who followed the old advice ended
+     up with unreadable axis text and did not know why. -->
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the distinction that causes the most confusion, so let's be careful. There are two pairs of options that both sound like they control size, but they do different jobs. fig-width and fig-height set the size of the canvas R draws the plot on, in inches, and that decides how big the axis text and points look relative to the plot. out-width and out-height set how big the finished image is displayed on the slide, and that scales the whole picture, text and all. Here's the practical consequence, and it's the thing to take away: if your axis labels are too small to read from the back of the room, do not reach for out-width to make the plot bigger, because that scales the tiny text right along with it. Instead, lower fig-width. A smaller canvas makes the text larger relative to the plot, and then the whole thing scales up cleanly. The last two tabs show how to match the drawn and displayed size exactly, and remind you that fig options are always in inches while out options need a unit.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Two different jobs
+
++ `fig-width` and `fig-height` set the size of the **canvas R draws on**, in inches. This decides how large the axis labels and points look **relative to** the plot.
+
++ `out-width` and `out-height` set how large the finished image is **displayed on the slide**. This scales the whole picture, text and all.
+
+:::{.callout-important title="The practical consequence"}
+Making a plot smaller with `out-width` shrinks the text along with it. If your axis labels are too small to read from the back of the room, do **not** raise `out-width`. Lower `fig-width` instead: a smaller canvas makes the text larger relative to the plot, and then the whole thing scales up cleanly.
+:::
+
+#### Matching them exactly
+
+If you want the image displayed at exactly the size it was drawn, give the `out-` options the same numbers with `in` attached:
+
+````{verbatim}
+```{r}
+#| fig-width: 10
+#| fig-height: 3
+#| out-width: 10in
+#| out-height: 3in
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+````
+
+:::{.callout-note}
++ `fig-` options take a plain number and the unit is always inches.
++ `out-` options need a unit, so write `10in`, or use a percentage such as `80%`.
+:::
+
+#### Output
+
+```{r}
+#| label: fig-exact
+#| fig-width: 10
+#| fig-height: 3
+#| out-width: 10in
+#| out-height: 3in
+ggplot(data = mtcars) +
+  geom_histogram(aes(x = mpg))
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Theme
+
+::: {.panel-tabset}
+
+### Pre-made themes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Reveal.js ships with a whole set of ready-made themes, and switching between them is a one-line change. You set the theme option in your YAML header to the theme's name, like dark, and the entire look of the deck changes. There's a link here to the full list. The direction in the callout is just to try one and watch what happens — it's the fastest way to see how much the theme controls.
+
+</details>
+
+There are many pre-made themes that you can apply to `revealjs` presentations. See the list [here](https://quarto.org/docs/presentations/revealjs/themes.html#using-themes).
+
+You can set a theme using the `theme` option in the YAML header like below:
+
+<br>
+
+````{verbatim}
+format:
+  revealjs:
+    theme: dark
+````
+
+<br>
+
+:::{.callout-note title="Direction"}
+Try one of the themes listed and see how the appearance of the presentation changes.
+:::
+
+<!-- CHANGED (A1): the "Customized themes" tab existed as a header with NOTHING
+     under it in the original file, so the slide rendered as an empty tab. The
+     four tabs below fill it in. This is the most useful thing in the section,
+     because the course's own decks are built this way. -->
+
+### Customized themes
+
+::: {.panel-tabset}
+
+#### The idea
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A pre-made theme gets you close to what you want, but usually not exactly. To change the details, you write your own scss file and hand Quarto both — the default plus your custom file. The order matters here: default is applied first, then your custom scss goes on top, so anything you put in your own file wins. And this isn't hypothetical — every single lecture in this course is built exactly this way, with a file called custom.scss, and it's genuinely worth opening to see how it's done.
+
+</details>
+
+A pre-made theme gets you close. To change details, you write your own **scss** file and hand Quarto both:
+
+````{verbatim}
+format:
+  revealjs:
+    theme: [default, custom.scss]
+````
+
++ `default` is applied first
++ `custom.scss` is applied second, so anything in it wins
+
+:::{.callout-note title="A live example"}
+This is exactly what every lecture in this course does. The file is `lectures/custom.scss`, and it is worth opening.
+:::
+
+#### Two halves of an scss file
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+An scss file has two labelled sections, and knowing the difference saves you a lot of frustration. The scss-defaults section is for variables — the colors and fonts the whole theme is built from. If you want to change your link color across the entire deck, you set a variable here. The scss-rules section holds ordinary CSS rules, applied last, and it's for targeting one specific thing, like make my level-two headers orange. Rough rule: defaults for the deck-wide look, rules for one-off targeting.
+
+</details>
+
+An scss file can have two labelled sections, and the difference matters:
+
+````{verbatim}
+/*-- scss:defaults --*/
+$body-color: #222;
+$link-color: #06a666;
+
+/*-- scss:rules --*/
+.reveal h2 {
+  color: #f59219;
+}
+````
+
++ `scss:defaults` sets **variables** that the theme is built from. Use it for the colors and fonts of the whole deck.
++ `scss:rules` holds ordinary **CSS rules**, applied after everything else. Use it to target one specific thing.
+
+#### Finding what to target
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So how do you know what to write in that rules section? You let the browser tell you. Right-click the thing you want to change, choose Inspect, and read off the class name the browser shows for that element. Then you write a rule for that class in your scss-rules section. That's the whole workflow: inspect, read the class, write the rule. You don't have to know reveal.js's internals by heart — the browser hands you the target.
+
+</details>
+
+To change the look of something on a slide:
+
+1. Right-click it in the browser and choose **Inspect**
+2. Read the class name shown for that element
+3. Write a rule for it in the `scss:rules` section
+
+````{verbatim}
+/*-- scss:rules --*/
+.reveal .panel-tabset [role="tab"] {
+  font-size: 0.85em;
+}
+````
+
+#### Direction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's a small exercise to make this concrete. Make a file called my-theme.scss next to your qmd, put in a rule that colors your level-two headers red, point your YAML at it with theme default plus my-theme.scss, and render. Every slide title should turn red. Once you've seen your own rule take effect on the real deck, the whole custom-theme idea stops being mysterious.
+
+</details>
+
+:::{.callout-note title="Direction"}
++ Create a file called `my-theme.scss` next to your qmd file
++ Put this in it:
+
+````{verbatim}
+/*-- scss:rules --*/
+.reveal h2 {
+  color: #c1272d;
+}
+````
+
++ Point your YAML header at it with `theme: [default, my-theme.scss]` and render
++ Every slide title should now be red
+:::
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+<!-- ADDED (B2/B3): entire slide below. Slides get emailed and uploaded more
+     often than any other output in this course, and the original said nothing
+     about how to hand one over. This mirrors the "Submitting your html" slide
+     added to 02-1. -->
+## Sharing your slides
+
+::: {.panel-tabset}
+
+### The problem
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here's a gotcha that bites people constantly. When you render my_talk.qmd, you get two things, not one: the HTML file, and a folder next to it, my_talk_files, that holds your figures, fonts, and all the reveal.js machinery. If you email just the HTML file — which feels like the natural thing to do — the person opens a broken page, because everything that made it work was in that folder you left behind. And this bites harder for slides than for a normal report, because the entire presentation framework lives in that folder.
+
+</details>
+
+Rendering `my_talk.qmd` produces **two** things:
+
++ `my_talk.html`
++ `my_talk_files/`, a folder holding the figures, fonts, and the revealjs machinery
+
+Send only the html file and the recipient gets a broken page. This bites harder for slides than for a report, because the presentation framework itself lives in that folder.
+
+### The fix
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The fix is one line: embed-resources set to true in your YAML header. That tells Quarto to pack everything — figures, fonts, the framework, all of it — into the single HTML file. Now you can email that one file, or upload it on its own, and it just works. The trade-off, in the callout, is that the file gets noticeably bigger and takes a moment longer to open. That's the price of it working anywhere, and it's almost always worth paying.
+
+</details>
+
+````{verbatim}
+format:
+  revealjs:
+    embed-resources: true
+````
+
+Everything is packed into the single html file, which you can then email or upload on its own.
+
+:::{.callout-note}
+The file gets noticeably larger, and self-contained slides take a moment longer to open. That is the price of it working anywhere.
+:::
+
+### Check it
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here's how you make sure before you hit send. Render, then move only the HTML file — just that one file — to your Desktop, away from its folder. Open it there and click through a few slides. If the figures and the styling all survive the move, you know it's truly self-contained and safe to send. If they break, you forgot the embed-resources line. Thirty seconds of checking saves you an embarrassing follow-up email.
+
+</details>
+
+1. Render
+2. Move **only** the `.html` file to your Desktop
+3. Open it there and step through a few slides
+
+If the figures and the styling survive, it is safe to send.
+
+:::
+<!--end of panel-->
+
+## Resources
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+That's the tour. Where do you go from here? The single best resource is the official Quarto documentation for reveal.js — it's thorough and well organized, and it's linked right here. There's a second link for the more advanced features we didn't cover today, and a third to the full list of YAML options, which is the page you'll actually keep open once you start customizing your own decks. Everything I showed you today is in there, plus a great deal more.
+
+</details>
+
++ The best resource is the official documentation for using Quarto with `revealjs`, found [here](https://quarto.org/docs/presentations/revealjs).
+<!-- CHANGED (A4): "The best resources is" -> "The best resource is". -->
+
++ There are more things you can do with `revealjs`, which can be found [here](https://quarto.org/docs/presentations/revealjs/advanced.html).
+
++ [The full list of revealjs YAML options](https://quarto.org/docs/reference/formats/presentations/revealjs.html)
+<!-- ADDED: a direct link to the options reference, which is the page students
+     actually need once they start customizing. -->

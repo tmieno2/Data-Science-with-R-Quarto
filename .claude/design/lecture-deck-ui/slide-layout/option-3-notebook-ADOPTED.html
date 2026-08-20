@@ -1,0 +1,175 @@
+<!-- @dsCard group="Slide layouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Slide layout — Notebook</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* NOTEBOOK — warm paper, 22px body, and a permanent margin column.
+   The margin is the structural idea. It buys three things at once:
+     · larger type without longer lines (measure drops to ~66 characters)
+     · a home for asides that today have nowhere to go but the main flow
+     · a column the transcript panel can occupy WITHOUT overlaying content,
+       which is the one thing the current absolute-positioned panel cannot do. */
+.sys-notebook { padding: 30px 38px 0; }
+
+.nb-head { display: flex; align-items: baseline; gap: 14px;
+           border-bottom: 1px solid var(--rule); padding-bottom: 8px;
+           margin-bottom: 4px; }
+.sys-notebook h2 { font-size: 32px; font-weight: 600; color: var(--ink);
+                   margin: 0; line-height: 1.15; }
+.nb-head .chap { margin-left: auto; font-size: 14px; color: var(--ink-muted);
+                 letter-spacing: .08em; text-transform: uppercase;
+                 white-space: nowrap; }
+
+.nb-tabs { display: inline-block; margin: 10px 0 14px; white-space: nowrap; }
+.nb-tabs span { display: inline-block; font-size: var(--t-tab); padding: 3px 12px;
+                color: var(--ink-muted); border-bottom: 2px solid transparent; }
+.nb-tabs span.on { color: var(--accent); border-bottom-color: var(--accent);
+                   font-weight: 700; }
+
+.nb-cols { display: grid; grid-template-columns: 1fr var(--margin-w); gap: 26px; }
+.nb-margin { border-left: 1px solid var(--rule); padding-left: 18px;
+             font-size: 15px; line-height: 1.45; color: var(--ink-muted); }
+.nb-margin .lbl { display: block; font-size: 12px; letter-spacing: .1em;
+                  text-transform: uppercase; color: var(--accent);
+                  font-weight: 700; margin-bottom: 5px; }
+.nb-margin .note { margin-bottom: 16px; }
+.nb-margin code { font-size: 14px; }
+
+.sys-notebook strong { color: var(--accent-sub); }
+.sys-notebook pre.src { border: 1px solid var(--rule); }
+
+.nb-title { height: 100%; display: flex; flex-direction: column;
+            justify-content: center; padding: 0 24px 70px; }
+.nb-title .num { font-size: 15px; letter-spacing: .15em; text-transform: uppercase;
+                 color: var(--accent-sub); font-weight: 700; margin-bottom: 14px; }
+.nb-title h1 { font-size: 46px; margin: 0 0 18px; font-weight: 600; max-width: 780px;
+               line-height: 1.14; }
+.nb-title .rule { width: 100%; max-width: 620px; height: 1px; background: var(--rule);
+                  margin-bottom: 18px; }
+.nb-title .meta { font-size: var(--t-body); color: var(--ink-muted); }
+
+.nb-div { height: 100%; display: flex; flex-direction: column; justify-content: center;
+          align-items: center; text-align: center; padding-bottom: 70px; }
+.nb-div .step { font-size: 15px; letter-spacing: .15em; text-transform: uppercase;
+                color: var(--accent-sub); font-weight: 700; }
+.nb-div h1 { font-size: 48px; margin: 12px 0 0; font-weight: 600; }
+.nb-div .rule { width: 180px; height: 1px; background: var(--rule); margin-top: 24px; }
+</style>
+
+<h1 class="page">Notebook — larger type paid for with a shorter measure</h1>
+<p class="page">
+  Body copy goes from 19.2px to <b>22px</b> and line-height from 1.3 to 1.38,
+  which is the difference between readable and squinting from the back of a room.
+  That normally costs vertical space; here it does not, because the margin column
+  cuts the measure from ~110 characters to ~66, so a paragraph occupies fewer
+  lines even though each line is taller. The margin also gives the lecturer
+  transcript a column of its own — see <code>../transcript-panel/BRIEF.md</code>.
+</p>
+
+<p class="caption"><b>1 · Title slide.</b> Paper <code>#fbf9f3</code>, ink-blue
+  accent, sienna for the eyebrow.</p>
+<div class="stage sys-notebook">
+  <div class="nb-title">
+    <div class="num">Chapter 3 · Lecture 1</div>
+    <h1>Importing and Exporting Datasets</h1>
+    <div class="rule"></div>
+    <div class="meta">Taro Mieno · University of Nebraska–Lincoln<br>
+      <span style="font-size:16px">AECN 896-05 · Data Science with R</span></div>
+  </div>
+  <div class="logo tr">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>2 · Section divider.</b></p>
+<div class="stage sys-notebook">
+  <div class="nb-div">
+    <div class="step">Part 2</div>
+    <h1>Working directories</h1>
+    <div class="rule"></div>
+  </div>
+  <div class="logo tr">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>3 · Concept slide.</b> Asides that would otherwise pad the
+  bullet list — the "why does this break on my laptop" question — move to the
+  margin, where they do not compete with the main line of argument.</p>
+<div class="stage sys-notebook safeline">
+  <div class="nb-head">
+    <h2>Importing and Exporting Datasets</h2>
+    <span class="chap">Ch 3 · Data Wrangling</span>
+  </div>
+  <div class="nb-tabs">
+    <span class="on">Objectives</span><span>read.csv()</span
+    ><span>Working directory</span><span>Exercise</span>
+  </div>
+  <div class="nb-cols">
+    <div>
+      <ul>
+        <li>Read a <code>.csv</code> file into R as a <strong>data.frame</strong></li>
+        <li>Understand what the <strong>working directory</strong> is</li>
+        <li>Write a dataset back out to disk</li>
+        <li>Know when to reach for <code>readRDS()</code> instead</li>
+      </ul>
+    </div>
+    <div class="nb-margin">
+      <div class="note">
+        <span class="lbl">Why it matters</span>
+        A path that works on your machine will not work on mine. Nearly every
+        "it doesn't run" email in this course is a working-directory problem in
+        disguise.
+      </div>
+      <div class="note">
+        <span class="lbl">See also</span>
+        <code>here::here()</code>, Chapter 6.
+      </div>
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>4 · Code + output.</b> Code keeps the full main column;
+  the margin explains the pipe once, in place, instead of in a paragraph below
+  the output where it costs flow space.</p>
+<div class="stage sys-notebook safeline">
+  <div class="nb-head">
+    <h2>Summarizing by group</h2>
+    <span class="chap">Ch 3 · Data Wrangling</span>
+  </div>
+  <div class="nb-tabs">
+    <span>Syntax</span><span class="on">Example</span><span>Your turn</span>
+  </div>
+  <div class="nb-cols">
+    <div>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+  &lt;chr&gt;         &lt;dbl&gt;
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+    </div>
+    <div class="nb-margin">
+      <div class="note">
+        <span class="lbl">The pipe</span>
+        <code>%>%</code> passes the result on the left into the function on the
+        right as its <i>first</i> argument. Read it as "and then".
+      </div>
+      <div class="note">
+        <span class="lbl">Watch for</span>
+        <code>summarize()</code> drops every column you did not group by or
+        compute. That is intended.
+      </div>
+    </div>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>

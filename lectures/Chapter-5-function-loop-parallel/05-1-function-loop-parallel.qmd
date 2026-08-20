@@ -1,0 +1,2085 @@
+---
+title: "05-1: User-defined Function, Loop, and Parallelization"
+abstract: "Chapter 5: Function and Loop"
+format: 
+  revealjs:
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+webr:
+  # CHANGED: dropped 'parallel'. It is a base R package that ships with R, so it
+  # is not in the wasm repo and cannot be installed by webr. No webr cell uses
+  # it -- detectCores()/mclapply() appear only in host-rendered {r} chunks.
+  packages: ['dplyr', 'microbenchmark', 'future.apply', 'ggplot2', 'reshape', 'data.table']
+  cell-options:
+    editor-font-scale: 0.7
+    out-width: 100%
+    # dpi: 144
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things worth knowing before we start, because they will save you time all semester. The three stacked lines in the bottom left corner open a table of contents, so you can jump straight to a section rather than arrowing through every slide. And pressing the letter o gives you a panel view of the whole deck at once, which is the fastest way to find the slide you half remember. Both matter more in this chapter than most, because we move back and forth between the loop material and the parallel material, and you will want to compare them.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes on these slides are live. The faintly blue area is an editor you can type in, and Run Code executes everything in it. If you only want part of it, highlight that part and press Command Enter on a Mac, or Control Enter on Windows. Two buttons in the top right corner matter: the stacked-paper icon copies the code so you can paste it into RStudio on your own machine, and the reload button puts the original back if you have edited yourself into a corner. Do use these. This is a chapter where you learn far more by running things than by reading them.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Learning objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four things by the end of this chapter. First, writing your own functions, which is the foundation for everything else here. Second, repeating work with a for loop and with lapply. Third, and this one surprises people, learning when not to loop at all, because a great deal of what looks like a loop problem is really a vectorization problem and runs far faster written that way. Fourth, parallelizing genuinely slow work with future underscore lapply. Notice the order. Parallelization comes last deliberately. It is the most exciting tool and the least often the right one, and you should reach for vectorization first almost every time.
+
+</details>
+
++ Learn how to write functions yourself
++ Learn how to use a for loop and `lapply()` to complete repetitive jobs
++ Learn how not to loop things that can be easily vectorized
++ Learn how to parallelize repetitive jobs using the `future_lapply()` function from the `future.apply` package
+
+
+# User-defined Function
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## User-defined Function
+
+::: {.panel-tabset}
+
+### When?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The honest answer to when you should write a function is: when you notice yourself about to do the same thing a second time with different inputs. The mean example on screen makes the point cheaply. You could write sum of x divided by length of x every single time you need an average, and it would work, but nobody does that, because someone wrote mean for you. Your own functions are the same idea at a smaller scale. And the payoff grows with the length of the task. For a one-line calculation a function barely pays for itself. For a fifteen-line procedure you run on forty datasets, it is the difference between maintainable and unmanageable.
+
+</details>
+
+It is beneficial to write your own function when you expect to repeat the same action with different inputs to the action.
+
+<br>
+
+**Example: `mean()`**
+
+Calculating the average of a variable is such a common task 
+
++ You do not want to do `sum(x)/length(x)` every time you get a mean
++ You can just use the `mean()` function
+
+A function is more useful when the task is longer and more complicated.
+
+### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the skeleton, and it really is this simple. You give the function a name, you list its arguments inside function, and then in the body you do something with those arguments and return a result. Two things to notice. The return call is how the value gets out. Without it you may still get something back, but being explicit makes your intent obvious to whoever reads it next, including you in six months. And the note at the bottom matters more than it looks: the argument does not have to be called x. That is just a placeholder. Name your arguments after what they actually are.
+
+</details>
+
+Here is the general structure of a user-defined function:
+
+```{r eval = F}
+#--- NOT RUN ---#
+function_name <- function(x) {
+
+  1. do something on x
+
+  2. return the results
+
+}
+```
+
+<br>
+
+Then, you can use the function like this:
+
+```{r eval = F}
+#--- NOT RUN ---#
+function_name(x)
+```
+
+<br>
+
+Note: the argument does not have to be named `x`
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the skeleton with something in it. This function is called square it, it takes one argument named a, it squares a and stores that in squared a, and then returns squared a. Map it against the structure on the previous tab and you will see the two numbered comments are exactly the two steps. Then run the second block, which calls square it with ten and stores the result in ten squared. The thing to notice is that you never told R what a is anywhere outside the function. The ten you passed in becomes a for the duration of the call, and then it is gone.
+
+</details>
+
+The following function takes numeric numbers, square them, and return the squared values: 
+
+```{webr-r}
+#| autorun: true
+square_it <- function(a) {
+
+  #--- 1. do something on x ---# 
+  squared_a <- a^2
+
+  #--- 2. return the results ---# 
+  return(squared_a)
+
+}
+```
+
+<br>
+
+Try the function:
+
+```{webr-r}
+ten_squared <- square_it(10) 
+
+ten_squared
+```
+
+### Scope 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This tab is about where things live. Inside this function we create two objects, squared a and original a, and we return original a. Run it, then look at your environment tab in RStudio. Neither of them is there. Objects created inside a function exist only while the function is running, and then they vanish. That is a feature, not a limitation. It means a function cannot accidentally clobber a variable you are using elsewhere, and you can reuse obvious names like x or result inside functions without worrying. And read the last line carefully: we return original a, but only its contents come back, not the name.
+
+</details>
+
+Any objects that are defined within a function are not registered (created) to the global environment.  
+
+For example, `squared_a` and `original_a` are defined only internally, and are not registered on the global environment. 
+
+```{webr-r}
+#| autorun: true
+square_and_sqrt_it <- function(a) {
+
+  #--- 1. do something on x ---# 
+  squared_a <- a^2
+  original_a <- sqrt(squared_a)
+
+  #--- 2. return the results ---# 
+  return(original_a)
+
+} 
+```
+
+<br>
+
+You can confirm this by looking at the environment tab in RStudio after running the following:
+
+```{webr-r}
+square_and_sqrt_it(8)
+```
+
+<br>
+
+Even though we are returning `original_a`, only its content is returned.
+
+### Scope 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the direction that catches people out. Look at the function. It uses something called multiplier, but multiplier is not one of its arguments, and it is never created inside the function either. So run it, and it fails, because R has nowhere to find that name. Then define multiplier in the global environment and run exactly the same function again, and now it works. That is R's scoping rule: when a name is not found locally, R goes looking outward. This is convenient and it is also dangerous, because a function that silently depends on a global variable will work on your machine and break on someone else's. Pass things in as arguments.
+
+</details>
+
+When R sees objects that are not provided explicitly as arguments to the function, then R looks for them in the global environment:
+
+```{webr-r}
+square_multiply_it <- function(a) {
+
+  #--- 1. do something on a ---# 
+  squared_a <- a^2
+  z <- multiplier * squared_a
+
+  #--- 2. return the results ---# 
+  return(z)
+
+} 
+```
+
+<br>
+
+<!-- CHANGED: this read "Here, `multiplier` is provided as an argument to the
+function", which is the opposite of what the tab demonstrates. `multiplier` is
+NOT an argument -- that is precisely why R has to go looking for it in the
+global environment, and why the first call below fails. -->
+
+Here, `multiplier` is [not]{style="color: red;"} provided as an argument to the function, and it is not defined inside it either.
+
+Try this:
+
+```{webr-r}
+square_multiply_it(10) 
+```
+
+<br>
+
+Now, define `multiplier` on the global environment, and then run it again:
+
+```{webr-r}
+multiplier <- 10
+square_multiply_it(10)
+```
+
+### default value
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small addition with a large payoff. Writing a equals five in the argument list gives that argument a default, so calling square it with no arguments at all still works and uses five. Defaults are how you make a function easy to call in the common case and still flexible in the unusual one. The pattern you will see in real packages is a function with two or three arguments you almost always supply and a dozen you almost never touch, all defaulted to something sensible. Your own functions should do the same. Default the things that usually stay the same, and require the things that always change.
+
+</details>
+
+You can set default values for function arguments by `argument = value` like below: 
+
+```{webr-r}
+#| autorun: true
+square_it <- function(a = 5) {
+
+  #--- 1. do something on a ---# 
+  squared_a <- a^2
+
+  #--- 2. return the results ---# 
+  return(squared_a)
+
+} 
+```
+
+<br>
+
+Try this:
+
+```{webr-r}
+square_it()
+```
+
+### Multiple arguments
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Adding arguments is just adding them, separated by commas. This function takes a and b and returns a squared plus b squared. Then look at the two calls, because the difference between them is the lesson. In the first, four and three are matched to a and b by position: first value to first argument. In the second we name them explicitly, b equals three and a equals four, and now the order does not matter at all. Positional is fine for one or two obvious arguments. The moment there are several, or the moment you are looping, name them. You will see exactly why in the exercises.
+
+</details>
+
+It is easy to create a function with multiple arguments. You just simply add more arguments within `function()` like below:
+
+```{webr-r}
+#| autorun: true
+#--- define a function with two arguments ---#
+square_them_add <- function(a = 5, b = 2) {
+
+  #--- 1. do something on a ---# 
+  squared_and_summed <- a^2 + b^2
+
+  #--- 2. return the results ---# 
+  return(squared_and_summed)
+
+} 
+
+#--- run it ---#
+square_them_add(4, 3)
+```
+
+<br>
+
+As you are likely to have noticed, the order of input arguments is assumed to be the same as the order of the arguments of the function. Above,
+
++ `a = 4`
++ `b = 3`
+
+You can mess with the order of input arguments if you want if you name the input arguments as follows:
+
+```{webr-r}
+square_them_add(b = 3, a = 4) 
+```
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three exercises, and they build on each other deliberately. The first is a straight translation: you are given the Fahrenheit to Celsius formula, so wrap it in a function. The second asks for a yield response function, taking a nitrogen rate and returning predicted corn yield from that log relationship. The third is the interesting one, because it asks you to calculate revenue using the function you wrote in exercise two rather than rewriting the yield formula. That is the habit worth building. Functions are meant to be built out of other functions, and if you find yourself copying the yield equation into a second place, you have missed the point.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Exercise 1
+
+Define a function that takes temperature in Fahrenheit, convert it into Celsius, and return it. 
+
+Here is the formula: `temp_C <- (temp_F - 32) * 5 / 9`
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+f_to_c <- function(temp_F) {
+  temp_C <- (temp_F - 32) * 5 / 9
+  return(temp_C)
+}
+``` 
+
+#### Exercise 2
+
+After running a randomized nitrogen trial, you found the following relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
+
+$$
+\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+$$ 
+
+Write a function that takes a nitrogen rate as an argument, calculate the estimated yield for the nitrogen rate, and then return the estimated yield.
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+n_to_yield <- function(N) {
+  yield <- 120 + 25 * log(N)
+  return(yield)
+}
+```
+
+#### Exercise 3
+
+You would like to calculate the revenue of corn production (defined below) as a function of nitrogen rate based on the yield response function.
+
+```{=tex}
+\begin{align*}
+P_{corn} * \mbox{corn yield}
+\end{align*}
+```
+
+Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function you created in Exercise 2.
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+calc_rev <- function(corn_price, N) {
+  yield <- n_to_yield(N)
+  revenue <- corn_price * yield
+  return(revenue)
+}
+```
+
+:::
+<!--end of panel-->
+:::
+<!--end of panel-->
+
+
+
+# Loop
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Loop
+
+::: {.panel-tabset}
+
+### Motivations
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the case for loops. Squaring the numbers one through five by hand is five lines, and that is perfectly fine. Now imagine a thousand integers. Nobody is writing a thousand lines, and if they did, nobody could read it or change it afterwards. But the real argument is the last bullet. The repetitive work you will actually meet is not squaring numbers. It is things like Monte Carlo simulation, where you run a genuinely complicated procedure thousands of times with slightly different inputs. Writing that out by hand is not merely tedious, it is impossible. Loops are how you describe the pattern once and let R do the repetition.
+
+</details>
+
++ We sometimes need to run the same process over and over again often with slight changes in parameters. 
+ 
++ In such a case, it is very time-consuming and messy to write all of the steps one by one. 
+
++ For example, suppose you are interested in knowing the square of 1 through 5 with a step of 1 ([1,2,3,4,5]). The following code certainly works:
+
+```{r eval = F}
+1^2 
+2^2 
+3^2 
+4^2 
+5^2 
+```
+
++ However, imagine you have to do this for 1000 integers. 
+
++ Yes, you don’t want to write each one of them one by one as that would occupy 1000 lines of your code, and it would be time-consuming. 
+
++ Things become even more challenging when you need to repeat far more complex processes, such as Monte Carlo simulations. To handle such repetitive tasks efficiently, it is important to learn how to write programs that automate these jobs using loops.
+
+### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Strip a loop down and it has exactly two parts: the thing you do, which stays the same every time, and the thing that changes. In the squaring example the action is squaring, and the changing part is which number gets squared. Getting into the habit of naming those two parts separately, before you write any code, makes loops much easier to write. Then the syntax underneath is just that idea spelled out. For x in some list of values, do something with x. R runs the body once for each value, with x taking the next value each time round.
+
+</details>
+
++ **Looping** means repeatedly executing the same process, with only the parameters changing.
+
++ In the example above:
+  + The repeated process is the **action of squaring**.
+  + The parameter that changes is **what number gets squared**.
+
+**Syntax** 
+
+```{r eval = F}
+#--- NOT RUN ---#
+for (x in a_list_of_values){
+  you do what you want to do with x
+} 
+```
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two loops that do exactly the same thing. The first uses x as the loop variable, the second uses bluh bluh bluh, and the output is identical. That is the point of showing you the silly one. The loop variable is just a name you choose, with no meaning to R at all. Beginners often think there is something special about i or x. There is not. Pick a name that says what the value is, like year or county or nitrogen rate, and your loop becomes self-documenting. Also notice that both bodies call print. That is not decoration, and the exercise tab shows you why.
+
+</details>
+
+```{webr-r}
+for (x in 1:5){
+  print(x^2)
+}  
+```
+
+<br>
+
+This does the same:
+
+```{webr-r}
+for (bluh_bluh_bluh in 1:5){
+  print(bluh_bluh_bluh^2)
+}  
+```
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Your turn. Cube each element of a sequence that starts at five, goes up in fives, and stops at fifty. So you need seq to build the values and a for loop to walk through them. One thing to watch, and the callout under the answer spells it out. Inside a for loop, R does not automatically print. If you write i cubed on its own line, R computes it, throws it away, and shows you nothing at all. You have to wrap it in print to see the numbers. That trips up almost everyone the first time, because at the console the same expression would have printed quite happily.
+
+</details>
+
+Write a for loop that cubes each element of a sequence starting at 5, increasing by 5, and ending at 50.
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+<!-- CHANGED: the answer was `for (i in seq(5, 50, by = 5)){ i^3 }`, which
+produces NO output at all -- auto-printing is switched off inside a for loop, so
+the cubed value is computed and thrown away. Students running the official
+answer would see nothing and assume they had made a mistake. The deck's own
+example a few tabs earlier correctly uses print(). -->
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+for (i in seq(5, 50, by = 5)){
+  print(i^3)
+}
+```
+
+::: {.callout-note title="Why `print()`?"}
+Inside a `for` loop, R does **not** auto-print. Writing `i^3` on its own computes the value and discards it silently. If you want to see it, you have to ask.
+:::
+
+:::
+<!--end of panel-->
+
+## Looping with `lapply()`
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Base R gives you a second way to loop, and it is the one you will end up using most. The syntax is lapply of A and B, where A is the values you want to loop over and B is what you want done to each one. B can be a function that already exists, like mean, or one you write on the spot. The note at the bottom repays reading twice. What lapply loops over depends on what you hand it: elements of a vector, elements of a list, and for a data frame, the columns. That last one surprises people until you remember a data frame is a list of equal-length columns.
+
+</details>
+
+Instead of using a `for` loop, we can use the `lapply()` function from the base package to loop.
+
+<br>
+
+**Syntax**
+
+```{r lapply-s, eval = F}
+#--- NOT RUN ---#  
+lapply(A, B) 
+```
+
++ `A` is the list of values 
++ `B` is the function you would like to apply to each of the values in `A` 
+  + You can use an existing function (e.g., `mean()`) 
+  + You can also write a function on the spot
+
+<br>
+
+**Note**:
+
++ When `A` is a vector, `lapply()` works on each of the vector elements
++ When `A` is a list, `lapply()` works on each of the list elements whatever they may be 
++ When `A` is a `data.frame`, `lapply()` works on each of the columns (`data.frame` is a list of columns of equal length)
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same job as the for loop, in one line. Read the backslash of x as function of x. It is just shorthand, and you will see it everywhere in modern R code. But the important sentence is the one in red at the bottom. lapply always returns a list. Always. That is what the l stands for. So even though you fed it a simple numeric vector and did simple arithmetic, what comes back is a list of five one-element pieces, not a vector. That is the single biggest difference from a for loop, and it is why you will so often see unlist or bind rows immediately after an lapply.
+
+</details>
+
+This does the same thing as the for loop example we looked at earlier:
+
+```{webr-r}
+lapply(1:5, \(x){x^2})
+```
+
++ `\(x)`: shorthand for `function(x)`
+
+<br>
+
+The key difference from a for loop is the object class of the output after the loop. 
+
+<span style="color:red"> Important</span>: the output type of `lappy()` is always a `list` (that's why it is called `lapply`)
+
+### define a function
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A small habit that pays off constantly. Rather than writing the action inline, define it as a named function first, then loop over that. Here we define square it, and then lapply calls it. For a one-line action this looks like extra work, and honestly it is. But the moment the action is fifteen lines long, having it as a named function means you can test it on a single value, get it right, and only then put it in a loop. Debugging a broken function is easy. Debugging a broken function that is also inside a loop over a thousand values is not.
+
+</details>
+
+It is often the case that you want to write a function of the action you intend to repeat first and then loop.
+
+For example, for the loop of squaring numbers, you can first define a function that implements the action of squaring: 
+
+```{webr-r}
+#| autorun: true
+square_it <- function(x){
+  return(x^2)
+} 
+```
+
+<br>
+
+And then loop:
+
+```{webr-r}
+lapply(1:5, \(x) square_it(x))
+```
+
+### multiple arguments
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A very common situation: your function takes several arguments, but you only want to loop over one of them. Here square them add takes a and b, and we want to try many values of a while holding b at five. The lapply line shows the pattern. The value being looped is called x inside the shorthand function, we pass it as the first argument, and we pin b equals five explicitly. Notice that b is named and the looped value is not. That is the safe way round, and it connects directly to what we said about naming arguments. Get the pinning wrong and your loop values quietly land in the wrong slot.
+
+</details>
+
+Often times, you would like to loop over a single parameter of a function that has multiple arguments: 
+
+For example, you would like to fix the value of `b` at 5 while trying different values of `a` of the following function:
+
+```{webr-r}
+#| autorun: true
+square_them_add <- function(a, b) {
+
+  squared_and_summed <- a^2 + b^2
+
+  return(squared_and_summed)
+
+} 
+```
+
+<br>
+
+Then you can do this:
+
+```{webr-r}
+lapply(1:10, \(x) square_them_add(x, b = 5)) 
+```
+
+<br>
+
+As you can see, this function tries each of `1:10` (called internally `x`), give it to `square_them_add()` as its first argument while `b` is fixed at 5.
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two exercises. The first is the lapply version of the cubing loop you just wrote, so you can feel the difference directly, including the fact that you get a list back rather than printed output. The second is the one to slow down on. You need a function that takes both a nitrogen rate and a corn price and returns revenue, and then you loop over corn prices while holding nitrogen at two hundred. Look carefully at how the answer names its arguments in the lapply call. That is not stylistic. Pass them positionally in the wrong order and the corn price gets treated as the nitrogen rate, the code runs perfectly happily, and you get nonsense.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Exercise 1
+
+Use `lapply()` to cube each element of a sequence starting at 5, increasing by 5, and ending at 50.
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+lapply(seq(5, 50, by = 5), \(x) x^3) 
+```
+
+
+#### Exercise 2
+
+Define a function that takes a nitrogen rate and corn price as arguments and calculate revenue. Yield can be estimated using the following equation:
+
+$$
+\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+$$ 
+
+At each value of the corn price sequence of `seq(2.5, 4.0, by = 0.1)`, calculate the revenue using `lapply()` where nitrogen rate is fixed at 200 (lb/acre).
+
+<br>
+
+**Work here**
+
+```{webr-r}
+
+```
+
+<br>
+
+<!-- CHANGED: the answer defined n_to_yield(N), which takes nitrogen only and
+returns YIELD, then looped the corn price sequence into its NITROGEN argument.
+So it computed yield at nitrogen rates of 2.5, 2.6, ... (n_to_yield(2.5) =
+142.9) instead of revenue at N = 200 (2.5 * n_to_yield(200) = 631.1). Three
+errors against the question asked: wrong arguments, wrong quantity returned, and
+nitrogen never fixed at 200. -->
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+#--- takes BOTH arguments and returns revenue, as the question asks ---#
+calc_revenue <- function(N, corn_price) {
+  yield <- 120 + 25 * log(N)
+  revenue <- corn_price * yield
+  return(revenue)
+}
+
+corn_price_seq <- seq(2.5, 4.0, by = 0.1)
+
+#--- loop over corn price, hold nitrogen fixed at 200 ---#
+lapply(corn_price_seq, \(x) calc_revenue(N = 200, corn_price = x))
+```
+
+::: {.callout-note title="Name the arguments"}
+Naming them (`N = 200`, `corn_price = x`) is what stops the looped value landing in the wrong slot. With positional arguments, `calc_revenue(x, 200)` would quietly compute yield at a nitrogen rate of 2.5 and multiply it by a corn price of 200.
+:::
+
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Looping over multiple variables
+
+::: {.panel-tabset}
+
+### Motivations
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So far every loop has walked down a single list of values. Real questions are rarely that tidy. The example here is a sensitivity analysis: you want to know how profitable corn production is across a range of corn prices and a range of nitrogen rates, which means every combination of the two, not each list separately. The trick is in the last two bullets, and it is worth remembering because it generalises to any number of variables. Build a data frame that holds all the combinations, one combination per row, and then loop over the rows. You have turned a two-dimensional problem back into a one-dimensional loop.
+
+</details>
+
++ The example we have looked at is a very simple case where a loop is done over a single list of values
+
++ It is often the case that you want to loop over multiple variables. 
+ 
+**Example**
+
+You are interested in understanding the sensitivity of the profitability of corn production with respect to corn price and nitrogen application rate. 
+
+So, you would like to loop over two sets of sequences of values:
+
++ corn price
++ nitrogen application rate
+
+**How**
+
+The trick is to 
+
++ create a `data.frame` of two (or as many variables as you would like to loop over) variables (corn price and nitrogen application rate), which stores all the permutations of the two variables 
+
++ then loop over the rows of the `data.frame` 
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Concretely, we are asking how corn revenue responds to two things at once: the price of corn, between three and five dollars a bushel, and the nitrogen rate, between zero and three hundred pounds an acre. Keep those ranges in mind as we go through the four steps, because the numbers on the next few tabs come straight from them. And notice this grid is small, deliberately. Three prices and four nitrogen rates give twelve combinations, few enough that you can look at the whole table and check it by eye. Get the mechanics right on twelve rows before you turn it loose on twelve thousand.
+
+</details>
+
++ We are interested in understanding the sensitivity of corn revenue to corn price and applied nitrogen amount.
+
++ We consider
+  * the range of $3.0/bu to $5.0/bu for corn price 
+  * 0 lb/acre to 300 lb/acre for nitrogen rate
+
+### Steps
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four steps, and they are worth naming before you look at the code. Step one builds the sequences and expands them into every combination with expand dot grid, giving you a data frame with one row per case. Step two writes a function that takes a row number, pulls the parameters out of that row, and computes what you want. Step three loops over the row numbers. Step four stacks the results back into one data frame with bind rows. That shape, expand then loop over rows then bind, is one you will reuse constantly, so learn it as a pattern rather than as four separate bits of code.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Step 1
+
+Get a sequence of values for corn price and nitrogen rate: 
+
+```{webr-r}
+#| autorun: true
+#--- corn price vector ---#
+corn_price_vec <- seq(3, 5, by = 1)
+
+#--- nitrogen vector ---#
+nitrogen_vec <- seq(0, 300, by = 100) 
+```
+
+<br>
+
+We then create a complete combination of the values using the `expand.grid()` function. The resulting object is a `data.frame`.
+
+```{webr-r}
+#| autorun: true
+#--- crate a data.frame that holds parameter sets to loop over ---#
+(
+parameters_data <- 
+  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)
+)
+
+```
+
+#### Step 2
+
+Define a function that 
+
++ takes a row number
++ refer to `parameters_data` to extract the parameters stored at the row number
++ calculate corn yield and revenue based on the extracted parameters (corn price and nitrogen rate).
+
+```{webr-r}
+#| autorun: true
+gen_rev_corn <- function(i) {
+
+  #--- define corn price ---#
+  corn_price <- parameters_data[i,'corn_price']
+  #--- define nitrogen  ---#
+  nitrogen <- parameters_data[i,'nitrogen']
+  #--- calculate yield ---#
+  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
+  #--- calculate revenue ---#
+  revenue <- corn_price * yield 
+  #--- combine all the information you would like to have  ---#
+  data_to_return <- data.frame(
+    corn_price = corn_price,
+    nitrogen = nitrogen,
+    revenue = revenue
+  )
+
+  return(data_to_return)
+} 
+```
+
+<br>
+
+This function 
+
++ takes `i` (act as a row number within the function) 
++ extract corn price and nitrogen from the `i`th row of `parameters_data` <!-- CHANGED: said `parameters_mat`, which is not an object that exists anywhere in this deck -->
++ use the extracted values to calculate yield and revenue
++ create a `data.frame` of the resulting revenue, corn price, and nitrogen rate
++ returns the `data.frame`
+
+#### Step 3
+
+Do a loop using `lapply()`:
+
+```{webr-r}
+#--- loop over all the parameter combinations ---#
+rev_data <- lapply(1:nrow(parameters_data), gen_rev_corn)
+
+#--- take a look ---#
+rev_data %>% head()
+```
+
+#### Step 4
+
+Combine the list of `data.frame`s into a single `data.frame` using `bind_rows()` from the `dplyr` package.
+
+```{webr-r}
+(
+final_results <- bind_rows(rev_data)
+)
+```
+
+:::
+<!--end of panel-->
+
+### Tips to write a function for loop
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the most practical advice in the chapter, so do not skip past it. Do not start by writing a function. Start by writing ordinary code that works for one specific case, here row one, with the number one written in literally. Run it, look at the result, satisfy yourself it is right. Only then turn it into a function by replacing that one with i. The reason is that debugging is much harder inside a function, where the intermediate objects disappear the moment it finishes. Working line by line at the top level, you can inspect everything as you go. Get it right first, then wrap it up.
+
+</details>
+
+Before defining a function, write code that works for one row.
+
+We will work on a specific value of `i`. Here it is `i = 1`.
+
+```{webr-r}
+#--- define corn price ---#
+corn_price <- parameters_data[1, 'corn_price']
+
+#--- define nitrogen  ---#
+nitrogen <- parameters_data[1, 'nitrogen']
+
+#--- calculate yield ---#
+yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
+
+#--- calculate revenue ---#
+revenue <- corn_price * yield 
+
+#--- combine all the information you would like to have  ---#
+data_to_return <- data.frame(
+  corn_price = corn_price,
+  nitrogen = nitrogen,
+  revenue = revenue
+)
+```
+
+<br>
+
+After you confirm the code you write gives you desired outcomes, make it a function by replacing `1` with `i`.
+
+### Exercise
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now do the whole pattern yourself. Four steps, laid out for you: build the two price sequences, expand them into all combinations, write a function that takes a row number and returns profit for that combination, and loop. Notice it is profit here, not revenue, so you subtract the nitrogen cost as well as counting the corn income. And note that the nitrogen rate is fixed at two hundred throughout, so it is not one of the things you are looping over, even though it appears in both equations. Work through it in the order given, and use the tip from the last tab: get row one working before you write any function at all.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+Find the profit of corn production at different price combinations of corn and nitrogen where nitrogen rate is fixed at 200 lb/acre.
+
++ Step 1: Define the following sequences of numbers
+  * corn price: `seq(2.5, 4.0, by = 0.05)`
+  * nitrogen price: `seq(0.2, 0.6, by = 0.01)`
++ Step 2: Create a data.frame of the complete combinations of the values from the price vectors
++ Step 3: Define a function that takes a row number, extract corn price and nitrogen price and then calculate profit based on the price combination using the following equations:
+
+$$
+\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+$$ 
+
+$$
+\mbox{profit} = \mbox{corn price} \times \mbox{corn yield} - \mbox{nitrogen price} \times \mbox{nitrogen rate}
+$$
+
++ Step 4: loop over the row numbers of the parameter data
+
+#### Workspace
+
+```{webr-r}
+#--- work here ---#
+
+
+
+
+
+```
+
+**Answer**
+
+```{r, eval = FALSE}
+#| code-fold: true
+
+corn_price_vec <- seq(2.5, 4.0, by = 0.05)
+#--- CHANGED: was by = 0.02, but the instruction asks for by = 0.01 ---#
+n_price_vec <- seq(0.2, 0.6, by = 0.01)
+
+cases_data <- 
+  expand.grid(
+    corn_price = corn_price_vec, 
+    n_price = n_price_vec
+  )
+
+get_profit <- function(i) {
+  corn_price <- cases_data[i, "corn_price"]
+  n_price <- cases_data[i, "n_price"]
+
+  corn_yield <- 120 + 25 * log(200)
+  profit <- corn_price * corn_yield - n_price * 200
+
+  data_to_return <-
+    data.frame(
+      corn_price = corn_price,
+      n_price = n_price,
+      profit = profit
+    )
+    
+  return(data_to_return)
+}
+
+lapply(
+  1:nrow(cases_data),
+  \(i) get_profit(i)
+) %>%
+  bind_rows()
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
+## Do you really need to loop?
+
+::: {.panel-tabset}
+
+### Why not?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Having spent all that time teaching you to loop, here is the twist. You should not have looped in any of those examples. Every one of them could be vectorized. A vectorized operation takes whole vectors as input and works on all the elements at once, which is what the addition example on screen is doing. Adding two thousand-element vectors is a single operation as far as your code is concerned. R is built for this, and the internals are compiled code, so it is not just tidier to write, it is genuinely faster. The next few tabs show you exactly how much faster.
+
+</details>
+
++ Actually, we should not have used a for loop or `lapply()` in any of the examples above in practice.
+
++ This is because they can be easily **vectorized**. 
+
++ Vectorized operations are those that take vectors as inputs and work on each element of the vectors in parallel
+
+**Example**
+
+```{webr-r}
+#--- define numeric vectors ---#
+x <- 1:1000
+y <- 1:1000
+
+#--- element wise addition ---#
+z_vec <- x + y
+```
+
+### compare
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two ways to add the same two vectors. The vectorized version is x plus y, and that is the entire program. The loop version walks the indices one at a time, pulling out element i from each vector, adding them, and building a list, which then has to be unlisted back into a vector. Then all dot equal confirms the two results are identical, and they are. So you get exactly the same answer either way. The question is what each one costs, and the sentence at the bottom is the hint. R is written to be good at the first kind of operation and comparatively bad at the second.
+
+</details>
+
+**Vectorized** 
+
+```{webr-r}
+#--- define numeric vectors ---#
+x <- 1:1000
+y <- 1:1000
+
+#--- element wise addition ---#
+z_vec <- x + y
+```
+
+<br>
+
+**Non-vectorized (loop)** 
+
+```{webr-r}
+z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>%  unlist()
+```
+
+<br>
+
+**Compare**
+
+```{webr-r}
+#--- check if identical with z_vec ---#
+all.equal(z_la, z_vec) 
+```
+
+Both produce the same results. However, R is written in a way that is much better at doing vectorized operations. 
+
+### time
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now we measure instead of asserting. Microbenchmark runs each expression a hundred times and reports the distribution, which is what you want, because a single timing is mostly noise. Look at the numbers when the block finishes. The vectorized version is dramatically faster. The explanation is in the second bullet, and it is worth understanding rather than memorising. Every trip round that loop, R has to work out what the objects are, check their types, allocate somewhere for the result, and so on. Vectorized code pays those costs once for the whole vector instead of once per element. That overhead is the entire difference.
+
+</details>
+
+Let's time them using the `microbenchmark()` function from the `microbenchmark` package. 
+
+Here, we do not `unlist()` after `lapply()` to just focus on the multiplication part.
+
+```{webr-r}
+microbenchmark(
+  #--- vectorized ---#
+  "vectorized" = { x + y }, 
+  #--- not vectorized ---#
+  "not vectorized" = { lapply(1:1000, function(i) x[i] + y[i])},
+  times = 100, 
+  unit = "ms"
+) 
+```
+
+<br>
+
++ As you can see, the vectorized version is faster. 
++ The time difference comes from R having to conduct many more internal checks and hidden operations for the non-vectorized one
+
+### vectorize 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The simplest possible illustration of the point. On top, lapply calling square it a thousand times. Underneath, square it applied to the whole vector at once. Same answers. But look at why the second one works. The body of square it is x squared, and squaring in R is already vectorized, so the function inherits that for free without you doing anything. That is the general lesson. A great many functions you write are automatically vectorized because everything inside them is, and you never needed the loop in the first place. Before you write lapply, try handing your function the whole vector and see what happens.
+
+</details>
+
+Instead of this:
+
+```{webr-r}
+lapply(1:1000, square_it)
+```
+
+<br>
+
+You can just do this:
+
+```{webr-r}
+square_it(1:1000)
+```
+
+### vectorize 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the same idea on the real example. Compare this function with the one from the loop version. That one took a row number and went and looked up the parameters itself. This one just takes corn price and nitrogen directly as arguments and does the arithmetic. That change is precisely what makes it vectorizable. Then instead of looping over rows, we call it once inside mutate, handing it the two entire columns, and it computes every row's revenue in one go. No loop, no list of data frames, no bind rows at the end. One line, and the result is already a proper data frame.
+
+</details>
+
+Here is the vectorized version of the revenue sensitivity analysis:
+
+```{webr-r}
+#| autorun: true
+gen_rev_corn_short <- function(corn_price, nitrogen) {
+
+  #--- calculate yield ---#
+  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
+
+  #--- calculate revenue ---#
+  revenue <- corn_price * yield 
+
+  return(revenue)
+} 
+```
+
+<br>
+
+Then use the function to calculate revenue and assign it to a new variable in the parameters_data data.
+
+```{webr-r}
+rev_data_2 <- 
+  mutate(
+    parameters_data,
+    revenue = gen_rev_corn_short(corn_price, nitrogen)
+  )
+```
+ 
+### compare
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the timing comparison for the realistic case. Run it and look at the gap. The vectorized version computes every combination in a single pass. The loop version calls a function once per row, and each of those calls does its own data frame lookup and builds its own little one-row data frame, which then all have to be stitched together. All of that is overhead you simply do not pay in the vectorized version. Keep this result in mind for the parallel section that follows, because the temptation there is to reach for more cores. Very often the better move is to stop looping at all.
+
+</details>
+
+Let’s compare the vectorized and non-vectorized version:
+
+```{webr-r}
+microbenchmark(
+
+  #--- vectorized ---#
+  "vectorized" = { rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen)) },
+
+  #--- not vectorized ---#
+  "not vectorized" = { parameters_data$revenue <- lapply(1:nrow(parameters_data), gen_rev_corn) },
+  times = 100, 
+  unit = "ms"
+
+) 
+```
+
+:::
+<!--end of panel-->
+
+# Parallelized computation
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Parallel processing
+
+::: {.panel-tabset}
+
+### Intro
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Parallelization means splitting work across several cores so that pieces run at the same time. Our focus is the easy case, which has the wonderful name embarrassingly parallel: every piece is completely independent, so no piece needs any other piece's answer. Squaring integers qualifies, because computing one squared does not require knowing two squared. That independence is what makes parallelization straightforward, since you never have to think about ordering or about one worker waiting on another. And the last bullet is genuinely reassuring. Most of what you will actually want to speed up, simulations, or running a model over many datasets, does fall into this category.
+
+</details>
+
++ Parallelization of computation involves distributing the task at hand to multiple cores so that multiple processes are done in parallel. 
+
++ Our focus is on the so called **embarrassingly parallel** processes.
+
+**Embarrassingly parallel process**: a collection of processes where each process is completely independent of any another (one process does not use the outputs of any of the other processes) 
+
++ The example of integer squaring is embarrassingly parallel. In order to calculate $1^2$, you do not need to use the result of $2^2$ or any other squares. <!-- CHANGED: read "calculate 12 ... the result of 22" -- the superscripts had been lost, leaving two meaningless numbers -->
+ 
++ Embarrassingly parallel processes are very easy to parallelize because you do not have to worry about which process to complete first to make other processes happen. 
+
++ Fortunately, most of the processes you are interested in parallelizing fall under this category
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The good news is that you have already learned the hard part. Parallelizing with the future dot apply package means writing future underscore lapply where you would have written lapply, and that is essentially the whole change. Look at the two lines at the bottom: same values, same function, same shape of result. Everything you know about lapply carries straight over, including the fact that you get a list back. There is one piece of setup to do first, which the next tab covers, and it is the piece people get wrong, so pay attention to it.
+
+</details>
+
++ We will use the `future_lapply()` function from the `future.apply` package for parallelization. 
+
++ Using the package, parallelization is a piece of cake as it is basically the same syntactically as `lapply()`.
+
+```{r eval = F}
+#--- install the package ---#
+install.packages("future.apply") 
+
+#--- load packages ---#
+library(future.apply)
+```
+
+```{r}
+#| include: false
+library(future.apply)
+library(microbenchmark)
+library(data.table)
+library(tictoc)
+```
+
+<br>
+
+**How**
+
+You can simply replace `lapply()` with `future_lapply()`!
+
+```{r eval = F}
+#--- not parallelized ---#
+sq_ls <- lapply(1:1000, function(x) x^2) 
+
+#--- parallelized ---#
+sq_ls_par <- future_lapply(1:1000, function(x) x^2) 
+```
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two things before you can parallelize. First, find out how many cores you have, with detect cores. Second, and this is the part that matters, tell R how to run the workers, using plan. We use multisession, which starts separate R sessions as workers and works on every platform. Now read the red callout, because it is the trap. There is another option, multicore, that uses forking. Forking does not exist on Windows, and it is switched off inside RStudio. If you ask for multicore where forking is unavailable, R does not warn you and does not switch to something else. It quietly runs everything on one core. Your code works, and you gain nothing.
+
+</details>
+
+<!-- CHANGED: split into two nested tabs. With the corrected backend explanation
+this tab ran to 1007px against reveal's 700px logical slide, so the multicore
+warning -- the most important thing on the slide -- sat below the fold. -->
+
+:::: {.panel-tabset}
+
+#### Cores and `plan()`
+
+You can find out how many cores you have available for parallel computation on your computer using the `detectCores()` function from the `parallel` package.
+
+```{r}
+#--- number of all cores ---#
+parallel::detectCores()
+```
+
+<br>
+
+Before we implement parallelized `lapply()`, we need to declare what backend process we will be using by `plan()`.
+
+<!-- CHANGED: this slide used plan(multicore, ...) and claimed that "with the
+multicore option, R figures out which multicore or multisession should be used
+and automatically redirect ... to the appropriate (available) one".
+
+That is not what multicore does. The auto-selecting strategy was `multiprocess`,
+deprecated in future 1.20.0 and now removed entirely (it is not exported in
+future 1.34.0). When forking is unavailable, plan(multicore) does NOT fall back
+to multisession -- it runs SEQUENTIALLY, in the parent process, with no error.
+Verified by process ID: with forking enabled, future_lapply() ran across 4
+distinct PIDs; with forking disabled, all work ran in 1 PID equal to the parent.
+
+Forking is unavailable on Windows AND inside RStudio (future disables it there
+by default). So on this slide's original advice, a large share of the class got
+zero parallelism while the rendered timings still showed a speed-up.
+
+Switched the default to multisession, which works on every platform. -->
+
+```{r}
+#--- multisession works everywhere: Windows, Mac, Linux, and inside RStudio ---#
+plan(multisession, workers = parallel::detectCores() - 1)
+```
+
+<br>
+
+:::{.callout-note}
+Unless you tell R explicitly to parallelize things (like using `future_lapply()`), R always uses a single core by default. So, you do not have to change anything manually when you do not want to use multiple cores.
+:::
+
+#### Which backend?
+
++ `sequential`: this is just a regular loop, no parallelization
++ `multisession`: separate R sessions as workers. Works everywhere
++ `multicore`: forked sessions. Faster to start than `multisession`, but [only on Mac/Linux, and not inside RStudio]{style="color: red;"}
+
+<br>
+
+::: {.callout-important title="Why not `multicore`?"}
+`multicore` relies on **forking**, which is unavailable on Windows and is switched off inside RStudio. When forking is unavailable, `plan(multicore)` does not switch to `multisession` for you — it quietly runs everything **sequentially** in a single process, with no error and no warning.
+
+You would see your code run, get correct answers, and gain nothing at all. `multisession` is the safe default. Reach for `multicore` only when you know you are on Mac/Linux outside RStudio and startup cost matters.
+:::
+
+::::
+
+<!--end of nested panel-->
+
+
+### Try it
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So here it is. Future underscore lapply, squaring a thousand numbers, spread across your workers. Run it. The point of this tab is that nothing dramatic happens. You get a list of a thousand squares back, exactly as lapply would have given you, and it looks completely ordinary. That is the whole idea. Once the plan is set, the parallel version of your code is visually indistinguishable from the serial version, which means you can switch between them freely. Which raises the obvious question, and it is the one the next tab asks, so form an opinion before you click. Was any of this actually faster?
+
+</details>
+
+```{r}
+sq_ls <- future_lapply(1:1000, function(x) x^2)
+```
+
+### Any faster?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now we time it, and the result is probably not what you expected. The parallelized version comes out slower than the plain lapply. Not slightly slower, noticeably slower. This is a real result, and it is worth sitting with for a moment rather than assuming something is broken on your machine. Nothing is broken. Parallelization is not free, and this particular example is constructed to show you the cost rather than the benefit. Have a guess at where the time is actually going before you move on, and then the next tab will tell you whether you were right.
+
+</details>
+
+```{r}
+#| cache: true
+microbenchmark(
+
+  #--- parallelized ---#
+  "parallelized" = { sq_ls <- future_lapply(1:1000, function(x) x^2) }, 
+
+  #--- non-parallelized ---#
+  "not parallelized" = { sq_ls <- lapply(1:1000, function(x) x^2) },
+  times = 100, 
+  unit = "ms"
+
+) 
+```
+
+### What just happened?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the explanation. Handing a job to another core is itself work. The value has to be sent over, the worker has to be told what to do, and the answer has to come back. That overhead is small but it is not zero, and you pay it for every single iteration. Squaring a number takes almost no time at all, so the cost of the handover completely swamps the saving. The rule that follows is in the last bullet, and it is the one to remember. Parallelization pays when each individual iteration is slow. If your iterations are fast, adding cores makes things worse.
+
+</details>
+
++ This is because communicating jobs to each core takes some time as well. 
+
++ So, if each of the iterative processes is super fast (like this example where you just square a number), the time spent on communicating with the cores outweighs the time saving due to parallel computation.
+
++ Parallelization is more beneficial when each of the repetitive processes takes long.
+
+:::
+<!--end of panel-->
+
+## Parallel processing: a less trivial example
+
+::: {.panel-tabset}
+
+### MC simulation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So let us do it properly, with work that is actually slow. Monte Carlo simulation is close to the ideal use case: you run the same procedure many times on freshly generated data, and each run is completely independent of the others. The specific question here is a familiar one from econometrics. If an independent variable is correlated with the error term, does that bias your OLS estimate? We know the answer is yes, and that is deliberate. The point is not the finding, it is watching how long the simulation takes and how much of that time parallelization can give you back.
+
+</details>
+
++ One of the very good use cases of parallelization is MC simulation 
+
++ We will run MC simulations that test whether the correlation between an independent variable and error term would cause bias (yes, we know the answer). 
+
+### MC steps
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three steps, repeated a thousand times. Step one generates fifty thousand observations, and the structure matters. There is a shared term mu that goes into both x and the error v. That shared component is exactly what creates the correlation between the covariate and the error, which is the whole point of the exercise. Step two runs OLS and keeps the coefficient on x. Step three repeats the whole thing a thousand times, so we can look at the distribution of those estimates rather than a single draw. And note the last line: each repetition is independent, so this is embarrassingly parallel.
+
+</details>
+
+1. generate a dataset (50,000 observations) according to the following data generating process:
+
+$$
+ y = 1 + x + v
+$$
+
+where 
++ $\mu \sim N(0,1)$
++ $x \sim N(0,1) + \mu$
++ $v \sim N(0,1) + \mu$. 
+ 
+The $\mu$ term causes correlation between $x$ (the covariate) and $v$ (the error term). 
+
+2. estimate the coefficient on $x$ via OLS, and return the estimate. 
+
+3. repeat this process $1,000$ times to understand the property of the OLS estimators under the data generating process.
+
+This Monte Carlo simulation is embarrassingly parallel because each process is independent of any other.
+
+### function
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here are those three steps as a function, and notice it follows the advice from earlier in the chapter exactly. It takes i, a single index, and everything else it needs it creates internally. The sample size is set inside, the data is generated fresh on each call, the regression is run, and it returns just one number, the coefficient on x. Returning one number rather than the whole model object matters more than it looks. When you run this a thousand times in parallel, everything you return has to be sent back from the worker, and shipping a thousand full model objects around would cost you real time.
+
+</details>
+
+Here is a function that implements the steps described in the previous slide:
+
+```{r}
+#--- repeat steps 1-3 B times ---#
+MC_sim <- function(i){
+
+  N <- 50000 # sample size
+
+  #--- steps 1 and 2:  ---#
+  mu <- rnorm(N) # the common term shared by both x and u
+  x <- rnorm(N) + mu # independent variable
+  v <- rnorm(N) + mu # error
+  y <- 1 + x + v # dependent variable
+  data <- data.table(y = y, x = x)
+
+  #--- OLS ---# 
+  reg <- lm(y~x, data = data) # OLS
+
+  #--- return the coef ---#
+  return(reg$coef['x'])
+}  
+```
+
+### performance
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the numbers, and this is the payoff for the whole section. A single run takes a small fraction of a second, which tells you each iteration is doing real work, unlike the squaring example. Then the sequential version of all one thousand runs, and then the parallel version. Compare those last two figures. That is a substantial speed-up, achieved by changing one word in one line of code. Two caveats worth holding on to. These timings depend on how many cores this machine has, so yours will differ. And the gain is nowhere near the number of cores, because of the handover cost we just discussed.
+
+</details>
+
+**Single run**:
+
+```{r}
+tic()
+single_res <- MC_sim(1)
+toc()
+```
+
+**Not parallelized (sequential)**:
+
+```{r}
+#| cache: true
+tic()
+MC_results <- lapply(1:1000, MC_sim)
+toc() 
+```
+
+**Parallelized**:
+
+```{r}
+#| cache: true
+tic()
+MC_results <- future_lapply(1:1000, MC_sim)
+toc() 
+```
+
+### Mac/Linux
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One alternative worth knowing about if you are on a Mac or Linux. The parallel package's mclapply does the same job and is just as easy, since its syntax also matches lapply, with the number of cores set through mc dot cores. And pbmclapply is the same thing with a progress bar, which sounds trivial but is genuinely valuable when a job runs for an hour and you want to know whether it is halfway or nearly done. The catch is in the tab title. Both rely on forking, so neither works on Windows. If you are writing code other people will run, stay with future underscore lapply.
+
+</details>
+
++ For Mac or Linux users, `parallel::mclapply()` is just as compelling (or `pbmclapply::pbmclapply()` if you want to have a nice progress report, which is very helpful particularly when the process is long). 
+
++ It is just as easy to use as `future_lapply()` because its syntax is the same as `lapply()`. 
+
++ You can control the number of cores to employ by adding `mc.cores` option. Here is an example code that does the same MC simulations we conducted above: 
+
+```{r}
+#| eval: false
+#--- mclapply ---#
+library(parallel)
+MC_results <- mclapply(1:1000, MC_sim, mc.cores = detectCores() - 1)
+
+#--- or with progress bar ---#
+library(pbmclapply)
+MC_results <- pbmclapply(1:1000, MC_sim, mc.cores = detectCores() - 1)
+```
+
+:::
+<!--end of panel-->
+
+# Low-dimensional optimization
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Low-dimensional optimization
+
+::: {.panel-tabset}
+
+### Setup
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A new problem, and a very practical one. You have run a nitrogen trial, fitted a yield response curve, and now you want the nitrogen rate that maximises profit. The profit expression is on screen: corn price times yield, minus nitrogen price times the amount you applied. The distinction in the last line is the one to hold on to for the rest of this section. N is a decision variable, the thing you get to choose. The two prices are parameters, things the world hands you. Optimization means choosing the decision variable for given parameters, and the interesting work comes from repeating that across many parameter combinations.
+
+</details>
+
+Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
+
+$$
+\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+$$
+
+You are interested in finding the best nitrogen rates that maximize profit at different combinations of corn and nitrogen prices for this field.
+
+$$
+Max_{N}\;\; P_C \times Y(N) - P_N \times N
+$$
+
++ $N$: nitrogen rate (lb/acre)
++ $Y(N)$: corn yield (bu/acre) as a function of $N$ as described above
++ $P_C$: corn price ($/bu)
++ $P_N$: nitrogen price ($/lb)
+
+Here, $N$ is a decision variable, and $P_C$ and $P_N$ are parameters.
+
+### Grid search
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Grid search is the least clever method available and often the right one. You simply evaluate the objective at a lot of values of the decision variable and keep the best. That is it. It is inefficient, because you compute a great many values you end up discarding, and it does not scale: with one or two decision variables it is fine, with ten it is hopeless. But for a problem like this it is reliable, easy to reason about, and impossible to get subtly wrong in the way a numerical optimizer can. The table shows the idea, profit computed at every nitrogen rate from nearly zero up to three hundred.
+
+</details>
+
+Grid search is a very inefficient yet effective tool for finding solutions to optimization problems as long as the dimension of the optimization problem is low (1 or 2 variables).
+
+Grid search basically evaluates the objective function (profit here) at many levels of the decision variables (nitrogen here) and pick the one that maximizes the objective function (profit).
+
+<br>
+
+**Example**
+
+```{webr-r}
+#| context: output
+data.table(N = seq(0.1, 300, by = 0.1)) %>% 
+  mutate(yield = 120 + 25 * log(N)) %>% 
+  mutate(profit = 3.5 * yield - 0.4 * N)  
+```
+
+### Example
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now in code. First a function taking a nitrogen rate and the two prices, returning profit, which is just the equation from the setup tab written out. Then we build a data frame of nitrogen rates from nought point one up to three hundred in steps of a tenth, and compute profit at every one of them with mutate. Notice what we are not doing here. There is no loop. Get profit is vectorized because everything inside it is, so handing it the whole column works directly. That is the lesson from the vectorization section showing up in real work, and it is why this runs instantly on three thousand rows.
+
+</details>
+
+Let's define a function that takes `N`, `P_C`, and `P_N` values and returns profits.
+
+```{webr-r}
+#| autorun: true
+get_profit <- function(N, P_C, P_N) {
+
+  yield <- 120 + 25 * log(N) 
+  profit <- P_C * yield - P_N * N
+  return(profit)
+
+}
+```
+
+<br>
+
+Let's create a sequence of `N` values and then calculate profit at each level of `N`.
+
+```{webr-r}
+#| autorun: true
+( 
+data_main <- 
+  tibble(N = seq(0.1, 300, by = 0.1)) %>% 
+  mutate(profit = get_profit(N, 3.5, 0.4))
+)
+```
+
+### Profit-N
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the same information as a picture, and it is worth a moment. Profit rises steeply at low nitrogen rates, flattens out, and then begins to fall as the cost of the extra nitrogen outweighs the extra yield it buys. The dashed red line marks the maximum. Two things to take from the shape. The peak is quite flat, which in practice means being somewhat wrong about the optimal rate costs you very little, and that is genuinely reassuring for a farmer. And the curve is smooth with a single peak, which is exactly the situation where grid search cannot go wrong.
+
+</details>
+
+Here is the visualization of profit-N relationship:
+
+```{webr-r}
+#| context: output
+opt_N <- filter(data_main, profit == max(profit))$N
+
+ggplot(data_main) +
+  geom_line(aes(y = profit, x = N)) +
+  geom_vline(xintercept = opt_N, linetype = 2, color = "red") +
+  annotate('text', x = opt_N - 40, y = 450, label = "Optimal N rate", size = 3)
+```
+
+### Best N
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two ways to pull the best row out. The first filters for the row where profit equals the maximum, which reads exactly like what you mean. The second sorts the whole dataset by profit and takes the last row. Both give you the same answer, but read the warning underneath, because this deck previously had it backwards. The filter version is roughly three times faster, and it has to be. Filtering scans the column once to find the largest value, whereas arranging sorts everything first, and sorting is fundamentally more expensive than scanning. Use arrange when you want the top several rows, or you actually need the ordering. For a single maximum, filter.
+
+</details>
+
+Once the profit-N relationship is found, we can use `dplyr::filter()` combined with `max()` to identify the optimal N rate.
+
+```{webr-r}
+dplyr::filter(data_main, profit == max(profit))
+```
+
+<br>
+
+Alternatively, you can sort the data by profit in the ascending order (default) and pick the last row using `dplyr::slice(n())`.
+
+```{webr-r}
+dplyr::arrange(data_main, profit) %>% 
+  dplyr::slice(n())
+```
+
+<br>
+
+<!-- CHANGED: this said "This method is faster than the first one", which is
+backwards. Benchmarked on the 3,000-row data_main used here:
+    filter(profit == max(profit))    median 0.33 ms
+    arrange(profit) %>% slice(n())   median 1.01 ms
+The arrange version is ~3x SLOWER, and has to be: sorting is O(n log n) while
+scanning for a maximum is O(n). -->
+
+::: {.callout-warning title="Convenient, but slower"}
+This second method is [slower]{style="color: red;"}, not faster — about **3x** on this data.
+
+`filter()` only has to scan the column once to find the maximum. `arrange()` has to sort the whole dataset first, and sorting costs more than scanning. The gap widens as the data grows.
+
+Use `arrange()` when you want the top *few* rows, or the ordering itself. To pick out a single maximum, `filter()` is both clearer and cheaper.
+:::
+
+:::
+<!--end of panel-->
+
+## Coding strategy 1: looping
+
+::: {.panel-tabset}
+
+### loop
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You can now find the optimal nitrogen rate for one price combination. The obvious next step is to do it for many, and here is the strategy, which should look familiar because it is the same three-step pattern from the loop section. Build a data frame of all the price combinations you care about. Write a function that takes a row number, pulls that row's prices out, and runs the grid search you just wrote. Then loop over the row numbers. Notice that the grid search itself does not change at all. It just gets wrapped. That is what makes this pattern so reusable.
+
+</details>
+
+Now that you have written codes to find the optimal N at a given combination of corn and nitrogen prices.
+
+We can move on to the next step of finding the optimal N rates at many various combinations of corn and nitrogen prices.
+
+Here is the coding strategy:
+
+1. Define a set of all the combinations of corn and nitrogen prices you want to analyze as a `data.frame`.
+
+2. Define a function that extract corn and nitrogen prices from the parameter `data.frame` and find the optimal N rate at the given combination of prices.
+   
+3. Loop over the price combinations (loop over the rows of the `data.frame` created in step 1).
+
+### Step 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step one, the parameter grid. Three corn prices and three nitrogen prices, expanded into all nine combinations, one per row. Two small things. We pipe the result through tibble, which does not change the data but gives you nicer printing, particularly once the grid gets long. And keep the size in mind. Nine rows is small enough to check by hand, which is exactly what you want while you are still getting the code right. When this works, widening the sequences is a one-character change, and none of the rest of the code has to care.
+
+</details>
+
+Here, we define a `data.frame` of parameters to be explored. We will be looping over the rows of the `data.frame`.
+
+<!-- CHANGED: added autorun. Strategy 2's Step 1 further down also assigned to
+`price_parameters`, with a different shape (3 columns, 27 rows vs 2 columns, 9
+rows), and that one WAS autorun. So on page load only Strategy 2's version
+existed, and a student clicking Strategy 1's Step 3 silently looped over the
+wrong data. Strategy 2's object has been renamed to `eval_parameters`. -->
+
+```{webr-r}
+#| autorun: true
+P_C_seq <- seq(2.5, 4.5, by = 1)
+P_N_seq <- seq(0.2, 0.6, by = 0.2)
+
+(
+price_parameters <-
+  expand.grid(P_C = P_C_seq, P_N = P_N_seq) %>%
+  tibble()
+)
+```
+
+
+### Step 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step two is the function, and look at what is inside it. It pulls the corn and nitrogen price out of row i, builds the nitrogen grid, computes profit at every rate using the get profit function from earlier, and filters down to the best row. Then the two mutates on the end are easy to overlook but important. They attach the prices onto the result. Without them you would get back a set of optimal nitrogen rates with no record of which price combination each one belongs to. When you are looping and stacking results, always carry the parameters through alongside the answer.
+
+</details>
+
+Now, we will define a function that extract a combination of corn and nitrogen prices from `price_parameters` (extract a row from `price_parameters`), and then find the optimal N.
+
+```{webr-r}
+#| autorun: true
+get_opt_N <- function(i) {
+
+  P_C <- price_parameters[i, ]$P_C
+  P_N <- price_parameters[i, ]$P_N
+
+  N_data <- tibble(N = seq(0.1, 300, by = 0.1))
+
+  opt_N <- mutate(N_data, profit = get_profit(N, P_C, P_N)) %>% 
+    filter(profit == max(profit)) %>% 
+    mutate(P_C = P_C) %>% 
+    mutate(P_N = P_N)
+
+  return(opt_N)
+
+}
+```
+
+<br>
+
+Check if this function works:
+
+```{webr-r}
+get_opt_N(1)
+```
+
+### Step 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step three, the loop, and we use future underscore lapply so the price combinations can run across cores. Then bind rows stacks the nine one-row data frames into a single table, the same finish as the earlier loop example. One honest caveat, in the note underneath. These slides run R inside your browser, which is single-threaded, and we never called plan here, so on this page it runs one combination after another regardless. Copy it onto your own machine, set a plan first, and the identical line parallelizes. That interchangeability is precisely the point, but you will not see the speed-up here.
+
+</details>
+
+Loop:
+
+```{webr-r}
+opt_N_all_ls <- future_lapply(1:nrow(price_parameters), get_opt_N)
+```
+
+<!-- ADDED: this cell runs in the browser via WebR, which is single-threaded,
+and plan() is only ever called in a host-rendered {r} chunk. So the default
+sequential plan applies here and nothing actually runs in parallel. Without this
+note the slide silently implies otherwise. -->
+
+::: {.callout-note title="In this browser, this runs sequentially"}
+These slides run R in your browser through WebR, which is single-threaded, and `plan()` was never called here. `future_lapply()` still works — it just falls back to running one job after another.
+
+Copy this onto your own computer, call `plan(multisession, workers = ...)` first, and the same line parallelizes with no other change. That interchangeability is the point.
+:::
+
+<br>
+
+```{webr-r}
+opt_N_all_ls[[1]] 
+```
+
+<br>
+
+Combine the list of `data.frame`s into a single `data.frame` using `bind_rows()`.
+
+```{webr-r}
+(
+opt_N_all <- bind_rows(opt_N_all_ls)
+)
+```
+
+:::
+<!--end of panel-->
+
+## Coding strategy 2: vectorized
+
+::: {.panel-tabset}
+### vectorized
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the same problem without looping at all, and the trick is a change of perspective. In strategy one the nitrogen grid lived inside the function and got rebuilt for every price combination. Here we put nitrogen into the parameter grid itself, alongside the two prices, so a single data frame holds every combination of all three. Then profit is one vectorized calculation over the whole thing, and finding the best rate becomes a grouped operation. No function, no loop, nothing to bind together at the end. Read the three steps and notice that nitrogen rate has been promoted from something the function handles to just another column.
+
+</details>
+
+Instead of writing a loop like above, we can actually vectorize the process. Here are the steps:
+
+1. Define a set of all the combinations of **nitrogen rate**, corn price, and nitrogen price you want to analyze as a `data.frame`.
+
+2. Calculate profits for all the combinations of **nitrogen rate**, corn price, and nitrogen price inside the `data.frame`
+
+3. Find the optimal N rate for each of the combinations of **nitrogen rate**, corn price, and nitrogen price 
+
+### Step 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is that combined grid. Three corn prices, two nitrogen prices and three nitrogen rates, expanded into every combination, which gives eighteen rows. Compare that with strategy one, where the grid held only the nine price combinations and the nitrogen rates were generated inside the function, over and over again. Everything is now in one table up front. This is also where the memory question starts to bite, and we come back to it shortly. With three short sequences this is trivially small, but the row count is the product of all three lengths, so it grows very quickly once the sequences get realistic.
+
+</details>
+
+Here, we define all the combinations of **nitrogen rate**, corn price, and nitrogen price you want to analyze as a `data.frame`.
+
+```{webr-r}
+#| autorun: true
+P_C_seq <- seq(2.5, 4.5, by = 1)
+P_N_seq <- seq(0.3, 0.6, by = 0.3)
+N_seq <- seq(100, 300, by = 100)
+
+#--- CHANGED: was also called `price_parameters`, colliding with Strategy 1's ---#
+(
+eval_parameters <-
+  expand.grid(P_C = P_C_seq, P_N = P_N_seq, N = N_seq) %>%
+  tibble() %>%
+  arrange(P_C, P_N)
+)
+```
+
+### Steps 2 and 3
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two lines to finish. First, profit for every row at once with mutate, handing get profit three whole columns. Second, group by the two prices and, within each group, take the row with the highest profit. That grouping is doing the same job the loop did in strategy one: it treats each price combination separately. But there is no function to write and nothing to stack at the end, because the answer is already a single data frame. Compare this with the three tabs it took to do the same thing by looping, and you can see why vectorizing is worth reaching for first.
+
+</details>
+
+Now, we will calculate profit for all the rows in `eval_parameters`.
+
+```{webr-r}
+(
+profit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))
+)
+```
+
+<br>
+
+Now, we can identify the optimal N rate at each of the corn and nitrogen combinations:
+
+```{webr-r}
+profit_data %>% 
+  group_by(P_C, P_N) %>% 
+  arrange(profit) %>% 
+  slice(n())
+```
+
+:::
+<!--end of panel-->
+
+## Which strategy?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+So which should you use? The deciding factor is memory. Strategy one holds one price combination at a time, so its memory footprint stays small no matter how many combinations there are. Strategy two builds every combination at once, which is why it is fast, and also why it can exhaust your RAM. Once you run out of RAM your machine starts swapping to disk and performance collapses, far worse than the loop would ever have been. So the rule is simple. If the full grid fits comfortably in memory, vectorize. If it does not, break the job into chunks and loop over those. The callout shows you how to watch memory usage on both platforms.
+
+</details>
+  
++ Which strategy you should take depends on the size of your computer's RAM. <!-- CHANGED: said "RMA memory" -->
+
++ Going over the RAM memory limit will suffocate your computer, which leads to a substantial loss in computing performance. 
+
++ Vectorized version is more memory-hungry:
+  * Strategy 1: loops over the price combinations, holding **one** combination in memory at a time
+  * Strategy 2: does not loop at all — it holds **every** combination in memory at once <!-- CHANGED: read "Strategy 2: loop over price (all the price combinations at the same time)", which contradicts the whole point of calling it vectorized -->
+
++ If you can fit the entire dataset in the RAM memory, then take Strategy 2. Otherwise, break up the entire task into pieces like Strategy 1. 
+
+<span style = "color: blue;">  </span>
+
+:::{.callout-note title="Keep track of RAM memory usage"}
++ Mac users: go to <span style = "color: blue;">Applications </span> $\rightarrow$ <span style = "color: blue;">Utilities </span> $\rightarrow$
+<span style = "color: blue;">Activity Monitor </span> 
+
++ Windows users: press `Windows Key` + `R` $\rightarrow$ type "resmon" into the search box
+:::
+
+## Optimization (fixed attribute combinations)
+
+::: {.panel-tabset}
+
+### setup
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One more wrinkle, and it is the one that makes this realistic. Until now the yield response has been the same everywhere. In an actual field it is not. Soil varies, and here yield depends on electrical conductivity and slope as well as nitrogen, so the optimal rate differs from one part of the field to another. Look carefully at the vocabulary in the last line, because it now has three categories rather than two. Nitrogen is still the decision variable, the prices are still parameters, but slope and EC are attributes: fixed characteristics of a place that you cannot choose and cannot change.
+
+</details>
+
+Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
+
+$$
+\mbox{corn yield} = 120 + (EC/40) \times (1 + slope)\times 25 \times log(\mbox{nitrogen rate})
+$$
+
+You are interested in finding the best nitrogen rates that maximize profit for different parts of the field at a given corn and nitrogen price combination. 
+
+$$
+Max_{N} P_C \times [120 + (EC/40) \times (1 + slope) * 25 \times log(\mbox{nitrogen rate})] - P_N \times N
+$$
+
++ `N`: nitrogen rate (lb/acre)
++ `slope`: the slope  
++ `EC`: electrical conductivity  
++ `P_C`: corn price ($/bu)
++ `P_N`: nitrogen price ($/lb)
+
+Here, `N` is a decision variable, `slope` and `EC` are attributes, and `P_C` and `P_N` are parameters.
+
+### data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A two-plot field, kept deliberately tiny so you can see everything at once. Plot one has zero slope and an EC of forty. Plot two has a slope of nought point two and an EC of thirty. That is the entire dataset. The objective underneath is to find the best nitrogen rate for each plot at a given price combination. Keep those two pairs in your head for the next two tabs, because the whole point of what follows is which slope and EC values legitimately go together. Two plots means exactly two valid combinations, and any method that produces more than two has invented something.
+
+</details>
+
+**Data**
+
+Consider a 2-plot field like below for the sake of tractability:
+
+```{webr-r}
+#| autorun: true
+(
+field_data <- data.frame(plot_id = c(1, 2), slope = c(0, 0.2), ec = c(40, 30))
+)
+```
+
+<br>
+
+**Objective**
+
+You want to find the optimal nitrogen rate for each plot for a given combination of corn and nitrogen prices.
+
+### Strategy 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The obvious approach is the one we have used all along: expand grid over everything, slope, EC and nitrogen rate. Run it and count. Expand grid gives you every slope crossed with every EC, so you get four combinations of soil properties. But only two of them exist. There is no part of this field with a slope of nought point two and an EC of forty, and none with zero slope and an EC of thirty. Those rows are fabrications. Here it merely wastes effort, but on a real field with many plots you would be computing optimal rates for soils that do not exist and might quietly average them in later.
+
+</details>
+
+You can expand on all the variables, nitrogen rate (decision variable), slope and EC (attributes), and corn and nitrogen prices (parameters):
+
+```{webr-r}
+#| autorun: true
+(
+eval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_seq)
+)
+```
+
+<br>
+
++ You only need some of the rows in this dataset because no plots have `slope`-`ec` combinations of `c(0, 30)` and `c(0.2, 40)`
++ You created unnecessary rows with this approach
+
+### Strategy 2
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The fix is to stop treating slope and EC as independent lists, because they are not. They arrive together, as rows of the field data. Expand grid dot df from the reshape package does exactly that. It crosses whole rows of one data frame with rows of another, rather than crossing individual columns. So the slope and EC pairings stay intact, each plot keeps its own soil properties, and you only get combinations that actually exist. That distinction, crossing rows rather than crossing columns, is worth remembering. It comes up whenever some of your variables are attributes that travel together instead of dimensions you are free to vary independently.
+
+</details>
+
+Instead of applying `expand.grid()` on all the three vectors using `expand.grid()`, we can use `expand.grid.df()` from the `reshape` package as follows.
+
+```{webr-r}
+#| autorun: true
+reshape::expand.grid.df(field_data, data.frame(N_seq))
+```
+
+<br>
+
+This generates all unique combinations of **rows** from the two data frames, without creating any observations that are not possible in reality.
+:::
+<!--end of panel-->
+
+

@@ -1,0 +1,88 @@
+<!-- @dsCard group="Tabs" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Tabs — current</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* Today's tab row, at measured values:
+   font-size 16.32px (0.85em), padding 2.448px 8.976px, active white on #06a666,
+   inactive #52616b, 2px solid #06a666 rule under the strip, 9.6px margin. */
+.spec { width: 966px; background: #fff; padding: 22px 24px 26px;
+        box-shadow: 0 2px 14px rgba(0,0,0,.14); margin-bottom: 6px;
+        box-sizing: border-box; font-size: var(--t-body); }
+.spec .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+             color: #8a8f98; margin-bottom: 12px; }
+
+.t-list { display: inline-block; border-bottom: 2px solid #06a666;
+          margin-bottom: 9.6px; white-space: nowrap; max-width: 100%; }
+.t-tab  { display: inline-block; font-size: 16.32px; padding: 2.448px 8.976px;
+          color: #52616b; border: 1px solid transparent; border-bottom: none;
+          border-radius: 5px 5px 0 0; margin-bottom: -2px; }
+.t-tab.on { background: #06a666; border-color: #06a666; color: #fff; font-weight: 600; }
+.t-tab code { font-size: inherit; color: inherit; }
+
+.t-list.nest { border-bottom-color: #cfe9dd; }
+.t-list.nest .t-tab { font-size: 12.7px; }
+.t-list.nest .t-tab.on { background: #cfe9dd; border-color: #cfe9dd; color: #14503a; }
+
+.body { padding-top: 6px; }
+.ratio { font-size: 13px; color: #c81e1e; margin: 10px 0 0; font-weight: 600; }
+</style>
+
+<h1 class="page">Tabs — what ships today</h1>
+<p class="page">
+  Rendered at the measured values from <code>custom.scss</code>. Specimen width is
+  966px, the real usable width of a slide (1050 minus 42px padding each side).
+</p>
+
+<div class="spec">
+  <div class="lbl">1 · Normal row — four tabs</div>
+  <div class="t-list">
+    <span class="t-tab on">Objectives</span><span class="t-tab">read.csv()</span
+    ><span class="t-tab">Working directory</span><span class="t-tab">Exercise</span>
+  </div>
+  <div class="body">Tab content sits here.</div>
+  <p class="ratio">Active tab: white on #06a666 = 2.71:1 — fails AA (needs 4.5:1).
+     Inactive #52616b on white = 6.4:1. The hierarchy is inverted.</p>
+</div>
+
+<div class="spec">
+  <div class="lbl">2 · Long row — real headings from 02-2</div>
+  <div class="t-list">
+    <span class="t-tab">YAML</span><span class="t-tab">Creating a new slide</span
+    ><span class="t-tab on">Include R codes and results</span
+    ><span class="t-tab">Moving around</span><span class="t-tab">Exporting to PDF</span
+    ><span class="t-tab">Speaker notes</span>
+  </div>
+  <div class="body">Six real labels. This is why the padding was cut to .15em .55em.</div>
+</div>
+
+<div class="spec">
+  <div class="lbl">3 · Labels containing inline code</div>
+  <div class="t-list">
+    <span class="t-tab on"><code>echo</code> and <code>eval</code></span
+    ><span class="t-tab">Example: <code>read.csv()</code></span
+    ><span class="t-tab"><code>readRDS()</code></span>
+  </div>
+  <div class="body">
+    Without the <code>[role="tab"] code</code> patch these would each be 1.2rem
+    purple, and the first label would read as three separate things.
+  </div>
+</div>
+
+<div class="spec">
+  <div class="lbl">4 · Nested tabset</div>
+  <div class="t-list">
+    <span class="t-tab on">Syntax and Examples</span><span class="t-tab">Your turn</span>
+  </div>
+  <div class="body">
+    <div class="t-list nest">
+      <span class="t-tab on">Example 1</span><span class="t-tab">Example 2</span
+      ><span class="t-tab">Example 3</span>
+    </div>
+    <div style="padding-top:6px">Inner content.</div>
+  </div>
+  <p class="ratio">The pale #cfe9dd active state reads as "disabled", the
+     conventional meaning of a washed-out control, rather than "one level down".</p>
+</div>

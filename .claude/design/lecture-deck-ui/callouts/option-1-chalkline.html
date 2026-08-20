@@ -1,0 +1,129 @@
+<!-- @dsCard group="Callouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Callouts — Chalkline</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* CHALKLINE callouts — four roles, distinguished by rule weight and a label.
+   No icons (they are off in every deck), no boxes, no title bar. The title row
+   that Quarto spends ~34px on becomes an 11.5px uppercase label riding on the
+   first line of the body, which is where the ~40px saving comes from. */
+.spec { width:966px; background:var(--paper); padding:24px; box-sizing:border-box;
+        box-shadow:0 2px 14px rgba(0,0,0,.14); margin-bottom:6px;
+        font-size:var(--t-body); color:var(--ink); }
+.spec .lbl { font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+             color:#8a8f98; margin-bottom:14px; }
+
+.cx { padding:2px 0 2px 15px; margin-bottom:15px; border-left:3px solid var(--rule); }
+.cx .tag { font-size:11.5px; font-weight:700; letter-spacing:.09em;
+           text-transform:uppercase; display:inline-block; margin-right:9px;
+           vertical-align:.08em; }
+.cx .bd { display:inline; }
+
+/* aside — the quietest thing on the slide */
+.cx.aside { border-left-color:var(--rule); }
+.cx.aside .tag { color:var(--ink-muted); }
+.cx.aside .bd { color:var(--ink-muted); }
+
+/* watch out — the loudest. 5px rule, tinted ground, ink body at full strength. */
+.cx.watch { border-left:5px solid var(--accent-sub); background:#fdf4ea;
+            padding:9px 14px 9px 15px; }
+.cx.watch .tag { color:var(--accent-sub); }
+
+/* try it — accent rule, ink body */
+.cx.tryit { border-left-color:var(--accent); }
+.cx.tryit .tag { color:var(--accent); }
+
+/* answer — the fourth member of the same family, and the only one you click.
+   `all: unset`-style opt-out first, because custom.scss styles every <details>
+   with a grey border and every <summary> with a negative margin. */
+details.ax { border:0; padding:0; border-left:3px solid var(--accent);
+             border-radius:0; margin-bottom:15px; background:var(--tint); }
+details.ax > summary { margin:0; padding:6px 14px; font-weight:700; font-size:15px;
+                       cursor:pointer; list-style:none; color:var(--accent);
+                       display:flex; align-items:center; gap:8px; }
+details.ax > summary::-webkit-details-marker { display:none; }
+details.ax > summary::before { content:"▸"; font-size:12px; }
+details.ax[open] > summary::before { content:"▾"; }
+details.ax > summary .hint { margin-left:auto; font-weight:600; font-size:12px;
+                             color:var(--ink-muted); letter-spacing:.04em; }
+details.ax[open] { padding-bottom:10px; }
+details.ax .abody { padding:2px 14px 0; }
+details.ax .abody pre { margin-bottom:0; }
+
+.h { font-size:13px; color:var(--ink-muted); margin:12px 0 0; }
+.ok { color:#0f6b4a; font-weight:600; }
+</style>
+
+<h1 class="page">Chalkline — four roles, no boxes</h1>
+<p class="page">
+  Rule weight carries importance: a hairline for an aside, a 5px rule and a tinted
+  ground for the thing students actually get wrong. The label is 11.5px uppercase
+  and sits inline, so a one-line callout costs <b>~52px</b> instead of Quarto's
+  ~90px — the four blocks below fit in 210px where today's take 360px.
+</p>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">1 · The four roles</div>
+
+  <div class="cx aside"><span class="tag">Aside</span><span class="bd">The same
+    idea appeared in Chapter 2 when we set the YAML header.</span></div>
+
+  <div class="cx watch"><span class="tag">Watch out</span><span class="bd">A path
+    that works on your machine will not work on mine. This is the single most
+    common reason your code runs and my copy does not.</span></div>
+
+  <div class="cx tryit"><span class="tag">Try it</span><span class="bd">Run
+    <code>getwd()</code> now, and read the result out loud.</span></div>
+
+  <details class="ax">
+    <summary>Answer <span class="hint">2 lines</span></summary>
+    <div class="abody">
+<pre class="src">corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>)</pre>
+    </div>
+  </details>
+
+  <p class="h"><span class="ok">Watch-out label #8a4b08 on #fdf4ea = 5.4:1;
+     aside body #52616b = 6.4:1.</span> Importance and contrast now run in the
+     same direction — today they run in opposite directions.</p>
+</div>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">2 · Answer box — closed, and open</div>
+  <details class="ax"><summary>Answer <span class="hint">2 lines</span></summary></details>
+  <details class="ax" open>
+    <summary>Answer <span class="hint">2 lines</span></summary>
+    <div class="abody">
+<pre class="src">corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>)</pre>
+    </div>
+  </details>
+  <p class="h">
+    Accent rather than grey, so it reads as live. The <b>"2 lines"</b> hint tells a
+    student what opening will cost them before they open it — on a slide near the
+    700px ceiling that is the difference between a reveal and a scroll.
+    The rule opts out of <code>custom.scss</code> explicitly
+    (<code>border:0; padding:0</code> on the details, <code>margin:0</code> on the
+    summary), the same way <code>transcript-support.html</code> does.
+  </p>
+</div>
+
+<div class="spec sys-chalkline">
+  <div class="lbl">3 · On a slide, at 700px</div>
+</div>
+<div class="stage sys-chalkline safeline">
+  <h2 style="font-size:var(--t-h2);margin:0 0 10px;padding-bottom:7px;
+             border-bottom:2px solid var(--accent);font-weight:600">Working directories</h2>
+  <p>R resolves every relative path against the <strong>working directory</strong>.</p>
+  <div class="cx watch"><span class="tag">Watch out</span><span class="bd">A path
+    that works on your machine will not work on mine.</span></div>
+<pre class="src"><span class="fn">getwd</span>()
+<span class="fn">read.csv</span>(<span class="str">"data/corn.csv"</span>)   <span class="cmt"># relative — depends on getwd()</span></pre>
+  <div class="cx tryit"><span class="tag">Try it</span><span class="bd">Run
+    <code>getwd()</code> and compare with your neighbour.</span></div>
+  <details class="ax"><summary>Answer <span class="hint">2 lines</span></summary></details>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>

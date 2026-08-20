@@ -1,0 +1,1214 @@
+---
+title: "08-2: Make Regression and Summary Tables with `modelsummary`"
+abstract: "Chapter 8: Make Tables"
+format:
+  revealjs:
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+---
+
+## Tips to make the most of the lecture notes
+
+```{r}
+#| include: false
+library(sandwich)
+library(modelsummary)
+library(flextable)
+library(dplyr)
+library(gt)
+```
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation aids: stacked lines bottom left for a table of contents, letter o for a panel view of every slide. This deck is worth navigating deliberately, because it covers two quite separate tools that happen to live in the same package. The first half is regression tables, the thing you need when writing up results. The second half is summary tables, the thing you need for a descriptive statistics section. You will almost certainly want one before the other, and jumping straight to the half you need beats paging through the whole deck.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same code-box conventions as always, with one thing to flag. Unlike most decks in this course, none of the cells here run in your browser. Every table you see was produced when the slides were rendered, on my machine, because modelsummary and its output formats do not travel through browser R. So the copy button is the important one on this deck. Take the code into RStudio, where you have your own regressions to point it at, and treat these slides as a reference for the arguments rather than as a sandbox.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+# Create regression tables
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Create regression tables with the `modelsummary` package 
+
+::: {.panel-tabset}
+
+### Dataset
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The data for the whole lecture: county-level corn and soybean yields, together with drought indicators. Two things to note. The install line pulls a package from r-universe rather than CRAN, so it needs both repositories listed. And the line dropping the geometry column matters, because this dataset is originally spatial. We do not need the polygons here, and carrying them around would slow everything down. The variable definitions on the second tab are worth reading properly, because the d-numbers are drought severity categories and you will see them in every table from here on.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Get the data
+
+We use `county_yield` throughout this lecture.
+
+First install the `r.spatial.workshop.datasets` package.
+
+```{r}
+#| eval: false
+#--- install the r.spatial.workshop.datasets package ---#
+install.packages("r.spatial.workshop.datasets", repos = c("https://tmieno2.r-universe.dev", "https://cran.r-project.org"))
+```
+
+<br>
+
+Then, get the data:
+
+```{r}
+#--- get the data ---#
+data(county_yield, package = "r.spatial.workshop.datasets")
+
+county_yield <- dplyr::select(county_yield, - geometry)
+```
+
+#### Look at the data
+
+```{r}
+county_yield
+```
+
+<br>
+
+**Variable Definitions**
+
++ `soy_yield`: soybean yield (bu/acre)
++ `corn_yield`: corn yield (bu/acre)
++ `d0_5_9`: ratio of weeks under drought severity of 0 from May to September
++ `d1_5_9`: ~ drought severity of 1 from May to September   
++ `d2_5_9`: ~ drought severity of 2 from May to September   
++ `d3_5_9`: ~ drought severity of 3 from May to September   
++ `d4_5_9`: ~ drought severity of 4 from May to September   
+
+:::
+<!--end of panel--> 
+
+### Initiate a regression table 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Before you can tabulate regressions you need regressions, so this tab runs four of them: two specifications each for corn and soybeans. It also computes robust variance-covariance matrices with vcovHC from sandwich, which we do not actually use until the swapping section later on. Then the second nested tab shows the payoff. You hand msummary a list of model objects and it produces a complete table, coefficients, standard errors and goodness-of-fit statistics, with no formatting instructions at all. That default is genuinely usable, and everything that follows is about refining it.
+
+</details>
+
+::: {.panel-tabset}
+#### Prepare regression results
+
+Let's first run regressions which we are going to report in tables.
+
+```{r}
+model_1_corn <- lm(corn_yield ~ d1_5_9 + d2_5_9, data = county_yield)
+model_2_corn <- lm(corn_yield ~ d1_5_9 + d2_5_9 + d3_5_9 + d4_5_9, data = county_yield)
+model_1_soy <- lm(soy_yield ~ d1_5_9 + d2_5_9, data = county_yield)
+model_2_soy <- lm(soy_yield ~ d1_5_9 + d2_5_9 + d3_5_9 + d4_5_9, data = county_yield)
+```
+
+<br> 
+
+Get White-Huber robust variance-covariance matrix for the regressions:
+
+```{r}
+vcov_1_corn <- sandwich::vcovHC(model_1_corn)
+vcov_2_corn <- sandwich::vcovHC(model_2_corn)
+vcov_1_soy <- sandwich::vcovHC(model_1_soy)
+vcov_2_soy <- sandwich::vcovHC(model_2_soy)
+```
+
+#### default table
+
+You can supply a list of regression results to `modelsummary::msummary()` to create a default regression table.
+
+```{r}
+modelsummary::msummary(
+  list(
+    model_1_corn,
+    model_2_corn,
+    model_1_soy,
+    model_2_soy
+  )
+)
+```
+
+:::
+<!--end of panel-->
+
+### Modify
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the menu of arguments for reshaping the default table, and the nested tabs work through the important ones. Read the list on the first tab before diving in, because it tells you the shape of the whole interface. Notice how much of it is about labelling and selection rather than statistics: coef map for renaming and reordering coefficients, coef omit and gof omit for dropping rows you do not want, add rows for inserting your own. That is because the numbers come from your models. What a table package does is decide what to show and what to call it.
+
+</details>
+
+::: {.panel-tabset}
+
+#### How
+
+`modelsummary::msummary()` offers multiple options to modify the default regression table to your liking:
+
++ `title`: put a title to the table
++ `stars`: place significance symbols (and modify the symbol placement rules)
++ `coef_map`: change the order and label of variable names  
++ `notes`: add footnotes
++ `fmt`: change the format of numbers 
++ `statistic`: type of statistics you display along with coefficient estimates
++ `gof_map`: define which model statistics to display 
++ `gof_omit`: define which model statistics to omit from the default selection of model statistics
++ `add_rows`: add rows of arbitrary contents to the table
+
+#### `stars`
+
+::: {.columns}
+
+::: {.column width="50%"}
+Add `stars = TRUE` in `modelsummary::msummary()` to add significance markers.
+
+You can modify significance levels and markers by supplying a named vector with its elements being the significance levels and their corresponding names being the significance markers.
+
+<br>
+
+**Example**:
+
+```{r}
+#| eval: false
+
+#--- create a named vector ---#
+stars_label <- c("+" = 0.1, "&+" = 0.05, "+*+" = 0.01)
+
+#--- create a table ---#
+modelsummary::msummary(model_1_corn, stars = stars_label)
+```
+:::
+<!--end of the 1st column-->
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+
+#--- create a named vector ---#
+stars_label <- c("+" = 0.1, "&+" = 0.05, "+*+" = 0.01)
+
+#--- create a table ---#
+modelsummary::msummary(model_1_corn, stars = stars_label)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `coef_map`
+
+::: {.columns}
+
+::: {.column width="50%"}
+`coef_map` allows you to reorder coefficient rows and change their labels.  
+
+As with the `stars` option, you supply a named vector where its names are the existing labels and their corresponding elements are the new labels. 
+
+In the table, the coefficient rows are placed in the order they are ordered in the named vector.
+
+<br>
+
+```{r coef, eval = F}
+#| eval: false
+ 
+#--- define a coef_map vector ---#
+coef_map_vec <- c(
+  "d1_5_9" = "DI: category 1", 
+  "d2_5_9" = "DI: category 2", 
+  "d3_5_9" = "DI: category 3", 
+  "d4_5_9" = "DI: category 4", 
+  "(Intercept)" = "Constant"
+) 
+
+#--- create a table ---#
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  coef_map = coef_map_vec
+)
+
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+ 
+#--- define a coef_map vector ---#
+coef_map_vec <- c(
+  "d1_5_9" = "DI: category 1", 
+  "d2_5_9" = "DI: category 2", 
+  "d3_5_9" = "DI: category 3", 
+  "d4_5_9" = "DI: category 4", 
+  "(Intercept)" = "Constant"
+) 
+
+#--- create a table ---#
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  coef_map = coef_map_vec
+)
+
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `coef_omit`
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+`coef_omit` lets you omit coefficient rows from the default selections.
+
+You supply a vector of strings (and/or regular expressions), and coefficient rows that match the string pattern will be omitted.
+
+<br>
+
+**Example**
+
+```{r}
+#| eval: false
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  coef_omit ="d2"
+)
+```
+
+<br>
+
+`d2` matches with `d2_5_9`, and rows associated with the coefficients on `d2_5_9` are removed.
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+
+```{r}  
+#| echo: false
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  coef_omit ="d2"
+)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `gof_omit`
+
+
+::: {.columns}
+
+::: {.column width="50%"}
+
+`gof_omit` lets you omit model statistics like $R^2$ from the default selections.
+
+You supply a vector of strings (and/or regular expressions), and statistics that match the string pattern will be omitted.
+
+<br>
+
+**Example**
+
+```{r}
+#| eval: false
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  gof_omit ="IC|Adj"
+)
+```
+
+`IC` matches with `AIC` and `BIC`, and `Adj` matches with `R2 Adj`
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+modelsummary::msummary(
+  list(model_2_corn, model_2_soy), 
+  gof_omit ="IC|Adj"
+)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+#### `add_rows`
+
+`add_rows` can be used to insert arbitrary rows into a table. Adding rows with it is a two-step process:
+
++ Creating a `data.frame` (or `tibble`) to insert
+
+```{r}
+#--- create a table (data.frame) to insert ---#
+(
+rows <- data.frame(
+  c1 = c("FE: County", "FE: Year"),
+  c2 = c("Yes", "Yes"),
+  c3 = c("No", "No")   #--- CHANGED: second entry read "Now" ---#
+  )
+)
+```
+
+<br>
+
++ Tell which rows you will insert the `data.frame` at, by `attr(data.frame, "position") <- row number`. 
+
+```{r}
+#--- tell where to insert ---#
+attr(rows, "position") <- c(3, 4)
+
+#--- create a table with rows inserted ---#
+modelsummary::msummary(
+  list(Model1 = model_2_corn, Model2 = model_2_soy), 
+  gof_omit ="IC|Adj",
+  coef_omit = "d",
+  add_rows = rows #<<   #--- CHANGED: was add_row; it worked only by R's partial argument matching ---#
+)
+```
+
+:::
+<!--end of panel-->
+
+### Swapping VCOV
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the tab to pay attention to, and it has been corrected. You often want robust standard errors rather than the defaults, and modelsummary lets you supply your own variance-covariance matrices through the vcov argument. Older code, including the previous version of this slide, used an argument called statistic override. That name no longer exists. And because msummary accepts dot dot dot, passing it produces no error and no warning whatsoever; the table simply comes back with default standard errors. Read the red callout, then compare the two tables and check the numbers in brackets actually move.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Instruction
+
+It is often the case that we replace the default variance-covariance matrix with a robust one for valid statistical testing.
+
+<!-- CHANGED: this whole section used `statistic_override`, which modelsummary
+renamed to `vcov`. The argument no longer exists (checked against the formals of
+modelsummary 2.3.0), and because msummary() has a `...`, passing it raises NO
+error and NO warning -- it is simply swallowed.
+
+That made this the most dangerous defect found in these decks. The "Compare" tab
+placed a default table and a "VCOV swapped" table side by side, and the two were
+byte-identical: the slide demonstrated nothing while appearing to work. Worse, a
+student carrying this pattern into their own research would believe they had
+applied robust standard errors when they had not.
+
+Verified: with `statistic_override` the output is identical to the default; with
+`vcov` it genuinely differs. -->
+
+You can achieve this using the `vcov` option. You give it a list of variance-covariance matrices, in the order their corresponding regression results appear on the table.
+
+<br>
+
+**Syntax:**
+```{r eval = F}
+vcov = list(vcov_1, vcov_2, ...)
+```
+
+<br>
+
+::: {.callout-important title="`statistic_override` is gone, and it fails silently"}
+Older code and older tutorials use `statistic_override` for this. That argument was renamed to `vcov`, and `msummary()` accepts `...`, so passing the old name produces [no error and no warning]{style="color: red;"}. The table simply comes back with the default standard errors.
+
+If you inherit code that uses it, the output looks completely fine. Check by running the table with and without: if the standard errors do not move, your override is not being applied.
+:::
+
+#### Compare
+
+::: {.columns}
+
+::: {.column width="50%"}
+Default: 
+
+```{r }
+modelsummary::msummary(
+  list(Model1 = model_2_corn, Model2 = model_2_soy), 
+  gof_omit = "IC|R",
+  coef_omit = "d3|d4"
+  #--- no statistical override ---#
+)  
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+VCOV swapped:
+
+```{r }
+modelsummary::msummary(
+  list(Model1 = model_2_corn, Model2 = model_2_soy), 
+  gof_omit = "IC|R",
+  coef_omit = "d3|d4",
+  #--- CHANGED: was statistic_override, which is silently ignored ---#
+  vcov = list(vcov_2_corn, vcov_2_soy)
+)
+```
+
+<br>
+
+Compare the standard errors in brackets against the default table on the left. They **move**. Under the old `statistic_override` spelling they did not, and nothing said so.
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### Save the table 
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Getting the table out of R. One argument, output, taking a filename, and the extension decides the format. The list covers html, latex, markdown, plain text, Word, PowerPoint and image formats. The note about docx is the practically important one for this audience. A table saved to Word arrives as a real editable table, so you can make final adjustments by hand where that is quicker than writing more code. That is not cheating. It is recognising that the last five percent of table polish is often faster done directly.
+
+</details>
+
+You can save the table to a file by providing a file name to the `output` option.
+
+The supported file types are:
+
++ .html 
++ .tex 
++ .md 
++ .txt 
++ .docx, pptx
++ .png 
++ .jpg
+
+<br>
+
+**Example**:
+
+The `docx` option may be particularly useful for those who want to put finishing touches on the table manually on WORD:
+
+```{r eval = F}
+modelsummary::msummary(
+  list(Model1 = model_2_corn, Model2 = model_2_soy),
+  output = "reg_results_table.docx" #<<
+)
+```
+
+:::
+<!--end of panel-->
+
+## Further modify regression tables with other packages
+
+::: {.panel-tabset}
+
+### output type
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same output argument does something else, and it is more interesting. Instead of a filename, give it the name of a table package, and rather than writing a file it hands you back that package's object. The two examples produce a flextable and a gt table, and the class check underneath proves it. Why this matters: modelsummary does the statistical work, extracting and formatting the coefficients, then hands off to a dedicated table package for appearance. You are not limited to what modelsummary itself knows how to style, which matters once a journal asks for something specific.
+
+</details>
+
+Using the `output` option in `modelsummary::msummary()`, you can turn the regression table into R objects that are readily modifiable by the `gt`, `kableExtra`, and `flextable` packages.
+
+<br>
+
+**Example: flextable**
+
+```{r}
+#--- create a regression table and turn it into a gt_tbl ---#
+reg_table_ft <- list(model_1_corn, model_1_soy)%>% 
+  modelsummary::msummary(output = "flextable")
+
+#--- check the class ---#
+class(reg_table_ft)
+```
+
+<br>
+
+**Example: `gt`**
+
+```{r }
+#--- create a regression table and turn it into a gt_tbl ---#
+reg_table_gt <- list(model_1_corn, model_1_soy)%>% 
+  modelsummary::msummary(output = "gt")
+
+#--- check the class ---#
+class(reg_table_gt)
+```
+
+
+### edit with `flextable`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And here is that handoff in practice. Because the output is a genuine flextable object, everything from the previous lecture applies unchanged. The example bolds some cells and colours another, using exactly the i and j selectors you already know. Note the row and column numbers though. They refer to the finished table, where coefficient and standard error rows alternate and the first column holds the labels. So counting rows in the output rather than in your model is how you get those numbers right, and it usually takes one attempt to find them.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="70%"}
+Now that the regression table created using `modelsummary::msummary()` with `output = "flextable"` is a `flextable` object. 
+
+
+So, we can use our knowledge of the `flextable` package to further modify the regression table if you would like. 
+
+For the details of how to use the `flextable` package visit the `flextable` lecture notes. 
+
+Here I will just give you an example of the use of `flextable` operations.
+:::
+<!--end of the 1st column-->
+::: {.column width="30%"}
+
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+<br>
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Example**
+
+```{r}
+#| eval: false
+list(
+  "Corn 1" = model_1_corn, 
+  "Corn 2" =  model_2_corn, 
+  "Soy 1" = model_1_soy, 
+  "Soy 2" = model_2_soy
+) %>% 
+modelsummary::msummary(
+  output = "flextable",
+  gof_omit ="IC|Adj",
+) %>%  
+bold(i = 9, j = c(3, 5), bold = TRUE) %>% 
+color(i = 3, j = 2, color = "red")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r edit-ft}  
+#| echo: false
+list(
+  "Corn 1" = model_1_corn, 
+  "Corn 2" =  model_2_corn, 
+  "Soy 1" = model_1_soy, 
+  "Soy 2" = model_2_soy
+) %>% 
+modelsummary::msummary(
+  output = "flextable",
+  gof_omit ="IC|Adj",
+) %>%  
+bold(i = 9, j = c(3, 5), bold = TRUE) %>% 
+color(i = 3, j = 2, color = "red")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### edit with `gt`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same idea with gt instead. The example does two things worth knowing. tab spanner adds a heading spanning several columns, which is how you group Corn one and Corn two under a single Corn label, and that is a very common requirement in published regression tables. Then tab style colours a range of rows. Pick whichever of the two packages you already know; there is no strong reason to prefer one here. The point of both tabs is simply that you are not confined to what modelsummary itself offers.
+
+</details>
+
+Now that the regression table is a `gt_tbl` object, we can use our knowledge of the `gt` package to modify the regression table. 
+
+For the details of how to use the `gt` package, see the `gt` documentation. Here I will just give you an example of the use of `gt` operations. <!-- CHANGED: the link was empty -- [here]() with no URL -- and rendered as a dead link -->
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Example**
+```{r} 
+#| eval: false
+list(
+  "Corn 1" = model_1_corn, 
+  "Corn 2" =  model_2_corn, 
+  "Soy 1" = model_1_soy, 
+  "Soy 2" = model_2_soy
+) %>% 
+  modelsummary::msummary(
+    output = "gt",
+    gof_omit ="IC|Adj",
+  ) %>%  
+  gt::tab_spanner( #<<
+    label = "Corn", #<<
+    columns = vars("Corn 1", "Corn 2") #<<
+  ) %>% #<<
+  gt::tab_style( #<<
+    style = cell_text(color = 'red'), #<<
+    locations = cells_body(rows = 7:8) #<<
+  ) #<<
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r} 
+#| echo: false
+list(
+  "Corn 1" = model_1_corn, 
+  "Corn 2" =  model_2_corn, 
+  "Soy 1" = model_1_soy, 
+  "Soy 2" = model_2_soy
+) %>% 
+  modelsummary::msummary(
+    output = "gt",
+    gof_omit ="IC|Adj",
+  ) %>%  
+  gt::tab_spanner( #<<
+    label = "Corn", #<<
+    columns = vars("Corn 1", "Corn 2") #<<
+  ) %>% #<<
+  gt::tab_style( #<<
+    style = cell_text(color = 'red'), #<<
+    locations = cells_body(rows = 7:8) #<<
+  ) #<<
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+# Create summary tables
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+## Example table
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Before we get into syntax, here is where we are heading. This is one call to datasummary, and it produces a table with years down the side, three variables nested under each year, and mean and standard deviation for each state across the top. That is a genuinely complicated layout, described by a single formula. It will look impenetrable right now. The next few slides build it up piece by piece, so come back to this slide at the end, and you should be able to read every part of it.
+
+</details>
+
+```{r exmaple-table}
+county_yield %>% 
+  dplyr::filter(year %in% 2010:2012) %>% 
+  modelsummary::datasummary(
+    (Year = factor(year)) * (
+      (`Corn Yield (bu/acre)` = corn_yield) + 
+      (`Soy Yield (bu/acre)` = soy_yield) + 
+      (`DI: category 4` = d4_5_9)
+    ) ~ 
+    state_name * (Mean + SD) ,
+    data = .
+  )  
+```
+
+## `modelsummary::datasummary()`
+
+::: {.panel-tabset}
+
+### Basics
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The formula interface, and it is the whole idea behind datasummary. A formula has two sides separated by a tilde, exactly as in regression, but here the meaning is spatial rather than statistical. Whatever is on the left becomes the rows, whatever is on the right becomes the columns. That is all. Look at the two examples, which are the same request with the sides swapped, and see that the table simply transposes. Once you accept that the formula describes a layout rather than a model, the rest of this section is just vocabulary.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+**Syntax**:
+
+```{r eval = F}
+modelsummary::datasummary(formula, data = dataset)
+```
+
+`formula` has two sides separated by `~` just like formula for regression. 
+
+Variables/statistics on the left-hand side (right-hand side) comprise rows (columns).
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**Example**
+
+```{r }
+modelsummary::datasummary(
+  corn_yield ~ Mean,
+  data = county_yield
+)
+```
+
+<br>
+
+Switching the order changes the structure of the resulting table:
+
+```{r }
+modelsummary::datasummary(
+  Mean ~ corn_yield,
+  data = county_yield
+)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+
+### summary functions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The package supplies its own statistics, capitalised to distinguish them from base ones: Mean, SD, Min, Max, the percentiles, and Histogram, which draws a little inline distribution. Why they exist rather than just using the base functions is in the sentence underneath, now corrected. They have na dot rm equals TRUE built in, so they quietly ignore missing values, whereas base mean returns NA the moment there is one. The two examples make the difference visible: capital M Mean gives you a number, lowercase mean gives you NA. One keystroke, and a common source of confusion.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+The `modelsummary` package offers multiple summary functions of its own:
+
++ `Mean`
++ `SD`
++ `Min`
++ `Max`
++ `P0`, `P25`, `P50`, `P75`, `P100`
++ `Histogram`
+
+These functions have `na.rm = TRUE` built in, so they do not return NA the way their `base` counterparts do when the data contain missing values. <!-- CHANGED: said na.rm = NA. modelsummary::Mean is function(x, fmt, na.rm = TRUE, ...) -->
+
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+For example, compare these two:
+
+```{r }
+modelsummary::datasummary(
+  soy_yield ~ Mean,
+  data = county_yield
+)
+```
+
+<br>
+
+```{r }
+modelsummary::datasummary(
+  #--- mean from the base package ---#
+  soy_yield ~ mean,
+  data = county_yield
+)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns--> 
+
+### user-defined function
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You are not restricted to the built-in statistics. Any function taking a vector and returning a single value can be used, including one you have just written. The example builds MinMax, which pastes the minimum and maximum into a bracketed range, then uses it exactly where you would have written Mean. Notice it returns a string rather than a number, which is fine; the table prints what it is given. This is how you produce the slightly unusual summaries that journals in a particular field expect, without stepping outside the framework.
+
+</details>
+
+
+You can use a user-defined function that takes a vector of values and return a single value. 
+
+**Example**:
+
+```{r user-defined}  
+#--- define a function ---#
+MinMax <- function(x){
+  paste0('[', min(x, na.rm = TRUE), ', ', max(x, na.rm = TRUE), ']')
+} 
+
+#--- use it ---#
+modelsummary::datasummary(corn_yield ~ MinMax, data = county_yield) 
+```
+
+
+### add stats/variables
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Adding more of either side is done with a plus. Several variables on the left, several statistics on the right, and you get every combination: each statistic computed for each variable. The example does four variables against four statistics, including the user-defined one from the last tab and the inline histogram. Read the sentence at the bottom, because it states the rule precisely, and it is that rule which makes the more complicated formulas later comprehensible. Plus means and, and the two sides are crossed with each other rather than paired up.
+
+</details>
+
+You can add more variables and statistics using `+`.
+
+**Example**:
+
+```{r plus}  
+modelsummary::datasummary(
+  corn_yield + soy_yield + d0_5_9 + d1_5_9
+  ~ Mean + SD+ MinMax + Histogram, 
+  data = county_yield
+)
+```
+
+For each of the variables on the left-hand side, each of the statistics on the right-hand side is calculated and displayed.
+
+### All
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A shortcut for the common case of summarising everything numeric. All wraps your dataset and expands to all its numeric columns, so you do not have to name them. Note the caveat above the example, which is the sort of thing you would otherwise lose twenty minutes to. It does not work on a tibble, so you wrap the data in data dot frame on the fly. That is why the example has data dot frame around county yield inside All, which otherwise looks redundant. It is not. It is working around a limitation.
+
+</details>
+
+You can use `All()` to create a summary table for all the numeric variables in the dataset.
+
+At the moment, `All()` does not work on `tibble`. So, if your dataset is `tibble`, convert it to a `data.frame` on the fly in the code like below:
+
+**Example**:
+
+```{r all, cache = F}  
+modelsummary::datasummary(
+  All(data.frame(county_yield)) 
+  ~ Mean + SD, 
+  data = county_yield
+)
+```
+
+:::
+<!--end of panel-->
+
+
+## More on `datasummary()` <!-- CHANGED: title said tablesummary(), which is not a function in this package -->
+
+::: {.panel-tabset}
+
+### Nesting by group
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the operator that makes this package powerful. Where plus means and, the asterisk means nested within. So state name times Mean plus SD gives you a mean and a standard deviation for each state, side by side, which is the table you would otherwise build with group by and summarize. Look at the sentence at the bottom, because it shows both operators working together in one formula. The two statistics are nested inside state, while MinMax sits outside the nesting and is therefore computed once over the whole sample.
+
+</details>
+
+You can nest categorical variables with `*`, meaning you can get summary statistics for each value of the categorical variable (like `group_by() %>% summarize()`).
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+#--- single stat ---#
+variable ~ category_variable * stat  
+
+#--- multiple stats ---#
+variable ~ category_variable * (stat 1 + stat 2 + ...)  
+```
+
+<br>
+
+**Examples**:
+
+```{r nesting-f}  
+modelsummary::datasummary(
+  corn_yield + soy_yield + d0_5_9 + d1_5_9
+  ~ state_name * (Mean + SD) + MinMax,
+  data = county_yield
+)
+```
+
+For each value of `state_name` (`Nebraska`, `Colorado`, `Kansas`), `Mean` and `SD` are shown for each of the variables on the left-hand side. But, `MinMax` is for the entire sample.
+
+### deeper
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And nesting composes. Multiply by two categorical variables and you get a column for every combination, so year times state gives you Kansas twenty eleven, Kansas twenty twelve, Nebraska twenty eleven and so on, each with its own mean and standard deviation. The example filters to two years and two states first, and that is deliberate. Nested columns multiply very quickly, and a table forty columns wide helps nobody. That is the practical constraint on this feature: the syntax will happily produce far more columns than will ever fit on a page.
+
+</details>
+
+You can nest with multiple categorical variables by multiplying stats with multiple categorical variables. 
+
+**Example**:
+
+```{r deeper}  
+county_yield %>% 
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
+    corn_yield + soy_yield + d0_5_9 + d1_5_9
+    ~ factor(year) * state_name * (Mean + SD) + MinMax, 
+    data = .
+  )
+```
+
+For each of the unique combinations of `state_name` (`Nebraska`, `Kansas`) and `year` (2011, 2012), `Mean` and `SD` are shown for each of the variables on the left-hand side. But, `MinMax` is for the entire sample.
+
+
+### renaming
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+By default your column names and the statistic names become the labels, which is rarely what you want in a finished table. The renaming syntax is a label, an equals sign, and the thing being labelled, all wrapped in parentheses, and it works on both variables and statistics. The example renames corn yield to a proper label with units, and SD to Std dot Dev. Then read the callout: if your label contains spaces you must wrap it in back quotes. And note the last line, which is honest advice. If this syntax annoys you, rename in gt afterwards instead.
+
+</details>
+
+By default variable and statistics names are used as the labels in the table.
+
+You can provide labels by the following syntax: `(label = variable/stat)`
+
+<br>
+
+**Example**:
+
+```{r renaming}  
+county_yield %>% 
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
+    (`Corn Yield (bu/acre)` = corn_yield)
+    ~ state_name * (Mean + (Std.Dev. = SD)), 
+    data = .
+  )
+```
+
++ `corn_yield` is labeled as `Corn Yield (bu/acre)`
++ `SD` is labeled as `Std.Dev.`
+
+<!-- CHANGED: this was `.content-box-red[...]`, which is xaringan/remark.js
+syntax left over from an earlier version of these slides. Quarto does not
+understand it, so it rendered on the slide as the literal text
+".content-box-red[Note: ...]", brackets and all. -->
+
+::: {.callout-note title="Labels with spaces"}
+When your label contains spaces, surround it with back quotes.
+:::
+
+If you do not like this way of changing labels, you can always use `gt` package.
+
+
+### function arguments
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+How to pass arguments to a statistic. You multiply the statistic by Arguments, in parentheses, listing what you want passed through. The example does two things with it. It adds na dot rm equals TRUE to the lowercase base mean and sd, which is exactly what the capitalised versions do for you automatically. And it passes prob equals nought point one to quantile, which is the only way to say which quantile you actually want. That second use is the one you will need, since quantile without a probability is not a well-defined request.
+
+</details>
+
+You can pass option arguments to the stats function by: `stat * Argument(options)`
+
+<br>
+
+**Example**:
+
+```{r arguments}  
+county_yield %>% 
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
+    corn_yield 
+    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) +
+      quantile * Arguments(prob = 0.1, na.rm = TRUE), 
+    data = .
+  )
+```
+
+<br>
+
++ `(mean + sd) * Arguments(na.rm = TRUE)` adds `na.rm = TRUE` option to `mean()` and `sd()`
++ `quantile * Arguments(prob = 0.1, na.rm = TRUE)` adds `prob = 0.1` and `na.rm = TRUE` to `quantile()`
+
+### title and notes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two arguments for the surrounding text. Title puts a caption on the table, notes puts one or more footnotes underneath, and notes takes a vector so you can have several. Nothing complicated here, but do use them. A table that arrives in a document with its title and notes already attached is one you cannot later mismatch with the wrong caption, which is a genuinely common error when tables and captions are maintained separately. Build the description into the same call that produces the table, and it travels with it.
+
+</details>
+
+**Example**
+
+```{r title}  
+county_yield %>% 
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
+    corn_yield 
+    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + 
+      quantile * Arguments(prob = 0.1, na.rm = TRUE),  
+    data = .,
+    title = "A title",
+    notes = c("first note", "second note")
+  )
+```
+
+### align columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Column alignment, controlled by the align argument. You pass a single string with one letter per column: l for left, r for right, c for centre. So the nth letter aligns the nth column, and the string needs to be as long as the table is wide. The example uses four letters for a four-column table. Only those three letters are valid, so a stray character will not do what you hope. In practice you want left for the label column and right for the numbers, which is what makes columns of figures line up.
+
+</details>
+
+You can use `align` to align columns. Available alignment are:
+
++ `l`: left
++ `r`: right
++ `c`: center
+
+For `align`, you provide a sequence of the option letters (e.g., `"lrcl"`) <!-- CHANGED: was align() as though a function, and the example string "lrcle" contained an e, which is not one of the three valid letters -->
+
+The `n`th letter corresponds to `n`th column.
+
+**Example**:
+
+```{r align}  
+county_yield %>% 
+  dplyr::filter(year %in% 2011:2012) %>% 
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+  modelsummary::datasummary(
+    corn_yield 
+    ~ state_name * (`This is M E A N` = mean) * Arguments(na.rm = TRUE) + 
+      (`This is Q U A N T I L E` = quantile) * Arguments(prob = 0.1, na.rm = TRUE),
+    data = .,
+    align = "lrlc"
+  )
+```
+
+### Output
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A short tab, and the message is that there is nothing new to learn. The output argument on datasummary behaves exactly as it does on msummary: give it a filename to write a file, or the name of a table package to get that package's object back for further editing. That consistency is worth noticing as a design point. Once you have learned how to get one kind of table out of this package you have learned it for all of them, and the same goes for title and notes.
+
+</details>
+
+You can use the `output` option to either export the table as a file or save it as R objects which you can further modify. 
+
+This works exactly the same way as the `modelsummary::msummary()` function. 
+
+:::
+<!--end of panel-->
+
+## Convenience functions
+
+::: {.panel-tabset}
+
+### balance table
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A convenience function for a table economists produce constantly. If you have a treatment and a control group, datasummary balance gives you means and standard deviations for each group side by side, plus a difference, which is the standard way of showing that randomisation worked. The formula is simpler than the general case: variables to summarise on the left, the grouping variable on the right. The example uses state as the grouping variable, which is not really a treatment, but the shape of the output is exactly what you would produce for a real experiment.
+
+</details>
+
+If your data was generated through randomized experiments (or you are using natural experiments), then `datasummary_balance()` can be very useful as it can generate a variable balance table.
+
+<br>
+
+**Syntax**:
+```{r eval = F}
+modelsummary::datasummary_balance(variables to summarize ~ treatment dummy)
+```
+
++ `variables to summarize`: list of variables to summarize
++ `treatment dummy`: a dummy variable that indicates whether in the treated or control group
+
+<br>
+
+**Example**:
+
+```{r balance-tab, eval = F}  
+county_yield %>% 
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
+  dplyr::select(c(state_name, where(is.numeric))) %>% 
+  dplyr::select(- year) %>% 
+  modelsummary::datasummary_balance(
+    All (data.frame(.))~ state_name,
+    data = .
+  )
+```
+
+
+```{r balance-tab-f, ref.label = "balance-tab", echo = F}  
+
+```
+
+### correlation table
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+And the last one, a correlation matrix, in a single call with no formula at all. Just pipe in the numeric columns you care about. Note the select calls before it, keeping only numeric variables and then dropping year, because year is numeric but correlating it with anything here would be meaningless. That is worth remembering generally. These convenience functions do not know which of your numeric columns are quantities of interest and which are identifiers or dates. Filtering down to the ones that matter is your job, not theirs.
+
+</details>
+
+
+You can create a correlation table with `datasummary_correlation()`.
+
+```{r }
+county_yield %>% 
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
+  dplyr::select(c(state_name, where(is.numeric))) %>% 
+  dplyr::select(- year) %>% 
+  modelsummary::datasummary_correlation()
+```
+
+:::
+<!--end of panel-->
+

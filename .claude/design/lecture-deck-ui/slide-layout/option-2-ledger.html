@@ -1,0 +1,169 @@
+<!-- @dsCard group="Slide layouts" -->
+<!doctype html>
+<meta charset="utf-8">
+<title>Slide layout — Ledger</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../_deck.css">
+<style>
+/* LEDGER — the title becomes a band that spans the slide.
+   The band is the whole point: today the head of a slide costs an h2 (35.2px +
+   12px margin) plus a tab strip (16.3px + padding + 9.6px margin) plus the
+   stage's 34px top padding — about 125px of stacked, unstructured space. The
+   band folds the topic, the chapter and the tab strip into 96px and gives the
+   transcript pill somewhere to live that is not on top of the content. */
+.sys-ledger { padding: 0 0 0; }            /* the band goes edge to edge */
+
+.lg-band {
+  background: var(--accent); color: var(--band-fg);
+  padding: 13px 42px 0; position: relative;
+}
+.lg-band .row { display: flex; align-items: baseline; gap: 14px; }
+.lg-band h2 { font-size: 30px; font-weight: 600; margin: 0; color: var(--band-fg);
+              line-height: 1.15; }
+.lg-band .chap { margin-left: auto; font-size: 14px; letter-spacing: .1em;
+                 text-transform: uppercase; opacity: .82; white-space: nowrap; }
+
+/* tabs live in the band, hanging off its bottom edge */
+.lg-tabs { display: flex; gap: 3px; margin-top: 11px; white-space: nowrap;
+           align-items: flex-end; }
+.lg-tabs span.tab { font-size: var(--t-tab); padding: 5px 13px; color: rgba(255,255,255,.8);
+                    background: rgba(255,255,255,.11); }
+.lg-tabs span.tab.on { background: var(--paper); color: var(--accent); font-weight: 700; }
+
+.lg-body { padding: 20px 42px 0; }
+
+.sys-ledger h3 { font-size: var(--t-h3); margin: 0 0 8px; color: var(--accent); }
+.sys-ledger strong { color: var(--accent-sub); }
+
+/* code + output as one bordered object */
+.lg-unit { border: 1px solid var(--rule); margin-bottom: 12px; }
+.lg-unit .hd { font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+               color: var(--ink-muted); background: var(--tint);
+               padding: 4px 12px; border-bottom: 1px solid var(--rule); }
+.lg-unit pre.src, .lg-unit pre.out { margin: 0; border-radius: 0; }
+.lg-unit pre.out { border-top: 1px solid var(--rule); }
+
+/* title slide: the band grows to fill the slide */
+.lg-title { height: 100%; background: var(--accent); color: var(--band-fg);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 0 62px 60px; }
+.lg-title .num { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+                 opacity: .82; margin-bottom: 14px; }
+.lg-title h1 { font-size: 48px; margin: 0 0 20px; font-weight: 600; max-width: 800px;
+               line-height: 1.12; }
+.lg-title .rule { width: 96px; height: 3px; background: rgba(255,255,255,.6);
+                  margin-bottom: 20px; }
+.lg-title .meta { font-size: var(--t-body); opacity: .9; }
+
+/* divider: band inverted */
+.lg-div { height: 100%; display: flex; flex-direction: column; justify-content: center;
+          padding: 0 62px 60px; border-left: 14px solid var(--accent); }
+.lg-div .step { font-size: 15px; letter-spacing: .16em; text-transform: uppercase;
+                color: var(--accent); font-weight: 700; }
+.lg-div h1 { font-size: 46px; margin: 8px 0 0; font-weight: 600; }
+
+/* The transcript control rides at the end of the TAB LINE, not the title line:
+   the title line already ends with the chapter label, and a control absolutely
+   positioned there lands on top of it. */
+.pill { margin-left: auto; align-self: center; font-size: 11.5px; font-weight: 700;
+        letter-spacing: .08em; text-transform: uppercase; color: var(--band-fg);
+        border: 1px solid rgba(255,255,255,.6); padding: 3px 10px;
+        white-space: nowrap; }
+
+.stage .footer.on-band { color: #6f6f6f; }
+</style>
+
+<h1 class="page">Ledger — a title band that buys back vertical space</h1>
+<p class="page">
+  The head of a slide today is about 125px of loosely stacked furniture: top
+  padding, a 35.2px heading, a margin, a tab strip, another margin. Ledger folds
+  the topic, the chapter and the tabs into a single 96px band. It is the only one
+  of the three directions that gives space <i>back</i> to the content, which
+  matters because several slides already measure exactly 700px.
+</p>
+
+<p class="caption"><b>1 · Title slide.</b> The band, grown to fill the slide.</p>
+<div class="stage sys-ledger">
+  <div class="lg-title">
+    <div class="num">Chapter 3 · Lecture 1</div>
+    <h1>Importing and Exporting Datasets</h1>
+    <div class="rule"></div>
+    <div class="meta">Taro Mieno · University of Nebraska–Lincoln<br>
+      <span style="font-size:16px;opacity:.85">AECN 896-05 · Data Science with R</span></div>
+  </div>
+</div>
+
+<p class="caption"><b>2 · Section divider.</b> The band collapses to a bar down
+  the left edge — same system, obviously a different kind of slide.</p>
+<div class="stage sys-ledger">
+  <div class="lg-div">
+    <div class="step">Part 2</div>
+    <h1>Working directories</h1>
+  </div>
+  <div class="logo tr">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>3 · Concept slide.</b> Chapter sits at the far right of the
+  band; the transcript pill sits on the band rather than over the content.</p>
+<div class="stage sys-ledger safeline">
+  <div class="lg-band">
+    <div class="row">
+      <h2>Importing and Exporting Datasets</h2>
+      <span class="chap">Ch 3 · Data Wrangling</span>
+    </div>
+    <div class="lg-tabs">
+      <span class="tab on">Objectives</span><span class="tab">read.csv()</span
+      ><span class="tab">Working directory</span><span class="tab">Exercise</span
+      ><span class="pill">Transcript</span>
+    </div>
+  </div>
+  <div class="lg-body">
+    <ul>
+      <li>Read a <code>.csv</code> file into R as a <strong>data.frame</strong></li>
+      <li>Understand what the <strong>working directory</strong> is, and why a path
+          that works on your machine will not work on mine</li>
+      <li>Write a dataset back out to disk</li>
+      <li>Know when to reach for <code>readRDS()</code> instead</li>
+    </ul>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>
+
+<p class="caption"><b>4 · Code + output.</b> Labelled as one object. The label
+  row costs 22px and removes the guesswork about which block is which.</p>
+<div class="stage sys-ledger safeline">
+  <div class="lg-band">
+    <div class="row">
+      <h2>Summarizing by group</h2>
+      <span class="chap">Ch 3 · Data Wrangling</span>
+    </div>
+    <div class="lg-tabs">
+      <span class="tab">Syntax</span><span class="tab on">Example</span
+      ><span class="tab">Your turn</span><span class="pill">Transcript</span>
+    </div>
+  </div>
+  <div class="lg-body">
+    <p>Chain the verbs together with the pipe:</p>
+    <div class="lg-unit">
+      <div class="hd">R</div>
+<pre class="src"><span class="fn">library</span>(dplyr)
+
+corn_data <span class="fn">%>%</span>
+  <span class="fn">filter</span>(state == <span class="str">"NE"</span>) <span class="fn">%>%</span>
+  <span class="fn">group_by</span>(county) <span class="fn">%>%</span>
+  <span class="fn">summarize</span>(mean_yield = <span class="fn">mean</span>(yield))</pre>
+<pre class="out"># A tibble: 3 × 2
+  county   mean_yield
+  &lt;chr&gt;         &lt;dbl&gt;
+1 Buffalo        182.
+2 Custer         171.
+3 Dawson         189.</pre>
+    </div>
+    <p>Each <code>%>%</code> passes the result on the left into the function on the
+       right as its first argument.</p>
+  </div>
+  <div class="logo">N</div>
+  <div class="footer">back to the lecture slides on the course website</div>
+</div>

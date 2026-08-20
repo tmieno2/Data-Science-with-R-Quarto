@@ -1,0 +1,451 @@
+---
+title: "Ex-6-1: Organizing a Reproducible Project"
+abstract: "Code Projects"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+---
+
+There is no code to run in most of this. That is not a defect of the exercises:
+organizing a project is not a coding skill, and you cannot practise it in a
+browser or on a toy example. What you can do is build a real structure once,
+deliberately, and then use it for the rest of the course.
+
+The test that every exercise here is working toward is a single question. **If
+you sent this folder to a stranger, could they reproduce your results without
+asking you anything?** Everything below is a way of making the answer yes.
+
+# Build the structure
+
+**Task.** Create a project called `nitrogen-study` with the folder layout the
+lecture recommends.
+
+1. `File -> New Project -> New Directory -> New Project`, named
+   `nitrogen-study`.
+2. Create the folders below. Make them all now, even the ones you have nothing
+   to put in yet.
+3. Put a `.gitkeep` file, or a short `readme.md`, in each empty folder.
+
+```
+nitrogen-study/
+├── nitrogen-study.Rproj
+├── Code/
+│   ├── DataPrep/
+│   └── Analysis/
+├── Data/
+│   ├── Raw/
+│   └── Processed/
+├── Literature/
+├── Results/
+└── Writing/
+```
+
+::: {.callout-important title="It worked if"}
+`fs::dir_tree()` or the Files pane shows all nine folders, and
+`here::here()` prints the `nitrogen-study` path.
+:::
+
+::: {.callout-note collapse="true" title="Doing it from the console"}
+```{r}
+#| eval: false
+library(here)
+
+dirs <- c(
+  "Code/DataPrep", "Code/Analysis",
+  "Data/Raw", "Data/Processed",
+  "Literature", "Results", "Writing"
+)
+
+for (d in dirs) dir.create(here(d), recursive = TRUE, showWarnings = FALSE)
+
+# stop empty folders disappearing when you share the project
+for (d in dirs) file.create(here(d, ".gitkeep"))
+
+fs::dir_tree(here())
+```
+
+The empty-folder point is not pedantry. Git does not track folders, only files,
+so an empty `Data/Raw` will not survive being cloned. Someone who clones your
+project then gets a script that writes to a folder that does not exist, and a
+confusing error.
+
+Why create folders you have nothing for yet? Because the alternative is deciding
+where something goes at the moment you are busy with it, which is when you will
+decide badly.
+:::
+
+# Sort out somebody else's mess
+
+This is how most projects actually arrive: everything in one folder, named
+however it happened.
+
+**Task.** Create this mess in a scratch folder, then reorganize it into your
+structure without looking at the answer.
+
+```{r}
+#| eval: false
+mess <- here::here("mess")
+dir.create(mess, showWarnings = FALSE)
+
+files <- c(
+  "data.csv", "data_v2.csv", "data_v2_FINAL.csv",
+  "analysis.R", "analysis_new.R", "Untitled1.R",
+  "plot.png", "figure for paper.png",
+  "notes.docx", "Smith et al 2019.pdf",
+  "cleaned.rds", "regression output.txt",
+  "script that makes the map.R", "final_paper.qmd"
+)
+
+file.create(file.path(mess, files))
+```
+
+For each file, decide which folder it belongs in and what it should be called.
+Three of them you cannot place from the name alone. Identify which, and say what
+you would need to know.
+
+::: {.callout-important title="It worked if"}
+Every file has a destination and a new name, and you can state the run order of
+the code files from their names alone.
+:::
+
+::: {.callout-note collapse="true" title="One reasonable answer"}
+| Original | Goes to | Renamed |
+|---|---|---|
+| `data.csv`, `data_v2.csv`, `data_v2_FINAL.csv` | `Data/Raw/` | **cannot decide from the name** |
+| `cleaned.rds` | `Data/Processed/` | `nitrogen-cleaned.rds` |
+| `analysis.R`, `analysis_new.R` | `Code/Analysis/` | **cannot decide from the name** |
+| `Untitled1.R` | probably nowhere | delete, or open it and find out |
+| `script that makes the map.R` | `Code/Analysis/` | `02-3-make-map.R` |
+| `plot.png`, `figure for paper.png` | `Results/` | `fig-yield-response.png` |
+| `regression output.txt` | `Results/` | `reg-main.txt` |
+| `Smith et al 2019.pdf` | `Literature/` | keep |
+| `notes.docx` | `Literature/` or `Writing/` | keep |
+| `final_paper.qmd` | `Writing/` | `manuscript.qmd` |
+
+The three you cannot place are the three sets of near-duplicates:
+`data` / `data_v2` / `data_v2_FINAL`, and `analysis` / `analysis_new`. Nothing in
+the names tells you which is current. You have to open them, compare them, and
+guess, and if the author is not available you may never know.
+
+That is the actual cost of bad naming, and it is why `_FINAL` is a warning sign
+rather than a solution. Two files whose names differ only by `_new` are a
+question you have left for your future self, who will have forgotten the answer.
+
+Note also what disappears once files are named for the order they run in.
+`01-1-`, `01-2-`, `02-1-` is not decoration: it is the instruction for
+reproducing the project, written where nobody can lose it.
+
+Spaces in filenames are a separate small nuisance. They are legal, and they
+require quoting in every shell command and break some tools outright. Use
+hyphens.
+:::
+
+# Name files for the order they run in
+
+**Task.** Your study needs the following steps. Give each one a filename and put
+it in the right folder.
+
+1. download county-level weather data from an API
+2. download county boundaries
+3. clean the nitrogen trial data
+4. merge trial data with weather
+5. estimate the main regression
+6. run a robustness check with a different specification
+7. produce the figures and tables for the paper
+
+Then write a `readme.md` at the project root telling a stranger what to run.
+
+::: {.callout-important title="It worked if"}
+Sorting `Code/DataPrep` and `Code/Analysis` alphabetically gives you the correct
+execution order, with no readme required to work it out.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```
+Code/DataPrep/
+  01-1-download-weather-data.R
+  01-2-download-county-boundaries.R
+  01-3-clean-trial-data.R
+  01-4-merge-trial-weather.R
+
+Code/Analysis/
+  02-1-main-regression.R
+  02-2-robustness-alt-spec.R
+  02-3-gen-figures-tables.R
+```
+
+The numbering carries two pieces of information: the `01` versus `02` says which
+stage, and the `-1`, `-2` says the order within it. Alphabetical sort equals
+execution order, which means the folder listing *is* the documentation.
+
+A readme worth writing:
+
+````markdown
+# Nitrogen study
+
+## What this is
+Estimates corn yield response to nitrogen using on-farm trial data,
+2020-2023.
+
+## How to reproduce
+1. Open `nitrogen-study.Rproj` in RStudio.
+2. Run `Code/DataPrep/` in filename order. Requires an API key in
+   `.Renviron` as `NOAA_KEY`.
+3. Run `Code/Analysis/` in filename order.
+4. Render `Writing/manuscript.qmd`.
+
+Total runtime is about 20 minutes; step 01-1 is most of it.
+
+## Data
+`Data/Raw/` is read-only and is not regenerated by any script.
+See `Data/Raw/metadata.md` for sources and download dates.
+````
+
+The API key line is the sort of thing that gets forgotten and makes a project
+unreproducible in a way that looks like a bug. Note what is written down and
+what is deliberately *not*: the key itself never goes in the repository.
+:::
+
+# Make raw data read-only, and mean it
+
+The lecture's first rule is that you never overwrite raw data. Here you enforce
+it rather than remembering it.
+
+**Task.**
+
+1. Put a csv in `Data/Raw/`. Any of the corn yield files will do.
+2. Write `Data/Raw/metadata.md` recording where the file came from, when you
+   downloaded it, and what the columns mean.
+3. Make the file read-only at the operating-system level.
+4. Try to overwrite it from R and observe what happens.
+5. Write a `Code/DataPrep` script that reads it, changes something, and saves
+   the result to `Data/Processed/`.
+
+::: {.callout-important title="It worked if"}
+Writing to the raw file **fails with an error**, and your processed file appears
+in `Data/Processed/`.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+raw <- here("Data", "Raw", "corn_yields.csv")
+
+#--- make it read-only ---#
+Sys.chmod(raw, mode = "0444")
+
+#--- now try to clobber it ---#
+readr::write_csv(data.frame(x = 1), raw)
+#> Error: Permission denied
+
+#--- the right shape for a DataPrep script ---#
+corn <- readr::read_csv(raw)
+
+corn_clean <-
+  corn %>%
+  janitor::clean_names() %>%
+  dplyr::filter(!is.na(yield))
+
+saveRDS(corn_clean, here("Data", "Processed", "corn-clean.rds"))
+```
+
+Why bother, when you could simply be careful? Because being careful is a
+promise you make to yourself at the moment you have the least attention. The
+`0444` makes it impossible instead of merely inadvisable, and it costs one line.
+
+Raw data is the only thing in the project you cannot regenerate. Every script,
+every figure, every processed dataset can be rebuilt by rerunning code. If you
+overwrite `Data/Raw/`, you have destroyed the irreplaceable part.
+
+`metadata.md` is the other half. A csv with no provenance is nearly worthless
+six months later, because you cannot answer the first question a referee asks:
+where did this come from and when?
+:::
+
+# Read your own code as a stranger
+
+**Task.** Here is some code that works. Reformat it so a person can read it.
+
+```{r}
+#| eval: false
+d<-read.csv("Data/Raw/corn_yields.csv");d2<-d[d$Yield>100&d$Irrigated==1,]
+res=lm(Yield~Irrigated+FIPS,data=d);summary(res)
+Final_Data_2<-aggregate(d2$Yield,by=list(d2$County_name),FUN=mean)
+```
+
+1. Fix it by hand first: one statement per line, spaces around operators,
+   consistent assignment, names that say what things are.
+2. Then install `styler` and use `Addins -> Style selection` on the original.
+3. Compare. Name two things you fixed that `styler` did not.
+
+::: {.callout-important title="It worked if"}
+You can name something wrong with this code that no automatic tool can fix.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+```{r}
+#| eval: false
+corn <- read.csv(here("Data", "Raw", "corn_yields.csv"))
+
+irrigated_high_yield <-
+  corn %>%
+  dplyr::filter(Yield > 100, Irrigated == 1)
+
+yield_model <- lm(Yield ~ Irrigated + FIPS, data = corn)
+summary(yield_model)
+
+mean_yield_by_county <-
+  irrigated_high_yield %>%
+  dplyr::group_by(County_name) %>%
+  dplyr::summarize(mean_yield = mean(Yield))
+```
+
+`styler` fixes spacing, indentation, and line breaks. It will not fix:
+
+- **the names.** `d`, `d2`, `res`, and `Final_Data_2` mean nothing. `styler`
+  cannot know that `d2` is the irrigated high-yield subset, so it leaves the
+  name alone. Naming is the part that carries the meaning, and it is entirely on
+  you.
+- **`=` versus `<-`.** Mixing them is legal and inconsistent. Pick `<-`.
+- **the actual bug.** `lm(Yield ~ Irrigated + FIPS)` treats `FIPS` as a
+  *number*, so the model claims yield rises linearly with county code. It should
+  be `factor(FIPS)`. No formatter will ever tell you this, and unreadable code
+  is exactly where this kind of error hides.
+
+That last point is the argument for style. Readable code is not a courtesy, it
+is how you find your own mistakes.
+:::
+
+::: {.callout-tip collapse="true" title="Setting up styler"}
+```{r}
+#| eval: false
+install.packages("styler")
+```
+
+Then highlight code and use `Addins -> Style selection`. Addins have no keyboard
+shortcut by default; assign one under
+`Tools -> Modify Keyboard Shortcuts...` by searching for "Style selection".
+
+Do not confuse this with `cmd`/`ctrl` + `shift` + `A`, which is RStudio's own
+Reformat Code. That is built in, works without `styler`, and does not follow the
+tidyverse style.
+:::
+
+# Stop typing the same thing
+
+**Task.**
+
+1. Open `Tools -> Edit Code Snippets...` and read a few of the R ones.
+2. Write a snippet `hdr` that inserts a commented section divider.
+3. Write a snippet `rdd` that inserts a `readRDS(here(...))` call with the
+   cursor left in the right place.
+4. Write one that inserts your standard qmd setup chunk.
+
+::: {.callout-important title="It worked if"}
+Typing the shortcut and pressing Tab inserts the text with your cursor where you
+want it.
+:::
+
+::: {.callout-note collapse="true" title="Answer"}
+Snippet definitions are indented with **tabs**, not spaces. This is the one thing
+that goes wrong, and it fails silently.
+
+````{verbatim}
+snippet hdr
+	# /*=================================================*/
+	#' # ${1:section name}
+	# /*=================================================*/
+
+snippet rdd
+	readRDS(here::here("Data", "Processed", "${1:file}.rds"))
+
+snippet qsetup
+	```{r}
+	#| label: setup
+	#| include: false
+	library(tidyverse)
+	library(here)
+	```
+````
+
+`${1:name}` is a placeholder: the cursor lands there, the text is pre-selected,
+and Tab moves to `${2:...}` if there is one. That is what makes a snippet worth
+more than copy-paste.
+
+These are per-user, not per-project, so they follow you to every project you
+open. Ten minutes here is repaid for years.
+:::
+
+# Audit a real project
+
+**Task.** Clone <https://github.com/tmieno2/Sample-Reproducible-Project> and
+read it the way somebody reproducing it would, not the way an author would.
+
+Answer these without running anything:
+
+1. What is this project about, and how quickly could you tell?
+2. Where is the instruction telling you what to run, and in what order?
+3. Which folder holds data you could not regenerate?
+4. Pick one number in the writing. Trace it back to the code that produced it
+   and the data that fed it.
+5. What would you need from the author that the repository does not give you?
+
+::: {.callout-important title="It worked if"}
+You completed step 4. If you cannot trace one number back to its source, either
+the project is not reproducible or you have not finished reading it.
+:::
+
+::: {.callout-note collapse="true" title="What to look for"}
+Step 4 is the whole exercise. Everything else is orientation.
+
+Tracing a number backwards is the only test that actually distinguishes a
+project that *looks* organized from one that is reproducible. A tidy folder tree
+proves nothing; a number you can follow from the manuscript, to the script that
+computed it, to the dataset it came from, proves everything.
+
+You may also notice `renv.lock` in the repository. That records the exact version
+of every package used, so a future R can reinstall the same versions. It is the
+answer to the failure mode none of the folder structure addresses: your code is
+fine, your data is fine, and a package changed under you.
+
+Step 5 is worth being honest about. Almost every real project has a gap: an API
+key, a licensed dataset, a manual step someone did in Excel once. The point is
+not that gaps are shameful, it is that they should be **written down** rather
+than discovered.
+:::
+
+# The only test that counts
+
+**Task.** Take a project you have actually done — an assignment from this course
+will do — and reorganize it into this structure. Then:
+
+1. Rename every file so the run order is obvious.
+2. Make `Data/Raw` read-only and write its `metadata.md`.
+3. Write the root `readme.md`.
+4. Delete everything in `Data/Processed`, `Results`, and every rendered output.
+5. Restart R, and rebuild the whole project from raw data by following your own
+   readme.
+6. Swap projects with a classmate and reproduce each other's.
+
+::: {.callout-important title="It worked if"}
+Step 5 rebuilds everything with no manual intervention and no errors, and your
+classmate gets your numbers in step 6 without messaging you once.
+:::
+
+::: {.callout-warning collapse="true" title="What usually breaks at step 5"}
+In rough order of frequency:
+
+- an absolute path (`/Users/yourname/...`) that exists on one machine
+- a script that depends on an object another script left in the Environment,
+  rather than reading it from `Data/Processed`
+- `library()` calls for packages that are not installed on a clean machine
+- a step that was done by hand once and never written down
+- a file in `Results/` that no script produces, because you made it
+  interactively and forgot
+
+Every one of these is invisible until you delete the outputs and try again. That
+is why step 4 is in the list, and why "it runs on my machine" is not evidence of
+anything.
+:::
