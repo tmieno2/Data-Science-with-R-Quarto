@@ -103,8 +103,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -744,10 +758,10 @@ Answer
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">best_n</span>(<span class="dv">4</span>, <span class="fl">0.5</span>)   <span class="co"># about 200</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Checking it.</strong> Differentiate profit with respect to <code>N</code>:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \frac{d}{dN}\left[P_C(120 + 25\log N) - P_N N\right] = \frac{25 P_C}{N} - P_N = 0
 \quad\Longrightarrow\quad N^* = \frac{25 P_C}{P_N}
-\]</span></p>
+</span></p>
 <p>With <code>Pc = 4</code> and <code>Pn = 0.5</code>, that is <code>25 * 4 / 0.5 = 200</code>. Your grid search should land within a fraction of a unit of it, and the gap tells you how coarse your grid is.</p>
 <p>Always check a numerical answer against something you can derive, whenever you can derive anything. A grid search that quietly returns the edge of its own grid looks exactly like a grid search that worked.</p>
 <div class="cell">

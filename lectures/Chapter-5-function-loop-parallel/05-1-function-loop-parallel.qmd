@@ -3,9 +3,13 @@ title: "05-1: User-defined Function, Loop, and Parallelization"
 abstract: "Chapter 5: Function and Loop"
 format: 
   revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
     include-in-header:
       - ../transcript-support.html
       - ../webr-layout.html
+      - ../katex-amd-fix.html
     footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
     theme: [default, ../custom.scss, ../notebook.scss]
     fontsize: 1.2em
@@ -373,7 +377,7 @@ f_to_c <- function(temp_F) {
 After running a randomized nitrogen trial, you found the following relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
 
 $$
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
 $$ 
 
 Write a function that takes a nitrogen rate as an argument, calculate the estimated yield for the nitrogen rate, and then return the estimated yield.
@@ -401,7 +405,7 @@ You would like to calculate the revenue of corn production (defined below) as a 
 
 ```{=tex}
 \begin{align*}
-P_{corn} * \mbox{corn yield}
+P_{corn} * \text{corn yield}
 \end{align*}
 ```
 
@@ -719,7 +723,7 @@ lapply(seq(5, 50, by = 5), \(x) x^3)
 Define a function that takes a nitrogen rate and corn price as arguments and calculate revenue. Yield can be estimated using the following equation:
 
 $$
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
 $$ 
 
 At each value of the corn price sequence of `seq(2.5, 4.0, by = 0.1)`, calculate the revenue using `lapply()` where nitrogen rate is fixed at 200 (lb/acre).
@@ -981,11 +985,11 @@ Find the profit of corn production at different price combinations of corn and n
 + Step 3: Define a function that takes a row number, extract corn price and nitrogen price and then calculate profit based on the price combination using the following equations:
 
 $$
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
 $$ 
 
 $$
-\mbox{profit} = \mbox{corn price} \times \mbox{corn yield} - \mbox{nitrogen price} \times \mbox{nitrogen rate}
+\text{profit} = \text{corn price} \times \text{corn yield} - \text{nitrogen price} \times \text{nitrogen rate}
 $$
 
 + Step 4: loop over the row numbers of the parameter data
@@ -1595,7 +1599,7 @@ A new problem, and a very practical one. You have run a nitrogen trial, fitted a
 Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
 
 $$
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
 $$
 
 You are interested in finding the best nitrogen rates that maximize profit at different combinations of corn and nitrogen prices for this field.
@@ -1994,13 +1998,13 @@ One more wrinkle, and it is the one that makes this realistic. Until now the yie
 Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):
 
 $$
-\mbox{corn yield} = 120 + (EC/40) \times (1 + slope)\times 25 \times log(\mbox{nitrogen rate})
+\text{corn yield} = 120 + (EC/40) \times (1 + slope)\times 25 \times log(\text{nitrogen rate})
 $$
 
 You are interested in finding the best nitrogen rates that maximize profit for different parts of the field at a given corn and nitrogen price combination. 
 
 $$
-Max_{N} P_C \times [120 + (EC/40) \times (1 + slope) * 25 \times log(\mbox{nitrogen rate})] - P_N \times N
+Max_{N} P_C \times [120 + (EC/40) \times (1 + slope) * 25 \times log(\text{nitrogen rate})] - P_N \times N
 $$
 
 + `N`: nitrogen rate (lb/acre)

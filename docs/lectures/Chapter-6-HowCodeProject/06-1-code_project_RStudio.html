@@ -95,6 +95,22 @@
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -774,7 +790,7 @@ RStudio addins never get one by default. Verified against styler 1.10.3. -->
 <p><strong>Want a keyboard shortcut?</strong></p>
 </div>
 <div class="callout-content">
-<p>Addins have no shortcut out of the box. To give <strong>Style selection</strong> one, go to <span style="color: blue;">Tools</span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Modify Keyboard Shortcuts…</span>, search for “Style selection”, and assign a key of your choosing.</p>
+<p>Addins have no shortcut out of the box. To give <strong>Style selection</strong> one, go to <span style="color: blue;">Tools</span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Modify Keyboard Shortcuts…</span>, search for “Style selection”, and assign a key of your choosing.</p>
 <p>Do not confuse this with <code>cmd</code> + <code>shift</code> + <code>A</code> (<code>ctrl</code> + <code>shift</code> + <code>A</code> on Windows). That is RStudio’s <strong>own</strong> “Reformat Code” command. It is built in, it works without <code>styler</code>, and it does <span style="color: red;">not</span> follow the tidyverse style guide.</p>
 </div>
 </div>
@@ -991,7 +1007,7 @@ Transcript
 </summary>
 <p>Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, hit tab, and watch the arrow appear. And remember the tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.</p>
 </details>
-<p>Follow <span style="color: blue;"> Tools </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Global Options </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;"> Code </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;"> Edit Snippets</span> , select R tab, and add snippets.</p>
+<p>Follow <span style="color: blue;"> Tools </span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Global Options </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Code </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Edit Snippets</span> , select R tab, and add snippets.</p>
 <p><br></p>
 <div title="Try yourself">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
@@ -1112,7 +1128,6 @@ Transcript
   <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
   <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
   <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -1280,27 +1295,9 @@ Transcript
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

@@ -95,6 +95,22 @@
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -727,6 +743,15 @@
       start();
     }
   })();
+  </script>
+  <!-- quarto-webr loads Monaco's AMD loader (define.amd). KaTeX ships UMD and
+       registers as an anonymous AMD module instead of setting window.katex, so
+       Quarto's inline renderer throws "katex is not defined" on every WebR deck.
+       Import the ESM build, which ignores AMD, and publish the global before
+       DOMContentLoaded so the stock renderer finds it. -->
+  <script type="module">
+    import katex from "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.mjs";
+    window.katex = window.katex || katex;
   </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/editor/editor.main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -2746,9 +2771,9 @@ Transcript
 </div>
 <div id="tabset-2-2">
 <p>After running a randomized nitrogen trial, you found the following relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):</p>
-<p><span class="math display">\[
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
-\]</span></p>
+<p><span class="math display">
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
+</span></p>
 <p>Write a function that takes a nitrogen rate as an argument, calculate the estimated yield for the nitrogen rate, and then return the estimated yield.</p>
 <p><strong>Work here</strong></p>
 <div id="qwebr-insertion-location-13"></div>
@@ -2767,9 +2792,9 @@ Transcript
 </div>
 <div id="tabset-2-3">
 <p>You would like to calculate the revenue of corn production (defined below) as a function of nitrogen rate based on the yield response function.</p>
-<span class="math display">\[\begin{align*}
-P_{corn} * \mbox{corn yield}
-\end{align*}\]</span>
+<span class="math display">\begin{align*}
+P_{corn} * \text{corn yield}
+\end{align*}</span>
 <p>Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function you created in Exercise 2.</p>
 <p><strong>Work here</strong></p>
 <div id="qwebr-insertion-location-14"></div>
@@ -3028,9 +3053,9 @@ Transcript
 </div>
 <div id="tabset-5-2">
 <p>Define a function that takes a nitrogen rate and corn price as arguments and calculate revenue. Yield can be estimated using the following equation:</p>
-<p><span class="math display">\[
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
-\]</span></p>
+<p><span class="math display">
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
+</span></p>
 <p>At each value of the corn price sequence of <code>seq(2.5, 4.0, by = 0.1)</code>, calculate the revenue using <code>lapply()</code> where nitrogen rate is fixed at 200 (lb/acre).</p>
 <p><br></p>
 <p><strong>Work here</strong></p>
@@ -3214,12 +3239,12 @@ Transcript
 <li>Step 2: Create a data.frame of the complete combinations of the values from the price vectors</li>
 <li>Step 3: Define a function that takes a row number, extract corn price and nitrogen price and then calculate profit based on the price combination using the following equations:</li>
 </ul>
-<p><span class="math display">\[
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
-\]</span></p>
-<p><span class="math display">\[
-\mbox{profit} = \mbox{corn price} \times \mbox{corn yield} - \mbox{nitrogen price} \times \mbox{nitrogen rate}
-\]</span></p>
+<p><span class="math display">
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
+</span></p>
+<p><span class="math display">
+\text{profit} = \text{corn price} \times \text{corn yield} - \text{nitrogen price} \times \text{nitrogen rate}
+</span></p>
 <ul>
 <li>Step 4: loop over the row numbers of the parameter data</li>
 </ul>
@@ -3405,7 +3430,7 @@ Transcript
 </ul>
 <p><strong>Embarrassingly parallel process</strong>: a collection of processes where each process is completely independent of any another (one process does not use the outputs of any of the other processes)</p>
 <ul>
-<li><p>The example of integer squaring is embarrassingly parallel. In order to calculate <span class="math inline">\(1^2\)</span>, you do not need to use the result of <span class="math inline">\(2^2\)</span> or any other squares. <!-- CHANGED: read "calculate 12 ... the result of 22" -- the superscripts had been lost, leaving two meaningless numbers --></p></li>
+<li><p>The example of integer squaring is embarrassingly parallel. In order to calculate <span class="math inline">1^2</span>, you do not need to use the result of <span class="math inline">2^2</span> or any other squares. <!-- CHANGED: read "calculate 12 ... the result of 22" -- the superscripts had been lost, leaving two meaningless numbers --></p></li>
 <li><p>Embarrassingly parallel processes are very easy to parallelize because you do not have to worry about which process to complete first to make other processes happen.</p></li>
 <li><p>Fortunately, most of the processes you are interested in parallelizing fall under this category</p></li>
 </ul>
@@ -3605,14 +3630,14 @@ Transcript
 <ol type="1">
 <li>generate a dataset (50,000 observations) according to the following data generating process:</li>
 </ol>
-<p><span class="math display">\[
+<p><span class="math display">
 y = 1 + x + v
-\]</span></p>
-<p>where + <span class="math inline">\(\mu \sim N(0,1)\)</span> + <span class="math inline">\(x \sim N(0,1) + \mu\)</span> + <span class="math inline">\(v \sim N(0,1) + \mu\)</span>.</p>
-<p>The <span class="math inline">\(\mu\)</span> term causes correlation between <span class="math inline">\(x\)</span> (the covariate) and <span class="math inline">\(v\)</span> (the error term).</p>
+</span></p>
+<p>where + <span class="math inline">\mu \sim N(0,1)</span> + <span class="math inline">x \sim N(0,1) + \mu</span> + <span class="math inline">v \sim N(0,1) + \mu</span>.</p>
+<p>The <span class="math inline">\mu</span> term causes correlation between <span class="math inline">x</span> (the covariate) and <span class="math inline">v</span> (the error term).</p>
 <ol start="2" type="1">
-<li><p>estimate the coefficient on <span class="math inline">\(x\)</span> via OLS, and return the estimate.</p></li>
-<li><p>repeat this process <span class="math inline">\(1,000\)</span> times to understand the property of the OLS estimators under the data generating process.</p></li>
+<li><p>estimate the coefficient on <span class="math inline">x</span> via OLS, and return the estimate.</p></li>
+<li><p>repeat this process <span class="math inline">1,000</span> times to understand the property of the OLS estimators under the data generating process.</p></li>
 </ol>
 <p>This Monte Carlo simulation is embarrassingly parallel because each process is independent of any other.</p>
 </div>
@@ -3658,7 +3683,7 @@ Transcript
 <span id="cb22-2"><a></a>single_res <span class="ot">&lt;-</span> <span class="fu">MC_sim</span>(<span class="dv">1</span>)</span>
 <span id="cb22-3"><a></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>0.012 sec elapsed</code></pre>
+<pre><code>0.011 sec elapsed</code></pre>
 </div>
 </div>
 <p><strong>Not parallelized (sequential)</strong>:</p>
@@ -3729,20 +3754,20 @@ Transcript
 <p>A new problem, and a very practical one. You have run a nitrogen trial, fitted a yield response curve, and now you want the nitrogen rate that maximises profit. The profit expression is on screen: corn price times yield, minus nitrogen price times the amount you applied. The distinction in the last line is the one to hold on to for the rest of this section. N is a decision variable, the thing you get to choose. The two prices are parameters, things the world hands you. Optimization means choosing the decision variable for given parameters, and the interesting work comes from repeating that across many parameter combinations.</p>
 </details>
 <p>Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):</p>
-<p><span class="math display">\[
-\mbox{corn yield} = 120 + 25 \times log(\mbox{nitrogen rate})
-\]</span></p>
+<p><span class="math display">
+\text{corn yield} = 120 + 25 \times log(\text{nitrogen rate})
+</span></p>
 <p>You are interested in finding the best nitrogen rates that maximize profit at different combinations of corn and nitrogen prices for this field.</p>
-<p><span class="math display">\[
+<p><span class="math display">
 Max_{N}\;\; P_C \times Y(N) - P_N \times N
-\]</span></p>
+</span></p>
 <ul>
-<li><span class="math inline">\(N\)</span>: nitrogen rate (lb/acre)</li>
-<li><span class="math inline">\(Y(N)\)</span>: corn yield (bu/acre) as a function of <span class="math inline">\(N\)</span> as described above</li>
-<li><span class="math inline">\(P_C\)</span>: corn price ($/bu)</li>
-<li><span class="math inline">\(P_N\)</span>: nitrogen price ($/lb)</li>
+<li><span class="math inline">N</span>: nitrogen rate (lb/acre)</li>
+<li><span class="math inline">Y(N)</span>: corn yield (bu/acre) as a function of <span class="math inline">N</span> as described above</li>
+<li><span class="math inline">P_C</span>: corn price ($/bu)</li>
+<li><span class="math inline">P_N</span>: nitrogen price ($/lb)</li>
 </ul>
-<p>Here, <span class="math inline">\(N\)</span> is a decision variable, and <span class="math inline">\(P_C\)</span> and <span class="math inline">\(P_N\)</span> are parameters.</p>
+<p>Here, <span class="math inline">N</span> is a decision variable, and <span class="math inline">P_C</span> and <span class="math inline">P_N</span> are parameters.</p>
 </div>
 <div id="tabset-14-2">
 <details class="transcript">
@@ -3991,8 +4016,8 @@ Transcript
 </div>
 <div class="callout-content">
 <ul>
-<li><p>Mac users: go to <span style="color: blue;">Applications </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Utilities </span> <span class="math inline">\(\rightarrow\)</span> <span style="color: blue;">Activity Monitor </span></p></li>
-<li><p>Windows users: press <code>Windows Key</code> + <code>R</code> <span class="math inline">\(\rightarrow\)</span> type “resmon” into the search box</p></li>
+<li><p>Mac users: go to <span style="color: blue;">Applications </span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Utilities </span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Activity Monitor </span></p></li>
+<li><p>Windows users: press <code>Windows Key</code> + <code>R</code> <span class="math inline">\rightarrow</span> type “resmon” into the search box</p></li>
 </ul>
 </div>
 </div>
@@ -4012,13 +4037,13 @@ Transcript
 <p>One more wrinkle, and it is the one that makes this realistic. Until now the yield response has been the same everywhere. In an actual field it is not. Soil varies, and here yield depends on electrical conductivity and slope as well as nitrogen, so the optimal rate differs from one part of the field to another. Look carefully at the vocabulary in the last line, because it now has three categories rather than two. Nitrogen is still the decision variable, the prices are still parameters, but slope and EC are attributes: fixed characteristics of a place that you cannot choose and cannot change.</p>
 </details>
 <p>Suppose you have run a randomized nitrogen experiment for corn production on a field, collected data, and run a regression to find the following quantitative relationship between corn yield (bu/acre) and nitrogen rate (lb/acre):</p>
-<p><span class="math display">\[
-\mbox{corn yield} = 120 + (EC/40) \times (1 + slope)\times 25 \times log(\mbox{nitrogen rate})
-\]</span></p>
+<p><span class="math display">
+\text{corn yield} = 120 + (EC/40) \times (1 + slope)\times 25 \times log(\text{nitrogen rate})
+</span></p>
 <p>You are interested in finding the best nitrogen rates that maximize profit for different parts of the field at a given corn and nitrogen price combination.</p>
-<p><span class="math display">\[
-Max_{N} P_C \times [120 + (EC/40) \times (1 + slope) * 25 \times log(\mbox{nitrogen rate})] - P_N \times N
-\]</span></p>
+<p><span class="math display">
+Max_{N} P_C \times [120 + (EC/40) \times (1 + slope) * 25 \times log(\text{nitrogen rate})] - P_N \times N
+</span></p>
 <ul>
 <li><code>N</code>: nitrogen rate (lb/acre)</li>
 <li><code>slope</code>: the slope<br>
@@ -4100,7 +4125,6 @@ Transcript
   <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
   <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
   <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -4268,27 +4292,9 @@ Transcript
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

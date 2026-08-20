@@ -95,6 +95,22 @@
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -352,7 +368,7 @@ Transcript
 <p>There are four output options available from a Quarto (.qmd) file, each with distinct pros and cons.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div class="tabwid"><style>.cl-ea39f964{}.cl-ea36b060{font-family:'Helvetica';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ea36b06a{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-ea37fc90{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ea380a3c{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a3d{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a46{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a47{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a48{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a49{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a4a{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a50{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a51{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a52{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a53{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a5a{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a5b{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a5c{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a5d{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a64{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a65{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a66{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a67{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea380a68{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-ea39f964"><thead><tr style="overflow-wrap:break-word;"><th class="cl-ea380a3c"><p class="cl-ea37fc90"><span class="cl-ea36b060">Format</span></p></th><th class="cl-ea380a3d"><p class="cl-ea37fc90"><span class="cl-ea36b060">Pros</span></p></th><th class="cl-ea380a46"><p class="cl-ea37fc90"><span class="cl-ea36b060">Cons</span></p></th><th class="cl-ea380a47"><p class="cl-ea37fc90"><span class="cl-ea36b060">Journal Submission Status</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-ea380a48"><p class="cl-ea37fc90"><span class="cl-ea36b06a">PDF (LaTeX)</span></p></td><td class="cl-ea380a49"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Extremely flexible; professional output</span></p></td><td class="cl-ea380a4a"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Slow compilation; requires LaTeX skills</span></p></td><td class="cl-ea380a50"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Accepted (but journals require LaTeX source files</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ea380a51"><p class="cl-ea37fc90"><span class="cl-ea36b06a">PDF (Typst)</span></p></td><td class="cl-ea380a52"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Fast; modern alternative</span></p></td><td class="cl-ea380a53"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Still developing; limited ecosystem</span></p></td><td class="cl-ea380a5a"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ea380a5b"><p class="cl-ea37fc90"><span class="cl-ea36b06a">HTML</span></p></td><td class="cl-ea380a5c"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Fast; highly flexible for web sharing</span></p></td><td class="cl-ea380a5d"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Not designed for journals</span></p></td><td class="cl-ea380a64"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-ea380a65"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Word</span></p></td><td class="cl-ea380a66"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Fast; widely used; simple for editors</span></p></td><td class="cl-ea380a67"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Limited support for complex math</span></p></td><td class="cl-ea380a68"><p class="cl-ea37fc90"><span class="cl-ea36b06a">Accepted</span></p></td></tr></tbody></table></div>
+<div class="tabwid"><style>.cl-cc9fe36a{}.cl-cc9c246e{font-family:'Helvetica';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-cc9c2478{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-cc9da12c{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cc9db518{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db519{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db522{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db523{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db524{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db52c{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db52d{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db536{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db537{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db538{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db540{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db541{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db542{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db543{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db544{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db545{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 0.75pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db54a{width:1.185in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db54b{width:2.858in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db54c{width:2.934in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cc9db54d{width:3.631in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0.75pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-cc9fe36a"><thead><tr style="overflow-wrap:break-word;"><th class="cl-cc9db518"><p class="cl-cc9da12c"><span class="cl-cc9c246e">Format</span></p></th><th class="cl-cc9db519"><p class="cl-cc9da12c"><span class="cl-cc9c246e">Pros</span></p></th><th class="cl-cc9db522"><p class="cl-cc9da12c"><span class="cl-cc9c246e">Cons</span></p></th><th class="cl-cc9db523"><p class="cl-cc9da12c"><span class="cl-cc9c246e">Journal Submission Status</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-cc9db524"><p class="cl-cc9da12c"><span class="cl-cc9c2478">PDF (LaTeX)</span></p></td><td class="cl-cc9db52c"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Extremely flexible; professional output</span></p></td><td class="cl-cc9db52d"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Slow compilation; requires LaTeX skills</span></p></td><td class="cl-cc9db536"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Accepted (but journals require LaTeX source files</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cc9db537"><p class="cl-cc9da12c"><span class="cl-cc9c2478">PDF (Typst)</span></p></td><td class="cl-cc9db538"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Fast; modern alternative</span></p></td><td class="cl-cc9db540"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Still developing; limited ecosystem</span></p></td><td class="cl-cc9db541"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cc9db542"><p class="cl-cc9da12c"><span class="cl-cc9c2478">HTML</span></p></td><td class="cl-cc9db543"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Fast; highly flexible for web sharing</span></p></td><td class="cl-cc9db544"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Not designed for journals</span></p></td><td class="cl-cc9db545"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Not accepted</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cc9db54a"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Word</span></p></td><td class="cl-cc9db54b"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Fast; widely used; simple for editors</span></p></td><td class="cl-cc9db54c"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Limited support for complex math</span></p></td><td class="cl-cc9db54d"><p class="cl-cc9da12c"><span class="cl-cc9c2478">Accepted</span></p></td></tr></tbody></table></div>
 </div>
 </div>
 </section>
@@ -618,9 +634,9 @@ Transcript
 <span id="cb9-4"><a></a><span class="in">\end{align}</span></span>
 <span id="cb9-5"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>would print the following:</p>
-<span class="math display">\[\begin{align}
+<span class="math display">\begin{align}
 y = \alpha + \beta x + v
-\end{align}\]</span>
+\end{align}</span>
 <p><br></p>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -642,9 +658,9 @@ y = \alpha + \beta x + v
 <span id="cb10-2"><a></a>y = \alpha + \beta x + v</span>
 <span id="cb10-3"><a></a>$$</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>, which would print the following:</p>
-<span class="math display">\[\begin{align}
+<span class="math display">\begin{align}
 y = \alpha + \beta x + v
-\end{align}\]</span>
+\end{align}</span>
 <p>You can actually use some of the Latex environments (e.g., <code>equation</code>, <code>align</code>) like below:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a></a>$$</span>
 <span id="cb11-2"><a></a>\begin{align}</span>
@@ -681,7 +697,7 @@ Transcript
 <div class="sourceCode" id="cb12"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a></a>Here is the math $\alpha$.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
 <p>This would print like this in the output:</p>
-<p>Here is the math <span class="math inline">\(\alpha\)</span>.</p>
+<p>Here is the math <span class="math inline">\alpha</span>.</p>
 </div>
 <div id="tabset-7-3">
 <details class="transcript">
@@ -717,10 +733,10 @@ Transcript
 <!--end of the columns-->
 <p><br></p>
 <p>It will print like below:</p>
-<span class="math display">\[\begin{align}
+<span class="math display">\begin{align}
 y &amp; = \alpha + \beta x + v \\
 v &amp; = \rho Wv + \mu
-\end{align}\]</span>
+\end{align}</span>
 </div>
 <div id="tabset-5-2">
 <p>Use the <strong>case</strong> environment like below:</p>
@@ -752,13 +768,13 @@ v &amp; = \rho Wv + \mu
 <!--end of the columns-->
 <p><br></p>
 <p>It will print like below:</p>
-<span class="math display">\[\begin{align}
+<span class="math display">\begin{align}
 y_{j,i} =
   \begin{cases}
   \alpha_{j,i} + \beta_{j,i} N + \gamma_{j,i} N^2 + \varepsilon_{j,i} \, ,&amp; N &lt; \tau_{j,i} \\
   \alpha_{j,i} + \beta_{j,i} \tau_{j,i} + \gamma_{j,i} \tau_{j,i}^2 + \varepsilon_{j,i} \, ,&amp; N \ge \tau_{j,i}
   \end{cases}
-\end{align}\]</span>
+\end{align}</span>
 </div>
 </div>
 </div>
@@ -1106,7 +1122,6 @@ Transcript
   <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
   <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
   <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -1274,27 +1289,9 @@ Transcript
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

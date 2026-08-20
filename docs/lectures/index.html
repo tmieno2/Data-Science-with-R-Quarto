@@ -99,8 +99,22 @@ ul.task-list li input[type="checkbox"] {
   })
   </script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -225,7 +239,7 @@ Topic
 </thead>
 <tbody class="list">
 
-<tr data-index="0" data-listing-file-modified-sort="1787079112624" data-listing-reading-time-sort="41" data-listing-word-count-sort="8165" data-listing-title-sort="01-1: Introduction to R" data-listing-filename-sort="01-Introduction.qmd">
+<tr data-index="0" data-listing-file-modified-sort="1787258968710" data-listing-reading-time-sort="41" data-listing-word-count-sort="8165" data-listing-title-sort="01-1: Introduction to R" data-listing-filename-sort="01-Introduction.qmd">
 <td>
 <a href="../lectures/Chapter-1-Introduction/01-Introduction.html" class="title listing-title">01-1: Introduction to R</a>
 </td>
@@ -235,7 +249,7 @@ Topic
 
 </tr>
 
-<tr data-index="1" data-listing-file-modified-sort="1786749708329" data-listing-reading-time-sort="9" data-listing-word-count-sort="1688" data-listing-title-sort="02-0: Clone Github Repositories" data-listing-filename-sort="02-0-Github-sublime-merge.qmd">
+<tr data-index="1" data-listing-file-modified-sort="1787257846192" data-listing-reading-time-sort="9" data-listing-word-count-sort="1688" data-listing-title-sort="02-0: Clone Github Repositories" data-listing-filename-sort="02-0-Github-sublime-merge.qmd">
 <td>
 <a href="../lectures/Chapter-2-Quarto/02-0-Github-sublime-merge.html" class="title listing-title">02-0: Clone Github Repositories</a>
 </td>
@@ -245,7 +259,7 @@ Topic
 
 </tr>
 
-<tr data-index="2" data-listing-file-modified-sort="1786749708330" data-listing-reading-time-sort="47" data-listing-word-count-sort="9227" data-listing-title-sort="02-1: Introduction to Quarto" data-listing-filename-sort="02-1-Quarto-introduction.qmd">
+<tr data-index="2" data-listing-file-modified-sort="1787257846191" data-listing-reading-time-sort="47" data-listing-word-count-sort="9227" data-listing-title-sort="02-1: Introduction to Quarto" data-listing-filename-sort="02-1-Quarto-introduction.qmd">
 <td>
 <a href="../lectures/Chapter-2-Quarto/02-1-Quarto-introduction.html" class="title listing-title">02-1: Introduction to Quarto</a>
 </td>
@@ -255,7 +269,7 @@ Topic
 
 </tr>
 
-<tr data-index="3" data-listing-file-modified-sort="1786749708331" data-listing-reading-time-sort="32" data-listing-word-count-sort="6211" data-listing-title-sort="02-2: Using Quarto to Create Presentations" data-listing-filename-sort="02-2-Quarto-revealjs.qmd">
+<tr data-index="3" data-listing-file-modified-sort="1787257846191" data-listing-reading-time-sort="32" data-listing-word-count-sort="6211" data-listing-title-sort="02-2: Using Quarto to Create Presentations" data-listing-filename-sort="02-2-Quarto-revealjs.qmd">
 <td>
 <a href="../lectures/Chapter-2-Quarto/02-2-Quarto-revealjs.html" class="title listing-title">02-2: Using Quarto to Create Presentations</a>
 </td>
@@ -265,7 +279,7 @@ Topic
 
 </tr>
 
-<tr data-index="4" data-listing-file-modified-sort="1786747668590" data-listing-reading-time-sort="31" data-listing-word-count-sort="6165" data-listing-title-sort="03-1: Importing Files and Exporting to Files" data-listing-filename-sort="03-1-input-output.qmd">
+<tr data-index="4" data-listing-file-modified-sort="1787257846197" data-listing-reading-time-sort="31" data-listing-word-count-sort="6165" data-listing-title-sort="03-1: Importing Files and Exporting to Files" data-listing-filename-sort="03-1-input-output.qmd">
 <td>
 <a href="../lectures/Chapter-3-DataWrangling/03-1-input-output.html" class="title listing-title">03-1: Importing Files and Exporting to Files</a>
 </td>
@@ -275,7 +289,7 @@ Topic
 
 </tr>
 
-<tr data-index="5" data-listing-file-modified-sort="1787090022832" data-listing-reading-time-sort="47" data-listing-word-count-sort="9397" data-listing-title-sort="03-2: Data wrangling with `tidyverse`: The Basics" data-listing-filename-sort="03-2-data-wrangling-dplyr.qmd">
+<tr data-index="5" data-listing-file-modified-sort="1787258968710" data-listing-reading-time-sort="47" data-listing-word-count-sort="9397" data-listing-title-sort="03-2: Data wrangling with `tidyverse`: The Basics" data-listing-filename-sort="03-2-data-wrangling-dplyr.qmd">
 <td>
 <a href="../lectures/Chapter-3-DataWrangling/03-2-data-wrangling-dplyr.html" class="title listing-title">03-2: Data wrangling with <code>tidyverse</code>: The Basics</a>
 </td>
@@ -285,7 +299,7 @@ Topic
 
 </tr>
 
-<tr data-index="6" data-listing-file-modified-sort="1787089195647" data-listing-reading-time-sort="40" data-listing-word-count-sort="7993" data-listing-title-sort="03-3: Reshaping and Merging" data-listing-filename-sort="03-3-reshape-merge.qmd">
+<tr data-index="6" data-listing-file-modified-sort="1787258968711" data-listing-reading-time-sort="40" data-listing-word-count-sort="7993" data-listing-title-sort="03-3: Reshaping and Merging" data-listing-filename-sort="03-3-reshape-merge.qmd">
 <td>
 <a href="../lectures/Chapter-3-DataWrangling/03-3-reshape-merge.html" class="title listing-title">03-3: Reshaping and Merging</a>
 </td>
@@ -295,7 +309,7 @@ Topic
 
 </tr>
 
-<tr data-index="7" data-listing-file-modified-sort="1787079112626" data-listing-reading-time-sort="24" data-listing-word-count-sort="4703" data-listing-title-sort="04-1: Data Visualization with `ggplot2`: Basics" data-listing-filename-sort="04-1-data-visualization-basics.qmd">
+<tr data-index="7" data-listing-file-modified-sort="1787258968712" data-listing-reading-time-sort="24" data-listing-word-count-sort="4703" data-listing-title-sort="04-1: Data Visualization with `ggplot2`: Basics" data-listing-filename-sort="04-1-data-visualization-basics.qmd">
 <td>
 <a href="../lectures/Chapter-4-Data-Visualization/04-1-data-visualization-basics.html" class="title listing-title">04-1: Data Visualization with <code>ggplot2</code>: Basics</a>
 </td>
@@ -305,7 +319,7 @@ Topic
 
 </tr>
 
-<tr data-index="8" data-listing-file-modified-sort="1787079112627" data-listing-reading-time-sort="20" data-listing-word-count-sort="3891" data-listing-title-sort="04-2: Data Visualization with `ggplot2`: More in One" data-listing-filename-sort="04-2-more-information.qmd">
+<tr data-index="8" data-listing-file-modified-sort="1787258968712" data-listing-reading-time-sort="20" data-listing-word-count-sort="3891" data-listing-title-sort="04-2: Data Visualization with `ggplot2`: More in One" data-listing-filename-sort="04-2-more-information.qmd">
 <td>
 <a href="../lectures/Chapter-4-Data-Visualization/04-2-more-information.html" class="title listing-title">04-2: Data Visualization with <code>ggplot2</code>: More in One</a>
 </td>
@@ -315,7 +329,7 @@ Topic
 
 </tr>
 
-<tr data-index="9" data-listing-file-modified-sort="1787079112628" data-listing-reading-time-sort="47" data-listing-word-count-sort="9296" data-listing-title-sort="04-3: Data Visualization with `ggplot2`: Fine Tuning" data-listing-filename-sort="04-3-fine-tuning.qmd">
+<tr data-index="9" data-listing-file-modified-sort="1787258968713" data-listing-reading-time-sort="47" data-listing-word-count-sort="9296" data-listing-title-sort="04-3: Data Visualization with `ggplot2`: Fine Tuning" data-listing-filename-sort="04-3-fine-tuning.qmd">
 <td>
 <a href="../lectures/Chapter-4-Data-Visualization/04-3-fine-tuning.html" class="title listing-title">04-3: Data Visualization with <code>ggplot2</code>: Fine Tuning</a>
 </td>
@@ -325,7 +339,7 @@ Topic
 
 </tr>
 
-<tr data-index="10" data-listing-file-modified-sort="1787079112628" data-listing-reading-time-sort="62" data-listing-word-count-sort="12336" data-listing-title-sort="05-1: User-defined Function, Loop, and Parallelization" data-listing-filename-sort="05-1-function-loop-parallel.qmd">
+<tr data-index="10" data-listing-file-modified-sort="1787258879153" data-listing-reading-time-sort="62" data-listing-word-count-sort="12336" data-listing-title-sort="05-1: User-defined Function, Loop, and Parallelization" data-listing-filename-sort="05-1-function-loop-parallel.qmd">
 <td>
 <a href="../lectures/Chapter-5-function-loop-parallel/05-1-function-loop-parallel.html" class="title listing-title">05-1: User-defined Function, Loop, and Parallelization</a>
 </td>
@@ -335,7 +349,7 @@ Topic
 
 </tr>
 
-<tr data-index="11" data-listing-file-modified-sort="1786831935000" data-listing-reading-time-sort="23" data-listing-word-count-sort="4489" data-listing-title-sort="06-1: How to write R codes, manage Projects, work with RStudio" data-listing-filename-sort="06-1-code_project_RStudio.qmd">
+<tr data-index="11" data-listing-file-modified-sort="1787257846192" data-listing-reading-time-sort="23" data-listing-word-count-sort="4489" data-listing-title-sort="06-1: How to write R codes, manage Projects, work with RStudio" data-listing-filename-sort="06-1-code_project_RStudio.qmd">
 <td>
 <a href="../lectures/Chapter-6-HowCodeProject/06-1-code_project_RStudio.html" class="title listing-title">06-1: How to write R codes, manage Projects, work with RStudio</a>
 </td>
@@ -345,7 +359,7 @@ Topic
 
 </tr>
 
-<tr data-index="12" data-listing-file-modified-sort="1787079112628" data-listing-reading-time-sort="23" data-listing-word-count-sort="4576" data-listing-title-sort="07-1: Date and String Management" data-listing-filename-sort="07-1-date-string.qmd">
+<tr data-index="12" data-listing-file-modified-sort="1787258968713" data-listing-reading-time-sort="23" data-listing-word-count-sort="4576" data-listing-title-sort="07-1: Date and String Management" data-listing-filename-sort="07-1-date-string.qmd">
 <td>
 <a href="../lectures/Chapter-7-Date-String/07-1-date-string.html" class="title listing-title">07-1: Date and String Management</a>
 </td>
@@ -355,7 +369,7 @@ Topic
 
 </tr>
 
-<tr data-index="13" data-listing-file-modified-sort="1787079112629" data-listing-reading-time-sort="37" data-listing-word-count-sort="7351" data-listing-title-sort="08-1: Making Tables with `flextable`" data-listing-filename-sort="08-1-make_table_flextable.qmd">
+<tr data-index="13" data-listing-file-modified-sort="1787258968714" data-listing-reading-time-sort="37" data-listing-word-count-sort="7351" data-listing-title-sort="08-1: Making Tables with `flextable`" data-listing-filename-sort="08-1-make_table_flextable.qmd">
 <td>
 <a href="../lectures/Chapter-8-Table/08-1-make_table_flextable.html" class="title listing-title">08-1: Making Tables with <code>flextable</code></a>
 </td>
@@ -365,7 +379,7 @@ Topic
 
 </tr>
 
-<tr data-index="14" data-listing-file-modified-sort="1786902744395" data-listing-reading-time-sort="29" data-listing-word-count-sort="5790" data-listing-title-sort="08-2: Make Regression and Summary Tables with `modelsummary`" data-listing-filename-sort="08-2-modelsummary.qmd">
+<tr data-index="14" data-listing-file-modified-sort="1787257846196" data-listing-reading-time-sort="29" data-listing-word-count-sort="5790" data-listing-title-sort="08-2: Make Regression and Summary Tables with `modelsummary`" data-listing-filename-sort="08-2-modelsummary.qmd">
 <td>
 <a href="../lectures/Chapter-8-Table/08-2-modelsummary.html" class="title listing-title">08-2: Make Regression and Summary Tables with <code>modelsummary</code></a>
 </td>
@@ -375,7 +389,7 @@ Topic
 
 </tr>
 
-<tr data-index="15" data-listing-file-modified-sort="1787237902297" data-listing-reading-time-sort="59" data-listing-word-count-sort="11715" data-listing-title-sort="09-1: R as GIS: Vector Data Basics with the sf package" data-listing-filename-sort="L01_vector_basics.qmd">
+<tr data-index="15" data-listing-file-modified-sort="1787258968714" data-listing-reading-time-sort="59" data-listing-word-count-sort="11715" data-listing-title-sort="09-1: R as GIS: Vector Data Basics with the sf package" data-listing-filename-sort="L01_vector_basics.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L01_vector_basics.html" class="title listing-title">09-1: R as GIS: Vector Data Basics with the sf package</a>
 </td>
@@ -385,7 +399,7 @@ Topic
 
 </tr>
 
-<tr data-index="16" data-listing-file-modified-sort="1787089834224" data-listing-reading-time-sort="26" data-listing-word-count-sort="5143" data-listing-title-sort="09-2: R as GIS: Raster Data Basics" data-listing-filename-sort="L02_raster_basics.qmd">
+<tr data-index="16" data-listing-file-modified-sort="1787258968715" data-listing-reading-time-sort="26" data-listing-word-count-sort="5143" data-listing-title-sort="09-2: R as GIS: Raster Data Basics" data-listing-filename-sort="L02_raster_basics.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L02_raster_basics.html" class="title listing-title">09-2: R as GIS: Raster Data Basics</a>
 </td>
@@ -395,7 +409,7 @@ Topic
 
 </tr>
 
-<tr data-index="17" data-listing-file-modified-sort="1787089195652" data-listing-reading-time-sort="34" data-listing-word-count-sort="6697" data-listing-title-sort="09-3: R as GIS: Creating maps from vector and raster data" data-listing-filename-sort="L03_create_map.qmd">
+<tr data-index="17" data-listing-file-modified-sort="1787258968715" data-listing-reading-time-sort="34" data-listing-word-count-sort="6697" data-listing-title-sort="09-3: R as GIS: Creating maps from vector and raster data" data-listing-filename-sort="L03_create_map.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L03_create_map.html" class="title listing-title">09-3: R as GIS: Creating maps from vector and raster data</a>
 </td>
@@ -405,7 +419,7 @@ Topic
 
 </tr>
 
-<tr data-index="18" data-listing-file-modified-sort="1787089195653" data-listing-reading-time-sort="22" data-listing-word-count-sort="4380" data-listing-title-sort="09-4-1: R as GIS: Interaction of Vector Datasets I" data-listing-filename-sort="L04_1_vector_interactions.qmd">
+<tr data-index="18" data-listing-file-modified-sort="1787258968716" data-listing-reading-time-sort="22" data-listing-word-count-sort="4380" data-listing-title-sort="09-4-1: R as GIS: Interaction of Vector Datasets I" data-listing-filename-sort="L04_1_vector_interactions.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L04_1_vector_interactions.html" class="title listing-title">09-4-1: R as GIS: Interaction of Vector Datasets I</a>
 </td>
@@ -415,7 +429,7 @@ Topic
 
 </tr>
 
-<tr data-index="19" data-listing-file-modified-sort="1787089834227" data-listing-reading-time-sort="35" data-listing-word-count-sort="6831" data-listing-title-sort="09-4-2: R as GIS: Interaction of Vector Datasets II" data-listing-filename-sort="L04_2_vector_spatial_join.qmd">
+<tr data-index="19" data-listing-file-modified-sort="1787258968716" data-listing-reading-time-sort="35" data-listing-word-count-sort="6831" data-listing-title-sort="09-4-2: R as GIS: Interaction of Vector Datasets II" data-listing-filename-sort="L04_2_vector_spatial_join.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L04_2_vector_spatial_join.html" class="title listing-title">09-4-2: R as GIS: Interaction of Vector Datasets II</a>
 </td>
@@ -425,7 +439,7 @@ Topic
 
 </tr>
 
-<tr data-index="20" data-listing-file-modified-sort="1787091129006" data-listing-reading-time-sort="24" data-listing-word-count-sort="4613" data-listing-title-sort="09-5: R as GIS: Interaction of Vector and Raster Datasets" data-listing-filename-sort="L05_vector_raster_interaction.qmd">
+<tr data-index="20" data-listing-file-modified-sort="1787258968716" data-listing-reading-time-sort="24" data-listing-word-count-sort="4613" data-listing-title-sort="09-5: R as GIS: Interaction of Vector and Raster Datasets" data-listing-filename-sort="L05_vector_raster_interaction.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L05_vector_raster_interaction.html" class="title listing-title">09-5: R as GIS: Interaction of Vector and Raster Datasets</a>
 </td>
@@ -435,7 +449,7 @@ Topic
 
 </tr>
 
-<tr data-index="21" data-listing-file-modified-sort="1787089834228" data-listing-reading-time-sort="28" data-listing-word-count-sort="5500" data-listing-title-sort="09-6: R as GIS: Download Spatial Datasets using R" data-listing-filename-sort="L06_get_spatial_data.qmd">
+<tr data-index="21" data-listing-file-modified-sort="1787258968717" data-listing-reading-time-sort="28" data-listing-word-count-sort="5500" data-listing-title-sort="09-6: R as GIS: Download Spatial Datasets using R" data-listing-filename-sort="L06_get_spatial_data.qmd">
 <td>
 <a href="../lectures/Chapter-9-Spatial-Data/L06_get_spatial_data.html" class="title listing-title">09-6: R as GIS: Download Spatial Datasets using R</a>
 </td>
@@ -445,7 +459,7 @@ Topic
 
 </tr>
 
-<tr data-index="22" data-listing-file-modified-sort="1787079112624" data-listing-reading-time-sort="13" data-listing-word-count-sort="2562" data-listing-title-sort="A-1: `data.table` package for data wrangling" data-listing-filename-sort="data.table.qmd">
+<tr data-index="22" data-listing-file-modified-sort="1787258968709" data-listing-reading-time-sort="13" data-listing-word-count-sort="2562" data-listing-title-sort="A-1: `data.table` package for data wrangling" data-listing-filename-sort="data.table.qmd">
 <td>
 <a href="../lectures/Appendix-1-data.table/data.table.html" class="title listing-title">A-1: <code>data.table</code> package for data wrangling</a>
 </td>
@@ -455,7 +469,7 @@ Topic
 
 </tr>
 
-<tr data-index="23" data-listing-file-modified-sort="1761154762000" data-listing-reading-time-sort="3" data-listing-word-count-sort="428" data-listing-title-sort="Final Project Expectations and Regulations" data-listing-filename-sort="final_project.qmd">
+<tr data-index="23" data-listing-file-modified-sort="1787257846186" data-listing-reading-time-sort="3" data-listing-word-count-sort="428" data-listing-title-sort="Final Project Expectations and Regulations" data-listing-filename-sort="final_project.qmd">
 <td>
 <a href="../lectures/final_project.html" class="title listing-title">Final Project Expectations and Regulations</a>
 </td>

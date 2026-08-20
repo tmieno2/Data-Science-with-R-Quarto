@@ -95,6 +95,22 @@
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -727,6 +743,15 @@
       start();
     }
   })();
+  </script>
+  <!-- quarto-webr loads Monaco's AMD loader (define.amd). KaTeX ships UMD and
+       registers as an anonymous AMD module instead of setting window.katex, so
+       Quarto's inline renderer throws "katex is not defined" on every WebR deck.
+       Import the ESM build, which ignores AMD, and publish the global before
+       DOMContentLoaded so the stock renderer finds it. -->
+  <script type="module">
+    import katex from "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.mjs";
+    window.katex = window.katex || katex;
   </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/editor/editor.main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -3164,22 +3189,22 @@ Transcript
 <p>Now you use them. Three exercises, and I want you to actually type these rather than read them. First, build a vector starting at one and increasing by two up to ninety-nine, which is a direct application of seq. Second, compute the sample mean of that vector; the formula is on the slide. Third, compute the sample variance. Read the callout carefully on that last one, because it is a trap: the formula shown divides by n, whereas R’s built-in var function divides by n minus one, so the two will not agree. Compute it directly from the formula rather than reaching for var, or you will get a number that is close and wrong.</p>
 </details>
 <ol type="1">
-<li>Generate a vector (call it <span class="math inline">\(x\)</span>) that starts at 1 and increases by 2 up to 99</li>
+<li>Generate a vector (call it <span class="math inline">x</span>) that starts at 1 and increases by 2 up to 99</li>
 </ol>
 <div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ol start="2" type="1">
-<li>Calculate the sample mean of <span class="math inline">\(x\)</span></li>
+<li>Calculate the sample mean of <span class="math inline">x</span></li>
 </ol>
-<p><span class="math inline">\(\frac{1}{n}\sum_{i=1}^n x_i\)</span></p>
+<p><span class="math inline">\frac{1}{n}\sum_{i=1}^n x_i</span></p>
 <div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ol start="3" type="1">
-<li>Calculate the sample variance of <span class="math inline">\(x\)</span></li>
+<li>Calculate the sample variance of <span class="math inline">x</span></li>
 </ol>
-<p><span class="math inline">\(\frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})^2\)</span>, where <span class="math inline">\(\bar{x}\)</span> is the sample mean</p>
+<p><span class="math inline">\frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})^2</span>, where <span class="math inline">\bar{x}</span> is the sample mean</p>
 <div title="Note on the formula">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -3187,7 +3212,7 @@ Transcript
 <p><strong>Note on the formula</strong></p>
 </div>
 <div class="callout-content">
-<p>This formula divides by <span class="math inline">\(n\)</span>. R’s built-in <code>var()</code> divides by <span class="math inline">\(n-1\)</span>, so the two will not agree. Compute this one directly rather than reaching for <code>var()</code>.</p>
+<p>This formula divides by <span class="math inline">n</span>. R’s built-in <code>var()</code> divides by <span class="math inline">n-1</span>, so the two will not agree. Compute this one directly rather than reaching for <code>var()</code>.</p>
 </div>
 </div>
 </div>
@@ -3710,7 +3735,6 @@ Transcript
   <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
   <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
   <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -3878,27 +3902,9 @@ Transcript
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

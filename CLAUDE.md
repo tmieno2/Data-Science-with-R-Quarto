@@ -424,6 +424,65 @@ Preserve these invariants:
    Exit code 1 means it found something. It scans every `.qmd`/`.rmd` outside
    `docs/`, so it is cheap enough to run every time.
 
+## Math rendering: KaTeX, and the two traps in getting there
+
+The site renders math with **KaTeX**, pinned to 0.18.4, set in `_quarto.yml`
+for `html` and in every deck's `revealjs` block. It replaced MathJax 2.7.9 on
+2026-08-20. Both engines load from jsDelivr, so neither works offline.
+
+Two failures cost real time, and **neither produced a render error**. `quarto
+render` exited 0, emitted all 52 files, and logged nothing in both cases. Only
+a browser showed the breakage.
+
+1. **The pinned `url:` must end with a trailing slash.** Quarto concatenates
+   the filename onto it verbatim, so `.../dist` emits
+   `.../distkatex.min.js`, which 404s. Both assets fail, `window.katex` is
+   never defined, and every equation silently stays unrendered.
+
+2. **quarto-webr's Monaco loader breaks KaTeX's UMD build.** Monaco ships
+   `loader.js`, an AMD loader that defines `define.amd`. KaTeX's UMD wrapper
+   tests AMD *before* the browser-global branch:
+
+   ```js
+   "function"==typeof define && define.amd ? define([],t) : e.katex=t()
+   ```
+
+   So on a WebR deck KaTeX registers as an anonymous AMD module and never sets
+   `window.katex`. Quarto's inline renderer then throws `katex is not defined`
+   and the math stays as raw `<span class="math">`. MathJax was immune, which
+   is why this only appeared on the switch. Non-WebR decks were unaffected —
+   the symptom looks random until you diff the script lists.
+
+   The fix is `lectures/katex-amd-fix.html`, which imports the ESM build (ESM
+   ignores AMD) and publishes the global before `DOMContentLoaded`. **Every
+   deck that includes `webr-layout.html` must also include it**, right after:
+
+   ```yaml
+   include-in-header:
+     - ../transcript-support.html
+     - ../webr-layout.html
+     - ../katex-amd-fix.html
+   ```
+
+   A deck that gains its first `{webr-r}` cell gains both includes together.
+
+### `\mbox` is not KaTeX
+
+KaTeX has no `\mbox`; use `\text`. With Quarto's `throwOnError: false` an
+undefined command is not an error — it is printed literally in red, so
+`\mbox{corn yield}` renders as `\mboxcornyield` on the slide with the spaces
+collapsed. `05-1` carried 17 of these; all are now `\text`, and there is no
+`\mbox` left in the repository. Do not reintroduce it.
+
+### Verifying a math change
+
+Counting `$...$` in the source over-reports badly — currency like `$3.0/bu`
+and `$$` inside verbatim teaching examples both match. Count rendered
+`class="math"` spans in `docs/` instead, then check in a browser that the
+number of `.katex` nodes equals it, that `.katex-error` is zero, and that no
+`.katex-html` contains a literal backslash-command. A correctly rendered
+formula never contains a backslash; that check is what caught trap 2.
+
 ## Two dataset packages, and which to use
 
 | Package | Contents | Deps | Size | Used by |

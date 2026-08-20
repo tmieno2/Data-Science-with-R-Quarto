@@ -95,6 +95,22 @@
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -727,6 +743,15 @@
       start();
     }
   })();
+  </script>
+  <!-- quarto-webr loads Monaco's AMD loader (define.amd). KaTeX ships UMD and
+       registers as an anonymous AMD module instead of setting window.katex, so
+       Quarto's inline renderer throws "katex is not defined" on every WebR deck.
+       Import the ESM build, which ignores AMD, and publish the global before
+       DOMContentLoaded so the stock renderer finds it. -->
+  <script type="module">
+    import katex from "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.mjs";
+    window.katex = window.katex || katex;
   </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs/editor/editor.main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -2624,9 +2649,9 @@ Transcript
 <p>In <code>format</code> you specify how day, month, and year are represented in the date characters you intend to convert using special symbols including:</p>
 <ul>
 <li><code>%d</code>: day as a number (01-31)</li>
-<li><code>%m</code>: month (01, 02, <span class="math inline">\(\dots\)</span>, 12)</li>
-<li><code>%b</code>: abbreviated month (Jan, <span class="math inline">\(\dots\)</span>, Dec)</li>
-<li><code>%B</code>: unabbreviated month (January, <span class="math inline">\(\dots\)</span>, December)</li>
+<li><code>%m</code>: month (01, 02, <span class="math inline">\dots</span>, 12)</li>
+<li><code>%b</code>: abbreviated month (Jan, <span class="math inline">\dots</span>, Dec)</li>
+<li><code>%B</code>: unabbreviated month (January, <span class="math inline">\dots</span>, December)</li>
 <li><code>%y</code>: 2-digit year (96 for 1996, 02 for 2002)</li>
 <li><code>%Y</code>: 4-digit year (1996, 2012)</li>
 </ul>
@@ -2881,7 +2906,7 @@ explicitly with expand.grid() rather than relying on 5 and 3 being coprime. -->
 <div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <ul>
-<li><code>expand.grid()</code> produces all 5 <span class="math inline">\(\times\)</span> 3 = 15 pairings, so both columns are the same length and <code>str_c()</code> is happy</li>
+<li><code>expand.grid()</code> produces all 5 <span class="math inline">\times</span> 3 = 15 pairings, so both columns are the same length and <code>str_c()</code> is happy</li>
 <li>The intent is visible in the code, rather than depending on how two lengths happen to divide into each other</li>
 </ul>
 </div>
@@ -3354,7 +3379,6 @@ Transcript
   <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
   <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
   <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="../../site_libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -3522,27 +3546,9 @@ Transcript
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom
