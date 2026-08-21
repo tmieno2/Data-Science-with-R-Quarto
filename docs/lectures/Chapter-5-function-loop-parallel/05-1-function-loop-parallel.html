@@ -6,8 +6,8 @@
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.7.31">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
 
   <title>Data Science with R (AECN 896-05) – 05-1: User-defined Function, Loop, and Parallelization</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-c9dac63aa89771205c3ff35dd3570d5d.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-bf1223c773699056cca1ada9baf1738b.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -222,6 +222,16 @@
 
         </details>
 
+    On a tab whose figure fills the whole slide there is no free rectangle to
+    overlay, so add "inline" and the panel joins the flow when opened, pushing the
+    figure down instead of covering it:
+
+        <details class="transcript inline">
+
+    Use it only where it is needed. Measure rather than guess: an open panel must
+    not overlap a ".cell-output-display". The collapsed pill still costs 0px in
+    both variants, which is the property the whole design exists to preserve.
+
     It must live in the header rather than the body of a qmd: raw HTML placed
     above the first "##" heading becomes its own untitled slide.
 
@@ -230,6 +240,9 @@
     script at the bottom adds one behaviour on top: collapsing an open panel when
     the reader moves on. Without it everything still works, panels just keep their
     open state.
+
+    Audience: students reviewing after class. These are not presenter notes -
+    reveal's own ".notes" blocks are the presenter-only mechanism.
   -->
   <style>
   /* The panel is positioned against the slide rather than sitting in its normal
@@ -277,13 +290,25 @@
   .reveal details.transcript[open] > summary::before { content: "\25BE\00A0"; }
 
   /* Opened: a tall, narrow panel down the right-hand side, where slide content
-     rarely reaches. It starts below the tab bar (which ends at 16.4% of slide
-     height on the busiest slide in 02-2) so tab names stay clickable while a
-     transcript is open, and runs down to just above the footer. */
+     rarely reaches. It starts below the tab bar so tab names stay clickable
+     while a transcript is open, and runs down to just above the footer.
+
+     Measured as a share of the 700px logical slide. A top-level tab bar ends at
+     12.4-13%, so 21% clears it everywhere.
+
+     A tab bar that sits lower on the slide is cleared HORIZONTALLY instead: the
+     panel occupies x 62-100%, and no tab row measured so far reaches past x 66%.
+     Cases seen, all fine:
+       00-1  nested tabset          18.9%, names reach x 15%
+       00-1  tabset below prose     40.8%, names reach x 59%
+       01-2  nested tabset          29.6%, names reach x 46%
+     So the rule to preserve is not "top clears every tab bar" but "no tab NAME
+     overlaps the panel's rectangle". Re-check that if a deck grows a long tab row
+     sitting low on the slide. */
   .reveal details.transcript[open] {
-    top: 17%;
+    top: 21%;
     width: 36%;
-    max-height: 79%;
+    max-height: 75%;
     overflow-y: auto;
     padding: 0.55em 0.85em 0.7em;
     background: #f4fbf8;
@@ -299,13 +324,26 @@
   }
   .reveal details.transcript p { margin: 0.35em 0; }
 
-  /* The logo defaults to the bottom-right, exactly where the transcript panel
-     runs. Move it to the bottom-left so the whole right-hand column stays free.
-     The 56px offset clears reveal's menu button, which occupies x 8-43px. */
-  .reveal .slide-logo {
-    right: auto !important;
-    left: 56px !important;
+  /* Opt-out, applied per tab as class="transcript inline".
+     Some figures are rendered at out-width 80% and span x 1.4-98.6% of the slide,
+     running from just under the tab bar down to y ~95%. There is no rectangle
+     left to overlay, so on those tabs the panel joins the normal flow when opened
+     and pushes the figure down; the slide is "scrollable: true", so the figure
+     stays reachable. Note this rule only touches [open]: collapsed, the pill is
+     still absolutely positioned at the top-right corner and still costs 0px. */
+  .reveal details.transcript.inline[open] {
+    position: static;
+    width: auto;
+    max-height: none;
+    overflow-y: visible;
+    margin: 0 0 0.9em 0;
   }
+
+  /* No .slide-logo rule here: no deck in this course sets a "logo:" in its YAML,
+     so the bottom-right corner the panel would collide with is already free. If
+     a logo is ever added, move it out of the way with
+     .reveal .slide-logo { right: auto !important; left: 56px !important; }
+     where 56px clears reveal's menu button at x 8-43px. */
   </style>
 
   <script>
@@ -459,13 +497,10 @@
       host.dataset.webrCodePx = Math.ceil(widest + EDITOR_CHROME);
       setTracks(host, ((widest + EDITOR_CHROME) * CODE_SLACK) / available);
 
-      // NOTHING is promoted here — not even a manual `::: {.side-out}` wrapper.
-      // Whether side by side is acceptable depends on the OUTPUT (its width, and
-      // its height relative to the code), and no output exists yet. Promoting on
-      // the strength of the code alone is how a cell whose output turns out to be
-      // ten lines tall still opened side by side, and only collapsed once the
-      // student pressed Run. Every cell now waits for its output and is judged by
-      // the same gates in assessOutput.
+      // The measured code column is now the real one, so check straight away that
+      // Monaco is not wrapping in it. Before, this ran only after a cell had been
+      // run; a cell that opens side by side needs it on arrival.
+      ensureNoWrap(area, host, sourceLineCount(code), 0);
     }
 
     // The natural width of the output text. `pre` cannot be measured directly:
@@ -506,10 +541,11 @@
       return mode === "pending" || mode === "side";
     }
 
-    // Promotion is the ONLY way a cell becomes side-by-side. It happens after the
-    // output has been produced and measured, never before: guessing from the code
-    // alone made every cell open in two columns and then snap back to one on the
-    // first run, which moved the slide under the reader.
+    // A cell is put side by side as soon as its code has been measured, so the
+    // layout the reader first sees is the layout it keeps. The output cannot be
+    // measured until the cell has run, so assessOutput may still send a cell back
+    // to the vertical stack afterwards — that is the price of not making the
+    // reader wait for a run to see the final shape.
     function promote(host) {
       if (host.dataset.webrLayout === "side") return;
       host.classList.add("side-out");
@@ -679,20 +715,11 @@
       var host = existingWrapper || area.closest(".cell") || area.parentElement;
       if (!host) return;
 
-      if (existingWrapper) {
-        // `::: {.side-out}` is a hint, nothing more. It cannot make a cell side by
-        // side on its own, cannot suspend any gate, and cannot decide the timing:
-        // the cell is held stacked and judged on its output exactly like every
-        // other cell. Keeping the flag only stops routine measurement noise from
-        // tearing down a wrapper that has legitimately been promoted.
-        host.dataset.webrLayoutManual = "true";
-        host.classList.remove("side-out");
-        host.dataset.webrLayout = "pending";
-      } else {
-        // Everything else opens as the ordinary vertical stack and is promoted
-        // only once its output has been measured and shown to fit.
-        host.dataset.webrLayout = "pending";
-      }
+      // Open side by side. `::: {.side-out}` only adds the manual flag, which
+      // stops routine measurement noise from tearing the wrapper down; it still
+      // cannot suspend the gates in assessOutput, all of which force.
+      if (existingWrapper) host.dataset.webrLayoutManual = "true";
+      promote(host);
 
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
@@ -1043,7 +1070,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"square_it <- function(a) {\n\n  #--- 1. do something on x ---# \n  squared_a <- a^2\n\n  #--- 2. return the results ---# \n  return(squared_a)\n\n}","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ten_squared <- square_it(10) \n\nten_squared","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_and_sqrt_it <- function(a) {\n\n  #--- 1. do something on x ---# \n  squared_a <- a^2\n  original_a <- sqrt(squared_a)\n\n  #--- 2. return the results ---# \n  return(original_a)\n\n} ","id":3,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_and_sqrt_it(8)","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_multiply_it <- function(a) {\n\n  #--- 1. do something on a ---# \n  squared_a <- a^2\n  z <- multiplier * squared_a\n\n  #--- 2. return the results ---# \n  return(z)\n\n} ","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_multiply_it(10) ","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"multiplier <- 10\nsquare_multiply_it(10)","id":7,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it <- function(a = 5) {\n\n  #--- 1. do something on a ---# \n  squared_a <- a^2\n\n  #--- 2. return the results ---# \n  return(squared_a)\n\n} ","id":8,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it()","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define a function with two arguments ---#\nsquare_them_add <- function(a = 5, b = 2) {\n\n  #--- 1. do something on a ---# \n  squared_and_summed <- a^2 + b^2\n\n  #--- 2. return the results ---# \n  return(squared_and_summed)\n\n} \n\n#--- run it ---#\nsquare_them_add(4, 3)","id":10,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_them_add(b = 3, a = 4) ","id":11,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":12,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":14,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"for (x in 1:5){\n  print(x^2)\n}  ","id":15,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"for (bluh_bluh_bluh in 1:5){\n  print(bluh_bluh_bluh^2)\n}  ","id":16,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":17,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:5, \\(x){x^2})","id":18,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it <- function(x){\n  return(x^2)\n} ","id":19,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:5, \\(x) square_it(x))","id":20,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_them_add <- function(a, b) {\n\n  squared_and_summed <- a^2 + b^2\n\n  return(squared_and_summed)\n\n} ","id":21,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:10, \\(x) square_them_add(x, b = 5)) ","id":22,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-22","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":24,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- corn price vector ---#\ncorn_price_vec <- seq(3, 5, by = 1)\n\n#--- nitrogen vector ---#\nnitrogen_vec <- seq(0, 300, by = 100) ","id":25,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- crate a data.frame that holds parameter sets to loop over ---#\n(\nparameters_data <- \n  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)\n)","id":26,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"gen_rev_corn <- function(i) {\n\n  #--- define corn price ---#\n  corn_price <- parameters_data[i,'corn_price']\n  #--- define nitrogen  ---#\n  nitrogen <- parameters_data[i,'nitrogen']\n  #--- calculate yield ---#\n  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n  #--- calculate revenue ---#\n  revenue <- corn_price * yield \n  #--- combine all the information you would like to have  ---#\n  data_to_return <- data.frame(\n    corn_price = corn_price,\n    nitrogen = nitrogen,\n    revenue = revenue\n  )\n\n  return(data_to_return)\n} ","id":27,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- loop over all the parameter combinations ---#\nrev_data <- lapply(1:nrow(parameters_data), gen_rev_corn)\n\n#--- take a look ---#\nrev_data %>% head()","id":28,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nfinal_results <- bind_rows(rev_data)\n)","id":29,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define corn price ---#\ncorn_price <- parameters_data[1, 'corn_price']\n\n#--- define nitrogen  ---#\nnitrogen <- parameters_data[1, 'nitrogen']\n\n#--- calculate yield ---#\nyield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n\n#--- calculate revenue ---#\nrevenue <- corn_price * yield \n\n#--- combine all the information you would like to have  ---#\ndata_to_return <- data.frame(\n  corn_price = corn_price,\n  nitrogen = nitrogen,\n  revenue = revenue\n)","id":30,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- work here ---#\n\n\n\n","id":31,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define numeric vectors ---#\nx <- 1:1000\ny <- 1:1000\n\n#--- element wise addition ---#\nz_vec <- x + y","id":32,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define numeric vectors ---#\nx <- 1:1000\ny <- 1:1000\n\n#--- element wise addition ---#\nz_vec <- x + y","id":33,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>%  unlist()","id":34,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check if identical with z_vec ---#\nall.equal(z_la, z_vec) ","id":35,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"microbenchmark(\n  #--- vectorized ---#\n  \"vectorized\" = { x + y }, \n  #--- not vectorized ---#\n  \"not vectorized\" = { lapply(1:1000, function(i) x[i] + y[i])},\n  times = 100, \n  unit = \"ms\"\n) ","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:1000, square_it)","id":37,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it(1:1000)","id":38,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"gen_rev_corn_short <- function(corn_price, nitrogen) {\n\n  #--- calculate yield ---#\n  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n\n  #--- calculate revenue ---#\n  revenue <- corn_price * yield \n\n  return(revenue)\n} ","id":39,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"rev_data_2 <- \n  mutate(\n    parameters_data,\n    revenue = gen_rev_corn_short(corn_price, nitrogen)\n  )","id":40,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"microbenchmark(\n\n  #--- vectorized ---#\n  \"vectorized\" = { rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen)) },\n\n  #--- not vectorized ---#\n  \"not vectorized\" = { parameters_data$revenue <- lapply(1:nrow(parameters_data), gen_rev_corn) },\n  times = 100, \n  unit = \"ms\"\n\n) ","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data.table(N = seq(0.1, 300, by = 0.1)) %>% \n  mutate(yield = 120 + 25 * log(N)) %>% \n  mutate(profit = 3.5 * yield - 0.4 * N)  ","id":42,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-42","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_profit <- function(N, P_C, P_N) {\n\n  yield <- 120 + 25 * log(N) \n  profit <- P_C * yield - P_N * N\n  return(profit)\n\n}","id":43,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-43","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"( \ndata_main <- \n  tibble(N = seq(0.1, 300, by = 0.1)) %>% \n  mutate(profit = get_profit(N, 3.5, 0.4))\n)","id":44,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-44","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N <- filter(data_main, profit == max(profit))$N\n\nggplot(data_main) +\n  geom_line(aes(y = profit, x = N)) +\n  geom_vline(xintercept = opt_N, linetype = 2, color = \"red\") +\n  annotate('text', x = opt_N - 40, y = 450, label = \"Optimal N rate\", size = 3)","id":45,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-45","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::filter(data_main, profit == max(profit))","id":46,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-46","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::arrange(data_main, profit) %>% \n  dplyr::slice(n())","id":47,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-47","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"P_C_seq <- seq(2.5, 4.5, by = 1)\nP_N_seq <- seq(0.2, 0.6, by = 0.2)\n\n(\nprice_parameters <-\n  expand.grid(P_C = P_C_seq, P_N = P_N_seq) %>%\n  tibble()\n)","id":48,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-48","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_opt_N <- function(i) {\n\n  P_C <- price_parameters[i, ]$P_C\n  P_N <- price_parameters[i, ]$P_N\n\n  N_data <- tibble(N = seq(0.1, 300, by = 0.1))\n\n  opt_N <- mutate(N_data, profit = get_profit(N, P_C, P_N)) %>% \n    filter(profit == max(profit)) %>% \n    mutate(P_C = P_C) %>% \n    mutate(P_N = P_N)\n\n  return(opt_N)\n\n}","id":49,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-49","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_opt_N(1)","id":50,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-50","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N_all_ls <- future_lapply(1:nrow(price_parameters), get_opt_N)","id":51,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-51","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N_all_ls[[1]] ","id":52,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-52","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nopt_N_all <- bind_rows(opt_N_all_ls)\n)","id":53,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-53","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"P_C_seq <- seq(2.5, 4.5, by = 1)\nP_N_seq <- seq(0.3, 0.6, by = 0.3)\nN_seq <- seq(100, 300, by = 100)\n\n#--- CHANGED: was also called `price_parameters`, colliding with Strategy 1's ---#\n(\neval_parameters <-\n  expand.grid(P_C = P_C_seq, P_N = P_N_seq, N = N_seq) %>%\n  tibble() %>%\n  arrange(P_C, P_N)\n)","id":54,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-54","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nprofit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))\n)","id":55,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-55","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"profit_data %>% \n  group_by(P_C, P_N) %>% \n  arrange(profit) %>% \n  slice(n())","id":56,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-56","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nfield_data <- data.frame(plot_id = c(1, 2), slope = c(0, 0.2), ec = c(40, 30))\n)","id":57,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-57","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\neval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_seq)\n)","id":58,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-58","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"reshape::expand.grid.df(field_data, data.frame(N_seq))","id":59,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":72,"editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":5,"fig-width":7,"label":"unnamed-chunk-59","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
+  globalThis.qwebrCellDetails = [{"code":"# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the\n# browser against a virtual filesystem that does not hold the repo, so it\n# cannot source that file and has to carry a copy. Edit the shared file first,\n# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy\n# has drifted and prints the block to paste.\nlecture_theme <- function(base_size = 16) {\n  ggplot2::theme_bw(base_size = base_size) +\n    ggplot2::theme(\n      axis.text = ggplot2::element_text(size = base_size * 0.9),\n      axis.title = ggplot2::element_text(size = base_size),\n      legend.text = ggplot2::element_text(size = base_size * 0.9),\n      legend.title = ggplot2::element_text(size = base_size * 0.9),\n      plot.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      panel.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.key = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      # theme_bw's grey92 grid was chosen against a white panel and all but\n      # disappears on the warm paper once the panel stops being opaque.\n      panel.grid = ggplot2::element_line(colour = \"grey87\")\n    )\n}\n\n# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas\n# every size ggplot measures in points or millimetres comes out a third of what\n# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by\n# the same factor puts WebR figures at the same type size as the knitr ones.\n# Keep this in step with `dpi` in the header: change one, change the other.\nwebr_scale <- 216 / 72\nassignInNamespace(\".pt\", ggplot2::.pt * webr_scale, \"ggplot2\")\nassignInNamespace(\".stroke\", ggplot2::.stroke * webr_scale, \"ggplot2\")\ntheme_lecture <- lecture_theme(18 * webr_scale) +\n  # base_size also sets the theme's line widths, which are in millimetres and\n  # already pass through the scaled .pt; pin them to what 18pt gives, or they\n  # come out nine times too thick.\n  ggplot2::theme(\n    line = ggplot2::element_line(linewidth = 18 / 22),\n    rect = ggplot2::element_rect(linewidth = 18 / 22)\n  )\nggplot2::theme_set(theme_lecture)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it <- function(a) {\n\n  #--- 1. do something on x ---# \n  squared_a <- a^2\n\n  #--- 2. return the results ---# \n  return(squared_a)\n\n}","id":2,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ten_squared <- square_it(10) \n\nten_squared","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_and_sqrt_it <- function(a) {\n\n  #--- 1. do something on x ---# \n  squared_a <- a^2\n  original_a <- sqrt(squared_a)\n\n  #--- 2. return the results ---# \n  return(original_a)\n\n} ","id":4,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_and_sqrt_it(8)","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_multiply_it <- function(a) {\n\n  #--- 1. do something on a ---# \n  squared_a <- a^2\n  z <- multiplier * squared_a\n\n  #--- 2. return the results ---# \n  return(z)\n\n} ","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_multiply_it(10) ","id":7,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"multiplier <- 10\nsquare_multiply_it(10)","id":8,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it <- function(a = 5) {\n\n  #--- 1. do something on a ---# \n  squared_a <- a^2\n\n  #--- 2. return the results ---# \n  return(squared_a)\n\n} ","id":9,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it()","id":10,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define a function with two arguments ---#\nsquare_them_add <- function(a = 5, b = 2) {\n\n  #--- 1. do something on a ---# \n  squared_and_summed <- a^2 + b^2\n\n  #--- 2. return the results ---# \n  return(squared_and_summed)\n\n} \n\n#--- run it ---#\nsquare_them_add(4, 3)","id":11,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_them_add(b = 3, a = 4) ","id":12,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":14,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":15,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"for (x in 1:5){\n  print(x^2)\n}  ","id":16,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"for (bluh_bluh_bluh in 1:5){\n  print(bluh_bluh_bluh^2)\n}  ","id":17,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":18,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:5, \\(x){x^2})","id":19,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it <- function(x){\n  return(x^2)\n} ","id":20,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:5, \\(x) square_it(x))","id":21,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_them_add <- function(a, b) {\n\n  squared_and_summed <- a^2 + b^2\n\n  return(squared_and_summed)\n\n} ","id":22,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-22","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:10, \\(x) square_them_add(x, b = 5)) ","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":24,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":25,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- corn price vector ---#\ncorn_price_vec <- seq(3, 5, by = 1)\n\n#--- nitrogen vector ---#\nnitrogen_vec <- seq(0, 300, by = 100) ","id":26,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- crate a data.frame that holds parameter sets to loop over ---#\n(\nparameters_data <- \n  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)\n)","id":27,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"gen_rev_corn <- function(i) {\n\n  #--- define corn price ---#\n  corn_price <- parameters_data[i,'corn_price']\n  #--- define nitrogen  ---#\n  nitrogen <- parameters_data[i,'nitrogen']\n  #--- calculate yield ---#\n  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n  #--- calculate revenue ---#\n  revenue <- corn_price * yield \n  #--- combine all the information you would like to have  ---#\n  data_to_return <- data.frame(\n    corn_price = corn_price,\n    nitrogen = nitrogen,\n    revenue = revenue\n  )\n\n  return(data_to_return)\n} ","id":28,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- loop over all the parameter combinations ---#\nrev_data <- lapply(1:nrow(parameters_data), gen_rev_corn)\n\n#--- take a look ---#\nrev_data %>% head()","id":29,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nfinal_results <- bind_rows(rev_data)\n)","id":30,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define corn price ---#\ncorn_price <- parameters_data[1, 'corn_price']\n\n#--- define nitrogen  ---#\nnitrogen <- parameters_data[1, 'nitrogen']\n\n#--- calculate yield ---#\nyield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n\n#--- calculate revenue ---#\nrevenue <- corn_price * yield \n\n#--- combine all the information you would like to have  ---#\ndata_to_return <- data.frame(\n  corn_price = corn_price,\n  nitrogen = nitrogen,\n  revenue = revenue\n)","id":31,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- work here ---#\n\n\n\n","id":32,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define numeric vectors ---#\nx <- 1:1000\ny <- 1:1000\n\n#--- element wise addition ---#\nz_vec <- x + y","id":33,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- define numeric vectors ---#\nx <- 1:1000\ny <- 1:1000\n\n#--- element wise addition ---#\nz_vec <- x + y","id":34,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>%  unlist()","id":35,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check if identical with z_vec ---#\nall.equal(z_la, z_vec) ","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"microbenchmark(\n  #--- vectorized ---#\n  \"vectorized\" = { x + y }, \n  #--- not vectorized ---#\n  \"not vectorized\" = { lapply(1:1000, function(i) x[i] + y[i])},\n  times = 100, \n  unit = \"ms\"\n) ","id":37,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"lapply(1:1000, square_it)","id":38,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"square_it(1:1000)","id":39,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"gen_rev_corn_short <- function(corn_price, nitrogen) {\n\n  #--- calculate yield ---#\n  yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))\n\n  #--- calculate revenue ---#\n  revenue <- corn_price * yield \n\n  return(revenue)\n} ","id":40,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"rev_data_2 <- \n  mutate(\n    parameters_data,\n    revenue = gen_rev_corn_short(corn_price, nitrogen)\n  )","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"microbenchmark(\n\n  #--- vectorized ---#\n  \"vectorized\" = { rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen)) },\n\n  #--- not vectorized ---#\n  \"not vectorized\" = { parameters_data$revenue <- lapply(1:nrow(parameters_data), gen_rev_corn) },\n  times = 100, \n  unit = \"ms\"\n\n) ","id":42,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-42","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data.table(N = seq(0.1, 300, by = 0.1)) %>% \n  mutate(yield = 120 + 25 * log(N)) %>% \n  mutate(profit = 3.5 * yield - 0.4 * N)  ","id":43,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-43","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_profit <- function(N, P_C, P_N) {\n\n  yield <- 120 + 25 * log(N) \n  profit <- P_C * yield - P_N * N\n  return(profit)\n\n}","id":44,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-44","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"( \ndata_main <- \n  tibble(N = seq(0.1, 300, by = 0.1)) %>% \n  mutate(profit = get_profit(N, 3.5, 0.4))\n)","id":45,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-45","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N <- filter(data_main, profit == max(profit))$N\n\nggplot(data_main) +\n  geom_line(aes(y = profit, x = N)) +\n  geom_vline(xintercept = opt_N, linetype = 2, color = \"red\") +\n  annotate('text', x = opt_N - 40, y = 450, label = \"Optimal N rate\", size = 3)","id":46,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-46","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::filter(data_main, profit == max(profit))","id":47,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-47","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::arrange(data_main, profit) %>% \n  dplyr::slice(n())","id":48,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-48","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"P_C_seq <- seq(2.5, 4.5, by = 1)\nP_N_seq <- seq(0.2, 0.6, by = 0.2)\n\n(\nprice_parameters <-\n  expand.grid(P_C = P_C_seq, P_N = P_N_seq) %>%\n  tibble()\n)","id":49,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-49","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_opt_N <- function(i) {\n\n  P_C <- price_parameters[i, ]$P_C\n  P_N <- price_parameters[i, ]$P_N\n\n  N_data <- tibble(N = seq(0.1, 300, by = 0.1))\n\n  opt_N <- mutate(N_data, profit = get_profit(N, P_C, P_N)) %>% \n    filter(profit == max(profit)) %>% \n    mutate(P_C = P_C) %>% \n    mutate(P_N = P_N)\n\n  return(opt_N)\n\n}","id":50,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-50","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"get_opt_N(1)","id":51,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-51","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N_all_ls <- future_lapply(1:nrow(price_parameters), get_opt_N)","id":52,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-52","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"opt_N_all_ls[[1]] ","id":53,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-53","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nopt_N_all <- bind_rows(opt_N_all_ls)\n)","id":54,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-54","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"P_C_seq <- seq(2.5, 4.5, by = 1)\nP_N_seq <- seq(0.3, 0.6, by = 0.3)\nN_seq <- seq(100, 300, by = 100)\n\n#--- CHANGED: was also called `price_parameters`, colliding with Strategy 1's ---#\n(\neval_parameters <-\n  expand.grid(P_C = P_C_seq, P_N = P_N_seq, N = N_seq) %>%\n  tibble() %>%\n  arrange(P_C, P_N)\n)","id":55,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-55","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nprofit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))\n)","id":56,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-56","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"profit_data %>% \n  group_by(P_C, P_N) %>% \n  arrange(profit) %>% \n  slice(n())","id":57,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-57","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nfield_data <- data.frame(plot_id = c(1, 2), slope = c(0, 0.2), ec = c(40, 30))\n)","id":58,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-58","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\neval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_seq)\n)","id":59,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-59","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"reshape::expand.grid.df(field_data, data.frame(N_seq))","id":60,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-60","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
 
   </script>
   <script type="module">
@@ -2036,8 +2063,10 @@
           captureOutputOptions.captureGraphics = {
               width: fig_width,
               height: fig_height,
-              bg: "white", // default: transparent
-              pointsize: 12,
+              bg: "transparent", // was "white"; the slide paper colour must show through (see AGENTS.md)
+              // R draws this canvas at 72 dpi whatever `dpi` is, so base graphics
+              // text (hist(), plot()) must be scaled here to stay legible.
+              pointsize: 12 * options["dpi"] / 72,
               capture: true
           };
       }  else {
@@ -2071,7 +2100,11 @@
           const out = result.output
           .filter(
               evt => evt.type === "stdout" || 
-              ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) 
+              ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) ||
+              // Errors share the stderr stream with messages and warnings, which the
+              // decks silence. An error must show regardless or a failing line
+              // looks like it ran fine (see AGENTS.md).
+              ( evt.type === "stderr" && /^Error/.test(evt.data))
           )
           .map((evt, index) => {
               const className = `qwebr-output-code-${evt.type}`;
@@ -2541,6 +2574,8 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 </section>
 <section id="tips-to-make-the-most-of-the-lecture-notes" class="slide level2">
 <h2>Tips to make the most of the lecture notes</h2>
+<div id="qwebr-insertion-location-1"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <div class="panel-tabset">
 <ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Interactive navigation tools</a></li><li><a href="#tabset-1-2">Running and writing codes</a></li></ul>
 <div class="tab-content">
@@ -2657,11 +2692,11 @@ Transcript
 <p>Now the skeleton with something in it. This function is called square it, it takes one argument named a, it squares a and stores that in squared a, and then returns squared a. Map it against the structure on the previous tab and you will see the two numbered comments are exactly the two steps. Then run the second block, which calls square it with ten and stores the result in ten squared. The thing to notice is that you never told R what a is anywhere outside the function. The ten you passed in becomes a for the duration of the call, and then it is gone.</p>
 </details>
 <p>The following function takes numeric numbers, square them, and return the squared values:</p>
-<div id="qwebr-insertion-location-1"></div>
+<div id="qwebr-insertion-location-2"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Try the function:</p>
-<div id="qwebr-insertion-location-2"></div>
+<div id="qwebr-insertion-location-3"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-4">
@@ -2673,11 +2708,11 @@ Transcript
 </details>
 <p>Any objects that are defined within a function are not registered (created) to the global environment.</p>
 <p>For example, <code>squared_a</code> and <code>original_a</code> are defined only internally, and are not registered on the global environment.</p>
-<div id="qwebr-insertion-location-3"></div>
+<div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>You can confirm this by looking at the environment tab in RStudio after running the following:</p>
-<div id="qwebr-insertion-location-4"></div>
+<div id="qwebr-insertion-location-5"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Even though we are returning <code>original_a</code>, only its content is returned.</p>
@@ -2690,7 +2725,7 @@ Transcript
 <p>Now the direction that catches people out. Look at the function. It uses something called multiplier, but multiplier is not one of its arguments, and it is never created inside the function either. So run it, and it fails, because R has nowhere to find that name. Then define multiplier in the global environment and run exactly the same function again, and now it works. That is R’s scoping rule: when a name is not found locally, R goes looking outward. This is convenient and it is also dangerous, because a function that silently depends on a global variable will work on your machine and break on someone else’s. Pass things in as arguments.</p>
 </details>
 <p>When R sees objects that are not provided explicitly as arguments to the function, then R looks for them in the global environment:</p>
-<div id="qwebr-insertion-location-5"></div>
+<div id="qwebr-insertion-location-6"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <!-- CHANGED: this read "Here, `multiplier` is provided as an argument to the
@@ -2699,11 +2734,11 @@ NOT an argument -- that is precisely why R has to go looking for it in the
 global environment, and why the first call below fails. -->
 <p>Here, <code>multiplier</code> is <span style="color: red;">not</span> provided as an argument to the function, and it is not defined inside it either.</p>
 <p>Try this:</p>
-<div id="qwebr-insertion-location-6"></div>
+<div id="qwebr-insertion-location-7"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Now, define <code>multiplier</code> on the global environment, and then run it again:</p>
-<div id="qwebr-insertion-location-7"></div>
+<div id="qwebr-insertion-location-8"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-6">
@@ -2714,11 +2749,11 @@ Transcript
 <p>A small addition with a large payoff. Writing a equals five in the argument list gives that argument a default, so calling square it with no arguments at all still works and uses five. Defaults are how you make a function easy to call in the common case and still flexible in the unusual one. The pattern you will see in real packages is a function with two or three arguments you almost always supply and a dozen you almost never touch, all defaulted to something sensible. Your own functions should do the same. Default the things that usually stay the same, and require the things that always change.</p>
 </details>
 <p>You can set default values for function arguments by <code>argument = value</code> like below:</p>
-<div id="qwebr-insertion-location-8"></div>
+<div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Try this:</p>
-<div id="qwebr-insertion-location-9"></div>
+<div id="qwebr-insertion-location-10"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-7">
@@ -2729,7 +2764,7 @@ Transcript
 <p>Adding arguments is just adding them, separated by commas. This function takes a and b and returns a squared plus b squared. Then look at the two calls, because the difference between them is the lesson. In the first, four and three are matched to a and b by position: first value to first argument. In the second we name them explicitly, b equals three and a equals four, and now the order does not matter at all. Positional is fine for one or two obvious arguments. The moment there are several, or the moment you are looping, name them. You will see exactly why in the exercises.</p>
 </details>
 <p>It is easy to create a function with multiple arguments. You just simply add more arguments within <code>function()</code> like below:</p>
-<div id="qwebr-insertion-location-10"></div>
+<div id="qwebr-insertion-location-11"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>As you are likely to have noticed, the order of input arguments is assumed to be the same as the order of the arguments of the function. Above,</p>
@@ -2738,7 +2773,7 @@ Transcript
 <li><code>b = 3</code></li>
 </ul>
 <p>You can mess with the order of input arguments if you want if you name the input arguments as follows:</p>
-<div id="qwebr-insertion-location-11"></div>
+<div id="qwebr-insertion-location-12"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-8">
@@ -2755,7 +2790,7 @@ Transcript
 <p>Define a function that takes temperature in Fahrenheit, convert it into Celsius, and return it.</p>
 <p>Here is the formula: <code>temp_C &lt;- (temp_F - 32) * 5 / 9</code></p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-12"></div>
+<div id="qwebr-insertion-location-13"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
@@ -2776,7 +2811,7 @@ Transcript
 </span></p>
 <p>Write a function that takes a nitrogen rate as an argument, calculate the estimated yield for the nitrogen rate, and then return the estimated yield.</p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-13"></div>
+<div id="qwebr-insertion-location-14"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
@@ -2797,7 +2832,7 @@ P_{corn} * \text{corn yield}
 \end{align*}</span>
 <p>Write a function that takes corn price and nitrogen rate as its arguments, calculate revenue (and yield as an intermediate step), and return revenue. In doing so, use the function you created in Exercise 2.</p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-14"></div>
+<div id="qwebr-insertion-location-15"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
@@ -2890,11 +2925,11 @@ Transcript
 </summary>
 <p>Two loops that do exactly the same thing. The first uses x as the loop variable, the second uses bluh bluh bluh, and the output is identical. That is the point of showing you the silly one. The loop variable is just a name you choose, with no meaning to R at all. Beginners often think there is something special about i or x. There is not. Pick a name that says what the value is, like year or county or nitrogen rate, and your loop becomes self-documenting. Also notice that both bodies call print. That is not decoration, and the exercise tab shows you why.</p>
 </details>
-<div id="qwebr-insertion-location-15"></div>
+<div id="qwebr-insertion-location-16"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>This does the same:</p>
-<div id="qwebr-insertion-location-16"></div>
+<div id="qwebr-insertion-location-17"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-4-4">
@@ -2906,7 +2941,7 @@ Transcript
 </details>
 <p>Write a for loop that cubes each element of a sequence starting at 5, increasing by 5, and ending at 50.</p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-17"></div>
+<div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <!-- CHANGED: the answer was `for (i in seq(5, 50, by = 5)){ i^3 }`, which
@@ -2983,7 +3018,7 @@ Transcript
 <p>Same job as the for loop, in one line. Read the backslash of x as function of x. It is just shorthand, and you will see it everywhere in modern R code. But the important sentence is the one in red at the bottom. lapply always returns a list. Always. That is what the l stands for. So even though you fed it a simple numeric vector and did simple arithmetic, what comes back is a list of five one-element pieces, not a vector. That is the single biggest difference from a for loop, and it is why you will so often see unlist or bind rows immediately after an lapply.</p>
 </details>
 <p>This does the same thing as the for loop example we looked at earlier:</p>
-<div id="qwebr-insertion-location-18"></div>
+<div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <ul>
 <li><code>\(x)</code>: shorthand for <code>function(x)</code></li>
@@ -3001,11 +3036,11 @@ Transcript
 </details>
 <p>It is often the case that you want to write a function of the action you intend to repeat first and then loop.</p>
 <p>For example, for the loop of squaring numbers, you can first define a function that implements the action of squaring:</p>
-<div id="qwebr-insertion-location-19"></div>
+<div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>And then loop:</p>
-<div id="qwebr-insertion-location-20"></div>
+<div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-6-4">
@@ -3017,11 +3052,11 @@ Transcript
 </details>
 <p>Often times, you would like to loop over a single parameter of a function that has multiple arguments:</p>
 <p>For example, you would like to fix the value of <code>b</code> at 5 while trying different values of <code>a</code> of the following function:</p>
-<div id="qwebr-insertion-location-21"></div>
+<div id="qwebr-insertion-location-22"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Then you can do this:</p>
-<div id="qwebr-insertion-location-22"></div>
+<div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>As you can see, this function tries each of <code>1:10</code> (called internally <code>x</code>), give it to <code>square_them_add()</code> as its first argument while <code>b</code> is fixed at 5.</p>
@@ -3040,7 +3075,7 @@ Transcript
 <p>Use <code>lapply()</code> to cube each element of a sequence starting at 5, increasing by 5, and ending at 50.</p>
 <p><br></p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-23"></div>
+<div id="qwebr-insertion-location-24"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
@@ -3059,7 +3094,7 @@ Transcript
 <p>At each value of the corn price sequence of <code>seq(2.5, 4.0, by = 0.1)</code>, calculate the revenue using <code>lapply()</code> where nitrogen rate is fixed at 200 (lb/acre).</p>
 <p><br></p>
 <p><strong>Work here</strong></p>
-<div id="qwebr-insertion-location-24"></div>
+<div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <!-- CHANGED: the answer defined n_to_yield(N), which takes nitrogen only and
@@ -3164,11 +3199,11 @@ Transcript
 <div class="tab-content">
 <div id="tabset-7-1">
 <p>Get a sequence of values for corn price and nitrogen rate:</p>
-<div id="qwebr-insertion-location-25"></div>
+<div id="qwebr-insertion-location-26"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>We then create a complete combination of the values using the <code>expand.grid()</code> function. The resulting object is a <code>data.frame</code>.</p>
-<div id="qwebr-insertion-location-26"></div>
+<div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-7-2">
@@ -3178,7 +3213,7 @@ Transcript
 <li>refer to <code>parameters_data</code> to extract the parameters stored at the row number</li>
 <li>calculate corn yield and revenue based on the extracted parameters (corn price and nitrogen rate).</li>
 </ul>
-<div id="qwebr-insertion-location-27"></div>
+<div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>This function</p>
@@ -3192,12 +3227,12 @@ Transcript
 </div>
 <div id="tabset-7-3">
 <p>Do a loop using <code>lapply()</code>:</p>
-<div id="qwebr-insertion-location-28"></div>
+<div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-7-4">
 <p>Combine the list of <code>data.frame</code>s into a single <code>data.frame</code> using <code>bind_rows()</code> from the <code>dplyr</code> package.</p>
-<div id="qwebr-insertion-location-29"></div>
+<div id="qwebr-insertion-location-30"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -3213,7 +3248,7 @@ Transcript
 </details>
 <p>Before defining a function, write code that works for one row.</p>
 <p>We will work on a specific value of <code>i</code>. Here it is <code>i = 1</code>.</p>
-<div id="qwebr-insertion-location-30"></div>
+<div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>After you confirm the code you write gives you desired outcomes, make it a function by replacing <code>1</code> with <code>i</code>.</p>
@@ -3250,7 +3285,7 @@ Transcript
 </ul>
 </div>
 <div id="tabset-8-2">
-<div id="qwebr-insertion-location-31"></div>
+<div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><strong>Answer</strong></p>
 <div class="cell">
@@ -3317,7 +3352,7 @@ Transcript
 <li><p>Vectorized operations are those that take vectors as inputs and work on each element of the vectors in parallel</p></li>
 </ul>
 <p><strong>Example</strong></p>
-<div id="qwebr-insertion-location-32"></div>
+<div id="qwebr-insertion-location-33"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-10-2">
@@ -3328,15 +3363,15 @@ Transcript
 <p>Two ways to add the same two vectors. The vectorized version is x plus y, and that is the entire program. The loop version walks the indices one at a time, pulling out element i from each vector, adding them, and building a list, which then has to be unlisted back into a vector. Then all dot equal confirms the two results are identical, and they are. So you get exactly the same answer either way. The question is what each one costs, and the sentence at the bottom is the hint. R is written to be good at the first kind of operation and comparatively bad at the second.</p>
 </details>
 <p><strong>Vectorized</strong></p>
-<div id="qwebr-insertion-location-33"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p><strong>Non-vectorized (loop)</strong></p>
 <div id="qwebr-insertion-location-34"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
-<p><strong>Compare</strong></p>
+<p><strong>Non-vectorized (loop)</strong></p>
 <div id="qwebr-insertion-location-35"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p><strong>Compare</strong></p>
+<div id="qwebr-insertion-location-36"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>Both produce the same results. However, R is written in a way that is much better at doing vectorized operations.</p>
 </div>
@@ -3349,7 +3384,7 @@ Transcript
 </details>
 <p>Let’s time them using the <code>microbenchmark()</code> function from the <code>microbenchmark</code> package.</p>
 <p>Here, we do not <code>unlist()</code> after <code>lapply()</code> to just focus on the multiplication part.</p>
-<div id="qwebr-insertion-location-36"></div>
+<div id="qwebr-insertion-location-37"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
@@ -3365,11 +3400,11 @@ Transcript
 <p>The simplest possible illustration of the point. On top, lapply calling square it a thousand times. Underneath, square it applied to the whole vector at once. Same answers. But look at why the second one works. The body of square it is x squared, and squaring in R is already vectorized, so the function inherits that for free without you doing anything. That is the general lesson. A great many functions you write are automatically vectorized because everything inside them is, and you never needed the loop in the first place. Before you write lapply, try handing your function the whole vector and see what happens.</p>
 </details>
 <p>Instead of this:</p>
-<div id="qwebr-insertion-location-37"></div>
+<div id="qwebr-insertion-location-38"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>You can just do this:</p>
-<div id="qwebr-insertion-location-38"></div>
+<div id="qwebr-insertion-location-39"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-10-5">
@@ -3380,11 +3415,11 @@ Transcript
 <p>Now the same idea on the real example. Compare this function with the one from the loop version. That one took a row number and went and looked up the parameters itself. This one just takes corn price and nitrogen directly as arguments and does the arithmetic. That change is precisely what makes it vectorizable. Then instead of looping over rows, we call it once inside mutate, handing it the two entire columns, and it computes every row’s revenue in one go. No loop, no list of data frames, no bind rows at the end. One line, and the result is already a proper data frame.</p>
 </details>
 <p>Here is the vectorized version of the revenue sensitivity analysis:</p>
-<div id="qwebr-insertion-location-39"></div>
+<div id="qwebr-insertion-location-40"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Then use the function to calculate revenue and assign it to a new variable in the parameters_data data.</p>
-<div id="qwebr-insertion-location-40"></div>
+<div id="qwebr-insertion-location-41"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-10-6">
@@ -3395,7 +3430,7 @@ Transcript
 <p>And the timing comparison for the realistic case. Run it and look at the gap. The vectorized version computes every combination in a single pass. The loop version calls a function once per row, and each of those calls does its own data frame lookup and builds its own little one-row data frame, which then all have to be stitched together. All of that is overhead you simply do not pay in the vectorized version. Keep this result in mind for the parallel section that follows, because the temptation there is to reach for more cores. Very often the better move is to stop looping at all.</p>
 </details>
 <p>Let’s compare the vectorized and non-vectorized version:</p>
-<div id="qwebr-insertion-location-41"></div>
+<div id="qwebr-insertion-location-42"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -3483,7 +3518,7 @@ warning -- the most important thing on the slide -- sat below the fold. -->
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="co">#--- number of all cores ---#</span></span>
 <span id="cb15-2"><a></a>parallel<span class="sc">::</span><span class="fu">detectCores</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 20</code></pre>
+<pre><code>[1] 16</code></pre>
 </div>
 </div>
 <p><br></p>
@@ -3577,12 +3612,12 @@ Transcript
 <span id="cb19-11"><a></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Unit: milliseconds
-             expr         min          lq         mean      median          uq
-     parallelized 1410.999584 1426.836941 1446.3550705 1441.337350 1466.634452
- not parallelized    0.231117    0.244237    0.2959417    0.255963    0.271953
+             expr         min          lq         mean       median          uq
+     parallelized 2502.541149 2541.327087 2582.4461712 2559.9218995 2579.484639
+ not parallelized    0.224352    0.239686    0.2944755    0.2497105    0.274208
          max neval cld
- 1497.850376   100  a 
-    2.501451   100   b</code></pre>
+ 3542.130917   100  a 
+    2.401657   100   b</code></pre>
 </div>
 </div>
 </div>
@@ -3683,7 +3718,7 @@ Transcript
 <span id="cb22-2"><a></a>single_res <span class="ot">&lt;-</span> <span class="fu">MC_sim</span>(<span class="dv">1</span>)</span>
 <span id="cb22-3"><a></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>0.011 sec elapsed</code></pre>
+<pre><code>0.01 sec elapsed</code></pre>
 </div>
 </div>
 <p><strong>Not parallelized (sequential)</strong>:</p>
@@ -3692,7 +3727,7 @@ Transcript
 <span id="cb24-2"><a></a>MC_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, MC_sim)</span>
 <span id="cb24-3"><a></a><span class="fu">toc</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>11.26 sec elapsed</code></pre>
+<pre><code>10.174 sec elapsed</code></pre>
 </div>
 </div>
 <p><strong>Parallelized</strong>:</p>
@@ -3701,7 +3736,7 @@ Transcript
 <span id="cb26-2"><a></a>MC_results <span class="ot">&lt;-</span> <span class="fu">future_lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>, MC_sim)</span>
 <span id="cb26-3"><a></a><span class="fu">toc</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>2.143 sec elapsed</code></pre>
+<pre><code>3.216 sec elapsed</code></pre>
 </div>
 </div>
 </div>
@@ -3780,7 +3815,7 @@ Transcript
 <p>Grid search basically evaluates the objective function (profit here) at many levels of the decision variables (nitrogen here) and pick the one that maximizes the objective function (profit).</p>
 <p><br></p>
 <p><strong>Example</strong></p>
-<div id="qwebr-insertion-location-42"></div>
+<div id="qwebr-insertion-location-43"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-14-3">
@@ -3791,11 +3826,11 @@ Transcript
 <p>Now in code. First a function taking a nitrogen rate and the two prices, returning profit, which is just the equation from the setup tab written out. Then we build a data frame of nitrogen rates from nought point one up to three hundred in steps of a tenth, and compute profit at every one of them with mutate. Notice what we are not doing here. There is no loop. Get profit is vectorized because everything inside it is, so handing it the whole column works directly. That is the lesson from the vectorization section showing up in real work, and it is why this runs instantly on three thousand rows.</p>
 </details>
 <p>Let’s define a function that takes <code>N</code>, <code>P_C</code>, and <code>P_N</code> values and returns profits.</p>
-<div id="qwebr-insertion-location-43"></div>
+<div id="qwebr-insertion-location-44"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Let’s create a sequence of <code>N</code> values and then calculate profit at each level of <code>N</code>.</p>
-<div id="qwebr-insertion-location-44"></div>
+<div id="qwebr-insertion-location-45"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-14-4">
@@ -3806,7 +3841,7 @@ Transcript
 <p>Here is the same information as a picture, and it is worth a moment. Profit rises steeply at low nitrogen rates, flattens out, and then begins to fall as the cost of the extra nitrogen outweighs the extra yield it buys. The dashed red line marks the maximum. Two things to take from the shape. The peak is quite flat, which in practice means being somewhat wrong about the optimal rate costs you very little, and that is genuinely reassuring for a farmer. And the curve is smooth with a single peak, which is exactly the situation where grid search cannot go wrong.</p>
 </details>
 <p>Here is the visualization of profit-N relationship:</p>
-<div id="qwebr-insertion-location-45"></div>
+<div id="qwebr-insertion-location-46"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-14-5">
@@ -3817,11 +3852,11 @@ Transcript
 <p>Two ways to pull the best row out. The first filters for the row where profit equals the maximum, which reads exactly like what you mean. The second sorts the whole dataset by profit and takes the last row. Both give you the same answer, but read the warning underneath, because this deck previously had it backwards. The filter version is roughly three times faster, and it has to be. Filtering scans the column once to find the largest value, whereas arranging sorts everything first, and sorting is fundamentally more expensive than scanning. Use arrange when you want the top several rows, or you actually need the ordering. For a single maximum, filter.</p>
 </details>
 <p>Once the profit-N relationship is found, we can use <code>dplyr::filter()</code> combined with <code>max()</code> to identify the optimal N rate.</p>
-<div id="qwebr-insertion-location-46"></div>
+<div id="qwebr-insertion-location-47"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Alternatively, you can sort the data by profit in the ascending order (default) and pick the last row using <code>dplyr::slice(n())</code>.</p>
-<div id="qwebr-insertion-location-47"></div>
+<div id="qwebr-insertion-location-48"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <!-- CHANGED: this said "This method is faster than the first one", which is
@@ -3883,7 +3918,7 @@ Transcript
 rows), and that one WAS autorun. So on page load only Strategy 2's version
 existed, and a student clicking Strategy 1's Step 3 silently looped over the
 wrong data. Strategy 2's object has been renamed to `eval_parameters`. -->
-<div id="qwebr-insertion-location-48"></div>
+<div id="qwebr-insertion-location-49"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-15-3">
@@ -3894,11 +3929,11 @@ Transcript
 <p>Step two is the function, and look at what is inside it. It pulls the corn and nitrogen price out of row i, builds the nitrogen grid, computes profit at every rate using the get profit function from earlier, and filters down to the best row. Then the two mutates on the end are easy to overlook but important. They attach the prices onto the result. Without them you would get back a set of optimal nitrogen rates with no record of which price combination each one belongs to. When you are looping and stacking results, always carry the parameters through alongside the answer.</p>
 </details>
 <p>Now, we will define a function that extract a combination of corn and nitrogen prices from <code>price_parameters</code> (extract a row from <code>price_parameters</code>), and then find the optimal N.</p>
-<div id="qwebr-insertion-location-49"></div>
+<div id="qwebr-insertion-location-50"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Check if this function works:</p>
-<div id="qwebr-insertion-location-50"></div>
+<div id="qwebr-insertion-location-51"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-15-4">
@@ -3909,7 +3944,7 @@ Transcript
 <p>Step three, the loop, and we use future underscore lapply so the price combinations can run across cores. Then bind rows stacks the nine one-row data frames into a single table, the same finish as the earlier loop example. One honest caveat, in the note underneath. These slides run R inside your browser, which is single-threaded, and we never called plan here, so on this page it runs one combination after another regardless. Copy it onto your own machine, set a plan first, and the identical line parallelizes. That interchangeability is precisely the point, but you will not see the speed-up here.</p>
 </details>
 <p>Loop:</p>
-<div id="qwebr-insertion-location-51"></div>
+<div id="qwebr-insertion-location-52"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <!-- ADDED: this cell runs in the browser via WebR, which is single-threaded,
 and plan() is only ever called in a host-rendered {r} chunk. So the default
@@ -3929,11 +3964,11 @@ note the slide silently implies otherwise. -->
 </div>
 </div>
 <p><br></p>
-<div id="qwebr-insertion-location-52"></div>
+<div id="qwebr-insertion-location-53"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Combine the list of <code>data.frame</code>s into a single <code>data.frame</code> using <code>bind_rows()</code>.</p>
-<div id="qwebr-insertion-location-53"></div>
+<div id="qwebr-insertion-location-54"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -3967,7 +4002,7 @@ Transcript
 <p>Here is that combined grid. Three corn prices, two nitrogen prices and three nitrogen rates, expanded into every combination, which gives eighteen rows. Compare that with strategy one, where the grid held only the nine price combinations and the nitrogen rates were generated inside the function, over and over again. Everything is now in one table up front. This is also where the memory question starts to bite, and we come back to it shortly. With three short sequences this is trivially small, but the row count is the product of all three lengths, so it grows very quickly once the sequences get realistic.</p>
 </details>
 <p>Here, we define all the combinations of <strong>nitrogen rate</strong>, corn price, and nitrogen price you want to analyze as a <code>data.frame</code>.</p>
-<div id="qwebr-insertion-location-54"></div>
+<div id="qwebr-insertion-location-55"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-16-3">
@@ -3978,11 +4013,11 @@ Transcript
 <p>Two lines to finish. First, profit for every row at once with mutate, handing get profit three whole columns. Second, group by the two prices and, within each group, take the row with the highest profit. That grouping is doing the same job the loop did in strategy one: it treats each price combination separately. But there is no function to write and nothing to stack at the end, because the answer is already a single data frame. Compare this with the three tabs it took to do the same thing by looping, and you can see why vectorizing is worth reaching for first.</p>
 </details>
 <p>Now, we will calculate profit for all the rows in <code>eval_parameters</code>.</p>
-<div id="qwebr-insertion-location-55"></div>
+<div id="qwebr-insertion-location-56"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Now, we can identify the optimal N rate at each of the corn and nitrogen combinations:</p>
-<div id="qwebr-insertion-location-56"></div>
+<div id="qwebr-insertion-location-57"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -4064,7 +4099,7 @@ Transcript
 </details>
 <p><strong>Data</strong></p>
 <p>Consider a 2-plot field like below for the sake of tractability:</p>
-<div id="qwebr-insertion-location-57"></div>
+<div id="qwebr-insertion-location-58"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Objective</strong></p>
@@ -4078,7 +4113,7 @@ Transcript
 <p>The obvious approach is the one we have used all along: expand grid over everything, slope, EC and nitrogen rate. Run it and count. Expand grid gives you every slope crossed with every EC, so you get four combinations of soil properties. But only two of them exist. There is no part of this field with a slope of nought point two and an EC of forty, and none with zero slope and an EC of thirty. Those rows are fabrications. Here it merely wastes effort, but on a real field with many plots you would be computing optimal rates for soils that do not exist and might quietly average them in later.</p>
 </details>
 <p>You can expand on all the variables, nitrogen rate (decision variable), slope and EC (attributes), and corn and nitrogen prices (parameters):</p>
-<div id="qwebr-insertion-location-58"></div>
+<div id="qwebr-insertion-location-59"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
@@ -4094,7 +4129,7 @@ Transcript
 <p>The fix is to stop treating slope and EC as independent lists, because they are not. They arrive together, as rows of the field data. Expand grid dot df from the reshape package does exactly that. It crosses whole rows of one data frame with rows of another, rather than crossing individual columns. So the slope and EC pairings stay intact, each plot keeps its own soil properties, and you only get combinations that actually exist. That distinction, crossing rows rather than crossing columns, is worth remembering. It comes up whenever some of your variables are attributes that travel together instead of dimensions you are free to vary independently.</p>
 </details>
 <p>Instead of applying <code>expand.grid()</code> on all the three vectors using <code>expand.grid()</code>, we can use <code>expand.grid.df()</code> from the <code>reshape</code> package as follows.</p>
-<div id="qwebr-insertion-location-59"></div>
+<div id="qwebr-insertion-location-60"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>This generates all unique combinations of <strong>rows</strong> from the two data frames, without creating any observations that are not possible in reality.</p>

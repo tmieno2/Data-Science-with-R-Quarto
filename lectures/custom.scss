@@ -72,24 +72,24 @@ p>strong {
 //////////////////////////////////
 // Header
 //////////////////////////////////
-.reveal h1 {
-  font-size: 2.5rem;
+// Inline code inside a heading takes the heading's size, so a title like
+// "`lm()` and `feols()`" reads as one line rather than three pieces.
+.reveal h1,
+.reveal h1 code {
+  font-size: 2.4rem;
 }
 
-.reveal h1 code {
-  font-size: 2.5rem;
+.reveal h2,
+.reveal h2 code {
+  font-size: 2rem;
 }
 
 .reveal h2 {
-  font-size: 2.2rem;
   color: #f59219;
 }
 
-.reveal h2 code {
-  font-size: 1.8rem;
-}
-
-.reveal h3 {
+.reveal h3,
+.reveal h3 code {
   font-size: 1.6rem;
 }
 
@@ -216,6 +216,12 @@ details[open] {
 
 .qwebr-interactive-area {
   width: 90%;
+}
+
+// Shinylive apps need a floor, or the iframe collapses before the app loads.
+.shinylive-container,
+iframe.app-frame {
+  min-height: 600px;
 }
 /* ---------------------------------------------------------------------------
    Side-by-side webr cells: code on the left, output on the right.

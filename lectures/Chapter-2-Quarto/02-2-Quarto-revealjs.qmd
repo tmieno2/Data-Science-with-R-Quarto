@@ -57,6 +57,8 @@ Either add it to this folder or drop the reference. Flagged inline below.
 #| include: false
 library(ggplot2)
 library(dplyr)
+
+source(here::here("lectures/_lecture-theme.R"))
 ```
 <!-- CHANGED (C3): labelled the setup chunk, matching what 02-1 now teaches. -->
 
@@ -82,7 +84,7 @@ To create a presentation with Quarto, the first thing to do is declare the `reve
 title: "02-2 Using Quarto to Create Presentations"
 format:
   revealjs:
-    theme: [default, ../custom.scss]
+    theme: [default, ../custom.scss, ../notebook.scss]
     fontsize: 1.2em
     callout-icon: false
     scrollable: true
@@ -902,7 +904,7 @@ A pre-made theme gets you close. To change details, you write your own **scss** 
 ````{verbatim}
 format:
   revealjs:
-    theme: [default, custom.scss]
+    theme: [default, custom.scss, notebook.scss]
 ````
 
 + `default` is applied first

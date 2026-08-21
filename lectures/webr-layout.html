@@ -117,13 +117,10 @@
     host.dataset.webrCodePx = Math.ceil(widest + EDITOR_CHROME);
     setTracks(host, ((widest + EDITOR_CHROME) * CODE_SLACK) / available);
 
-    // NOTHING is promoted here — not even a manual `::: {.side-out}` wrapper.
-    // Whether side by side is acceptable depends on the OUTPUT (its width, and
-    // its height relative to the code), and no output exists yet. Promoting on
-    // the strength of the code alone is how a cell whose output turns out to be
-    // ten lines tall still opened side by side, and only collapsed once the
-    // student pressed Run. Every cell now waits for its output and is judged by
-    // the same gates in assessOutput.
+    // The measured code column is now the real one, so check straight away that
+    // Monaco is not wrapping in it. Before, this ran only after a cell had been
+    // run; a cell that opens side by side needs it on arrival.
+    ensureNoWrap(area, host, sourceLineCount(code), 0);
   }
 
   // The natural width of the output text. `pre` cannot be measured directly:
@@ -164,10 +161,11 @@
     return mode === "pending" || mode === "side";
   }
 
-  // Promotion is the ONLY way a cell becomes side-by-side. It happens after the
-  // output has been produced and measured, never before: guessing from the code
-  // alone made every cell open in two columns and then snap back to one on the
-  // first run, which moved the slide under the reader.
+  // A cell is put side by side as soon as its code has been measured, so the
+  // layout the reader first sees is the layout it keeps. The output cannot be
+  // measured until the cell has run, so assessOutput may still send a cell back
+  // to the vertical stack afterwards — that is the price of not making the
+  // reader wait for a run to see the final shape.
   function promote(host) {
     if (host.dataset.webrLayout === "side") return;
     host.classList.add("side-out");
@@ -337,20 +335,11 @@
     var host = existingWrapper || area.closest(".cell") || area.parentElement;
     if (!host) return;
 
-    if (existingWrapper) {
-      // `::: {.side-out}` is a hint, nothing more. It cannot make a cell side by
-      // side on its own, cannot suspend any gate, and cannot decide the timing:
-      // the cell is held stacked and judged on its output exactly like every
-      // other cell. Keeping the flag only stops routine measurement noise from
-      // tearing down a wrapper that has legitimately been promoted.
-      host.dataset.webrLayoutManual = "true";
-      host.classList.remove("side-out");
-      host.dataset.webrLayout = "pending";
-    } else {
-      // Everything else opens as the ordinary vertical stack and is promoted
-      // only once its output has been measured and shown to fit.
-      host.dataset.webrLayout = "pending";
-    }
+    // Open side by side. `::: {.side-out}` only adds the manual flag, which
+    // stops routine measurement noise from tearing the wrapper down; it still
+    // cannot suspend the gates in assessOutput, all of which force.
+    if (existingWrapper) host.dataset.webrLayoutManual = "true";
+    promote(host);
 
     // Estimate an initial split from the longest source line, in pixels against
     // the width this cell actually has. The old form was `(maxChars + 10) / 145`,

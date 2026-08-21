@@ -132,8 +132,10 @@ globalThis.qwebrComputeEngine = async function(
         captureOutputOptions.captureGraphics = {
             width: fig_width,
             height: fig_height,
-            bg: "white", // default: transparent
-            pointsize: 12,
+            bg: "transparent", // was "white"; the slide paper colour must show through (see AGENTS.md)
+            // R draws this canvas at 72 dpi whatever `dpi` is, so base graphics
+            // text (hist(), plot()) must be scaled here to stay legible.
+            pointsize: 12 * options["dpi"] / 72,
             capture: true
         };
     }  else {
@@ -167,7 +169,11 @@ globalThis.qwebrComputeEngine = async function(
         const out = result.output
         .filter(
             evt => evt.type === "stdout" || 
-            ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) 
+            ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) ||
+            // Errors share the stderr stream with messages and warnings, which the
+            // decks silence. An error must show regardless or a failing line
+            // looks like it ran fine (see AGENTS.md).
+            ( evt.type === "stderr" && /^Error/.test(evt.data))
         )
         .map((evt, index) => {
             const className = `qwebr-output-code-${evt.type}`;

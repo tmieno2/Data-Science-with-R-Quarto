@@ -11,7 +11,7 @@ format:
       - ../webr-layout.html
       - ../katex-amd-fix.html
     footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
-    theme: [default, ./../custom.scss, ../notebook.scss]
+    theme: [default, ../custom.scss, ../notebook.scss]
     fontsize: 1.2em
     callout-icon: false
     scrollable: true
@@ -24,9 +24,20 @@ webr:
 # show-startup-message: false    # Disable displaying status of webR initialization
   cell-options:
     editor-font-scale: 0.7
+    dpi: 216
+    fig-width: 7
+    fig-height: 4.5
+    out-width: 55%
 filters:
   - webr
 ---
+
+```{r}
+#| include: false
+
+source(here::here("lectures/_lecture-theme.R"))
+```
+
 
 ```{r, include = FALSE}
 library(sf)
@@ -100,6 +111,46 @@ data(NDRE)
 NDRE <- terra::rast(NDRE)
 data(prism_us)
 prism_us <- terra::rast(prism_us)
+
+# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the
+# browser against a virtual filesystem that does not hold the repo, so it
+# cannot source that file and has to carry a copy. Edit the shared file first,
+# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy
+# has drifted and prints the block to paste.
+lecture_theme <- function(base_size = 16) {
+  ggplot2::theme_bw(base_size = base_size) +
+    ggplot2::theme(
+      axis.text = ggplot2::element_text(size = base_size * 0.9),
+      axis.title = ggplot2::element_text(size = base_size),
+      legend.text = ggplot2::element_text(size = base_size * 0.9),
+      legend.title = ggplot2::element_text(size = base_size * 0.9),
+      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      panel.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      legend.key = ggplot2::element_rect(fill = "transparent", colour = NA),
+      # theme_bw's grey92 grid was chosen against a white panel and all but
+      # disappears on the warm paper once the panel stops being opaque.
+      panel.grid = ggplot2::element_line(colour = "grey87")
+    )
+}
+
+# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas
+# every size ggplot measures in points or millimetres comes out a third of what
+# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by
+# the same factor puts WebR figures at the same type size as the knitr ones.
+# Keep this in step with `dpi` in the header: change one, change the other.
+webr_scale <- 216 / 72
+assignInNamespace(".pt", ggplot2::.pt * webr_scale, "ggplot2")
+assignInNamespace(".stroke", ggplot2::.stroke * webr_scale, "ggplot2")
+theme_lecture <- lecture_theme(18 * webr_scale) +
+  # base_size also sets the theme's line widths, which are in millimetres and
+  # already pass through the scaled .pt; pin them to what 18pt gives, or they
+  # come out nine times too thick.
+  ggplot2::theme(
+    line = ggplot2::element_line(linewidth = 18 / 22),
+    rect = ggplot2::element_rect(linewidth = 18 / 22)
+  )
+ggplot2::theme_set(theme_lecture)
 ```
 
 ## Tips to make the most of the lecture notes

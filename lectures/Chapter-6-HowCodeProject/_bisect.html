@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-html/tabby.min.js"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="_bisect_files/libs/clipboard/clipboard.min.js"></script>
+<script src="_bisect_files/libs/quarto-html/tabby.min.js"></script>
+<script src="_bisect_files/libs/quarto-html/popper.min.js"></script>
+<script src="_bisect_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="_bisect_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="_bisect_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="_bisect_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.7.32">
 
-  <title>Data Science with R (AECN 896-05) – 06-1: How to write R codes, manage Projects, work with RStudio</title>
+  <title>06-1: How to write R codes, manage Projects, work with RStudio</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="_bisect_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="_bisect_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -27,74 +27,8 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-bf1223c773699056cca1ada9baf1738b.css">
+  <link rel="stylesheet" href="_bisect_files/libs/revealjs/dist/theme/quarto-3d179568291a993a50148962bab307da.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -111,10 +45,10 @@
 }}});
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css">
-  <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link href="_bisect_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="_bisect_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="_bisect_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="_bisect_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -378,9 +312,6 @@
     }, true);
   })();
   </script>
-<meta property="og:title" content="06-1: How to write R codes, manage Projects, work with RStudio – Data Science with R (AECN 896-05)">
-<meta property="og:description" content="Chapter 6: Reproducibility">
-<meta property="og:site_name" content="Data Science with R (AECN 896-05)">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -970,7 +901,6 @@ Transcript
 </details>
 <p>Let’s take a look at an example project that is designed to be reproducible. First, Clone <a href="https://github.com/tmieno2/Sample-Reproducible-Project.git">this repository</a>. We will then look at how the project is organized and developed.</p>
 </section></section>
-<section>
 <section id="rstudio-tips" class="title-slide slide level1 center">
 <h1>RStudio tips</h1>
 
@@ -979,173 +909,8 @@ Transcript
 </div>
 <hr color="#EB811B" size="1px" width="1000px">
 
-</section>
-<section id="code-snippets" class="slide level2">
-<h2>Code snippets</h2>
-<div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">What is it?</a></li><li><a href="#tabset-9-2">Examples</a></li><li><a href="#tabset-9-3">How to add snippets</a></li><li><a href="#tabset-9-4">Context-specificity</a></li><li><a href="#tabset-9-5">Variables</a></li><li><a href="#tabset-9-6">More examples</a></li></ul>
-<div class="tab-content">
-<div id="tabset-9-1">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Snippets are text expansion inside RStudio. You type a short trigger, hit tab, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. The line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.</p>
-</details>
-<p>Code snippets map a short sequence of letters and symbols to a longer, more complicated one.</p>
-<p><br></p>
-<p><strong>Syntax</strong></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>snippet (combination of letters to invoke)</span>
-<span id="cb1-2"><a></a>  (what you want to print) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div title="Important">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Important</strong></p>
-</div>
-<div class="callout-content">
-<p>You need a tab before <strong>(what you want to print)</strong></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-9-2">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Two examples in the nested tabs, and they are the two worth setting up first. Typing p i then tab gives you the pipe. Typing a s then tab gives you the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Note the parenthetical about hitting enter if there are competing completions. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so you may need one extra keystroke to disambiguate. That is worth knowing before you decide a snippet is broken.</p>
-</details>
-<div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">piping operator</a></li><li><a href="#tabset-7-2">assignment operator</a></li></ul>
-<div class="tab-content">
-<div id="tabset-7-1">
-<p><br></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a>snippet pi</span>
-<span id="cb2-2"><a></a>  %&gt;% </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<p>Once you add this, you can type “pi” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>%&gt;%</code> printed.</p>
-</div>
-<div id="tabset-7-2">
-<p><br></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a></a>snippet as</span>
-<span id="cb3-2"><a></a>  &lt;- </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<p>Once you add this, you can type “as” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>&lt;-</code> printed.</p>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</div>
-<div id="tabset-9-3">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, hit tab, and watch the arrow appear. And remember the tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.</p>
-</details>
-<p>Follow <span style="color: blue;"> Tools </span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Global Options </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Code </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Edit Snippets</span> , select R tab, and add snippets.</p>
-<p><br></p>
-<div title="Try yourself">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Try yourself</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Place the following</li>
-</ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a></a>snippet as</span>
-<span id="cb4-2"><a></a>  &lt;-</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li>type “as” and hit tab inside an R code chunk</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-9-4">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Something that confuses people the first time. A qmd file has two contexts. Inside an R chunk you are in R, and outside one you are in Markdown. Snippets are stored per context, so a snippet defined on the R tab only fires inside chunks, and a Markdown one only fires outside them. Look at the example in the second nested tab. A snippet that creates a whole R chunk necessarily belongs in the Markdown list, because you are outside a chunk at the moment you want to make one. And note it is invoked with shift tab there, rather than plain tab.</p>
-</details>
-<div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">What is it?</a></li><li><a href="#tabset-8-2">Example</a></li></ul>
-<div class="tab-content">
-<div id="tabset-8-1">
-<p>Suppose you are working on a Quarto document.</p>
-<ul>
-<li>You are in the R context if your cursor is in an R code chunk</li>
-<li>You are in the Markdown context if your cursor is outside of an R code chunk</li>
-</ul>
-<p>Snippets defined in the R (Markdown) tab only work in the R (Markdown) context.</p>
-</div>
-<div id="tabset-8-2">
-<p>This snippet will let you create an R code chunk with typing “rmc”. Place it in the Markdown tab of the snippets list and hit <strong>shift</strong>+<strong>tab</strong> to invoke it.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a></a>snippet rmc</span>
-<span id="cb5-2"><a></a>  `r ''````{r }</span>
-<span id="cb5-3"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Confirm that this snippet does not work in the R environment.</p>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</div>
-<div id="tabset-9-5">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>This is what makes snippets genuinely powerful rather than just shorter to type. The dollar sign with a number and a label marks a placeholder. Expand this one and your cursor lands in the chunk title; press tab and it jumps to the chunk contents. So a snippet is not simply fixed text, it is a small fill-in-the-blanks form that walks you through the parts you have to supply, in order. Once you see that, the useful snippets to write become obvious. Any structure you type repeatedly where only two or three pieces change each time is a candidate.</p>
-</details>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a></a>snippet rmc</span>
-<span id="cb6-2"><a></a>  `r ''````{r ${1:chunk_title}}</span>
-<span id="cb6-3"><a></a>    ${2:chunk_content}</span>
-<span id="cb6-4"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>$</code> is used as a special character to denote where the cursor should jump (by hitting <code>tab</code>) after completing each section of a snippet.</p>
-</div>
-<div id="tabset-9-6">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and tab and you get a line plot skeleton, with your cursor waiting on the dataset name, then the y variable, then x. Type g d and you get a density plot the same way. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.</p>
-</details>
-<p><strong>ggplot (scatter plot)</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>snippet gl</span>
-<span id="cb7-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
-<span id="cb7-3"><a></a>  geom_line(aes(y = ${2:y}, x = ${3:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><br></p>
-<p><strong>ggplot (density plot)</strong></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>snippet gd</span>
-<span id="cb8-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
-<span id="cb8-3"><a></a>  geom_density(aes(x = ${2:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="resources" class="slide level2">
-<h2>Resources</h2>
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Three places to go next. Efficient R Programming is a full book and much broader than this lecture, worth dipping into rather than reading end to end. The tidyverse style guide is the reference for the styling material we covered, and it is short. And the styler GitHub page is where to look when you want to configure the automatic reformatting rather than accept its defaults. None of these are required reading. But the habits in this chapter are ones you build slowly, and having somewhere to look when a specific question comes up beats trying to absorb it all now.</p>
-</details>
-<ul>
-<li><a href="https://csgillespie.github.io/efficientR/">Efficient R Programming</a></li>
-<li><a href="https://style.tidyverse.org/">tidyverse style guide</a></li>
-<li><a href="https://github.com/r-lib/styler"><code>styler</code> github page</a></li>
-</ul>
 
-
-</section></section>
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
@@ -1154,18 +919,18 @@ Transcript
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="../../site_libs/revealjs/dist/reveal.js"></script>
+  <script src="_bisect_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="../../site_libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="../../site_libs/revealjs/plugin/search/search.js"></script>
-  <script src="../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="_bisect_files/libs/revealjs/plugin/zoom/zoom.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -1342,6 +1107,44 @@ Transcript
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {
         const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")

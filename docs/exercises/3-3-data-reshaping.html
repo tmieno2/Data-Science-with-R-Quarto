@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -36,7 +36,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-38d9d8fd61e003a5a1c343a80d3dce47.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -1350,8 +1350,10 @@ globalThis.qwebrComputeEngine = async function(
         captureOutputOptions.captureGraphics = {
             width: fig_width,
             height: fig_height,
-            bg: "white", // default: transparent
-            pointsize: 12,
+            bg: "transparent", // was "white"; the slide paper colour must show through (see AGENTS.md)
+            // R draws this canvas at 72 dpi whatever `dpi` is, so base graphics
+            // text (hist(), plot()) must be scaled here to stay legible.
+            pointsize: 12 * options["dpi"] / 72,
             capture: true
         };
     }  else {
@@ -1385,7 +1387,11 @@ globalThis.qwebrComputeEngine = async function(
         const out = result.output
         .filter(
             evt => evt.type === "stdout" || 
-            ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) 
+            ( evt.type === "stderr" && (options.warning === "true" && options.message === "true")) ||
+            // Errors share the stderr stream with messages and warnings, which the
+            // decks silence. An error must show regardless or a failing line
+            // looks like it ran fine (see AGENTS.md).
+            ( evt.type === "stderr" && /^Error/.test(evt.data))
         )
         .map((evt, index) => {
             const className = `qwebr-output-code-${evt.type}`;
