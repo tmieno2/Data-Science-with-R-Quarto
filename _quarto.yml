@@ -12,6 +12,12 @@ project:
     - "!sample-project-reproducible/writing/*.qmd"
     # - "!lectures/Chapter-8-Table/08-2-modelsummary.qmd"
     - "!templates/"
+  # Measured output sizes for the WebR cells, written by
+  # _lecture-shared/measure-webr-output.R and read at load by webr-layout.html.
+  # Without this they are not copied into the site and every cell falls back to
+  # judging its layout on the code alone.
+  resources:
+    - "lectures/**/*.webr-output.json"
 
 website:
   title: "Data Science with R (AECN 896-05)"
