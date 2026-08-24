@@ -43,12 +43,12 @@ Change log at a glance:
                             lists, highlighting code line by line, slide numbers
                             and footer, and the Customized themes tab actually
                             filled in.
-  C. Improvements ......... explained why the column div needs four colons,
+  C. Improvements ......... explained four outer colons as a clarity convention,
                             separated fig- from out- properly, made the
                             scrollable demo actually overflow, chunk labels.
 
-SAMPLE FILE: sample_qmd_revealjs.qmd is referenced but is not in the repository.
-Either add it to this folder or drop the reference. Flagged inline below.
+EXAMPLE FILE: 02-1-Quarto-introduction.qmd is the existing source deck linked
+below.
 ================================================================================
 -->
 
@@ -72,6 +72,7 @@ source(here::here("lectures/_lecture-theme.R"))
 <summary>Transcript</summary>
 
 The very first thing you need, when you want slides instead of a document, is to tell Quarto which format to produce, and that happens in the YAML header at the top of the file. The one line that matters most here is the format declaration: setting the format to revealjs. That single word is what switches Quarto from producing an ordinary HTML page or a PDF to producing a reveal.js slide deck. Everything indented underneath revealjs is just an option that tweaks how the slides look and behave: the theme, the font size, whether the code is echoed, and so on. Don't try to memorize every option today. The key idea is simply that the format declaration is what turns an ordinary qmd file into a presentation.
+Read the example from the top. The title line supplies the presentation title. The theme list starts with the default reveal.js theme and then adds the course's custom and notebook stylesheets in that order. Fontsize at one-point-two em sets the base text size. Callout-icon false removes the standard icons from callout boxes, and scrollable true lets a slide scroll when its content is taller than the screen. Echo true displays the R code as well as its result, while fig-d-p-i four hundred asks for high-resolution figures. Because these are in the YAML header, they become deck-wide defaults rather than settings you repeat on every slide.
 
 </details>
 
@@ -109,6 +110,7 @@ format:
 <summary>Transcript</summary>
 
 Once Quarto knows you want slides, the next question is how you actually make a new slide, and the answer is headers. A level-one header, a single hash, starts a big section-divider slide, with the title sitting centered, like a chapter break. A level-two header, two hashes, starts an ordinary content slide with the title tucked up in the top-left corner. My advice, which you'll also see in the callout, is to use a single hash sparingly, just for the few big transitions in your talk, and a double hash for all the regular slides. The payoff comes when you press the letter o for the overview: your section titles stand out from the ordinary slides, and you can take in the shape of your whole talk at a glance.
+Here, the level-one title is centered vertically while the text remains left-aligned. The Direction callout points you to zero-two-one-Quarto-introduction-dot-q-m-d so you can inspect a complete source deck.
 
 </details>
 
@@ -146,11 +148,10 @@ Use `#` for the handful of section breaks that divide your talk, and `##` for th
      student has. -->
 
 :::{.callout-note title="Direction"}
-Look at `sample_qmd_revealjs.qmd`.
+Look at `02-1-Quarto-introduction.qmd`.
 :::
 <!-- CHANGED (A7): quoted the callout title, which was "title=Direction". -->
-<!-- NOTE (A/C): sample_qmd_revealjs.qmd is not in this repository. Either add
-     it to this folder and link to it relatively, or remove this callout. -->
+<!-- CHANGED: replaced the missing sample file with an existing source deck. -->
 
 ### Include R codes and results
 
@@ -158,6 +159,7 @@ Look at `sample_qmd_revealjs.qmd`.
 <summary>Transcript</summary>
 
 Here's the reassuring part. You already know how to embed R code and its output from the earlier lectures, and none of that changes just because we're making slides now. You write a code chunk in exactly the same way, the code runs, and its results appear on the slide. The one thing I'd point you to is the recommended settings in the callout: for a research talk you usually want to hide the code itself and silence the messages and warnings, so your audience sees the result — the figure or the table — and not the plumbing behind it. Put echo false, message false, and warning false in your YAML header once, and it applies to the whole deck.
+The top-level execute key groups those options as rules for running code throughout the presentation. Echo false hides the source lines, message false removes routine package messages, and warning false removes warnings from the audience-facing slides. You still see the figure or table produced by the chunk, which is why these settings reduce distraction without removing the result you actually want to present.
 
 </details>
 
@@ -197,13 +199,14 @@ execute:
 <details class="transcript">
 <summary>Transcript</summary>
 
-So you've rendered your slides and you've got an HTML file. Now what? You open it in a browser, and it behaves like any presentation tool you've used. The arrow keys or the space bar move you forward and back. Press f to go full screen so the browser chrome disappears. The two I really want you to remember are o, or escape, which zooms out to show every slide at once so you can click to jump anywhere, and m, which pulls up a menu listing all your slides by title. And if you forget all of this, just press the question-mark key during the talk and reveal.js shows you the complete list. So there's really nothing to memorize here.
+So you've rendered your slides and you've got an HTML file. Now what? You open it in a browser, and it behaves like any presentation tool you've used. The Right Arrow key or the Space bar moves you forward, and the Left Arrow key moves you back. Press f to go full screen so the browser chrome disappears. The two I really want you to remember are o, or escape, which zooms out to show every slide at once so you can click to jump anywhere, and m, which pulls up a menu listing all your slides by title. And if you forget all of this, just press the question-mark key during the talk and reveal.js shows you the complete list. So there's really nothing to memorize here.
 
 </details>
 
 Open the rendered html in a browser and use:
 
-+ **arrow keys** or **space**: next / previous slide
++ **right arrow** or **space**: next slide
++ **left arrow**: previous slide
 + **f**: full screen
 + **o** or **esc**: overview of every slide at once, click one to jump to it
 + **m**: the menu, which lists all slides by title
@@ -341,6 +344,7 @@ This appears on the second click.
 <summary>Transcript</summary>
 
 A very common layout need is two things side by side: a plot on the left and an explanation on the right, or two plots to compare. Reveal.js gives you a columns layout for this. You open an outer columns block, and inside it you put one column div for each column, each with a width. Look closely at the code, because there's a subtlety here that trips up almost everyone, and it's important enough that I gave it its own tab, right next door.
+The example makes those widths concrete. The first inner column takes forty percent of the available width and uses mtcars to draw a point plot with cylinders on the horizontal axis and miles per gallon on the vertical axis. The second takes the remaining sixty percent and draws a histogram of miles per gallon. The widths add to one hundred percent, so you are explicitly dividing the slide between the two pieces of content. The plus signs add each geometry to its ggplot, and aes tells ggplot which variables belong on the axes. Flip to Output to see those same column containers place the two rendered plots side by side, then move to Why four colons for the nesting rule that keeps the layout intact.
 
 </details>
 
@@ -377,25 +381,24 @@ ggplot(data = mtcars) +
 #### Why four colons?
 
 <!-- ADDED (C1): entire tab. The original showed :::: on the outside and ::: on
-     the inside without a word of explanation. This is the single most common
-     thing students get wrong when they copy the block, and the error it
-     produces (a mangled layout with no message) gives them no clue why. -->
+     the inside without explaining that the extra outer colon is a clarity
+     convention for the nested layout. -->
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here's the subtlety. Look at the colons. The outer columns block uses four colons, and the inner column blocks use three. That is not a typo and it's not arbitrary. When you nest one of these fenced divs inside another, the outer one has to use more colons than the inner ones, because that's the only way Quarto can tell which closing line belongs to which block. The exact numbers don't matter — five outside and three inside works just as well — only that the outer count is larger. And here's why you should care, which is in the callout: if you use three for both, Quarto matches the wrong closing line, your columns silently collapse into a single column, and there is no error message telling you why. So when your side-by-side layout mysteriously renders as one column, count your colons first.
+Here's the subtlety. Look at the colons. The outer columns block uses four colons, and the inner column blocks use three. That is not a typo, but here it is a clarity convention rather than a parsing requirement. Equal three-colon fences also parse correctly in this layout. Using more colons on the outer block makes the nesting boundaries easier to read and helps you see which closing line belongs to which block. The exact numbers don't matter, so five outside and three inside works just as well. When you see four on the outside and three on the inside, read that as a deliberate visual nesting signal.
 
 </details>
 
 Notice the outer block uses **four** colons and the inner blocks use **three**.
 
-+ When one of these blocks sits inside another, the outer one must be opened and closed with **more** colons than the inner ones.
-+ That is how Quarto knows which closing line belongs to which block.
-+ The exact number does not matter, only that the outer count is larger. Five outside and three inside works just as well.
++ Using more colons for the outer block is a **clarity convention** that makes the nesting boundaries easier to read.
++ Equal three-colon fences also parse correctly here.
++ The exact number does not matter. Five outside and three inside works just as well.
 
 :::{.callout-important}
-If you use three colons for both, Quarto matches the first closing line with the outer block and your columns silently collapse into one. There is no error message, so this is worth remembering.
+Using four colons outside and three inside makes the nesting easier to read, even though equal three-colon fences also parse correctly here.
 :::
 
 #### Output
@@ -481,6 +484,7 @@ Turning `scrollable` on for the whole document is convenient, but a scrolling sl
 <summary>Transcript</summary>
 
 This is the other half of the speaker-view feature we saw earlier. You attach private notes to any slide by adding a div marked notes. The audience never sees them — go ahead and look, they're invisible on the slide right now — but when you press s for speaker view, your notes appear on your private screen. This is where you put the reminder to yourself: mention that the y-axis is a count, not a share, that kind of thing. The syntax is right there in the code block below, and if you press s now, you'll see the hidden note attached to this very slide.
+The R chunk above the note is ordinary audience-facing content: ggplot starts with mtcars, and geom-histogram maps miles per gallon to the horizontal axis, so the bars count cars within mileage ranges. The notes block that follows belongs to the same slide but sends its text only to speaker view. That separation is useful because the visual and your private reminder stay together in the source without putting the reminder in front of the audience. The Try callout repeats the action: press s, allow the pop-up if needed, and inspect the note in the speaker window.
 
 </details>
 
@@ -621,6 +625,7 @@ When you show a block of code, the audience reads all of it at once and stops li
 <summary>Transcript</summary>
 
 The mechanism is a single chunk option, code-line-numbers, and you give it a string where each group separated by a vertical bar is one click. So the string bar-one-bar-two-bar-three means: first show the whole block with nothing highlighted, then highlight line one, then line two, then line three. You can group lines too — one-dash-two-bar-three highlights the first two lines together, then the third. And that leading bar, the one before the first number, means start with nothing highlighted, which gives you a clean first look at the whole block before you begin walking through it.
+The three numbered lines are a real pipeline, not filler. Mtcars enters the first pipe, filter keeps only rows where cyl equals four, and the next pipe hands those rows to summarize. Mean of mpg calculates their average miles per gallon, and mean-m-p-g names the one summary column. Those are the three steps the option highlights in sequence. Move to Output to click through the working version and see the value that pipeline returns.
 
 </details>
 
@@ -645,6 +650,7 @@ mtcars %>%
 <summary>Transcript</summary>
 
 Here's the same thing running. Click through it and watch: the whole pipeline appears first, then, line by line, it highlights — the data, then the filter, then the summarize. This is exactly how I'd talk you through a pipeline out loud, and now the highlighting is doing the pointing for me. This is the one feature I'd most encourage you to steal for your own presentations of code.
+The printed output is one row with a column named mean-m-p-g and the value twenty-six-point-six-six-three-six-four. That is the average mpg among the four-cylinder cars selected by the middle line. The output confirms what the pipeline computed, while the changing highlight controls where the audience looks as you explain how it got there.
 
 </details>
 
@@ -687,6 +693,7 @@ See [here](https://quarto.org/docs/reference/formats/html.html#figures) for all 
 <summary>Transcript</summary>
 
 Here's out-width set to 100 percent. The figure fills the full width available on the slide. Flip between the Code tab and the Output tab and just note the relationship: the number in the code, and the size on the slide.
+The plotting code uses mtcars as the data, maps mpg to the horizontal axis inside aes, and adds geom-histogram, so each bar counts cars in a range of miles-per-gallon values. We will keep that plot unchanged across all three examples. That way, any change you see comes from the display options rather than from a different dataset or geometry. The next tab reduces the width and introduces alignment.
 
 </details>
 
@@ -720,6 +727,7 @@ ggplot(data = mtcars) +
 <summary>Transcript</summary>
 
 Now out-width is 80 percent and I've added fig-align center. So the figure is a bit smaller than full width, and it's centered on the slide. This is probably the most common combination you'll actually use for a single plot.
+The ggplot, mtcars data, mpg mapping, and histogram geometry are exactly the same as in Example 1. Eighty percent leaves some unused horizontal space, and center divides that space between the two sides. Keeping the plot code fixed lets you see that out-width changes display size and fig-align changes placement. In the next example, we make both effects more obvious.
 
 </details>
 
@@ -755,6 +763,7 @@ ggplot(data = mtcars) +
 <summary>Transcript</summary>
 
 And here it's shrunk further, to 50 percent, and pushed to the right with fig-align right. I'm showing you the extremes on purpose so the effect is obvious. But notice something as the plot gets smaller: the axis labels are getting harder to read. Hold that thought, because the next tab is about exactly that problem.
+The data and plot are still unchanged: ggplot starts from mtcars, aes maps mpg to the horizontal axis, and geom-histogram counts cars within mileage ranges. At fifty percent, the finished image uses half the available width, and right alignment places the unused space to its left. Because only the output options changed, the smaller labels you see are evidence that out-width scales the whole finished image.
 
 </details>
 
@@ -797,6 +806,7 @@ ggplot(data = mtcars) +
 <summary>Transcript</summary>
 
 This is the distinction that causes the most confusion, so let's be careful. There are two pairs of options that both sound like they control size, but they do different jobs. fig-width and fig-height set the size of the canvas R draws the plot on, in inches, and that decides how big the axis text and points look relative to the plot. out-width and out-height set how big the finished image is displayed on the slide, and that scales the whole picture, text and all. Here's the practical consequence, and it's the thing to take away: if your axis labels are too small to read from the back of the room, do not reach for out-width to make the plot bigger, because that scales the tiny text right along with it. Instead, lower fig-width. A smaller canvas makes the text larger relative to the plot, and then the whole thing scales up cleanly. The last two tabs show how to match the drawn and displayed size exactly, and remind you that fig options are always in inches while out options need a unit.
+Read the matching example as two stages. Fig-width ten and fig-height three ask R to draw a wide, shallow ten-by-three-inch canvas. Out-width ten-in and out-height three-in then request matching display dimensions. The ggplot code uses mtcars and draws the same mpg histogram as the previous examples, so the Output tab isolates the effect of those four size settings. In the callout, notice the syntax difference: fig options use plain numbers because inches are assumed, while out options must say a unit explicitly, such as ten-in, or use a relative size such as eighty percent.
 
 </details>
 
@@ -895,11 +905,12 @@ Try one of the themes listed and see how the appearance of the presentation chan
 <details class="transcript">
 <summary>Transcript</summary>
 
-A pre-made theme gets you close to what you want, but usually not exactly. To change the details, you write your own scss file and hand Quarto both — the default plus your custom file. The order matters here: default is applied first, then your custom scss goes on top, so anything you put in your own file wins. And this isn't hypothetical — every single lecture in this course is built exactly this way, with a file called custom.scss, and it's genuinely worth opening to see how it's done.
+A pre-made theme gets you close to what you want, but usually not exactly. To change the details, you write your own scss file and give Quarto a theme list. The order matters here: default is applied first, custom dot s-c-s-s overrides default, and the later notebook dot s-c-s-s can override both. And this isn't hypothetical: every single lecture in this course is built exactly this way, with a file called custom.scss, and it's genuinely worth opening to see how it's done.
+The list on screen shows all three stylesheets. Quarto reads the list in order: default supplies the base, custom dot s-c-s-s overrides the base, and notebook dot s-c-s-s has the final precedence. Splitting custom rules across files can keep different kinds of styling separate. The live-example callout points to lectures slash custom dot s-c-s-s so you can inspect the course's own overrides rather than starting from an empty file.
 
 </details>
 
-A pre-made theme gets you close. To change details, you write your own **scss** file and hand Quarto both:
+A pre-made theme gets you close. To change details, you write your own **scss** file and give Quarto a theme list:
 
 ````{verbatim}
 format:
@@ -908,7 +919,8 @@ format:
 ````
 
 + `default` is applied first
-+ `custom.scss` is applied second, so anything in it wins
++ `custom.scss` overrides `default`
++ The later `notebook.scss` can override both
 
 :::{.callout-note title="A live example"}
 This is exactly what every lecture in this course does. The file is `lectures/custom.scss`, and it is worth opening.
@@ -919,7 +931,8 @@ This is exactly what every lecture in this course does. The file is `lectures/cu
 <details class="transcript">
 <summary>Transcript</summary>
 
-An scss file has two labelled sections, and knowing the difference saves you a lot of frustration. The scss-defaults section is for variables — the colors and fonts the whole theme is built from. If you want to change your link color across the entire deck, you set a variable here. The scss-rules section holds ordinary CSS rules, applied last, and it's for targeting one specific thing, like make my level-two headers orange. Rough rule: defaults for the deck-wide look, rules for one-off targeting.
+Scss-defaults and scss-rules are two common labelled sections in a Quarto theme file, and knowing the difference saves you a lot of frustration. The scss-defaults section is for variables, the colors and fonts the whole theme is built from. If you want to change your link color across the entire deck, you set a variable here. The scss-rules section holds ordinary CSS rules, applied last, and it's for targeting one specific thing, like make my level-two headers orange. Rough rule: defaults for the deck-wide look, rules for one-off targeting.
+In the exact example, body-color is set to hash-two-two-two, a near-black for the main text, and link-color is set to hash-zero-six-a-six-six-six, a green used for links. Below the rules marker, reveal h-two targets level-two headings inside the reveal.js deck, and its color is set to the orange hash-f-five-nine-two-one-nine. Variables give the theme values it can reuse consistently, while the targeted rule is useful when you want one element to depart from those broad defaults.
 
 </details>
 
@@ -945,6 +958,7 @@ $link-color: #06a666;
 <summary>Transcript</summary>
 
 So how do you know what to write in that rules section? You let the browser tell you. Right-click the thing you want to change, choose Inspect, and read off the class name the browser shows for that element. Then you write a rule for that class in your scss-rules section. That's the whole workflow: inspect, read the class, write the rule. You don't have to know reveal.js's internals by heart — the browser hands you the target.
+Read the example selector from left to right: reveal limits the rule to the presentation, panel-tabset narrows it to a tabset, and role equals tab selects the actual tab controls. Font-size zero-point-eight-five em makes those controls eighty-five percent of the size they would otherwise inherit. That precise selector matters because it shrinks the tab labels without also shrinking unrelated headings or body text.
 
 </details>
 
@@ -966,7 +980,7 @@ To change the look of something on a slide:
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here's a small exercise to make this concrete. Make a file called my-theme.scss next to your qmd, put in a rule that colors your level-two headers red, point your YAML at it with theme default plus my-theme.scss, and render. Every slide title should turn red. Once you've seen your own rule take effect on the real deck, the whole custom-theme idea stops being mysterious.
+Here's a small exercise to make this concrete. Make a file called my-theme.scss next to your qmd, put in a rule that colors your level-two headers red, point your YAML at it with theme default plus my-theme.scss, and render. Every level-two slide title should turn red. Once you've seen your own rule take effect on the real deck, the whole custom-theme idea stops being mysterious.
 
 </details>
 
@@ -982,7 +996,7 @@ Here's a small exercise to make this concrete. Make a file called my-theme.scss 
 ````
 
 + Point your YAML header at it with `theme: [default, my-theme.scss]` and render
-+ Every slide title should now be red
++ Every level-2 slide title should now be red
 :::
 
 :::
@@ -1004,23 +1018,24 @@ Here's a small exercise to make this concrete. Make a file called my-theme.scss 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here's a gotcha that bites people constantly. When you render my_talk.qmd, you get two things, not one: the HTML file, and a folder next to it, my_talk_files, that holds your figures, fonts, and all the reveal.js machinery. If you email just the HTML file — which feels like the natural thing to do — the person opens a broken page, because everything that made it work was in that folder you left behind. And this bites harder for slides than for a normal report, because the entire presentation framework lives in that folder.
+Here's a gotcha that bites people constantly. In a website project, the rendered my_talk.html may depend on both a deck-specific my_talk_files folder, which holds generated figures, and the project's shared site_libs directory, which holds reveal.js and other support files. If you email just the HTML file, which feels like the natural thing to do, the person may open a broken page because you left those dependencies behind. And this bites harder for slides than for a normal report because the presentation framework is one of those shared dependencies.
 
 </details>
 
-Rendering `my_talk.qmd` produces **two** things:
+In a website project, the rendered output may depend on:
 
 + `my_talk.html`
-+ `my_talk_files/`, a folder holding the figures, fonts, and the revealjs machinery
++ `my_talk_files/`, which holds deck-specific figures and other generated assets
++ the project's shared `site_libs/` directory, which holds the revealjs machinery and other support files
 
-Send only the html file and the recipient gets a broken page. This bites harder for slides than for a report, because the presentation framework itself lives in that folder.
+Send only the html file and the recipient may get a broken page because those dependencies remain in the project folders.
 
 ### The fix
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-As you saw in 02-1, the fix is one line: embed-resources set to true in your YAML header. That tells Quarto to pack everything, including figures, fonts, and the framework, into the single HTML file. Now you can email that one file, or upload it on its own, and it just works. The trade-off, in the callout, is that the file gets noticeably bigger and takes a moment longer to open. That's the price of it working anywhere, and it's almost always worth paying.
+As you saw in 02-1, the fix is one line: embed-resources set to true in your YAML header. That tells Quarto to embed linked static assets, including figures, fonts, and stylesheets, in the single HTML file. Dynamically loaded features such as speaker notes or zoom may still fail offline, so test those features before you distribute the deck. The trade-off, in the callout, is that the file gets noticeably bigger and takes a moment longer to open.
 
 </details>
 
@@ -1030,10 +1045,10 @@ format:
     embed-resources: true
 ````
 
-Everything is packed into the single html file, which you can then email or upload on its own.
+Linked static assets are embedded in the single html file, but dynamically loaded features should be tested offline before distribution.
 
 :::{.callout-note}
-The file gets noticeably larger, and self-contained slides take a moment longer to open. That is the price of it working anywhere.
+The file gets noticeably larger, and self-contained slides take a moment longer to open. That is the trade-off for embedding linked static assets.
 :::
 
 ### Check it
@@ -1041,7 +1056,7 @@ The file gets noticeably larger, and self-contained slides take a moment longer 
 <details class="transcript">
 <summary>Transcript</summary>
 
-And here's how you make sure before you hit send. Render, then move only the HTML file — just that one file — to your Desktop, away from its folder. Open it there and click through a few slides. If the figures and the styling all survive the move, you know it's truly self-contained and safe to send. If they break, you forgot the embed-resources line. Thirty seconds of checking saves you an embarrassing follow-up email.
+And here's how you make sure before you hit send. Render, then move only the HTML file to your Desktop, away from its folder. Open it there and click through a few slides. If the figures and the styling survive the move, you know the linked static assets are embedded. Also test dynamically loaded features such as speaker notes and zoom before you send it. If the static assets break, check the embed-resources line. Thirty seconds of checking saves you an embarrassing follow-up email.
 
 </details>
 
@@ -1049,7 +1064,7 @@ And here's how you make sure before you hit send. Render, then move only the HTM
 2. Move **only** the `.html` file to your Desktop
 3. Open it there and step through a few slides
 
-If the figures and the styling survive, it is safe to send.
+If the figures and styling survive, the linked static assets are embedded. Test dynamically loaded features such as speaker notes and zoom offline before sending.
 
 :::
 <!--end of panel-->

@@ -40,6 +40,42 @@ library(tidyr)
 source(here::here("lectures/_lecture-theme.R"))
 ```
 
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks. The three stacked lines in the bottom left corner open a table of contents, and the letter o gives you a panel view of every slide. It is worth knowing your way around this deck, because it is really two topics: reshaping a single dataset between long and wide, and merging two datasets into one. When you are working on an assignment you will usually need one or the other rather than both, so jumping straight to the pivot slides or to the join slides is the point.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes are live. The faintly blue area is an editor, Run Code runs everything in it, and highlighting part of it and pressing Command Enter, or Control Enter on Windows, runs just that part. The copy button in the top right takes the code to your own machine, and the reload button restores the original after you have experimented. One thing specific to this deck: most cells run themselves as the slide loads, so you will often see the result before you touch anything. That is deliberate. With reshaping and merging, the lesson is what the table looks like afterwards, and comparing before with after is easier when the after is already on screen.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+
 # Reshaping
 
 <html>
@@ -60,6 +96,7 @@ source(here::here("lectures/_lecture-theme.R"))
 <summary>Transcript</summary>
 
 Two words you will hear constantly, so let us pin them down with an example rather than a definition. On the left is the same data in long format: one column called yield holding every yield value, and a year column saying which year each belongs to. On the right is wide format: the years have become column names, and the yields sit underneath them. Same information, two shapes. Now read the note under the wide version, because it is the real cost of that shape: there is nothing in the wide dataset telling you what those numbers are. The column is called 2019, not yield in 2019.
+The code on the left builds the example from the ground up. Repeating each of the four state names twice gives one row for each state-year combination. Repeating 2019 and 2020 four times pairs those two years with every state, and the eight yield numbers supply one measurement for each row. The assignment is wrapped in parentheses so the object is both saved as yield data long and printed, and as tibble changes only how that small table is displayed. On the right, pivot wider starts from that saved object, takes its new headers from year, and takes the cell contents from yield. That conversion is why you can compare the two sides as the same observations reorganized, rather than two different datasets.
 
 </details>
 
@@ -112,6 +149,7 @@ Note: there is nothing in the dataset that tells you what the data values repres
 <summary>Transcript</summary>
 
 Here is the question people get stuck on: which shape is correct? The answer is that it depends entirely on what you are about to do. Look at the model on the slide. It has separate coefficients for rainfall in each month, which means the estimation needs each month's rainfall in its own column. So for this analysis, the dataset shown is the long one, even though it has months spread across columns, because long and wide are relative to the variable you are thinking about. That is why the word long on this slide is in red: it is long with respect to yield, while being wide with respect to rainfall.
+The code makes that mixed shape deliberately. It first creates the same eight state-year yield rows as before. The square-bracket step repeats every one of those rows five times so there is room for May through September. Mutate then adds the five month names repeatedly and generates forty rainfall values between zero and twenty with run if. Finally, pivot wider takes the month values into column names, takes rainfall into the cells, and adds the prefix R underscore so the new names match the rainfall terms in the equation, such as R underscore May. The random values exist only to give the reshaping operation something concrete to display. The structure, not the particular rainfall numbers, is what you should study.
 
 </details>
 
@@ -144,6 +182,7 @@ data.frame(
 <summary>Transcript</summary>
 
 And here is the same data in a shape that is too long for that analysis. Every rainfall observation is on its own row, with a month column saying which month it is. Nothing is wrong with this data; it is perfectly tidy. It simply does not match the model we want to estimate, which needs one column per month. Read the callout, because it is the point of this whole slide: whether a dataset is wide or long is not a property of the data, it is a judgment about what you are doing with it. There is no universally correct shape.
+The construction mirrors the previous tab up to the last step. Four state names repeated twice and the two years repeated four times create eight state-year yield observations. The square-bracket expression then repeats each observation five times, mutate labels those copies May through September and assigns a random rainfall value between zero and twenty, and head fifteen prints only the first fifteen rows so the slide stays readable. There is no pivot wider at the end, so month remains a column and rainfall remains one measurement column. Keeping that last step off is exactly what lets you see why this otherwise valid long table is too long for the displayed model.
 
 </details>
 
@@ -182,6 +221,7 @@ Whether a dataset is wide or long is determined based on what you are doing with
 <summary>Transcript</summary>
 
 Let us actually do the conversion, starting from long and going to wide. First we need something to work with, so this tab just creates the dataset: four states, two years each, with a yield for every combination. Eight rows, three columns. Run it and look at it, and keep the shape in mind, because in a moment we are going to turn those eight rows into four.
+In the code, each state is repeated twice because it has one observation in 2019 and one in 2020. The two-year sequence is repeated once for each of the four states, and the eight yield values line up with those eight state-year rows. The left arrow saves the result as yield data long, while the surrounding parentheses print it immediately so you can verify the object before reshaping it. Move to the next tab with those roles in mind: state identifies the row, year will supply new headers, and yield will supply their values.
 
 </details>
 
@@ -260,6 +300,7 @@ yield_data_wide <-
 <summary>Transcript</summary>
 
 A small practical problem with what we just did: the new columns are called 2019 and 2020, which are numbers. Column names that begin with a digit are awkward in R; you end up needing backticks around them every time you refer to one. The fix is names_prefix, which sticks a string on the front of every new name, so you get yield_2019 instead. It also makes the columns self-documenting, which addresses the complaint from the very first slide that a wide dataset does not say what its numbers are.
+Read the pipeline from top to bottom. Yield data long enters pivot wider, names prefix supplies the literal text yield underscore, names from still says that year supplies the changing part of each header, and values from still says that yield fills the cells. Quoted column names work here just like the unquoted names in the preceding example. The prefix does not change any observations; it changes only the labels created during the pivot.
 
 </details>
 
@@ -281,6 +322,7 @@ yield_data_long %>%
 <summary>Transcript</summary>
 
 One more capability before we go the other way. So far we have widened a single value column, but datasets usually have several. These two tabs show that values_from accepts a vector of column names, so you can widen yield and rainfall in the same call. Look carefully at the resulting column names, because this is the part that matters later: you get yield_2019, yield_2020, rainfall_2019, rainfall_2020. The new names combine the original variable with the year, joined by an underscore. Remember that structure, because reversing it is the trickiest thing in this lecture.
+The preparation tab recreates the eight state-year rows and adds one rainfall observation beside each yield observation, so yield and rainfall are two value columns measured for the same keys. In the demonstration, year is still the names from column, but the values from argument now receives a combine vector containing both yield and rainfall. Pivot wider therefore makes one pair of year columns for each value variable. No explicit names prefix is needed because tidyr uses the original value-column name as part of each new header when more than one value column is widened. That automatic combination is useful now, and it is also why the reverse pivot must later separate a header such as rainfall underscore 2020 into two meanings.
 
 </details>
 
@@ -386,10 +428,11 @@ yield_data_wide %>%
 <summary>Transcript</summary>
 
 If you widened with a prefix, you will want to strip it off when you go back. names_prefix on pivot_longer does exactly that, removing the given string from the front of each name before storing it. Otherwise your year column would contain yield_2019 rather than 2019. And note the sentence at the bottom, which catches people out: the resulting year column is character, not numeric, because column names are always text. If you intend to use it as a number, in a model or on an axis, convert it with as.numeric.
+The minus state selection leaves state in place as the identifier and pivots every other column. Names to calls the new header-label column year, values to calls the stacked measurement column yield, and names prefix removes yield underscore when that text is present. The currently saved object has bare 2019 and 2020 headers, so in this run there is simply no prefix to strip. The result still has the intended three roles: state identifies the unit, year identifies the occasion, and yield holds the measurement. Removing a prefix cleans the text, but it does not perform the numeric conversion mentioned below the code.
 
 </details>
 
-You do not want `year_` in front of the year numbers in the new `year` variable? You can use the `names_prefix` option as follows:
+You do not want `yield_` in front of the year numbers in the new `year` variable? You can use the `names_prefix` option as follows:
 
 ```{webr-r}
 yield_data_wide %>%  
@@ -410,6 +453,10 @@ Notice `year` is character. Convert it to numeric using `as.numeric()` if you us
 <summary>Transcript</summary>
 
 This is the hardest thing in this lecture, so take it slowly through the four tabs. The situation is that we widened two variables at once, so every column name now encodes two pieces of information, the variable and the year, glued together with an underscore. A single advanced pivot_longer can do this with .value, but these tabs use an explicit three-step route so you can see each part. The second tab shows you why an ordinary pivot_longer falls short. The trick taught here is to pivot everything into one long column first, then split the combined name into its two parts with separate, and then widen just the variable part back out again. Three steps, and the last tab puts them together.
+Start in Prep and compare the two objects. The long table has state and year as identifiers, with yield and rainfall beside them. Pivot wider takes names from year and values from both measurement columns, producing headers such as yield underscore 2019 and rainfall underscore 2020. The red objective is to recover exactly those original roles.
+The one-step tab shows the failure mode. Pivoting every column except state into a column called year and a column called yield does make the table longer, but those names are misleading. The new year column actually contains combined labels such as yield underscore 2019, while the new yield column mixes yield values and rainfall values. One ordinary pivot cannot tell which part of a combined header names the measurement and which part names the year.
+The separate tab makes those meanings explicit. First, pivot longer stores every combined header in type year and every number in value. The generic syntax shows the four jobs performed by separate: provide the data, name the character column to split, give the names of the new columns, and state the separator. In the example, separate splits type year at the underscore into type and year. Compare the before and after outputs on screen: value is unchanged, while one ambiguous label column becomes two useful columns.
+The three-step tab then pivots only type back across columns. Names from type creates separate yield and rainfall columns, while values from value supplies their contents. State and year are the remaining identifiers, so the result returns to one row per state-year combination. This route exists not merely to change the number of rows, but to recover the semantic structure that was packed into the wide column names.
 
 </details>
 
@@ -465,7 +512,7 @@ yield_data_wide <-
 
 #### one-step?
 
-You cannot revert this data back to the original long-formatted data in one step.
+You can revert it in one `pivot_longer()` call using the `.value` sentinel, although this deck demonstrates a more explicit three-step method.
 
 ```{webr-r}
 yield_data_wide %>% 
@@ -620,6 +667,7 @@ num_flights <-
 <summary>Transcript</summary>
 
 Now widen it. You want months across the top and carriers down the side, which means names_from is month and values_from is your count column. Use the names_prefix argument as well, so that your columns come out as month_1 rather than a bare 1, for the reason we discussed earlier. Look at the shape of the result: instead of a long list of carrier-month rows, you get a compact table with one row per carrier. This is the shape you would want for a printed table in a paper.
+The work area is where you should write that pipeline yourself. In the folded answer, num flights enters pivot wider, month supplies the new headers, month underscore is attached to each header, and num obs supplies the counts. The output chunk also assigns the result to num flights wide and wraps that assignment in parentheses so the saved object prints for checking. That assignment matters because Exercise 3 starts from the wide object you create here.
 
 </details>
 
@@ -669,6 +717,7 @@ num_flights_wide <-
 <summary>Transcript</summary>
 
 And now reverse it, to complete the circle. pivot_longer, gathering all the month columns, which you can select neatly with starts_with of month underscore rather than listing twelve of them. Strip the prefix off with names_prefix, and name the two new columns. Compare your answer with the object you created in exercise one. It should hold the same information, though the row ordering and the column types may differ, which is itself a useful thing to notice about round trips.
+In the answer, starts with month underscore selects only the twelve columns created by the previous pivot, so carrier stays in place as the identifier. Names to creates a column called month from those old headers, names prefix removes month underscore before the labels are stored, and values to stacks the counts in a column called num flights. The output should again have one row per carrier-month combination. Month is now character because it came from column names, whereas the original month in num flights was numeric, so matching information does not necessarily mean identical column types.
 
 </details>
 
@@ -941,7 +990,7 @@ left_join(data_x, data_y, by = keys)
 
 **Rules to be aware of**
 
--   [Rule 1]{style="color: blue;"}: It returns all rows from `data_x`, and all columns from `data_x` and `data_y`
+-   [Rule 1]{style="color: blue;"}: It returns all rows and columns from `data_x`, and all non-key columns from `data_y` by default
 -   [Rule 2]{style="color: blue;"}: Rows in `data_x` with no match in `data_y` will have NA values in the new columns
 -   [Rule 3]{style="color: blue;"}: If there are multiple matches between `data_x` and `data_y`, all combinations of the matches are returned
 
@@ -955,6 +1004,10 @@ The order of datasets matters.
 <summary>Transcript</summary>
 
 These tabs work through the simplest case, where each row on the left has exactly one match on the right. Start with the data prep tab and answer the question there yourself before moving on: what are the keys? Then the first demo joins them, and does it in both orders. Notice that here the order makes no difference, and the callout explains why: every row in each dataset has exactly one partner in the other, so nothing gets dropped or duplicated whichever way round you go. Then the later tabs deliberately break that symmetry by adding a county to one dataset and not the other, so you can see rules one and two actually operating.
+In Data prep, N and T are both two, so N times T gives four observations in each starting table. Set seed fixes the random draws so everyone sees the same made-up prices and yields. Run if generates prices between two and six and yields between one hundred eighty and two hundred eighty. The county and year vectors arrange those values so every county-year combination appears exactly once in each table. Printing the two tables side by side lets you identify county and year as the joint keys before seeing the answer.
+Demo 1 passes yield data as the left table, price data as the right table, and the combine vector county and year to by. Switching the tables reverses which measurement starts on the left, but it does not change the matched observations or the row count because both sides contain the same four keys exactly once. This is the special one-to-one situation described by the callout.
+Data prep 2 creates a six-row yield table by adding Chase County in both years. The surrounding parentheses save and display it. In Demo 2, putting price data on the left keeps its four Lancaster and Douglas rows, so the unmatched Chase rows that exist only on the right never enter the result. Putting yield data with Chase on the left keeps all six yield rows, and the two Chase rows receive N A for price because no right-hand key matches them. Those two outputs make the order rule visible rather than abstract.
+The keeping all rows tab addresses the case where dropping unmatched rows from either side is not acceptable. Full join uses the same county-year keys but retains the union of keys from both tables, so the Chase observations survive even when price data is written first. Move to the next demonstration after checking which function matches your actual intention: left join when the left table defines the population you must keep, and full join when unmatched rows from both tables matter.
 
 </details>
 
@@ -1068,7 +1121,7 @@ left_join(yield_data_with_chase, price_data, by = c("county", "year"))
 <br>
 
 ::: {.callout-note title="Remember?"}
--   **Rule 1**: `left_join()` returns all rows from `data_x`, and all columns from `data_x` and `data_y`
+-   **Rule 1**: `left_join()` returns all rows and columns from `data_x`, and all non-key columns from `data_y` by default
 -   **Rule 2**: Rows in `data_x` with no match in `data_y` will have NA values in the new columns
 :::
 
@@ -1092,6 +1145,7 @@ full_join(price_data, yield_data_with_chase, by = c("county", "year"))
 <summary>Transcript</summary>
 
 Now a more realistic case, one to many. The weather data here has several observations per county and year, one for each month, whereas the yield data has just one row per county-year. So each yield row has several weather rows it matches. Look carefully at what the join produces: the yield value gets repeated across every matching weather row. That is rule three in action, and it is correct behaviour, but it means your dataset has grown and any given yield figure now appears more than once. If you were to average yields on that result without thinking, you would be weighting by the number of weather observations.
+The preparation code makes twelve weather rows. Run if supplies a rainfall value between zero and twenty for each row. Repeating each county four times provides four observations per county, the year pattern assigns two months to each county-year, and the alternating four and five values label those months. Chase is present in weather but not in the current yield table. In the Demo, county and year are the only join keys, so month is intentionally not used to match. Each Lancaster or Douglas yield row therefore matches two monthly weather rows and appears twice, while the right-side Chase rows are omitted because yield data is on the left. Read the output row count as a diagnostic of both rule one and rule three.
 
 </details>
 
@@ -1134,6 +1188,7 @@ left_join(yield_data, weather_data, by = c("county", "year"))
 <summary>Transcript</summary>
 
 And now many to many, which is where you should be genuinely careful. The yield data now has multiple crops per county-year, and the weather data has multiple months per county-year, so both sides have several rows per key. The join produces every combination of the two, and the result grows quickly. Notice the commented-out line in the code, which passes relationship equals many-to-many. Recent versions of dplyr warn you when a join is many-to-many, precisely because it is so often a mistake, and that argument is how you confirm you meant it. If you see that warning and you were not expecting it, stop and check your keys.
+The new yield table contains eight rows. The first four random values are corn yields between one hundred eighty and two hundred eighty, the next four are soybean yields between forty and eighty, and the repeated county-year pattern gives both crops one row for every Lancaster and Douglas year. Weather still contributes two months for each of those county-year keys. Because crop and month are not join keys, each key has two crop rows on the left and two month rows on the right, producing four combinations. Across the four matching county-years, the join returns sixteen rows. That multiplication is the behavior you are acknowledging with relationship many-to-many, not a request for dplyr to change how the matches are formed.
 
 </details>
 
@@ -1170,6 +1225,9 @@ left_join(yield_data, weather_data, by = c("county", "year"))
 <summary>Transcript</summary>
 
 Two exercises to finish, and they are deliberately built as a pair. Both merge temperature onto the January flights, but one uses daily temperature and the other hourly. Before you write any code, answer the question each exercise asks: is this one-to-one, one-to-many, or many-to-many? Work it out by thinking about how many rows each dataset has per key, not by running it and seeing. That habit of predicting the relationship before joining is what stops you silently multiplying your dataset, and it is the real lesson of this whole section.
+The Preparation tab creates the three objects you need. Flights enters filter month equals one, then select keeps month, day, departure delay, and origin. Daily temperature starts from weather, keeps January, groups by origin, month, and day, and summarizes all hourly readings into one mean temperature for each airport-day. Hourly temperature instead keeps origin, month, day, hour, and temperature, so it still has many rows for a given airport-day. The difference between summarizing and selecting is what creates the two different join relationships.
+In Exercise 1, many flights can share an origin, month, and day, but daily temp January has only one row for that key. From the flight table's point of view this is many-to-one, or one-to-many if you describe the same relationship from the daily table's side. The left join uses origin, month, and day as its combine vector of keys, keeps every January flight, and attaches that day's mean temperature. The output chunk and folded answer show the same call.
+In Exercise 2, those same keys are repeated on both sides: there are many flights and many hourly weather observations per airport-day. Because hour is not included as a key, every flight matches every hourly temperature row for its day, making this many-to-many. The relationship argument set to many-to-many records that this multiplication is intentional and suppresses the diagnostic warning; it does not choose a single hour for each flight. That limitation is exactly why the next section introduces joins that can match observations in time more intelligently.
 
 </details>
 
@@ -1297,7 +1355,10 @@ left_join(flights_Jan, hourly_temp_Jan, by = c("origin", "month", "day"), relati
 <details class="transcript">
 <summary>Transcript</summary>
 
-Let me start with a join you have already written. In the exercises a moment ago you matched January flights to the hourly temperature at their origin airport, and it looked like it worked. Every flight came back, no warning, no error. But count the missing temperatures and fifty-two flights have none, because the weather station did not report for three particular hours. Nobody spots that in twenty-seven thousand rows. This is what equality joins do the moment your two datasets are on slightly different schedules, and it is why the rest of this section exists. What you actually wanted was the nearest observation in time, not the exactly matching one.
+Let me start with a new exact-hour equality join. In the exercises a moment ago you matched January flights to every hourly temperature row at their origin airport on the same day. Here you match each flight to the temperature at its origin airport for its scheduled departure hour, and it looks like it works. Every flight came back, no warning, no error. But count the missing temperatures and fifty-two flights have none, because the weather station did not report for three particular hours. Nobody spots that in twenty-seven thousand rows. This is what equality joins do the moment your two datasets are on slightly different schedules, and it is why the rest of this section exists. What you actually wanted was the nearest observation in time, not the exactly matching one.
+Data prep filters both source tables to January and keeps only the variables needed for the example. In the flight table, select renames time hour to scheduled departure hour and retains origin and departure delay. In the weather table, it renames the same timestamp variable to observation hour and retains origin and temperature. The different names let the later join state clearly which event time comes from which table.
+In A join that quietly fails, join by requires the same origin and exact equality between scheduled departure hour and observation hour. Because this is a left join, n row confirms that all 27,004 flights survived. Sum of is N A on the temperature column asks a different and essential question: how many left rows failed to acquire a weather value? The answer is fifty-two, which is why the important callout says row retention alone does not prove a successful match. The next tab filters those missing temperatures and counts them by origin and scheduled departure hour, revealing three unreported airport-hours rather than a random code failure. Rule two filled N A exactly as designed.
+The smaller example exists because you can inspect four irrigation events more easily than twenty-seven thousand flights. Readings stores field, a reading date converted from date text, and soil moisture. Irrigation stores field, its own independently timed irrigation date, and inches applied. The goal is not an equal date. It is to attach the most recent earlier reading to each irrigation event. No date occurs in both tables, while joining on field alone deliberately ignores time. With relationship many-to-many acknowledging the repeated fields, that field-only left join expands four irrigation events to ten combinations. The problem callout identifies the missing capability: we need a condition that can compare dates and then choose the closest qualifying row. Move to join by to write that condition.
 
 </details>
 
@@ -1325,7 +1386,7 @@ Both timestamps come from `time_hour`, renamed here to `dep_time` and `obs_time`
 
 #### A join that quietly fails
 
-You already did this in the last section: match each flight to the temperature at its origin, for its hour.
+This tab introduces a new exact-hour equality join: match each flight to the temperature at its origin for its scheduled departure hour.
 
 ```{webr-r}
 #| autorun: true
@@ -1431,6 +1492,7 @@ Four irrigation events became **ten** rows. Equality is the wrong tool: we do no
 <summary>Transcript</summary>
 
 To match on anything other than equality you need a different way of writing the keys, and that is `join_by`. Notice the two lines in the first block do exactly the same thing: `by` equals a character vector of names, and `join_by` with the names unquoted. So `join_by` is just a more expressive way of saying what you already know how to say. The payoff is the second block, where instead of naming a column you write a comparison: field, and irrigation date greater than or equal to reading date. That is no longer a key at all, it is a condition, and only `join_by` can express it.
+In both equality examples, county and year have the same names in x and y, so join by can match them without quotes. For the inequality form, read each expression from the left table to the right table: field matches the common field, the left-side irrigation date must be greater than or equal to the right-side reading date, and that admits readings taken on or before irrigation. The read-it-out-loud callout gives you the safest way to check the inequality direction. This is progress, but it is not yet a single-match solution. Field A on May twenty-second qualifies for all three of its earlier readings, so the inequality join returns all three. The Rolling join tab adds the instruction that chooses just the nearest qualifying date.
 
 </details>
 
@@ -1478,6 +1540,8 @@ This is an [inequality join]{style="color: blue;"}. It is progress, but look at 
 <summary>Transcript</summary>
 
 The inequality join gave us every earlier reading, but we only wanted one, the most recent. Wrapping the comparison in `closest` says exactly that: of all the rows satisfying the inequality, keep only the one where the two dates are nearest. Now every irrigation event usually gets one reading, although duplicate rows on the nearest date can return multiple matches. This is what is normally called a rolling join, because the value rolls forward in time until a newer one replaces it. Look at the last row though. Field B irrigated on the second of May, with no reading at or before that date, so it is NA; `closest` cannot invent a match. Then the last tab takes this straight back to the flights, where fifty-two missing temperatures become zero.
+In the first tab, field remains an equality condition and closest wraps only irrigation date greater than or equal to reading date. Four left-side irrigation events therefore produce four rows, with the latest earlier moisture value carried forward when one exists. Direction matters shows why the comparison sign is part of your research question. Greater than or equal searches at or before irrigation, while less than or equal searches at or after irrigation. Rolling backward cannot match field B on May second because no earlier reading exists. Rolling forward cannot match field A on May twenty-second because no later reading exists. In each case, the unmatched left row stays and the right-side columns become N A.
+Back to the flights, origin still has to match exactly, while closest chooses the latest observation time at or before each flight's scheduled departure hour. The result is saved as rolled. N row checks that all 27,004 flights remain and that no duplication occurred, while the missing-temperature count falls from fifty-two to zero. The comparison table is important because it checks both failure modes at once: a useful rolling join fixed the missing values without changing the number of observational units.
 
 </details>
 
@@ -1494,7 +1558,7 @@ left_join(irrigation, readings, join_by(field, closest(irrig_date >= read_date))
 <br>
 
 ::: {.callout-note title="This is a rolling join"}
-Four irrigation events in, four rows out. Each one carries the **most recent** reading that preceded it. The value "rolls" forward in time until a newer reading replaces it.
+Four irrigation events in, four rows out. Each irrigation carries its **most recent** preceding reading when one exists; otherwise it receives `NA`. The value "rolls" forward in time until a newer reading replaces it.
 :::
 
 #### Direction matters
@@ -1544,7 +1608,7 @@ sum(is.na(rolled$temp))   # ...and now?
 | `dep_time == obs_time` | 27,004 | **52** |
 | `closest(dep_time >= obs_time)` | 27,004 | **0** |
 
-The row count did not change, so nothing was duplicated. The 52 flights that fell in a reporting gap now carry the most recent observation before departure, which is the number you wanted all along.
+The row count did not change, so nothing was duplicated. The 52 flights that fell in a reporting gap now carry the most recent observation at or before each flight's scheduled departure hour, which is the number you wanted all along.
 :::
 ::::::::
 
@@ -1556,6 +1620,10 @@ The row count did not change, so nothing was duplicated. The 52 flights that fel
 <summary>Transcript</summary>
 
 A rolling join is deliberately one-directional, and sometimes that is wrong. If you just want the closest reading in time, whichever side it falls on, you have to look both ways. There is no single helper for this, so we build it: roll backward, roll forward, then compare the two gaps and keep the smaller one. Look at the first row of the intermediate table. Rolling backward found a reading seven days earlier, rolling forward found one just two days later. The rolling join gave you the seven-day-old reading; the nearest join gives you the two-day-old one. Same data, different answer, and which is correct depends entirely on your question.
+The Code tab implements those three numbered steps in one pipeline. Irrigation first joins to readings with the backward condition. Rename immediately preserves that result as date before and moisture before, which prevents the second join from leaving two indistinguishable reading columns. The next left join uses the forward condition and its rename creates date after and moisture after. The first mutate subtracts the dates in the appropriate order and converts each date difference to a plain numeric number of days, giving gap before and gap after.
+The second mutate creates the final moisture choice with if else. Choose the earlier measurement when there is no later gap, or when an earlier gap exists and is less than or equal to the later gap. Otherwise choose the later measurement. The N A checks matter because a comparison with a missing gap cannot by itself produce a usable true or false choice. Less than or equal also gives the earlier measurement priority if the two numeric gaps are equal. Printing nearest shows the full intermediate result so you can audit the decision rather than seeing only the selected value.
+The Compare tab uses select to display field, irrigation date, the two gaps, and the chosen moisture. For field A on May eighth, the seven-day earlier gap loses to the two-day later gap, so moisture twenty-two is selected instead of thirty. The important callout is not saying that nearest is more correct. It is showing that rolling and nearest answer different questions from the same rows.
+Use the final tab to choose deliberately. A rolling join is appropriate when direction carries meaning, especially when an analysis may use only information available before an event. Taking a later measurement there would leak future information. A two-sided nearest join is appropriate only when you want the best measurement of an underlying condition and before versus after has no substantive meaning.
 
 </details>
 
@@ -1635,6 +1703,10 @@ Neither is wrong. Choose the one your question needs.
 <summary>Transcript</summary>
 
 Three things to watch, and the first is a distinction worth getting straight. A reading five days before and a reading five days after are not a tie, because the inequality has already thrown one side away before `closest` ever looks at distance. A real tie means two rows sharing the same nearest date, which in practice means a duplicate in your lookup table, and then you do get both rows back and your dataset quietly grows. Second, unmatched rows are easy to miss at scale, so count your NAs rather than assuming. Third, if you have used `data.table`, you already know all of this as the roll argument. Same concepts, different spelling.
+The equidistant tab constructs one irrigation on May tenth and two readings exactly five days away on opposite sides. The first join uses greater than or equal and returns only May fifth; the second uses less than or equal and returns only May fifteenth. Each produces one row because the inequality filters a side before closest compares distances, exactly as the two-filters callout says.
+The real-tie tab instead creates two reading rows on the same May fifth date with different moisture values. Both are on the allowed side and both have the same nearest distance, so one irrigation row becomes two result rows. The warning callout tells you to compare n row before and after because closest selects a distance, not a unique record. Duplicate lookup keys can therefore reactivate rule three even in a rolling join.
+The unmatched example saves a backward rolling result and sums is N A on read date. That explicitly counts left-side events for which no right-side date satisfied the inequality. In a large dataset, make this check part of the join rather than relying on visual inspection.
+If you know data table, read on as the mapping between differently named keys: field matches field, and reading date in the lookup is aligned with irrigation date in the event table. Roll true requests the most recent value at or before the event, while roll nearest requests the closest value in either direction. These examples are marked not run because they are a syntax reference, but the final callout gives you the conceptual translation to the dplyr operations used in this section.
 
 </details>
 
@@ -1733,6 +1805,10 @@ readings[irrigation, on = .(field, read_date = irrig_date), roll = "nearest"]
 <summary>Transcript</summary>
 
 Two exercises, and the second one matters more than the first. The first is deliberately the opposite direction from the demonstration: you want the first rain on or after planting, so work out which way the inequality points before you write it. Field A had rain two days before planting, which should not be selected, and field C has no rain after planting at all. The second asks for the nearest rain in either direction, and then asks whether that is actually the right answer. It is not. For fields A and C the nearest rain fell before the seed was even in the ground, and field C's honest NA becomes a date that means nothing. Nearest is not an upgrade. It answers a different question.
+Preparation gives planting one date for each of fields A, B, and C. Rain has its own field, date, and inches columns, with multiple events for A and B but only an earlier event for C. As date converts every displayed date string into a value R can compare and subtract. Inspect the two printed tables before joining so you can predict the matches from the calendar rather than treating the output as a surprise.
+For Exercise 1, planting is the left table, field must match, and closest wraps planting date less than or equal to rain date. Read that condition aloud as rain occurring on or after planting. Closest then selects the first qualifying rain. Field A's April eighteenth rain is rejected and April twenty-seventh is selected. Field B receives May sixth. Field C remains in the left-join result but gets N A because no rain date satisfies the condition. The output chunk and folded answer show the same call so you can check your work without opening the solution first.
+Exercise 2 builds both directions but stops at the comparison table so you make the final decision yourself. The first join finds rain at or before planting and renames its columns date before and inches before. The second finds rain at or after planting and renames those columns date after and inches after. Mutate converts the two date differences into numeric gaps, and select keeps only the field, planting date, candidate dates, and gaps needed to compare them. The pipeline does not create a final nearest column on screen; you choose the smaller available gap by reading the result.
+The discussion supplies that interpretation. Nearest selects April eighteenth for A, May sixth for B, and May tenth for C. Only B agrees with the forward rolling question. For A and C, the smaller gap points to rain before planting, which cannot answer whether the crop received water after it entered the ground. The important callout explains why replacing C's honest N A with a plausible-looking but irrelevant date is dangerous. Keep the final habit on screen: state the relationship and direction your question requires first, then verify the join against those predictions.
 
 </details>
 

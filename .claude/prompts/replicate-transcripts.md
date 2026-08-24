@@ -36,7 +36,7 @@ These files live outside this project. Read them; do not edit them.
 
    Blank lines around the prose are required or Pandoc will not render the markdown inside the <details>.
 
-   Follow the writing style section of lecture-transcripts.md exactly: second person addressing the class, 90-130 words, refer to what is on screen, say WHY not just WHAT, spell code out as speech ("bar-one-bar-two" not "|1|2"). Read several transcripts in 02-2-Quarto-revealjs.qmd before writing your own — matching the voice matters more than covering every detail.
+   Follow the writing style section of lecture-transcripts.md exactly: second person addressing the class, no word limit, refer to what is on screen, say WHY not just WHAT, spell code out as speech ("bar-one-bar-two" not "|1|2"). Read several transcripts in 02-2-Quarto-revealjs.qmd before writing your own — match the voice, and explain the slide completely rather than trimming for length.
 
 3. Tabset styling, if this project's tabs do not already look like the reference. Copy custom.scss lines ~129-180: green #06a666 underline, filled accent on the active tab, smaller pale-green #cfe9dd nested tabs. Adapt the colours to this project's accent if it differs — and if you do, change the transcript pill colour to match, since it was picked to agree with the tabs.
 

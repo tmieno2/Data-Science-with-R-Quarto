@@ -105,7 +105,7 @@ These notes are interactive, which is unusual and worth explaining. The box with
 <details class="transcript">
 <summary>Transcript</summary>
 
-The tidyverse is not one package but a collection bundled together, and the list shows the members we care about: readr for reading files, dplyr for manipulating them, tidyr for reshaping, ggplot2 for plots, and stringr for text. Today is mostly dplyr. Two honest caveats. These are not the only way to do any of this; base R can do all of it, and data.table does much of it faster. We use the tidyverse because it is easy to learn and easy to read. And because it is enormously popular, help is easy to find, which matters more than elegance when you are stuck.
+The tidyverse is not one package but a collection bundled together, and the list shows the members we care about: readr for reading files, dplyr for manipulating them, tidyr for reshaping, ggplot2 for plots, and stringr for text. Today is mostly dplyr. Two honest caveats. These are not the only way to do any of this; base R can do all of it, and data.table does much of it faster. We use the tidyverse because it is easy to learn and easy to read. And because it is enormously popular, help is easy to find, which matters more than elegance when you are stuck. The tidyverse website linked on screen is a good starting point: click a package icon there to open that package's documentation. Searching the package name will also turn up introductions and worked examples when you need a different explanation.
 
 </details>
 
@@ -208,7 +208,7 @@ Two objectives for this section. Learn the basic operations that work on both cl
 <details class="transcript">
 <summary>Transcript</summary>
 
-We will work with mtcars, which comes with R so you already have it. Run it, and check its class: it is a plain data.frame. Then we make a tibble version with as_tibble and call it mtcars_tbl. Now we have one of each, built from identical data, which is exactly what we need in order to compare them fairly. Note carefully which is which, because the rest of this section puts them side by side: mtcars is the data.frame, mtcars_tbl is the tibble.
+We will work with mtcars, which comes with R so you already have it. Run it, and check its class: it is a plain data.frame. Then we make a tibble version with as_tibble and call it mtcars_tbl. Now we have one of each, built from identical data, which is exactly what we need in order to compare them fairly. Note carefully which is which, because the rest of this section puts them side by side: mtcars is the data.frame, mtcars_tbl is the tibble. The left arrow stores the converted object under its new name, and autorun true makes that setup run automatically when the tab loads. The final class call reports tbl-d-f, tbl, and data.frame. That last class is why a tibble can usually be passed to code written for an ordinary data.frame.
 
 </details>
 
@@ -288,7 +288,7 @@ mtcars_tbl
 <details class="transcript">
 <summary>Transcript</summary>
 
-You can subset either object with square brackets, exactly as you did with a matrix in Chapter 1: rows before the comma, columns after. The example takes rows two through eight and columns three and five, from both objects side by side. Compare the two outputs. At this level they behave the same way, which is reassuring. The differences appear on the next two tabs, when we start picking out single columns.
+You can subset either object with square brackets, exactly as you did with a matrix in Chapter 1: rows before the comma, columns after. The example takes rows two through eight and columns three and five, from both objects side by side. Two colon eight creates the consecutive row positions, while c of three comma five combines the two nonadjacent column positions. Compare the two outputs. At this level they behave the same way, which is reassuring. The differences appear on the next two tabs, when we start picking out single columns.
 
 </details>
 
@@ -336,7 +336,7 @@ mtcars_tbl[2:8, c(3,5)]
 <details class="transcript">
 <summary>Transcript</summary>
 
-Selecting columns by number works, but I want to talk you out of it. The numbers carry no meaning: three and five tell a reader nothing about what those columns contain, including you in a month. Worse, they are fragile, because if the dataset gains a column at the front, every number shifts and your code quietly does something different. Referring to columns by name is better on both counts. Now look carefully at the two outputs on this slide, because they are not the same kind of thing, and the subsection underneath explains why that matters.
+Selecting columns by number works, but I want to talk you out of it. The numbers carry no meaning: three and five tell a reader nothing about what those columns contain, including you in a month. Worse, they are fragile, because if the dataset gains a column at the front, every number shifts and your code quietly does something different. Referring to columns by name is better on both counts. In the general form, c combines several quoted variable names after the comma. In the examples, mpg is the single requested column, and head limits each display to its first six entries so the outputs are easy to compare. Now look carefully at the two outputs on this slide, because they are not the same kind of thing, and the subsection underneath explains why that matters. The data.frame silently simplifies that one-column selection to a numeric vector, while the tibble remains a one-column tibble. That stable tibble behavior prevents code from changing type just because you selected one column instead of two. As the callout says, use the dollar sign or dplyr colon colon pull when you intentionally want a vector.
 
 </details>
 
@@ -406,7 +406,7 @@ Use `$` or `dplyr::pull()` when you genuinely want a vector, so your intent is w
 <details class="transcript">
 <summary>Transcript</summary>
 
-The third way to get a column is the dollar sign, which works because a data.frame is a special kind of list, exactly as we saw in Chapter 1. Note that on both classes the dollar sign gives you a plain vector. That consistency is precisely why the callout on the previous tab recommended it: when you want a vector, say so with the dollar sign or with pull, and then it does not matter which class you are holding or how many columns it has.
+The third way to get a column is the dollar sign, which works because a data.frame is a special kind of list, exactly as we saw in Chapter 1. Write the object, then dollar sign mpg, with no quotation marks around the column name. Head again shows only the first six values. Note that on both classes the dollar sign gives you a plain vector. That consistency is precisely why the callout on the previous tab recommended it: when you want a vector, say so with the dollar sign or with pull, and then it does not matter which class you are holding or how many columns it has.
 
 </details>
 
@@ -466,7 +466,7 @@ We will use the following data throughout this lecture:
 <details class="transcript">
 <summary>Transcript</summary>
 
-We need real data to work with, and we are using flights from the nycflights13 package, which records every flight out of the New York airports in 2013. It is a good teaching dataset because it is big enough to be realistic and about something everybody understands. The code makes a slimmer version keeping six columns, because the full thing has nineteen and that is a lot to look at on a slide. Do not worry about the select call yet; that is what we are about to learn.
+We need real data to work with, and we are using flights from the nycflights13 package, which records every flight out of the New York airports in 2013. It is a good teaching dataset because it is big enough to be realistic and about something everybody understands. The code makes a slimmer version keeping six columns, because the full thing has nineteen and that is a lot to look at on a slide. Do not worry about the select call yet; that is what we are about to learn. The data call loads the named dataset, and package equals nycflights13 tells R where to find it even though we have not attached that whole package. Dplyr colon colon select keeps year, month, origin, carrier, arrival delay, and departure delay in the order shown. The left arrow stores that result as flights_slim, while the parentheses around the assignment also print it for inspection. Autorun true makes this preparation happen as soon as the cell is ready.
 
 </details>
 
@@ -488,7 +488,7 @@ flights_slim <- dplyr::select(flights, year, month, origin, carrier, arr_delay, 
 <details class="transcript">
 <summary>Transcript</summary>
 
-We also build a second, much smaller dataset called flights_mini, and the code that makes it uses several functions you have not met. Do not try to decode it now. The line underneath is the important instruction: you are not expected to understand this yet, and you will understand all of it by the end of the lecture. For the moment just run it and look at the result, so you know what columns it has and roughly what is in it, because most of the examples that follow use it.
+We also build a second, much smaller dataset called flights_mini, and the code that makes it uses several functions you have not met. Do not try to decode it now. The line underneath is the important instruction: you are not expected to understand this yet, and you will understand all of it by the end of the lecture. For the moment just run it and look at the result, so you know what columns it has and roughly what is in it, because most of the examples that follow use it. When you return for review, here is what each line contributes. Distinct looks at month and day and keeps the first flight for each calendar date; dot keep all equals true retains every other column from each chosen row instead of returning only month and day. Filter then keeps day one and day two, with percent-in-percent testing membership in c of one comma two. Arrange orders those rows by month. Select keeps the nine listed variables in the displayed order, so the examples stay compact while retaining times, delays, air time, and origin. The chain creates twenty-four rows, two dates from each month. The left arrow names the result flights_mini, the surrounding parentheses print it after assignment, and autorun true runs the setup automatically.
 
 </details>
 
@@ -521,7 +521,7 @@ You do not have to understand the code just yet. You will, once you have complet
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the pipe, which changes how you write R more than any other single thing in this course. The rule is very simple: x pipe f is the same as f of x. The thing on the left becomes the input to the function on the right. Run both lines in the box and confirm they give the same answer. That is genuinely all the pipe does. It looks pointless on one function, and its value only becomes obvious when you chain four of them, which we get to shortly. The callout notes it comes from magrittr, which arrives with dplyr, so you never install it separately.
+Now the pipe, which changes how you write R more than any other single thing in this course. The rule is very simple: x pipe f is the same as f of x. The thing on the left becomes the input to the function on the right. In the example, seq starts at one, stops at ninety-nine, and by equals two advances in steps of two, so it creates the odd numbers from one through ninety-nine. The first line passes that vector as the ordinary argument to mean. The second line puts the same vector before percent-greater-than-percent, so mean receives it as its first argument. Run both lines in the box and confirm they give the same answer. That is genuinely all the pipe does. It looks pointless on one function, and its value only becomes obvious when you chain four of them, which we get to shortly. The callout notes it comes from magrittr, which arrives with dplyr, so you never install it separately.
 
 </details>
 
@@ -554,7 +554,7 @@ The piping operator `%>%` actually comes from the `magrittr` package, but it is 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the general case, where the function takes several arguments. If your function normally takes x1, x2, and some options, then piping something into it makes that thing the first argument, and everything you write in the parentheses fills in from the second onward. Read the callout, because it is the whole rule in one sentence: the object before the pipe becomes the first argument of the function after it. Every dplyr function is designed to take data as its first argument, which is exactly why they chain together so neatly.
+Now the general case, where the function takes several arguments. If your function normally takes x1, x2, and some options, then piping something into it makes that thing the first argument, and everything you write in the parentheses fills in from the second onward. Read the callout, because it is the whole rule in one sentence: the object before the pipe becomes the first argument of the function after it. Core dplyr data-manipulation verbs are designed to take data as their first argument, which is exactly why they chain together so neatly.
 
 </details>
 
@@ -601,7 +601,7 @@ That is, in general, an R object that precedes the piping operator (`%>%`) becom
 <details class="transcript">
 <summary>Transcript</summary>
 
-So what happens when the thing you are piping is not supposed to be the first argument? gsub is the example, because its first argument is the pattern to look for, not the data. Piping a string into it therefore fails, and the code shows why: it becomes gsub of the string, then a space, then nothing, which is not what you meant. The fix is the dot. A dot inside the function call means put the piped object here instead, so you can direct it to whichever argument you actually want. You will not need this often, but when you do, nothing else will work.
+So what happens when the thing you are piping is not supposed to be the first argument? gsub is the example, because its first argument is the pattern to look for, not the data. Piping a string into it therefore fails, and the code shows why: it becomes gsub of the string, then a space, then nothing, which is not what you meant. The fix is the dot. A dot inside the function call means put the piped object here instead, so you can direct it to whichever argument you actually want. You will not need this often, but when you do, nothing else will work. More precisely, gsub's three arguments here are the pattern to find, the replacement, and the character vector to change. The ordinary call looks for a space in a_string and replaces it with an empty string, so the displayed sentence loses all its spaces. The incorrect piped call may return a value rather than an R error, but it fails to perform that intended replacement. The equivalence shown underneath makes the misplaced arguments visible. In the final call, the dot occupies gsub's third argument, so the pipe removes the spaces correctly. Code-track zero-point-five gives the code and output equal shares of the side-by-side cell; it changes the display layout, not the R result.
 
 </details>
 
@@ -698,7 +698,7 @@ seq(1, 99, by = 2) |> mean()
 <details class="transcript">
 <summary>Transcript</summary>
 
-You just met the dot, which lets you send the piped object somewhere other than the first argument. The native pipe has the same idea, written as an underscore, but it is far more restricted, and this is where people get caught. Two restrictions. First, the underscore has to be attached to a named argument: you cannot just drop it in positionally the way you can with a dot. Second, it may appear only once in the call, so anything where you need the piped object in two places is simply out of reach. Both of those are errors, not silent misbehaviour, so at least you find out immediately.
+You just met the dot, which lets you send the piped object somewhere other than the first argument. The native pipe has the same idea, written as an underscore, but it is far more restricted, and this is where people get caught. Two restrictions. First, when the underscore is used as an ordinary function argument, it has to be attached to a named argument: you cannot just drop it in positionally the way you can with a dot. Extraction chains are an exception in R 4.3 and later. Second, it may appear only once in the call, so anything where you need the piped object in two places is simply out of reach. Both restrictions produce errors, not silent misbehaviour, so at least you find out immediately.
 
 </details>
 
@@ -710,7 +710,7 @@ a_string %>% gsub(" ", "", .)      # magrittr: positional is fine
 a_string |> gsub(" ", "", x = _)   # native: must be a NAMED argument
 ```
 
-+ `_` must attach to a **named** argument. `gsub(" ", "", _)` is an error.
++ When `_` is used as an ordinary function argument, it must attach to a **named** argument. `gsub(" ", "", _)` is an error, but extraction chains such as `_$a` work in R 4.3 and later.
 + `_` may appear **only once**. `%>%` lets you write `rep(., .)`; `|>` cannot.
 
 #### Gotchas
@@ -718,7 +718,7 @@ a_string |> gsub(" ", "", x = _)   # native: must be a NAMED argument
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two more places the native pipe is stricter, and both produce errors that read oddly the first time you see them. One: the right-hand side has to be an actual function call, with parentheses. With magrittr you can pipe into a bare function name, mean with no brackets, and it works. With the native pipe that is a syntax error. Two: magrittr lets you pipe into a braces block, which is occasionally handy for a quick calculation on the piped object. The native pipe does not support that at all. Neither of these is a disaster; they are just the kind of thing that makes borrowed code fail in a way you cannot immediately explain.
+Two more places the native pipe is stricter, and both produce errors that read oddly the first time you see them. One: the right-hand side has to be an actual function call, with parentheses. With magrittr you can pipe into a bare function name, mean with no brackets, and it works. With the native pipe that is a syntax error. Two: magrittr lets you pipe into a braces block, which is occasionally handy for a quick calculation on the piped object. The native pipe does not support that at all. The middle two rows repeat the placeholder restrictions from the previous tab: the underscore needs a named argument and can appear only once. The final row is about extracting a component. Magrittr uses dot-dollar-a, while the native pipe uses underscore-dollar-a, and that native shorthand requires R version four-point-three or later. Neither set of differences is a disaster; they are just the kind of thing that makes borrowed code fail in a way you cannot immediately explain.
 
 </details>
 
@@ -755,7 +755,7 @@ In your own code afterwards either is fine, but **do not mix them in one chain**
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is where the pipe earns its keep. Four operations, chained, each line handing its result to the next: start with the data, select three columns, move one to the front, keep the early months. Read it top to bottom and it describes exactly what happens, in the order it happens. The callout states the rule formally, and the sentence after it is worth following through: relocate does not receive flights_mini, it receives whatever select produced. Each step sees the output of the step above it, and nothing else.
+Here is where the pipe earns its keep. Four operations, chained, each line handing its result to the next: start with the data, select three columns, move one to the front, keep the early months. Read it top to bottom and it describes exactly what happens, in the order it happens. The callout states the rule formally, and the sentence after it is worth following through: relocate does not receive flights_mini, it receives whatever select produced. Each step sees the output of the step above it, and nothing else. Specifically, select keeps year, month, and departure time; relocate moves departure time ahead of the other two; and filter keeps rows where month is at most three. Because the data arrive through the pipe as the first argument each time, those function calls need only the columns or condition that define their own step.
 
 </details>
 
@@ -789,7 +789,7 @@ For example, in the code above, `relocate(dep_time)` receives as its first argum
 <details class="transcript">
 <summary>Transcript</summary>
 
-This tab makes the case for the pipe by showing you the alternatives, and it is worth clicking through all three. The first does it with intermediate objects, a1 and a2, which work but litter your environment with things you do not care about and will not remember the meaning of. The second nests the calls inside each other, which creates no clutter but has to be read inside out, in the reverse of the order it executes. The third uses the pipe, and reads in the order things happen. Look at all three and decide for yourself which one you would rather come back to in six months.
+This tab makes the case for the pipe by showing you the alternatives, and it is worth clicking through all three. The first does it with intermediate objects, a1 and a2, which work but litter your environment with things you do not care about and will not remember the meaning of. The second nests the calls inside each other, which creates no clutter but has to be read inside out, in the reverse of the order it executes. The third uses the pipe, and reads in the order things happen. Look at all three and decide for yourself which one you would rather come back to in six months. In Setup, a1 filters flights_mini to months one through three, a2 selects year, month, and departure time from that result, and a3 relocates departure time to the front. Alternative 1 performs the same filter, select, and relocate by nesting the calls and assigns only the final result to a3. Alternative 2 also assigns only a3, but its pipe lets you follow those three operations from top to bottom in execution order.
 
 </details>
 
@@ -888,6 +888,8 @@ There are other useful functions, but we limit our attention to those above, whi
 <summary>Transcript</summary>
 
 filter is for choosing rows. You hand it the data and one or more logical conditions, and you get back only the rows where those conditions are true. The mental model to hold is that filter works down the dataset, testing each row and keeping or discarding it. Nothing about the columns changes. The tabs inside cover the basic syntax, examples, how to combine several conditions, and then exercises, so work through them in order.
+In the Examples tab, double equals tests whether month is four, exclamation-equals tests whether it is not four, and less-than keeps months before April. Remember that a single equals sign does not perform this comparison. In Multiple Conditions, ampersand means both conditions must be true, so month at least nine and at most eleven keeps September through November. Supplying those two conditions as separate filter arguments means the same thing. The vertical bar means either condition may be true, so month at least eleven or at most one keeps November, December, and January. Percent-in-percent is the cleanest choice for an explicit list: month percent-in-percent c of one comma two comma three asks whether each month appears anywhere in that vector. The longer chain of equality tests joined with vertical bars is equivalent, but harder to extend and read.
+The exercises make you choose among those forms. For June and July, test membership in c of six comma seven. For January, April, July, September, and December, put those five month numbers in the vector. The last exercise switches deliberately to flights_slim because that dataset has carrier, then compares carrier to the quoted text U-S. The answers are folded so you can attempt each blank live cell before revealing them.
 
 </details>
 
@@ -1039,6 +1041,7 @@ dplyr::filter(flights_slim, carrier == "US")
 <summary>Transcript</summary>
 
 Where filter chooses rows, select chooses columns, and the syntax is pleasingly simple: the data, then the names of the columns you want, unquoted. The other half of this tab is the minus sign, which inverts the request: rather than naming what to keep, you name what to drop and everything else stays. That is much less typing when you have twenty columns and want to lose one, and it is more robust too, because it keeps working when new columns arrive.
+The first example returns a one-column tibble containing arrival delay. The second keeps month, arrival delay, and departure delay, and the output follows the order in which you name them. The third puts a minus sign before year and month, so those two disappear while every other column remains. That keep-versus-drop distinction is what the exercises test: use minus arrival delay when you want everything except that column, but list month and arrival delay positively when those are the only two you want. Again, try the empty live cell before unfolding the answer.
 
 </details>
 
@@ -1152,7 +1155,7 @@ dplyr::select(flights_mini, month, arr_delay)
 <details class="transcript">
 <summary>Transcript</summary>
 
-relocate is a small convenience that you will use more than you expect. It changes the order of columns: whichever ones you name move to the front, and everything else keeps its existing order behind them. This matters purely for readability. When a dataset has twenty columns and you have just computed the one you care about, it lands at the far right where you cannot see it, and relocate brings it into view. That is why nearly every example in this lecture ends with a relocate.
+relocate is a small convenience that you will use more than you expect. It changes the order of columns: whichever ones you name move to the front, and everything else keeps its existing order behind them. This matters purely for readability. When a dataset has twenty columns and you have just computed the one you care about, it lands at the far right where you cannot see it, and relocate brings it into view. That is why nearly every example in this lecture ends with a relocate. In the code on screen, departure time becomes the first column and departure delay becomes the second, in exactly the order supplied. No rows or values change.
 
 </details>
 
@@ -1173,6 +1176,11 @@ The chosen variables move to the front, and the order of the remaining variables
 <summary>Transcript</summary>
 
 mutate is how you create new variables, and it is probably the verb you will use most in real work. The syntax is the data, then the name of the new variable, an equals sign, and an expression that computes it. That expression can use any of the existing columns. Note the parenthetical in the introduction: if you give it a name that already exists, it overwrites that column rather than adding one, which is sometimes exactly what you want and occasionally a nasty surprise.
+Start with the Example tab. Gain is arrival delay minus departure delay, so it measures how much delay changed while the flight was in progress. The next line keeps months one and two only, and relocate moves gain to the front so you can inspect it. In Multiple Variables, a single mutate creates gain, loss as the reverse subtraction, and gain_per_hour. Air time is recorded in minutes, so dividing it by sixty converts it to hours before gain is divided by it. Mutate evaluates these definitions from top to bottom, which is why gain_per_hour can use gain created just above it in the same call. The final pipe again limits the rows and brings the two gain measures forward.
+The Function tab shows that the expression may call a function. Mean of arrival delay with n-a dot r-m equals true calculates one overall mean while ignoring missing delays. Because these data are not grouped and mutate preserves the rows, that same mean is repeated in avg_arr_delay for every retained observation. Filter then shows January, and relocate makes the new column visible. The callout gives the general requirement: a function used this way must accept a whole variable column as its input.
+Selective Mutation is for changing values only when a condition is met. Ifelse takes three pieces: a test, the value used when it is true, and the value used when it is false. In the first example, J-F-K rows get departure time plus ten and every other row keeps its original departure time. Keeping that result in dep_time_correct protects the original column, relocate places the origin, old time, and corrected time together, and arrange sorts by origin so you can check the rule in blocks. In the dichotomous example, an arrival delay above zero gets the label time-loss; zero or less gets time-gain. These labels are quoted because they are character values.
+When you have more than two outcomes, case_when is easier to read than nested ifelse calls. Each line pairs a logical condition on the left of the tilde with the value to assign on the right. The example overwrites the abbreviated origin column by mapping J-F-K, E-W-R, and L-G-A to their full airport names, then relocates that column. Any row that matches none of the listed conditions would receive a missing value, so in your own data you should decide whether you need a final fallback case.
+The exercises combine these ideas with earlier verbs. Exercise 1 filters April and May together, computes their combined mean arrival delay while removing missing values, repeats it as avg_arr_delay, and relocates it. Exercise 2 filters January, February, and December, computes the combined sum of departure delay with missing values removed, names it sum_dep_delay, and moves it to the first column. There is no group_by in either chain, so these are one combined mean and one combined sum, not separate monthly results. Try each Work Here cell before opening its folded Answer tab.
 
 </details>
 
@@ -1369,7 +1377,7 @@ flights_mini %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-rename does what its name says, and the only thing to get right is the direction, which people reliably get backwards. It is new name equals old name. The new one goes on the left, which matches how assignment works everywhere else in R, but reads oddly the first time because you are naming the thing that does not exist yet. The example puts the renamed and the original side by side so you can check the correspondence. When it goes wrong, it is almost always because the order was reversed.
+rename does what its name says, and the only thing to get right is the direction, which people reliably get backwards. It is new name equals old name. The new one goes on the left, which matches how assignment works everywhere else in R, but reads oddly the first time because you are naming the thing that does not exist yet. The example puts the renamed and the original side by side so you can check the correspondence. When it goes wrong, it is almost always because the order was reversed. On the left, departure_delay replaces dep_delay and departure_time replaces dep_time. Select then displays month with those two renamed columns, in that order, and head limits the comparison to six rows. The right-hand code selects the corresponding original names and also shows six rows. Autorun true runs both comparison cells automatically so the correspondence is visible without another click.
 
 </details>
 
@@ -1423,7 +1431,7 @@ flights_mini %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-arrange sorts rows by the values of one or more variables. By default it sorts ascending, smallest first, which the first inner tab shows. To go the other way you wrap the variable in desc, on the second tab. Two things worth knowing beyond the basics: you can give several variables and it sorts by the first, breaking ties with the second, and missing values go to the bottom regardless of direction. Sorting is often how you answer a question, since which is the largest is just arrange plus looking at the top.
+arrange sorts rows by the values of one or more variables. By default it sorts ascending, smallest first, which the first inner tab shows. To go the other way you wrap the variable in desc, on the second tab. Two things worth knowing beyond the basics: you can give several variables and it sorts by the first, breaking ties with the second, and missing values go to the bottom regardless of direction. Sorting is often how you answer a question, since which is the largest is just arrange plus looking at the top. In both displayed examples, departure delay is the sorting variable. Head then prints only the first six rows, so the ascending tab exposes the smallest delays and the descending tab exposes the largest.
 
 </details>
 
@@ -1467,7 +1475,7 @@ dplyr::arrange(flights_mini, desc(dep_delay)) %>% head()
 <details class="transcript">
 <summary>Transcript</summary>
 
-This slide is short and important, so do not skip past it. Every operation we have done has left the original data completely unchanged. filter did not remove rows from flights_mini; it produced a new object with fewer rows and handed it to you. That is true of every dplyr verb without exception. The practical consequence is on the slide: if you want to keep a result, you must assign it to something. If you run a long pipe and then wonder why your data looks the same, this is why. Nothing was saved because nothing was assigned.
+This slide is short and important, so do not skip past it. Every operation we have done has left the original data completely unchanged. filter did not remove rows from flights_mini; it produced a new object with fewer rows and handed it to you. That is true of every dplyr verb without exception. The practical consequence is on the slide: if you want to keep a result, you must assign it to something. If you run a long pipe and then wonder why your data looks the same, this is why. Nothing was saved because nothing was assigned. The example keeps month four, assigns that transformed result to the new name flights_mini_filtered, and then evaluates that name on the final line to print the saved object. You could instead assign back to flights_mini, but that deliberately replaces your reference to the original, so use a new name when you still need both versions.
 
 </details>
 
@@ -1496,7 +1504,7 @@ flights_mini_filtered
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now grouped operations, which is where dplyr becomes genuinely powerful. The motivating question is the kind you actually ask of data: not what is the average delay, but what is the average delay for each carrier, so you can compare them. That is a group-wise operation, and it is two functions working together. group_by declares which variable defines the groups, and summarize then computes one row of results per group. Those two, used as a pair, answer an enormous share of real research questions.
+Now grouped operations, which is where dplyr becomes genuinely powerful. The motivating question is the kind you actually ask of data: not what is the average delay, but what is the average delay for each carrier, so you can compare them. That is a group-wise operation, and it is two functions working together. group_by declares which variable defines the groups, and summarize then computes one row of results per group. Those two, used as a pair, answer an enormous share of real research questions. The syntax on screen allows one grouping variable or several, separated by commas. Summarize then receives that grouped dataset and an expression for the one value you want from each group. The next tab turns this general form into working code.
 
 </details>
 
@@ -1521,7 +1529,7 @@ summarize(grouped dataset, expression)
 <details class="transcript">
 <summary>Transcript</summary>
 
-The tabs here take it in two steps and then put them together, which is worth following carefully because the first step is confusing on its own. Grouping a dataset appears to do nothing: the printed output looks the same as before. All group_by has done is attach a note saying that subsequent operations should happen group by group, and the only visible sign is a Groups line in the printed header. The work happens on the second step, when summarize sees that note and produces one row per group instead of one row overall. The third tab writes the whole thing as a single pipe, which is how you will actually write it.
+The tabs here take it in two steps and then put them together, which is worth following carefully because the first step is confusing on its own. Grouping a dataset appears to do nothing: the printed output looks the same as before. All group_by has done is attach grouping metadata. Group-aware verbs use the grouping, while other verbs may only preserve the grouping metadata, and the only visible sign is a Groups line in the printed header. The work happens on the second step, when summarize uses the grouping and produces one row per group instead of one row overall. The third tab writes the whole thing as a single pipe, which is how you will actually write it. In Step 1, group_by uses carrier as the grouping variable and the left arrow saves the grouped data as flights_carrier; evaluating that name prints it so you can find the Groups header. In Step 2, summarize takes that grouped object and names its result mean_arr_delay. Mean receives each carrier's arrival-delay vector, and n-a dot r-m equals true removes missing delays before calculating the mean. The Piped tab performs the same grouping and summary without keeping an intermediate flights_carrier object.
 
 </details>
 
@@ -1538,7 +1546,7 @@ flights_carrier <- dplyr::group_by(flights_slim, carrier)
 flights_carrier
 ```
 
-`flights_carrier` looks no different from `flights_slim`. All `group_by()` did was tell R that whatever you do next should be done group by group, which is why the printed output now carries a "Groups" line.
+`flights_carrier` looks no different from `flights_slim`. All `group_by()` did was attach grouping metadata. Group-aware verbs use the grouping, while other verbs may only preserve the grouping metadata, which is why the printed output now carries a "Groups" line.
 
 #### Step 2: summarizing
  
@@ -1567,7 +1575,7 @@ flights_slim %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-summarize is not limited to means. Anything that takes a vector and returns a single value works: minimum, maximum, median, standard deviation, a quantile. The example computes three different summaries in one call, which is the normal way to use it, because you almost always want more than one number per group. Note that each gets a name on the left of an equals sign, and those names become the column names of the result. Name them descriptively; you will be reading them later.
+summarize is not limited to means. Anything that takes a vector and returns a single value works: minimum, maximum, median, standard deviation, a quantile. The example computes three different summaries in one call, which is the normal way to use it, because you almost always want more than one number per group. Note that each gets a name on the left of an equals sign, and those names become the column names of the result. Name them descriptively; you will be reading them later. Here all three functions receive arrival delay separately within each carrier. Mean gives the average, min gives the smallest value, and quantile with prob equals zero-point-nine gives the ninetieth percentile, the value at or below which about ninety percent of the nonmissing delays fall. N-a dot r-m equals true tells each function to remove missing values first, because otherwise a missing delay can make the summary itself missing.
 
 </details>
 
@@ -1588,7 +1596,7 @@ flights_slim %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-One function deserves its own tab because you should use it almost every time: n, which counts the rows in each group and takes no arguments at all. Read the callout, because this is a point about doing statistics honestly rather than about R. A carrier with three flights and a carrier with thirty thousand flights both produce a mean arrival delay, and those two means are not equally trustworthy. Reporting the group size alongside the group mean lets your reader, and you, see which comparisons are worth anything. Get into the habit now.
+One function deserves its own tab because you should use it almost every time: n, which counts the rows in each group and takes no arguments at all. Read the callout, because this is a point about doing statistics honestly rather than about R. A carrier with three flights and a carrier with thirty thousand flights both produce a mean arrival delay, and those two means are not equally trustworthy. Reporting the group size alongside the group mean lets your reader, and you, see which comparisons are worth anything. Get into the habit now. The pipe groups flights_slim by carrier, then one summarize call creates both outputs: n_flights from n with empty parentheses, and mean_arr_delay from mean with missing delays removed. The result has one row per carrier, so you can judge each mean beside the number of flights that produced it.
 
 </details>
 
@@ -1619,7 +1627,7 @@ This is always worth reporting alongside a group mean. A carrier with 3 flights 
 <details class="transcript">
 <summary>Transcript</summary>
 
-This is the single most common source of wrong dplyr answers, so please read it properly. When you group by two variables and then summarize, dplyr removes only the last grouping variable. The result is still grouped by the first one. It does tell you, in a message and in the Groups line of the output, but it is a message people learn to skim past. The consequence is that everything you do next silently happens by carrier rather than on the whole dataset, and your numbers are wrong in a way that looks perfectly plausible. Two fixes: pass dot groups equals drop to summarize, or call ungroup afterwards. And the habit in the callout: when a dplyr result looks strange, check the Groups line first.
+This is the single most common source of wrong dplyr answers, so please read it properly. When you group by two variables and then summarize, dplyr removes only the last grouping variable. The result is still grouped by the first one. It does tell you, in a message and in the Groups line of the output, but it is a message people learn to skim past. The consequence is that subsequent group-aware operations still happen by carrier rather than on the whole dataset, and your numbers can be wrong in a way that looks perfectly plausible. Two fixes: pass dot groups equals drop to summarize, or call ungroup afterwards. And the habit in the callout: when a dplyr result looks strange, check the Groups line first. In the first example, group_by carrier comma month forms a group for each carrier-month combination, and summarize calculates one nonmissing mean arrival delay for each combination. Month is the last grouping variable and gets peeled off, leaving carrier. In the first remedy, dot groups equals quote drop quote asks summarize to remove all grouping as it creates the result. In the second, the three dots stand for the pipeline you have already built, and dplyr colon colon ungroup removes the grouping afterwards.
 
 </details>
 
@@ -1636,7 +1644,7 @@ flights_slim %>%
   dplyr::summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE))
 ```
 
-Notice the `# Groups: carrier` line in the output. Anything you do next still happens **by carrier**, which is usually not what you meant.
+Notice the `# Groups: carrier` line in the output. Subsequent group-aware operations still happen **by carrier** until you ungroup the data, which is usually not what you meant.
 
 Two ways to stop it:
 
@@ -1658,7 +1666,7 @@ If a `dplyr` result looks strange, check whether the data is still grouped. Prin
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is an important variation. Everything so far paired group_by with summarize, which collapses each group down to a single row. If you use mutate instead, the group calculation is computed and then attached back to every original row. So each flight keeps all its own information and gains a column holding its carrier and month average. That is what you want whenever you need to compare an observation against its own group, which is a very common thing to want: deviations from a group mean, shares of a group total, and so on.
+Here is an important variation. Everything so far paired group_by with summarize, which collapses each group down to a single row. If you use mutate instead, the group calculation is computed and then attached back to every original row. So each flight keeps all its own information and gains a column holding its carrier and month average. That is what you want whenever you need to compare an observation against its own group, which is a very common thing to want: deviations from a group mean, shares of a group total, and so on. The code groups by both carrier and month, calculates mean arrival delay inside each carrier-month group, and removes missing values with n-a dot r-m equals true. Relocate brings the repeated group mean to the first column. The left arrow saves the full row-level result as flights_new, and evaluating flights_new prints it. Notice that mutate does not drop either grouping variable, so this result is still grouped by carrier and month until you explicitly ungroup it.
 
 </details>
 
@@ -1683,6 +1691,10 @@ flights_new
 <summary>Transcript</summary>
 
 Now some exercises, and they build. The first asks which carrier had the worst average departure delay in a particular stretch of months, which is filter, then group_by, then summarize, then arrange, all four verbs in one chain. Then there is an instruction tab that loads a weather dataset for the New York airports, and the last two exercises work on that. Do them in order, because exercise three uses the object you create in exercise two. Every one has a folded answer, but genuinely try it first; reading a solution creates a much weaker memory than producing one.
+In Exercise 1, month percent-in-percent five colon eight keeps May through August. Group_by carrier creates one group per airline, summarize names the nonmissing average mean_dep_delay, and arrange of desc mean_dep_delay puts the longest average delay at the top. The blank WebR area is yours to work in; code-fold true keeps the supplied answer out of sight until you choose to inspect it.
+Before Exercise 2, the Instruction tab loads weather from nycflights13. Package equals nycflights13 tells data where that object lives, autorun true performs the setup automatically, and na.omit removes any row with a missing value in any weather column. The assignment replaces weather with that complete-case version, and the final bare name prints it so you can inspect its variables before summarizing them.
+Exercise 2 asks for one daily row per airport. Grouping by origin, month, and day defines an airport-date group. The four mean calls then produce daily temperature, humidity, wind speed, and precipitation, with each output deliberately retaining the familiar source-variable name. Missing-value removal is not repeated inside mean because na.omit already removed incomplete rows. The left arrow saves the result as daily_weather, and the surrounding parentheses print it. Under summarize's default behavior, day is peeled off but origin and month remain as grouping variables, so keep checking the Groups line as the earlier callout taught you.
+Exercise 3 starts from that daily_weather object. The first filter keeps months eleven, twelve, one, and two, and the second keeps only rows whose origin is the quoted airport code E-W-R. Separate filter calls are fine because the first result flows into the second. Together they return Newark's daily winter weather, and this dependence on daily_weather is why the exercises must be run in order.
 
 </details>
 
@@ -1793,7 +1805,6 @@ daily_weather %>%
 
 :::
 <!--end of panel-->
-
 
 
 

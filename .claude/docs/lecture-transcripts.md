@@ -58,8 +58,9 @@ These are spoken words, not prose. Match the existing 31 in `02-2`:
 
 - **Second person, addressing the class.** "So you've rendered your slides and
   you've got an HTML file. Now what?"
-- **90–130 words.** Long enough to be a real explanation, short enough that the
-  panel does not need scrolling.
+- **As long as the slide needs.** There is no word limit. Explain the slide
+  completely and stop when it is explained; never cut an explanation short to
+  hit a length. The panel scrolls, so a long transcript costs nothing.
 - **Refer to what is on screen.** "Look at the Code tab to see the syntax"; "the
   callout warns"; "flip between the two and note the relationship."
 - **Say why, not just what.** The transcript should carry the motivation the

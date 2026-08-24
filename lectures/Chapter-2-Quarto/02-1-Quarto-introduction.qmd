@@ -71,7 +71,7 @@ source(here::here("lectures/_lecture-theme.R"))
 <details class="transcript">
 <summary>Transcript</summary>
 
-Let's start with what Quarto is for. The core idea is that you write one document containing both your R code and the results that code produces, and Quarto assembles them into a finished report. These lecture notes are themselves written in Quarto, so you are looking at the output right now. The situation it is built for is the one you will actually be in: you have done an analysis and you need to show somebody, an advisor or a coauthor, both what you found and the code behind it. And this goes far beyond simple html documents; the gallery linked on the slide is worth a browse to see how far it stretches.
+Let's start with what Quarto is for. The core idea is that you write one document containing both your R code and the results that code produces, and Quarto assembles them into a finished report. These lecture notes are themselves written in Quarto, so you are looking at the output right now. The situation it is built for is the one you will actually be in: you have done an analysis and you need to show somebody, an advisor or a coauthor, both what you found and the code behind it. And this goes far beyond simple html documents; the gallery linked on the slide is worth a browse to see how far it stretches. The installation callout takes you to Quarto's official getting-started page. Use that link if the Render button or Quarto commands are missing on your machine, because you need Quarto itself installed before any of the workflow in this lecture can work.
 
 </details>
 
@@ -139,7 +139,7 @@ Generating a report using Quarto is a two-step process:
 <details class="transcript">
 <summary>Transcript</summary>
 
-Everything in a qmd file is one of two things: an R code chunk, or ordinary text. That is the whole model. What separates them is the special syntax in the callout, three backticks with r in curly braces, which fences off a piece of code and tells R to run it. Anything not inside that fence is treated as writing and passes through untouched. The Direction callout points you at sample_qmd.qmd, from the repository you cloned in the last lecture. Open it now and keep it open, because the rest of this lecture keeps pointing back at specific parts of it.
+Everything in a qmd file is one of two things: an R code chunk, or ordinary text. That is the whole model. What separates them is the special syntax in the callout, three backticks with r in curly braces, which fences off a piece of code and tells R to run it. Anything not inside that fence is treated as writing and passes through untouched. The Direction callout points you at sample_qmd.qmd, from the repository you cloned in the last lecture. Open it now and keep it open, because the rest of this lecture keeps pointing back at specific parts of it. In that sample, summary of cars and plot of pressure are each inside their own chunk fence. That is why R evaluates them as code instead of printing those expressions as ordinary text.
 
 </details>
 
@@ -185,7 +185,7 @@ If you have not cloned that repository yet, go back to lecture 02-0 and do it no
 <details class="transcript">
 <summary>Transcript</summary>
 
-The word for turning a qmd into a finished document is rendering, and you will hear me use it constantly from here on. The easy way is the Render button at the top of the code pane in RStudio. There is also a programmatic route, in the callout, using quarto_render from the quarto package, which matters when you want to render as part of a script rather than by hand. One warning from experience: there is no plain function called render available by default, so if you type that you will get a could not find function error.
+The word for turning a qmd into a finished document is rendering, and you will hear me use it constantly from here on. The easy way is the Render button at the top of the code pane in RStudio. There is also a programmatic route, in the callout, using quarto_render from the quarto package, which matters when you want to render as part of a script rather than by hand. One warning from experience: there is no plain function called render available by default, so if you type that you will get a could not find function error. In the command on screen, sample-underscore-qmd-dot-qmd is the file you are asking that function to render. The eval false option is there because this lecture is displaying the command as an example, not trying to render that sample file while the lecture itself is being built.
 
 </details>
 
@@ -285,7 +285,7 @@ YAML uses indentation to express nesting. `toc` is indented under `html`, which 
 <details class="transcript">
 <summary>Transcript</summary>
 
-This is a small feature that changes how you write. You can drop an R expression directly into a sentence, using a backtick followed by r and then the code, and what appears in the output is the value. So instead of typing the cars dataset has fifty rows, you write an expression that counts the rows, and the number appears. The reason this matters is in the callout. When your data changes, and it always does, that number updates itself the next time you render. You never again go hunting through your prose for hard-coded numbers that are now wrong.
+This is a small feature that changes how you write. You can drop an R expression directly into a sentence, using a backtick followed by r and then the code, and what appears in the output is the value. So instead of typing the cars dataset has fifty rows, you write an expression that counts the rows, and the number appears. The reason this matters is in the callout. When your data changes, and it always does, that number updates itself the next time you render. You never again go hunting through your prose for hard-coded numbers that are now wrong. The Direction callout sends you to the source of the sample document so you can compare the inline expression you type with the value that appears in the finished sentence.
 
 </details>
 
@@ -319,7 +319,7 @@ See the section **"Inline code"** and the `inline-demo` chunk. Look at how the s
 <details class="transcript">
 <summary>Transcript</summary>
 
-The writing itself is done in Markdown, and this table is the practical subset you need. Hashes make headers, and more hashes make smaller ones. Plus signs make bullets, numbers make numbered lists. Single asterisks give italic, double give bold, backticks give code style inside a sentence. Single dollars put maths in a line, double dollars put it on its own centered line. Square brackets followed by parentheses make a link, and the same with an exclamation mark in front inserts a figure. Keep this table; it is the one slide you will come back to during an assignment. The Direction asks you to compare each row against the sample file.
+The writing itself is done in Markdown, and this table is the practical subset you need. Hashes make headers, and more hashes make smaller ones. Plus signs make bullets, numbers make numbered lists. Single asterisks give italic, double give bold, backticks give code style inside a sentence. Single dollars put maths in a line, double dollars put it on its own centered line. Square brackets followed by parentheses make a link, and the same with an exclamation mark in front inserts a figure. A citation key, such as at-sign smith-twenty-twenty inside square brackets, is the citation syntax you will learn in 02-4. Keep this table; it is the one slide you will come back to during an assignment. The Direction asks you to compare each row against the sample file.
 
 </details>
 
@@ -353,7 +353,7 @@ Compare the section called **"Markdown basics"** in the qmd file with the corres
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the single most important thing in this lecture, because it is what students get stuck on more than anything else. When you render, R starts a completely fresh session that has no connection to the one you have been working in. It cannot see objects you made in the console, and it cannot see packages you loaded by hand. So everything the document needs has to be created inside the document itself, in order, top to bottom: every library call, every dataset, every object. The callout gives you the habit that prevents this: restart R, then run all chunks. If that works, your render will work.
+Now the single most important thing in this lecture, because it is what students get stuck on more than anything else. When you render, R starts a completely fresh session that has no connection to the one you have been working in. It cannot see objects you made in the console, and it cannot see packages you loaded by hand. So everything the document needs has to be created inside the document itself, in order, top to bottom: every library call, every dataset, every object. The callout gives you the habit that prevents this: restart R, then run all chunks. If that works, the document's R code is likely reproducible, but rendering can still fail elsewhere.
 
 </details>
 
@@ -380,7 +380,7 @@ Before you render, do this:
 1. **Session > Restart R** (or `Ctrl/Cmd + Shift + F10`)
 2. **Run > Run All Chunks**
 
-If that works in a fresh session, the render will work. If it fails, you have found the missing `library()` or missing object before Quarto has to tell you about it.
+If that works in a fresh session, the document's R code is likely reproducible, but rendering can still fail elsewhere. If it fails, you have found the missing `library()` or missing object before Quarto has to tell you about it.
 :::
 :::
 <!--end of panel-->
@@ -398,7 +398,7 @@ If that works in a fresh session, the render will work. If it fails, you have fo
 <details class="transcript">
 <summary>Transcript</summary>
 
-You can give a chunk a name, using the label option on its own line inside the chunk. That is all there is to the syntax. It looks like a cosmetic detail and it is not, which is what the next tab is about. Notice the shape of it: the label goes on a comment line starting with a hash and a pipe, immediately after the chunk opens. That hash-pipe pattern is how every chunk option is written, so you are learning the general syntax here as well as this particular option.
+You can give a chunk a name, using the label option on its own line inside the chunk. That is all there is to the syntax. It looks like a cosmetic detail and it is not, which is what the next tab is about. Notice the shape of it: the label goes on a comment line starting with a hash and a pipe, immediately after the chunk opens. That hash-pipe pattern is how every chunk option is written, so you are learning the general syntax here as well as this particular option. The example names the chunk read-corn-price because the code beneath it reads corn-underscore-price-dot-csv and stores the result in an object called corn-underscore-price. A descriptive label lets you recognize the job of the chunk without opening it.
 
 </details>
 
@@ -549,7 +549,9 @@ R codes come here
 <details class="transcript">
 <summary>Transcript</summary>
 
-The next few tabs go through the options one small group at a time, and each group has matching chunks in the sample file so you can see the difference rather than take my word for it. Echo and eval control whether the code is shown and whether it is run. Message and warning control whether R's chatter reaches the reader. Output controls the results. Include is a convenient combination of several at once. And the figure options control size, alignment, and captions. Work through the tabs in order; they build on each other.
+The next few tabs go through the options one small group at a time, and each group has matching chunks in the sample file so you can see the difference rather than take my word for it. Echo and eval control whether the code is shown and whether it is run. Message and warning control whether R's chatter reaches the reader. Output controls the results. Include is a convenient combination of several at once. And the figure options control size, alignment, and captions. Work through the tabs in order; they build on each other. In the echo and eval tab, echo true shows the code and echo false hides it, while eval true runs the code and eval false does not run it. The four named sample chunks show every combination, which matters because hiding code and preventing code from running are different jobs. In the next tab, message false suppresses messages and warning false suppresses warnings. The sample chunks deliberately produce both so you can compare exactly which kind of chatter each option removes.
+
+Then look at output. Output true prints the results, including messages and warnings, output false hides all of those results while the code still runs, and output a-s-i-s inserts the result without Quarto adding its usual formatting. That last choice is for output that is already written as document content, so Quarto should not wrap it as ordinary printed output. The check chunk in the Direction callout proves that output false did not prevent evaluation. Include false is the all-at-once version for a chunk that must run but should contribute nothing visible: evaluation stays on, while code, output, warnings, and messages are all hidden. That is why it is so useful on a setup chunk that loads packages. The include-demo and include-demo-check pair in the sample makes that invisible evaluation visible to you. Finally, the figure tab separates four jobs. Figure-align chooses default, center, left, or right. Figure-width and figure-height set the drawing dimensions in inches, and figure-cap supplies the caption. Follow the Direction by changing the alignment or width in the sample, then render again so you see the option change rather than only reading its name. The link in that callout is the full figure-option reference for choices beyond these four.
 
 </details>
 
@@ -595,7 +597,7 @@ See the section **"`message` and `warning`"**. The chunks `message-warning-both`
 + `true`: prints all results, including warnings and messages
 <!-- CHANGED (A10): "pint" -> "print". -->
 + `false`: hides all results, including warnings and messages
-+ `asis`: inserts the result into the document exactly as it is, with no formatting applied
++ `asis`: inserts output as raw Markdown without Quarto's usual enclosing output container
 
 <br>
 
@@ -656,7 +658,9 @@ See the `fig-options` chunk in the sample file, which sets all four at once. Cha
 <details class="transcript">
 <summary>Transcript</summary>
 
-Everything so far has been per chunk, which is fine until you want the same setting everywhere. If your instructor wants results without code, you do not want to type echo false into forty separate chunks. These tabs show the global route: an execute block in the YAML header that applies to the whole document. There is also a tab on code-fold, which I would argue is usually the better answer for an assignment, because it hides the code behind a button rather than deleting it, so I can still check your work. And a short note at the end on the precedence rule.
+Everything so far has been per chunk, which is fine until you want the same setting everywhere. If your instructor wants results without code, you do not want to type echo false into forty separate chunks. These tabs show the global route: an execute block in the YAML header that applies to the whole document. There is also a tab on code-fold, which I would argue is usually the better answer for an assignment, because it hides the code behind a button rather than deleting it, so I can still check your work. And a short note at the end on the precedence rule. In the YAML example, title and author still describe the report. Under format, the html block turns on a table of contents through level-two headings, numbers sections through level two, and uses the familiar html settings from the earlier YAML tab. The new part is execute, aligned with format at the top level. Echo false hides code throughout the document, while warning false and message false suppress those two kinds of diagnostic output throughout. The Direction has you add the echo setting to the sample and compare the echo-eval section before and after, so you can see a global default working across several chunks.
+
+Now move to the code-fold tab. Code-fold true belongs inside the html format block because it changes how html displays code. It collapses each code block behind a Code button, so the report stays readable but the work remains available for inspection. Code-fold show uses the same folding interface but starts with the code expanded. Click the button on the sample's code-fold-demo figure to see that this is a display choice, not removal of the code. The final callout gives you the precedence rule: a local option on one chunk overrides the global setting. That exception is what lets you establish a sensible document-wide default and still treat one chunk differently when it needs to be shown.
 
 </details>
 
@@ -791,7 +795,7 @@ Restart R and run all chunks from the top. Most render failures show up immediat
 <details class="transcript">
 <summary>Transcript</summary>
 
-One more tool for when things break. By default a single failing chunk stops the entire render, which is usually what you want but occasionally is not. Setting error true on a chunk tells Quarto to print the error into the document and carry on building. Two uses. First, when you are deliberately demonstrating an error, which is exactly what the sample file does with log of a. Second, and more practically, when several chunks are broken and you want to see all the failures in one render instead of fixing them one at a time.
+One more tool for when things break. By default a single failing chunk stops the entire render, which is usually what you want but occasionally is not. Setting error true on a chunk tells Quarto to print the error into the document and carry on building. Two uses. First, when you are deliberately demonstrating an error, which is exactly what the sample file does with log of a. Log expects a numeric value, so giving it the character a produces the error you see. Second, and more practically, when several chunks are broken and you want to see all the failures in one render instead of fixing them one at a time.
 
 </details>
 
@@ -843,13 +847,14 @@ Here is a problem you will have as soon as your analysis gets slow. While writin
 <details class="transcript">
 <summary>Transcript</summary>
 
-Let's watch it happen rather than take it on trust. The Direction asks you to switch the cache_1 chunk from eval false to eval true and render. You will see two new folders appear next to your document, one ending in cache and one ending in files, which is where the stored results live. Then render a second time without changing anything, and notice how much faster it is. That difference is the cached chunk being skipped. Once you have seen the folders appear you will also recognize them when you need to delete them, which is coming up in two tabs.
+Let's watch it happen rather than take it on trust. The Direction asks you to switch the cache_1 chunk from eval false to eval true and render. You will see sample_qmd_cache appear next to your document, which is where the stored results live. The separate sample_qmd_files resource folder comes from an ordinary non-embedded render and holds the document's figures and other resources, not its cached results. Then render a second time without changing anything, and notice how much faster it is. That difference is the cached chunk being skipped. Once you have seen the cache folder appear you will also recognize it when you need to delete it, which is coming up in two tabs.
 
 </details>
 
 :::{.callout-note title="Direction"}
 + Change `eval: false` to `eval: true` in the **cache_1** chunk
-+ Render and confirm that **sample_qmd_cache** and **sample_qmd_files** folders are created
++ Render and confirm that the **sample_qmd_cache** folder is created
++ **sample_qmd_files** is the separate resource folder created by an ordinary non-embedded render; it does not store cached results
 + Render again and observe that the rendering process is much faster now
 :::
 
@@ -858,7 +863,7 @@ Let's watch it happen rather than take it on trust. The Direction asks you to sw
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the trap, and it is the reason caching has a bad reputation. If you change the code inside a cached chunk, R notices and re-runs it. That part is reliable. But if the code stays exactly the same while the data it uses has changed, R does not notice, because all it compares is the text of the code, not the contents of your objects. So it hands you the old result, silently, and it looks correct. The Direction walks you through producing exactly that failure on purpose, which is the fastest way to learn to distrust a stale cache.
+Now the trap, and it is the reason caching has a bad reputation. If you change the code inside a cached chunk, R notices and re-runs it. That part is reliable. But if the code stays exactly the same while the data it uses has changed, R does not notice, because all it compares is the text of the code, not the contents of your objects. So it hands you the old result, silently, and it looks correct. The Direction walks you through producing exactly that failure on purpose, which is the fastest way to learn to distrust a stale cache. First change eval false to eval true in cache-underscore-two and render. Then, in cache-underscore-one, change y gets one plus x plus v to y gets one plus two times x plus v. Cache-underscore-one re-runs because its own code changed, so MC-underscore-results changes. Cache-underscore-two still prints its old number because the text inside cache-underscore-two did not change. That mismatch is the stale result the next tab fixes.
 
 </details>
 
@@ -938,7 +943,7 @@ Put this in `_quarto.yml` and only the documents you have actually edited get re
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now file paths, which is where cannot open file errors come from. The default rule is simple: R looks for the file in the same folder as the qmd file, not wherever your console happens to be pointed. The slide shows this concretely with the actual folder this file lives in, and the full path R would therefore try. If the file is not at that exact location, the read fails, and everything downstream that needed the data fails with it. The next four tabs are three ways to handle this, in increasing order of how much I recommend them.
+Now file paths, which is where cannot open file errors come from. The default rule is simple: R looks for the file in the same folder as the qmd file, not wherever your console happens to be pointed. The slide shows this concretely with the actual folder the sample file lives in, and the full path R would therefore try. If the file is not at that exact location, the read fails, and everything downstream that needed the data fails with it. The next four tabs are three ways to handle this, in increasing order of how much I recommend them. In the example chunk, read-dot-csv receives only corn-underscore-price-dot-csv, so no folder has been supplied. Eval false keeps this teaching example visible without asking the lecture deck to open a data file that is not there. The blue text first names the templates folder containing the qmd, then corn-underscore-price-dot-csv in that same folder to show the exact location R would try.
 
 </details>
 
@@ -957,13 +962,13 @@ By default, R looks for **corn_price.csv** in the same folder in which the qmd f
 
 <br>
 
-+ In my case, `sample_qmd.qmd` is located in <span style = "color: blue;"> `r here::here("lectures", "Chapter-2-Quarto")` </span>.
++ In its repository, `sample_qmd.qmd` is located in the <span style = "color: blue;"> `templates` </span> folder.
 <!-- CHANGED (A5): was here::here("Chapter-2-Quarto"), which printed a path that
      does not exist. here::here() builds the string whether or not the folder is
-     real, so the slide was confidently displaying a fake location. The actual
-     folder is lectures/Chapter-2-Quarto. -->
+     real, so the slide was confidently displaying a fake location. The sample
+     file is in the templates folder of its companion repository. -->
 
-+ This means that R tries to find <span style = "color: blue;"> `r here::here("lectures", "Chapter-2-Quarto", "corn_price.csv")`</span>.
++ This means that R tries to find <span style = "color: blue;"> `corn_price.csv` in that same `templates` folder</span>.
 
 + If the file is not there, R cannot import it and returns an error. Everything downstream that depends on the dataset fails too.
 
@@ -972,7 +977,7 @@ By default, R looks for **corn_price.csv** in the same folder in which the qmd f
 <details class="transcript">
 <summary>Transcript</summary>
 
-Option one is to put your data in the same folder as your qmd and refer to it by name alone. It is the simplest thing that works and it is genuinely fine for a single short assignment, so do not feel bad about using it this week. But read the callout, because it has a shelf life. As soon as a project has more than a handful of files you will want data in one folder, code in another, and output in a third, and at that point this approach stops working. Later in the course we set projects up that way, and then option three is what you use.
+Option one is to put your data in the same folder as your qmd and refer to it by name alone. It is the simplest thing that works and it is genuinely fine for a single short assignment, so do not feel bad about using it this week. But read the callout, because it has a shelf life. As soon as a project has more than a handful of files you will want data in one folder, code in another, and output in a third, and at that point this approach stops working. Later in the course we set projects up that way, and then option three is what you use. The chunk repeats read-dot-csv with only the file name, and eval false again keeps the example from trying to read a file while this lecture renders.
 
 </details>
 
@@ -997,7 +1002,7 @@ Once a project has more than a handful of files, you will want data in its own f
 <details class="transcript">
 <summary>Transcript</summary>
 
-Option two is to write out the entire path from the root of your hard drive, and I am showing it to you mainly so you recognize it and avoid it. Look at the example: it has my username in it. That is the problem in miniature. It breaks the moment you rename any folder above it, it breaks on anybody else's computer including mine when I am grading, and it breaks on your own second machine. If you find yourself typing a path that starts with Users or C colon, stop.
+Option two is to write out the entire path from the root of your hard drive, and I am showing it to you mainly so you recognize it and avoid it. Look at the example: it has my username in it. That is the problem in miniature. It breaks the moment you rename any folder above it, it breaks on anybody else's computer including mine when I am grading, and it breaks on your own second machine. If you find yourself typing a path that starts with Users or C colon, stop. Eval false prevents the lecture from actually trying this instructor-specific path. Its presence is another clue that the code is here for comparison, not as a path you should copy.
 
 </details>
 
@@ -1019,7 +1024,7 @@ read.csv("/Users/tmieno2/Dropbox/Data-Science-with-R/Chapter-2-Quarto/corn_price
 <details class="transcript">
 <summary>Transcript</summary>
 
-Option three is the one I recommend, and it is the here package. Rather than starting from your hard drive or from the qmd's own folder, here builds paths from the project root, which is the folder holding your Rproj file or your _quarto.yml. You write here, then the folder and file names as separate pieces, and it assembles the right path. It works no matter which subfolder the document sits in, it works on any computer because nothing above the project root is written down, and it works whether you render or run chunks by hand. If you are unsure what it decided the root was, run here on its own in the console.
+Option three is the one I recommend, and it is the here package. Rather than starting from your hard drive or from the qmd's own folder, here builds paths from the project root, which is the folder holding your Rproj file or your _quarto.yml. You write here, then the folder and file names as separate pieces, and it assembles the right path. It works no matter which subfolder the document sits in, it works on any computer because nothing above the project root is written down, and it works whether you render or run chunks by hand. If you are unsure what it decided the root was, run here on its own in the console. Read the code from the inside out. Library here makes the package available, then here receives data and corn-underscore-price-dot-csv as two path pieces, and that constructed path is passed to read-dot-csv. Eval false leaves the example unevaluated because this deck does not contain that data file. In the check callout, here colon-colon here names the function together with its package, and empty parentheses ask it to show the project root with no extra path pieces attached. The Direction points you to both path styles in the sample, where they are also displayed but not run.
 
 </details>
 
@@ -1049,14 +1054,15 @@ See the section **"Reading a data file"** in the sample file. The `read-relative
 <details class="transcript">
 <summary>Transcript</summary>
 
-One alternative worth knowing if you are working on a whole project rather than a single document. Setting execute-dir project in _quarto.yml makes every document run as though it were sitting at the project root, so a plain relative path like data slash corn_price works from anywhere in the project. It solves the same problem here solves, which is exactly why the note warns you to pick one and not both. Mixing them means you can no longer tell at a glance which folder any given path is starting from, and that confusion is worse than either approach on its own.
+One alternative worth knowing if you are working on a whole project rather than a single document. Nesting execute-dir project under project in _quarto.yml makes every document run as though it were sitting at the project root, so a plain relative path like data slash corn_price works from anywhere in the project. It solves the same problem here solves, which is exactly why the note warns you to pick one and not both. Mixing them means you can no longer tell at a glance which folder any given path is starting from, and that confusion is worse than either approach on its own.
 
 </details>
 
 If you would rather have every document in a project run as if it were sitting at the project root, set this once in `_quarto.yml`:
 
 ````{verbatim}
-execute-dir: project
+project:
+  execute-dir: project
 ````
 
 Then `read.csv("data/corn_price.csv")` works from any document in the project. This is a project-wide setting, so use it instead of `here`, not alongside it, to avoid confusion about which folder paths start from.
@@ -1096,7 +1102,7 @@ The html file by itself is **not** the whole document. Email only `my_report.htm
 <details class="transcript">
 <summary>Transcript</summary>
 
-The fix is one line in the YAML header: embed-resources set to true, indented under html. That tells Quarto to pack everything, figures and styles and scripts, inside the single html file. It gets bigger, but it becomes one genuinely self-contained document you can email, upload, or open anywhere, and you no longer need the files folder at all. Read the callout: this is required for everything you submit in this course. Set it once at the top of every assignment and then submit the single html file.
+The fix is one line in the YAML header: embed-resources set to true, indented under html. That tells Quarto to pack local resources such as figures, styles, and scripts inside the single html file. It gets bigger, but you can email or upload that one file and you no longer need the files folder. The math library is not embedded by default, so add self-contained-math true under html if it must also work without a network connection. Read the callout: embed-resources is required for everything you submit in this course. Set it once at the top of every assignment and then submit the single html file.
 
 </details>
 
@@ -1108,9 +1114,10 @@ format:
     embed-resources: true
 ````
 
-+ Everything gets packed **inside** the single html file
-+ The file gets bigger, but it is now one self-contained document you can email, upload, or open anywhere
++ Local resources get packed **inside** the single html file
++ The file gets bigger, but you can now email or upload it without its local companion resources
 + You no longer need the `_files` folder at all
++ Math libraries are not embedded by default; add `self-contained-math: true` under `html:` if the math library must also be embedded
 
 :::{.callout-important title="Required for this course"}
 Use `embed-resources: true` for every assignment you submit. Then submit the single `.html` file.
@@ -1121,7 +1128,7 @@ Use `embed-resources: true` for every assignment you submit. Then submit the sin
 <details class="transcript">
 <summary>Transcript</summary>
 
-And here is how to be certain before you submit, which takes about thirty seconds. Render the document. Then move only the html file, by itself, to your Desktop, away from its folder. Open it there and look. If the figures are still present, the file is genuinely self-contained and safe to hand in. If they have vanished, embed-resources is either missing or in the wrong place in your YAML, most likely indented incorrectly. Do this check the first few times until you trust your own header.
+And here is how to be certain before you submit, which takes about thirty seconds. Render the document. Then move only the html file, by itself, to your Desktop, away from its folder. Open it there and look. If the figures are still present, the file is genuinely self-contained and safe to hand in. If they have vanished, embed-resources is either missing or in the wrong place in your YAML, most likely indented incorrectly. Do this check the first few times until you trust your own header. The Direction gives you a controlled comparison: add embed-resources under html in sample-underscore-qmd-dot-qmd, render, and notice both that the html file becomes much larger and that it no longer needs the sample-underscore-qmd-underscore-files folder. The larger size is evidence that those resources have been packed into the file.
 
 </details>
 
@@ -1168,7 +1175,7 @@ A qmd file can be rendered to many different formats, using different engines. S
 <details class="transcript">
 <summary>Transcript</summary>
 
-Producing a different format is two steps. Step one, add the format under the format key in the YAML header, and the example shows three at once: html with its options, docx taking the defaults, and typst with page size, margins, and columns specified underneath it. Notice the pattern, that a format either takes default or has its own indented block of options. Step two, back in RStudio, there is a small downward triangle next to the Render button, and that is where you choose which of your declared formats to build.
+Producing a different format is two steps. Step one, add the format under the format key in the YAML header, and the example shows three at once: html with its options, docx taking the defaults, and typst with page size, margins, and columns specified underneath it. Notice the pattern, that a format either takes default or has its own indented block of options. Step two, back in RStudio, there is a small downward triangle next to the Render button, and that is where you choose which of your declared formats to build. Read the header from the top. Title and author describe the report. The html block adds a table of contents through level-two headings, numbers sections through level two, and embeds the resources so the html is self-contained. Docx default asks for a Word document without custom Word options. The typst block asks for a PDF on A5 paper, with one-centimeter horizontal and vertical margins and two text columns. Those options are indented under typst because they apply only to that format. The Direction asks you to add the docx and typst entries to your own qmd; after that, the Render menu can offer all three declared outputs.
 
 </details>
 

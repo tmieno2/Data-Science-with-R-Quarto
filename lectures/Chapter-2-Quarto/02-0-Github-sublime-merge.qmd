@@ -47,7 +47,7 @@ contain what those Directions name.
 <details class="transcript">
 <summary>Transcript</summary>
 
-Let's start with what Github actually is, because the name gets used pretty loosely. Think of it as an online service for storing code, primarily programs, though small datasets are fine too. The unit of storage is a repository, which you can picture as a folder that happens to live online. Repositories are either public, meaning anybody can look at them, or private, meaning only the owner can even see that they exist. And here is the part that matters for us: any public repository can be cloned, which is just a longer word for copied, onto your own computer. One reassurance, in the callout: Github runs on a tool called git, and git is well worth learning one day, but this course never asks you to use it. We copy things down, and that is the whole of it.
+Let's start with what Github actually is, because the name gets used pretty loosely. Think of it as an online service for storing code, primarily programs, though small datasets are fine too. The unit of storage is a repository, which you can picture as a folder that happens to live online. Repositories are either public, meaning anybody can look at them, or private, meaning only the owner can even see that they exist. Public repositories are useful for learning because you can inspect how someone else organized a working project and start from a good example instead of an empty folder. That is why learning to copy one is our objective here. And here is the part that matters for us: any public repository can be cloned, which is just a longer word for copied, onto your own computer. One reassurance, in the callout: Github runs on a tool called git, and git is well worth learning one day, but this course never asks you to use it. Git tracks the history of a project, but you do not need that version-control workflow for this one-way copy. We copy things down, and that is the whole of it.
 
 </details>
 
@@ -76,7 +76,7 @@ Github is built on a tool called **git**, which tracks the history of a project.
 <details class="transcript">
 <summary>Transcript</summary>
 
-To do the cloning we are going to use a program called Sublime Merge. I want to be clear that it is not the only option; there are plenty of git clients and you are welcome to use whatever you already know. I picked this one because it is light and the cloning workflow is about three clicks. Install it from the link in the first callout. The second callout is the one I really want you to read: Sublime Merge is paid software with an unlimited free evaluation, so every so often a window will pop up asking you to buy a license. Just dismiss it. Nothing we do in this course stops working, and you have not run out of a trial.
+To do the cloning we are going to use a program called Sublime Merge. I want to be clear that it is not the only option; there are plenty of git clients and you are welcome to use whatever you already know. I picked this one because it is light and the cloning workflow is about three clicks. Install it from the link in the first callout. The second callout is the one I really want you to read: Sublime Merge may be evaluated free with no enforced time limit, but continued use requires a license. Every so often a window may pop up asking you to buy one. That window does not mean an enforced evaluation period has expired, but you should purchase a license if you continue using the software.
 
 </details>
 
@@ -89,7 +89,7 @@ Click [here](https://www.sublimemerge.com/) and install it.
 :::
 
 :::{.callout-note title="About the license"}
-Sublime Merge is paid software with an unlimited free evaluation. You will occasionally see a window asking you to buy a license. Dismiss it. Everything we do in this course works during the evaluation.
+Sublime Merge may be evaluated free with no enforced time limit, but continued use requires a license. You may occasionally see a window asking you to buy a license during the evaluation. Everything we do in this course works during the evaluation.
 :::
 <!-- ADDED (B2): the purchase dialog reliably makes students think they have
      installed the wrong thing or run out of a trial. -->
@@ -103,7 +103,7 @@ Sublime Merge is paid software with an unlimited free evaluation. You will occas
 <details class="transcript">
 <summary>Transcript</summary>
 
-The first half of cloning happens on the Github website, not on your machine. You go to the repository you want, and you look for the green Code button, which is on the main page of every repository. Click it and a small panel drops down with the repository's address in it. Next to that address is a little icon showing two overlapping sheets of paper, and that is the copy button. Click it and the URL is on your clipboard. That is genuinely all this step is: go and get the address. The screenshot below shows exactly what you are looking for, because the button is smaller than you would expect.
+The first half of cloning happens on the Github website, not on your machine. You go to the repository you want, and you look for the green Code button, which is on the main page of every repository. Click it and a small panel drops down with the repository's address in it. Keep the Local tab and the HTTPS option selected, as they are in the screenshot. SSH and Github CLI are other ways to connect, but they require setup that we do not need for a public repository. Download ZIP gives you an archive instead of the URL that Sublime Merge uses for this workflow. Next to that address is a little icon showing two overlapping sheets of paper, and that is the copy button. Click it and the URL is on your clipboard. That is genuinely all this step is: go and get the address. The screenshot below shows exactly what you are looking for, because the button is smaller than you would expect. Once you have copied it, move to the Clone the repository tab and give that address to Sublime Merge.
 
 </details>
 
@@ -120,7 +120,7 @@ The first half of cloning happens on the Github website, not on your machine. Yo
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the second half, over in Sublime Merge, and it is three short steps in the tabs below. Step one, open the File menu and choose Clone Repository. Step two, you get a dialog with three boxes: the source URL, which should already be filled in from your clipboard, the repository name, and the destination path, which is where the folder will actually land on your machine. Step three is the one I added deliberately, because people skip it. Sublime Merge opens the repository when it finishes, which tells you the copy worked but not where it went. Click through the tabs and I will show you each screen.
+Now the second half, over in Sublime Merge, and it is three short steps in the tabs below. Step one, open the File menu and choose Clone Repository. Step two, you get a dialog with three boxes: the source URL, which should already be filled in from your clipboard, the repository name, and the destination path, which is where the folder will actually land on your machine. If the Source URL box is empty, paste the URL yourself. Sublime Merge also fills in the Repository Name from that URL. You can leave that name alone, or type a different name if you want the new folder on your computer to have a different name. For Destination Path, click the gray button with three dots and choose the parent folder where you want that new repository folder to be created. This is worth choosing carefully because you will need to return to these files in later lectures. Then click Clone to start copying the repository. Step three is the one I added deliberately, because people skip it. Sublime Merge opens the repository when it finishes, which tells you the copy worked but not where it went. Go to the Destination Path in Finder on a Mac or File Explorer on Windows. You should see a new folder with the Repository Name you just accepted or entered. Open it and confirm that the files you saw on Github are inside, so you know both that cloning succeeded and where to find the copy again. If you cannot find the folder, the callout gives you a shortcut: while the repository is open in Sublime Merge, open the command palette and select Open Containing Folder. Sublime Merge can take you directly there because it already knows the local path. Click through the tabs and I will show you each screen. After you have checked the result, the Do it yourself tab gives you the course repository to clone with this same workflow.
 
 </details>
 
@@ -153,7 +153,7 @@ Sublime Merge opens the cloned repository once it finishes, which tells you the 
 + Open it, and confirm that the files you saw on the Github page are inside
 
 :::{.callout-tip title="If you cannot find the folder"}
-In Sublime Merge, follow `file -> Open Containing Folder` while the repository is open. That takes you straight to it.
+In Sublime Merge, open the command palette and select `Open Containing Folder` while the repository is open. That takes you straight to it.
 :::
 
 :::

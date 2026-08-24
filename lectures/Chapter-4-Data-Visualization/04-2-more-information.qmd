@@ -134,6 +134,7 @@ ggplot2::theme_set(
 <summary>Transcript</summary>
 
 Last lecture we built figures where everything looked the same: all the points one colour, all the lines one style. Now we make a figure carry more information, by letting its appearance depend on the data. Look at the target figure: instead of one line for the whole country, there is a line per state, each in its own colour, with a legend telling you which is which. That is the same underlying plot as before, doing considerably more work. This is the single most valuable technique in ggplot2, and it is one word in one place.
+Read the code from the outside in. Ggplot starts with county_yield_mean, which has one mean corn yield for each state and year. Geom_line maps year to the horizontal axis and corn_yield to the vertical axis. Mapping state_name to colour also tells ggplot which observations belong to the same state, so it connects each state's values across time rather than joining all the observations into one meaningless line. The plus sign adds that line layer to the plot. Together, the separate lines and the automatically matched legend let you compare both yield levels and changes over time.
 
 </details>
 
@@ -159,6 +160,7 @@ ggplot(data = county_yield_mean) +
 <summary>Transcript</summary>
 
 And here is that one place, in red on the slide because it is the whole lesson: inside aes. Writing color equals state_name inside aes tells ggplot to split the data into groups by state and draw a separately coloured line for each. Compare that against last lecture, where we wrote color equals red outside aes to set one fixed colour. Inside aes means make this depend on a variable. Outside aes means set it to this value. Same argument name, completely different behaviour, and the position is the only thing that distinguishes them. Note too that the legend appears automatically; you never have to build one.
+In the live example, ggplot takes county_yield_mean as its data, while aes maps year to x, corn_yield to y, and state_name to colour. Geom_line then connects the observations within the groups created by that discrete colour mapping. Autorun true makes the example execute when the tab loads, and code-track zero point five gives the code and its output equal shares of the side-by-side area. Those presentation options change how you encounter the example, not what the ggplot code means.
 
 </details>
 
@@ -189,6 +191,9 @@ A legend is automatically generated.
 <summary>Transcript</summary>
 
 Four examples, and I want you to notice what changes between them and what does not. The aesthetic being mapped changes: colour for lines, fill for densities and boxplots, and in the last example both colour and shape at once. But the pattern never changes: a variable name, inside aes, mapped to an aesthetic. Also look at example two, where alpha is set to zero point three outside aes, so the overlapping densities are semi-transparent and you can see through them. That is a fixed value, so it goes outside. Both kinds of argument sitting side by side in one geom is exactly the situation you need to be able to read.
+Start with the Data tab, because all four figures depend on the object created there. County_yield is piped into group_by, which forms a group for every state_name and year combination. Summarize replaces all the county rows in each group with their mean corn_yield, and na dot r-m true tells mean to ignore missing yield values rather than let one missing value make the group mean missing. The result is assigned to county_yield_mean. The outer parentheses print that newly assigned result so you can inspect it, and autorun true ensures it exists before you use the example tabs.
+Example one uses that state-by-year summary. Year is on x, mean corn yield is on y, and state_name is mapped to colour, so the colour mapping both distinguishes and groups the state lines. In example two, geom_density estimates the distribution of corn_yield for each state. State_name is mapped to fill, while alpha zero point three is outside aes because every density should have the same transparency. The transparency matters because filled density shapes overlap.
+Examples three and four first keep only Nebraska and Kansas. The percent-in-percent test asks whether each state_name is one of those two values, and the piped dot supplied as data to ggplot means use this filtered result. In example three, factor year turns the numeric years into categories, which makes geom_boxplot draw a separate distribution for each year instead of treating year as a continuous measurement. Corn_yield is on y and state_name controls fill, so you can compare the two states within each year. Example four returns to points: d-three-five-nine is on x and corn_yield is on y. Mapping state_name to both colour and shape gives readers two visual cues for the state, while size zero point seven sits outside aes and makes every point the same smaller size. Code-track zero point five keeps each example's code and figure evenly divided on screen. Now use that same inside-versus-outside decision in the exercises.
 
 </details>
 
@@ -297,6 +302,8 @@ county_yield %>%
 <summary>Transcript</summary>
 
 Two exercises to practise the distinction. The first asks for a scatter plot coloured by clarity, and the second for density plots filled by colour with alpha set to zero point five. That second one is deliberately chosen: it needs one thing inside aes, the fill mapped to a variable, and one thing outside, the fixed transparency. If you find yourself unsure where a given argument goes, ask whether its value should change from group to group. If yes, it goes inside aes; if no, outside.
+Run the Instruction tab first. Data diamonds loads ggplot2's diamonds dataset, and the assignment creates a smaller object called premium. Inside filter, double equals Premium keeps only that cut, the ampersand requires the colour condition to be true as well, and the percent-in-percent test keeps colour E, I, or F. Writing dplyr double-colon filter makes the package source explicit. The final premium line prints the subset for inspection, and autorun true prepares it automatically for both exercises.
+For exercise one, ggplot uses premium, geom_point maps depth to x and price to y, and clarity belongs inside aes because it controls each point's colour. For exercise two, geom_density maps carat to x and diamond colour to fill. Alpha zero point five belongs outside aes because every density gets the same transparency, which lets you see the overlapping distributions. Write each solution in Work here, run it, and then open Answer to compare the structure rather than merely copying it.
 
 </details>
 
@@ -378,6 +385,7 @@ ggplot(data = premium) +
 <summary>Transcript</summary>
 
 Faceting is the other way to show more in one figure, and the comparison on this slide makes the case better than I can. On the left, every state's boxplots crowded into one panel, colour-coded. It is technically correct and almost unreadable. On the right, the same data split into a grid of small panels, one per state. Suddenly you can actually compare states, because each has its own space. The general rule: use colour when you want groups compared directly against each other, and faceting when there are too many groups for that to work.
+Both figures start from county_yield, so the comparison is about presentation rather than different data. On the left, factor year makes year categorical, corn_yield is on y, and state_name controls fill. That asks every state's box for every year to share one crowded plotting area. On the right, the same year and yield mappings feed geom_boxplot, but state_name moves into facet_wrap. Each state therefore gets its own panel, and nrow three asks ggplot to arrange those panels in three rows. Nrow changes only the layout of the panels, not which observations appear in them. Keeping the same axes across the panels makes state-to-state comparisons much easier.
 
 </details>
 
@@ -435,7 +443,8 @@ ggplot(data = county_yield) +
 <details class="transcript">
 <summary>Transcript</summary>
 
-The mechanism is a new layer added with a plus, either facet_wrap or facet_grid, naming the variable to split on. The syntax looks odd at first because it uses a tilde, which is R's formula notation, the same thing you will meet in regression models. For facet_wrap the formula is one-sided: nothing to the left, and what you want to facet by on the right. Read tilde state_name as simply split this by state. The callout explains why there is nothing on the left, and it is worth reading now, because facet_grid does use both sides of the tilde and the difference between the two functions turns on exactly that point.
+The mechanism is a new layer added with a plus, either facet_wrap or facet_grid, naming the variable to split on. The syntax looks odd at first because it uses a tilde, which is R's formula notation, the same thing you will meet in regression models. Facet_wrap accepts one-sided or two-sided formulas, but the sides do not control panel rows and columns. Read tilde state_name as simply split this by state. The callout explains why the one-sided form is useful here, and it is worth reading now, because facet_grid does use both sides of the tilde to control rows and columns.
+The base figure uses county_yield, converts year with factor so geom_boxplot treats each year as a category on x, and puts corn_yield on y. The next plus sign adds facet_wrap tilde state_name after the boxplot layer. Facet_wrap lays the state panels out in reading order and starts a new row when it runs out of width, so a left-hand formula variable would not control rows here. That is why the one-sided form shown on screen expresses the intention most clearly. Next, you will put two variables into the split and see how quickly the panel count grows.
 
 </details>
 
@@ -461,8 +470,8 @@ In this code, `facet_wrap(~ state_name)` is added to a simple boxplot, which tel
 
 <br>
 
-:::{.callout-note title="Why the tilde, and why nothing on the left"}
-`facet_wrap()` takes a **one-sided** formula: everything you want to facet by goes to the right of the `~`. It simply lays the panels out in reading order and wraps them onto the next row when it runs out of width, so there is no notion of which variable controls rows and which controls columns.
+:::{.callout-note title="Why the tilde, and why use one side here"}
+`facet_wrap()` accepts one-sided or two-sided formulas, but the sides do not control panel rows and columns. It simply lays the panels out in reading order and wraps them onto the next row when it runs out of width.
 
 That distinction does exist for `facet_grid()`, which we come to shortly, and there the two sides of the `~` matter a great deal.
 :::
@@ -479,6 +488,8 @@ That distinction does exist for `facet_grid()`, which we come to shortly, and th
 <summary>Transcript</summary>
 
 You can facet on two variables at once, and then you get one panel for every combination of the two. These tabs show it, and the second one is the more useful demonstration, because it first filters down to two years so the grid stays small enough to read. That filtering step is a genuine lesson rather than housekeeping: two-way faceting multiplies, so ten states by twenty years is two hundred panels, and no figure with two hundred panels has ever communicated anything. Cut the data down before you facet on two variables.
+On the What tab, geom_histogram puts corn_yield on x, so each panel shows the distribution of county yields. Facet_wrap state_name tilde year supplies both variables for faceting, producing one panel for each observed state-and-year combination. With facet_wrap, the two sides do not assign rows and columns; the panels are still wrapped in reading order. That is different from facet_grid on the next tab.
+The second example makes the reduction explicit. Filter uses the percent-in-percent test with c of 2017 and 2018 to retain either year, and the assignment stores those rows as county_yield_s. Autorun true creates that object when the tab loads. The following plot uses the smaller dataset, draws the same corn_yield histogram, and facets on state and year, so these three states and two selected years produce six panels rather than a needlessly large display. Run the plot and check that each panel represents one unique combination before moving on.
 
 </details>
 
@@ -540,6 +551,8 @@ ggplot(data = county_yield_s) +
 <summary>Transcript</summary>
 
 There are two faceting functions and it is worth knowing when to use which. These tabs compare them directly. facet_wrap takes the panels and wraps them into a block, filling row after row, which is what you want with one variable and many levels. facet_grid lays them out on a genuine two-dimensional grid, with one variable controlling rows and the other columns. Look at the two side by side on the compare tab: with two variables, facet_grid produces a table you can read across and down, which is almost always clearer.
+Every plot in these tabs uses county_yield_s and puts corn_yield on the histogram's x-axis, so the faceting function is the meaningful change. In facet_grid state_name tilde year, the variable on the left supplies rows and the variable on the right supplies columns. The callout states that rule directly. The Order matters tab then reverses the formula to year tilde state_name, which transposes the arrangement: years become rows and states become columns. The observations and histograms have not changed, but the reading direction has, so choose the order that makes the comparison you want easiest to scan.
+The Scale tabs control a separate decision. Facet_grid uses fixed x and y scales by default, which supports direct comparisons because the same position means the same value everywhere. Scales free-x allows different x ranges in different columns while panels in one column still share an x scale. Scales free-y allows different y ranges in different rows while panels in one row share a y scale. Scales free allows both kinds of variation, subject to those row-and-column sharing rules. Free scales can reveal the shape within panels whose ranges differ greatly, but they make cross-panel magnitudes harder to compare, so use them only when that tradeoff serves the question. Autorun true makes the demonstrations appear immediately, and out-width one hundred percent lets each comparison plot fill its column.
 
 </details>
 
@@ -717,6 +730,7 @@ ggplot(data = county_yield_s) +
 <summary>Transcript</summary>
 
 A small but genuinely useful piece of polish. By default the strip labels along the edge of each panel show the bare value, so you get 2017 rather than Year equals 2017, and a reader coming to your figure cold has to guess what that number means. You could do this with the labeller argument and label_both, but the approach taught here is to build the label you want as a new variable with mutate, pasting the text onto the value, and then facet on that variable instead. It is slightly indirect, but it gives you complete control over the wording.
+Read the pipeline from the top. County_yield_s enters mutate, and paste-zero joins the literal text Year equals, including its final space, to each value of year. That creates year_text while preserving the other columns. The next pipe passes the modified data onward, and data equals dot tells ggplot to use that piped result. Geom_histogram maps corn_yield to x. Finally, facet_grid state_name tilde year_text puts states in rows and the more informative year labels in columns. Because the wording is stored in the faceting variable itself, the strip text follows the data reliably. Keep this pattern in mind as you work through the two faceting exercises.
 
 </details>
 
@@ -744,6 +758,7 @@ county_yield_s %>%
 <summary>Transcript</summary>
 
 Two faceting exercises, each showing you the target figure. The first is a one-way facet by colour, and note that the target has the panels stacked vertically, which tells you which side of the tilde colour belongs on. The second is a two-way facet by colour and clarity. Work out from the picture which variable is in the rows and which in the columns before you write the code; reading a target figure carefully is half the skill.
+In exercise one, ggplot uses premium, geom_point maps carat to x and price to y, and facet_grid colour tilde dot puts diamond colour on the row side. The dot means there is no faceting variable on the column side, so the colour panels form one vertical column exactly like the target. In exercise two, geom_histogram maps carat to x, then facet_grid colour tilde clarity makes colour the rows and clarity the columns. Each panel therefore contains the carat distribution for one colour-and-clarity combination. Use the empty Work here cells first, then unfold the Answer tabs to check both your mappings and the side of the tilde used for each variable.
 
 </details>
 
@@ -861,12 +876,12 @@ ggplot(data = premium) +
 
 ::: {.panel-tabset}
 
-### Long-format needed
+### When long format is needed
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now a point that connects this lecture back to the previous chapter, and it explains a lot of frustration. Everything we have done today, colour-differentiation and faceting alike, works by taking one variable and splitting the data by its values. Read the callout: that requires your data to be in long format. If the thing you want to split by is spread across several columns rather than living in one column, none of these techniques can work, because there is no single variable to name.
+Now a point that connects this lecture back to the previous chapter, and it explains a lot of frustration. Everything we have done today, colour-differentiation and faceting alike, works by taking a grouping variable stored in a column and splitting the data by its values. Read the callout: the desired grouping variable must be a column, so reshaping is needed when that variable, such as year, is encoded across multiple column names. If the thing you want to split by is spread across several columns rather than living in one column, there is no single variable to name.
 
 </details>
 
@@ -876,7 +891,7 @@ We have seen
 +  faceted figures  
 
 :::{.callout-important}
-The dataset has to be in long format to create these types of figures!!
+The desired grouping variable must be a column, so reshaping is needed when that variable, such as `year`, is encoded across multiple column names.
 :::
 
 <br>
@@ -887,6 +902,7 @@ The dataset has to be in long format to create these types of figures!!
 <summary>Transcript</summary>
 
 Here is that problem made concrete. The dataset shown is wide: the years 2000 and 2001 have become column names, with yields underneath them. Now try to facet by year. You cannot, because there is no year variable to name; year is encoded in the column headers instead. The fix is the one from lecture 03-3: pivot_longer, to turn those columns back into a proper year variable. So reshaping is not a separate topic from plotting. Very often the reason a plot cannot be made is that the data is in the wrong shape, and pivot_longer is the answer.
+Follow the displayed pipeline to see how that wide result was constructed. Data dot table converts county_yield for data.table operations, and the bracket expression selects county_code, corn_yield, year, and state_name. Filter then keeps only years 2000 and 2001. Dcast uses county_code plus state_name on the left of the formula as the row identifiers and year on the right as the source of new column names. Value dot var corn_yield says which values should fill those year columns. The output consequently has one row for each state-and-county combination and separate 2000 and 2001 yield columns. That shape is convenient for looking across two years in a table, but the year information must return to one year column before you can name year as a fill or facet variable.
 
 </details>
 
@@ -938,6 +954,7 @@ The last topic is combining several datasets in one figure, and it rests on a di
 <summary>Transcript</summary>
 
 The first example is the ordinary case, to fix the pattern. The dataset is named once, inside ggplot, and then both geoms, the points and the smoothed line, use it without either mentioning it. That is the global dataset doing its job, and it is why every plot in the previous lecture worked with the data named only once at the top.
+Read the two layers separately. Geom_point maps d-three-five-nine to x and corn_yield to y, so it shows the individual county observations. Geom_smooth repeats those same mappings and adds a fitted smooth trend with its uncertainty band. The data is inherited globally, but the aes calls are local to the individual layers, so the mapping is repeated because one geom does not inherit aesthetics from another geom. The plus signs combine both layers on one set of axes. Autorun true draws the example when the tab loads, and code-track zero point four five gives the code forty-five percent of the side-by-side area so the figure has a little more room.
 
 </details>
 
@@ -961,6 +978,7 @@ ggplot(data = county_yield) +
 <summary>Transcript</summary>
 
 Now the same figure written to fail, which is worth running so you see the error. Here ggplot is called empty, with no data at all. geom_point is given a dataset locally so it works fine. But geom_smooth is given nothing, and there is no global dataset for it to fall back on, so it has no idea what to draw. This is the most common error when people first start using local datasets: they move one dataset into a geom and forget that the other geom was silently relying on the global one.
+The point layer has both pieces it needs: county_yield supplied locally as data, and an aes mapping corn_yield to y and d-three-five-nine to x. The smooth layer repeats the variable names in aes, but layers do not inherit data or mappings from other layers. It can inherit only from the initial ggplot call, which is empty here, so those names cannot be found when ggplot builds the smooth. Autorun true makes that failure visible immediately. Layout stacked places the error output below the editor, where there is enough width to read it. The lesson from the error is that every layer needs a complete route to its data, either through ggplot or through its own data argument.
 
 </details>
 
@@ -980,6 +998,7 @@ ggplot() +
 <summary>Transcript</summary>
 
 And here is the payoff. Call ggplot empty, then give each geom its own data. The points come from the county-level data, showing every observation, and the line comes from the yearly averages, showing the trend through them. Two datasets, at two different levels of aggregation, in one figure. This is an extremely common pattern in published work: raw observations in the background, a summary or a fitted line on top. Now you know how it is done.
+In the point layer, data equals county_yield is local, year is mapped to x, and each county's corn_yield is mapped to y. In the line layer, data equals mean_yield is local instead. Mean_yield has one average corn_yield for each year, so geom_line maps those two columns and connects the annual means in time order. Each layer also carries its own aes call because the initial ggplot supplies neither data nor mappings. Autorun true draws the combined figure on load, and code-track zero point four five leaves slightly more of the side-by-side width for the output. This local-data pattern is what lets you overlay observations and summaries without first forcing differently aggregated datasets into one table.
 
 </details>
 
@@ -1005,6 +1024,4 @@ ggplot() +
 
 :::
 <!--end of panel-->
-
-
 

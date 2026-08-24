@@ -36,6 +36,42 @@ source(here::here("lectures/_lecture-theme.R"))
 ```
 
 
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two navigation tricks before anything else, and since this is the first deck of the course they are worth a moment. The three stacked lines in the bottom left corner open a table of contents, so you can jump straight to a section. Pressing the letter o gives you a panel view of every slide at once. This deck is long, and it is the one you will come back to most often in the first few weeks, because it holds the basic vocabulary: what a vector is, what a data frame is, how to install a package. Being able to find one specific slide quickly matters more here than anywhere else.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes on these slides are live. R runs inside your browser, so you can try things out before you have R working on your own machine. The area with a hint of blue is an editor you can type in. Run Code executes everything in it, and you can run just part of it by highlighting that part and pressing Command Enter, or Control Enter on Windows. The two sheets icon in the top right copies the code so you can paste it into RStudio, and the reload button next to it puts the original code back when you have edited yourself into a mess. Do edit them. Changing a number and running it again is the fastest way to find out what something does, and nothing you type here can break anything.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+
 ## Learning Objectives
 
 <details class="transcript">
@@ -92,7 +128,7 @@ So what is R? It is a statistical programming language, genuinely popular in bot
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is something worth being blunt about: R's own interface is poor. If you install R and open it directly you get a fairly bare window, and it does not make a good first impression. RStudio is a separate program that sits on top of R and gives you a proper working environment, and it is by far the most popular way people actually use the language. So you will install two things, and you will then spend essentially all of your time in the second one. The screenshot shows what you will be looking at for the rest of the semester.
+Here is something worth being blunt about: R's own interface is poor. If you install R and open it directly you get a fairly bare window, and it does not make a good first impression. RStudio is a separate program that sits on top of R and gives you a proper working environment, and it is by far the most popular way people actually use the language. So you will install two things, and you will then spend essentially all of your time in the second one. The screenshot shows that bare R console, not RStudio. It is on screen so you can recognize the interface we are choosing not to use and understand why we add RStudio on top of R.
 
 </details>
 
@@ -159,12 +195,12 @@ Learn how to
 <details class="transcript">
 <summary>Transcript</summary>
 
-Before we get to objects, the raw materials they are made of. There are five basic types. Integer is whole numbers. Numeric, also called double, is numbers with a decimal part, and this is the one you will meet most often. Complex has an imaginary part and you will almost certainly never need it in this course. Logical is just TRUE or FALSE, and it becomes enormously important once you start filtering data. And character is text, written inside quotation marks. Note the remark on that last one: you cannot do arithmetic on characters. That sounds obvious right now and it will still catch you out later.
+Before we get to objects, the raw materials they are made of. There are five basic types. Integer literals require an L suffix. Numeric, also called double, is R's default numeric type and can represent whole or fractional values, and this is the one you will meet most often. Complex has an imaginary part and you will almost certainly never need it in this course. Logical is just TRUE or FALSE, and it becomes enormously important once you start filtering data. And character is text, written inside quotation marks. Note the remark on that last one: you cannot do arithmetic on characters. That sounds obvious right now and it will still catch you out later.
 
 </details>
 
-+ **integer**: whole numbers, e.g. `1`, `3`
-+ **numeric (double)**: numbers with a decimal part, e.g. `1`, `1.3`
++ **integer**: integer literals require an `L` suffix, e.g. `1L`, `3L`
++ **numeric (double)**: R's default numeric type; can represent whole or fractional values, e.g. `1`, `1.3`
 + **complex**: numbers with an imaginary part, e.g. `1+2i` (rarely needed in this course)
 + **logical (boolean)**: `TRUE` or `FALSE`
 + **character**: text, e.g. `"Nebraska"` (arithmetic is not allowed)
@@ -294,7 +330,7 @@ We will learn string manipulations later using the `stringr` package.
 <details class="transcript">
 <summary>Transcript</summary>
 
-Real data has holes in it, and R has a specific value for that: NA. Be clear about what it is not. It is not zero, and it is not the two-letter text NA in quotes; it is a distinct thing meaning this value is unknown. You test for it with is.na, which checks every element and returns TRUE wherever the value is missing. Now the important behaviour: most calculations involving NA return NA, and that is correct rather than annoying, because the honest answer to what is the mean of these numbers, one of which I do not know, is that you cannot say. You can ask for the mean of what remains with na.rm equals TRUE. But read the callout, because it matters: do not reach for that out of habit. It drops observations silently, which is how you end up reporting a result computed on a different sample than the one you think you have.
+Real data has holes in it, and R has a specific value for that: NA. Be clear about what it is not. It is not zero, and it is not the two-letter text NA in quotes; it is a distinct thing meaning this value is unknown. You test for it with is.na, which checks every element and returns TRUE wherever the value is missing. The first line uses c to combine four, three, NA, and nine into a vector and assigns that vector to x. Printing x lets you confirm that the missing value is stored alongside the numbers. Is dot n-a of x then returns FALSE, FALSE, TRUE, FALSE, so you can see that the third element is the missing one. Now the important behaviour: most calculations involving NA return NA, and that is correct rather than annoying, because the honest answer to what is the mean of these numbers, one of which I do not know, is that you cannot say. You can ask for the mean of what remains with na.rm equals TRUE. Here that removes the missing entry before calculating and gives sixteen divided by three, about five point three three. But read the callout, because it matters: do not reach for that out of habit. It drops observations silently, which is how you end up reporting a result computed on a different sample than the one you think you have.
 
 </details>
 
@@ -397,7 +433,7 @@ You can insert the assignment operator (`<-`) by hitting
 <details class="transcript">
 <summary>Transcript</summary>
 
-Once an object exists you can see what is inside it by typing its name and running it. That is all that evaluation means. I use the word constantly, so I want to define it once here: when I ask you to evaluate an object, I am asking you to print it so you can look at the contents. It is the simplest and most frequent thing you will do while working, and it is how you check that what you think happened has actually happened.
+Once an object exists you can see what is inside it by typing its name and running it. That is all that evaluation means. I use the word constantly, so I want to define it once here: when I ask you to evaluate an object, I am asking you to print it so you can look at the contents. It is the simplest and most frequent thing you will do while working, and it is how you check that what you think happened has actually happened. Since a currently holds one, evaluating a prints one. If the console prefixes that output with bracket one, the bracket is an index label telling you that the displayed line begins with the first element. It is not another value stored in a.
 
 </details>
 
@@ -418,7 +454,7 @@ I often ask you to **evaluate** an R object. That simply means printing it so yo
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two more assignments, to show this works for any type. The first stores a character string in b, and notice that b was previously holding the number two, so we have just replaced it. The second stores the result of a comparison in d, and this one is worth pausing on: the right-hand side is one equals two, which evaluates to FALSE, and it is that FALSE which gets stored, not the comparison itself. R evaluates the right-hand side first and then assigns the result. That order matters, and it is easy to skate past.
+Two more assignments, to show this works for any type. The first stores a character string in b, and notice that b was previously holding the number two, so we have just replaced it. The second stores the result of a comparison in d, and this one is worth pausing on: the right-hand side is one double-equals two, which evaluates to FALSE, and it is that FALSE which gets stored, not the comparison itself. R evaluates the right-hand side first and then assigns the result. That order matters, and it is easy to skate past.
 
 </details>
 
@@ -439,7 +475,7 @@ d
 <details class="transcript">
 <summary>Transcript</summary>
 
-Three things to remember about assignment, and the last two are deliberately shown as errors so that you meet them here rather than in the middle of an assignment. First, assigning to a name that already exists silently overwrites what was there. No warning; it is simply gone. Second, a name cannot begin with a digit, so 1a is not legal. Third, you cannot use a reserved word, meaning a word the language itself needs, such as if. Run those last two and read the errors carefully, because recognizing an error message you have seen before is a genuine and underrated skill.
+Three things to remember about assignment, and the last two are deliberately shown as errors so that you meet them here rather than in the middle of an assignment. First, assigning to a name that already exists silently overwrites what was there. No warning; it is simply gone. Second, a name cannot begin with a digit, so 1a is not legal. Third, you cannot use a reserved word, meaning a word the language itself needs, such as if, as an unquoted syntactic name, although backticks allow it as a non-syntactic name. Run those last two and read the errors carefully, because recognizing an error message you have seen before is a genuine and underrated skill.
 
 </details>
 
@@ -463,7 +499,7 @@ a
 
 <br>
 
-+ You cannot use a reserved word as the name of an object (complete list found [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html))
++ Reserved words cannot be used as unquoted syntactic object names, although backticks allow them as non-syntactic names (complete list found [here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html))
 
 ```{webr-r}
 #--- try this ---#
@@ -623,7 +659,7 @@ M_char
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the one you will use constantly. A data.frame looks like a matrix, but it is better thought of as a list of columns, and the crucial difference from a matrix is that different columns may be different types. Look at the example: nitrogen and yield are numbers, state is text, and they sit together quite happily. That is exactly what real data looks like, which is why this is the workhorse object of the entire course. The last bullet mentions tibble and data.table, which are variations on the same idea with some conveniences added, and we meet them later on.
+Now the one you will use constantly. A data.frame looks like a matrix, but it is better thought of as a list of columns, and the crucial difference from a matrix is that different columns may be different types. Inside data dot frame, each name-equals-value argument creates a named column. The c calls supply three values to each column, and values in the same position line up to make a row. That equal column length is what gives you a rectangle. Look at the example: nitrogen and yield are numbers, state is text, and they sit together quite happily. The first printed row, for example, joins nitrogen two hundred, yield two hundred forty, and the state Kansas. That is exactly what real data looks like, which is why this is the workhorse object of the entire course. The last bullet mentions tibble and data.table, which are variations on the same idea with some conveniences added, and we meet them later on.
 
 </details>
 
@@ -656,7 +692,7 @@ We will talk about some of them later.
 <details class="transcript">
 <summary>Transcript</summary>
 
-This tab is about a habit rather than a fact, and the tabs inside it cover why it matters, how to check, and how to inspect an object visually. The short version is this: knowing what class an object is is not an academic exercise. The same function behaves differently depending on the class it is handed, and some functions simply refuse to work on some classes at all. A large share of the errors you will hit this semester come from giving a function an object it was never designed for. So when something behaves strangely, checking the class is a very good first move.
+This tab is about a habit rather than a fact, and the tabs inside it cover why it matters, how to check, and how to inspect an object visually. The short version is this: knowing what class an object is is not an academic exercise. The same function behaves differently depending on the class it is handed, and some functions simply refuse to work on some classes at all. A large share of the errors you will hit this semester come from giving a function an object it was never designed for. So when something behaves strangely, checking the class is a very good first move. On the How tab, class of yield data reports data dot frame, which is the high-level class that determines how many functions treat it. Type-of of yield data reports list, which tells you about its underlying storage and connects back to the idea that a data frame is a list of columns. Structure, written s-t-r, gives the most useful quick inspection: it reports three observations of three variables, then shows each column's name, type, and first values. Those three functions answer related but different questions, so do not treat them as interchangeable. On the Visual inspection tab, View with a capital V opens the object in RStudio's spreadsheet-style viewer. That is convenient for looking, but structure is faster when you need the class, dimensions, and column types together. Flip through all three inner tabs and connect the reason for checking with the diagnostic each tool provides.
 
 </details>
 
@@ -751,7 +787,7 @@ Why do we care so much about functions? Because they are the reason R is worth u
 <details class="transcript">
 <summary>Transcript</summary>
 
-Four functions you will use constantly, so they are worth meeting properly. seq builds a sequence, and notice it can be told either how big each step should be, using by, or how many values you want in total, using length. rep repeats a value a given number of times. sum adds up everything in a vector. And length tells you how many elements a vector has, which sounds trivial and turns out to be one of the things you reach for most often. Run all four and look at the results before you move on, because the exercise on the next tab uses them.
+Four functions you will use constantly, so they are worth meeting properly. seq builds a sequence, and notice it can be told either how big each step should be, using by, or how many values you want in total, using length. Both seq lines start at zero, end at one hundred, and produce the same twenty-one values. By equals five specifies the gap directly. Length equals twenty-one asks R to choose evenly spaced values, and here R partially matches the name length to the full argument name length dot out. Rep repeats a value a given number of times. Rep of ten comma five means repeat the value ten five times, so the output contains five tens. Sum adds up everything in a vector. And length tells you how many elements a vector has, which sounds trivial and turns out to be one of the things you reach for most often. There is one problem on screen that you should recognize rather than blame on either function: v-one has not been defined in this deck. If you run sum of v-one or length of v-one exactly as shown, R reports that the object is not found. Once v-one is an existing vector, sum returns the total of its elements and length returns their count. Run the working examples and keep those roles separate before you move on, because the exercise on the next tab uses them.
 
 </details>
 
@@ -795,7 +831,7 @@ length(v1)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now you use them. Three exercises, and I want you to actually type these rather than read them. First, build a vector starting at one and increasing by two up to ninety-nine, which is a direct application of seq. Second, compute the sample mean of that vector; the formula is on the slide. Third, compute the sample variance. Read the callout carefully on that last one, because it is a trap: the formula shown divides by n, whereas R's built-in var function divides by n minus one, so the two will not agree. Compute it directly from the formula rather than reaching for var, or you will get a number that is close and wrong.
+Now you use them. Three exercises, and I want you to actually type these rather than read them. First, build a vector starting at one and increasing by two up to ninety-nine, which is a direct application of seq. In spoken code, x gets seq from one to ninety-nine, with by equal to two. That gives you the fifty odd numbers in that range. Second, compute the sample mean of that vector; the formula is on the slide. Let n be length of x, then sum of x divided by n gives fifty. Third, compute the sample variance. Subtract the mean from x, which works element by element, square those deviations with caret two, add them with sum, and divide by n. The displayed formula gives eight hundred thirty-three. Read the callout carefully on that last one, because it is a trap: the formula shown divides by n, whereas R's built-in var function divides by n minus one, so the two will not agree. Compute it directly from the formula rather than reaching for var, or you will get a number that is close and wrong. The reason for doing the arithmetic directly is to combine assignment, vectorized arithmetic, seq, sum, and length in one small problem. If you get stuck on a function name or argument, the next slide shows you how to ask R for help.
 
 </details>
 
@@ -849,7 +885,7 @@ This formula divides by $n$. R's built-in `var()` divides by $n-1$, so the two w
 <details class="transcript">
 <summary>Transcript</summary>
 
-You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it, but they all share the same structure and two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.
+You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it. R help pages follow common conventions, but their sections vary by topic. When present, two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.
 
 </details>
 
@@ -862,9 +898,9 @@ Put a `?` in front of any function name to open its help page in the
 ?mean
 ```
 
-Every help page has the same sections. The two worth reading first are
-**Usage**, which lists the arguments and their defaults, and **Examples** at
-the very bottom, which you can copy and run.
+R help pages follow common conventions, but their sections vary by topic. When
+present, two worth reading first are **Usage**, which lists the arguments and
+their defaults, and **Examples** at the very bottom, which you can copy and run.
 
 #### When you do not know the name
 
@@ -884,7 +920,7 @@ That works when you know the function's name. When you do not, there are three o
 <details class="transcript">
 <summary>Transcript</summary>
 
-When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks R to sum a character string, and look at what comes back. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.
+When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks R to sum a character string, and look at what comes back. The message says the argument has the invalid type character. That is useful evidence: sum exists and was called, but the object you supplied is not a numeric or otherwise summable input. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.
 
 </details>
 
@@ -914,11 +950,11 @@ to solve a problem, and it is what practising researchers do daily.
 <details class="transcript">
 <summary>Transcript</summary>
 
-We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: every help page, for every function, has the same sections in the same order. So once you can read one, you can read all of them. Three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.
+We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: R help pages follow common conventions, but their sections vary by topic. Once you understand those conventions, you can navigate the pages more easily. On the seq page, three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.
 
 </details>
 
-Running `?seq` opens the page shown in the next tabs. Every help page---no matter the function---is laid out with the **same sections in the same order**, so once you can read one, you can read them all.
+Running `?seq` opens the page shown in the next tabs. R help pages follow common conventions, but their sections vary by topic, so learning those conventions makes the pages easier to navigate.
 
 ```{r}
 #| eval: false
@@ -961,7 +997,7 @@ That is usually enough to decide whether this is the function you want. If it is
 <details class="transcript">
 <summary>Transcript</summary>
 
-Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change.
+Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. To is the endpoint and also defaults to one. By is the increment, and the expression shown as its default connects the endpoints to length dot out when you request a particular number of values. Null for length dot out means that no output length has been requested. Along dot with gives another route: supply an existing object there and seq makes a sequence with one position for each of its elements. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change. The dense-looking Usage line is not code you are expected to memorize. It is a compact map that tells you what can be supplied and what R will assume.
 
 </details>
 
@@ -1032,7 +1068,7 @@ When you meet a new function, jump straight to **Examples**, run one, then look 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time.
+Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time. Here is the distinction you should recover from the page. Times equals three repeats the whole vector three times, so the first line returns one, two, one, two, one, two. Each equals three repeats every individual element three times before moving on, so the second returns one, one, one, two, two, two. The same six values appear, but their order records which argument did the repeating.
 
 </details>
 
@@ -1087,7 +1123,7 @@ A package is a drawer in your workspace (the R environment) holding specialized 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two steps, and keeping them separate in your head prevents a lot of confusion. First you install the package, using install.packages with the name in quotes, which downloads it onto your computer. Then, to actually use it, you load it with library, which brings that drawer into your current workspace. Now read the callout, because this is a genuine stumbling block: you install once per computer, but you load in every new session. And crucially that includes every time you render a Quarto document, because rendering starts a fresh session. That single fact is the source of a great many could not find function errors.
+Two steps, and keeping them separate in your head prevents a lot of confusion. First you install the package, using install.packages with the name in quotes, which downloads it onto your computer. The first box is a template, and the second replaces package name with ggplot2 to show a real installation call. The quotation marks matter because install dot packages expects the package name as character text. Then, to actually use it, you load it with library, which brings that drawer into your current workspace. In the library call shown, ggplot2 is written as the package name without quotation marks. Loading does not download the package, so it works only after installation has succeeded. Now read the callout, because this is a genuine stumbling block: you install once per computer, but you load in every new session. And crucially that includes every time you render a Quarto document, because rendering starts a fresh session. That single fact is the source of a great many could not find function errors.
 
 </details>
 
@@ -1171,7 +1207,7 @@ b <- a
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now add, subtract, multiply, and divide the two vectors, and look carefully at what comes back each time. Every result is itself a vector of five numbers. That is the point, and it is what the callout is telling you: arithmetic on vectors happens element by element. The first element of a is combined with the first element of b, the second with the second, and so on down the line. This is called vectorization, and it is one of the things that makes R pleasant to use, because in many other languages you would have to write a loop to achieve the same thing.
+Now add, subtract, multiply, and divide the two vectors, and look carefully at what comes back each time. Every result is itself a vector of five numbers. That is the point, and it is what the callout is telling you: arithmetic on vectors happens element by element. The first element of a is combined with the first element of b, the second with the second, and so on down the line. Because a and b contain the same values, addition doubles each position, subtraction produces five zeros, multiplication produces the squares one, four, nine, sixteen, twenty-five, and division produces five ones. Those outputs are a quick check that you are pairing corresponding positions. This is called vectorization, and it is one of the things that makes R pleasant to use, because in many other languages you would have to write a loop to achieve the same thing.
 
 </details>
 
@@ -1203,7 +1239,7 @@ Vector arithmetic operations happen **element by element**!
 <details class="transcript">
 <summary>Transcript</summary>
 
-To get at part of a vector you use square brackets with a position inside them. a bracket two gives you the second element. And you are not limited to one at a time: put a vector of positions inside the brackets and you get several elements back, so a bracket c of one comma two gives you the first and second. Notice the pattern here, because it generalizes: whatever goes inside the brackets describes which elements you want. That idea carries straight over to matrices and data frames, where the brackets simply gain more positions.
+To get at part of a vector you use square brackets with a position inside them. a bracket two gives you the second element. The next line applies the same rule to b, so b bracket three gives you its third element. And you are not limited to one at a time: put a vector of positions inside the brackets and you get several elements back, so a bracket c of one comma two gives you the first and second. The final example asks b for positions one and five and returns those two values. Notice the pattern here, because it generalizes: whatever goes inside the brackets describes which elements you want. R counts positions from one, not zero, which is why bracket one means the first element. That idea carries straight over to matrices and data frames, where the brackets simply gain more positions.
 
 </details>
 
@@ -1300,7 +1336,7 @@ A %*% t(B)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Accessing a matrix uses the same square brackets as a vector, but now there are two positions inside, separated by a comma: rows first, then columns. So A bracket one comma two is the first row, second column. As with vectors you can ask for several at once by putting a vector into either position. And the third example is the one to remember: leaving a position empty means give me all of them, so A bracket one comma nothing hands you the entire first row. That empty-means-everything convention comes up constantly once we get to data frames.
+Accessing a matrix uses the same square brackets as a vector, but now there are two positions inside, separated by a comma: rows first, then columns. So A bracket one comma two is the first row, second column. As with vectors you can ask for several at once by putting a vector into either position. In the second example, c of one comma three in the row position selects rows one and three, while the two after the comma keeps only column two. And the third example is the one to remember: leaving a position empty means give me all of them, so A bracket one comma nothing hands you the entire first row. That empty-means-everything convention comes up constantly once we get to data frames.
 
 </details>
 
@@ -1419,7 +1455,7 @@ a_list$b
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the object you will spend the rest of the course inside. Three things to hold onto. It is the most common type we use, by a wide margin. Technically it is a special kind of list whose elements are vectors that all happen to have the same length, and that equal length is what gives it its rectangular, matrix-like shape. And because of that dual nature it inherits properties of both a list and a matrix, which is exactly why the next tab shows two different ways of getting at its contents. Run mtcars to see a real one.
+Now the object you will spend the rest of the course inside. Three things to hold onto. It is the most common type we use, by a wide margin. Technically it is a special kind of list whose elements are vectors that all happen to have the same length, and that equal length is what gives it its rectangular, matrix-like shape. And because of that dual nature it inherits properties of both a list and a matrix, which is exactly why the next tab shows two different ways of getting at its contents. Run mtcars to see a real one. In the printed output, each row is a car model and each named column is a measured variable such as miles per gallon, cylinders, or gears. The aligned rows show what equal-length column vectors look like when R presents them as one rectangular data frame. All the displayed mtcars columns are numeric, but that is a feature of this dataset, not a requirement of data frames.
 
 </details>
 
@@ -1438,7 +1474,7 @@ mtcars
 <details class="transcript">
 <summary>Transcript</summary>
 
-And here is that dual nature in action. The list-like way uses the dollar sign with a column name, so mtcars dollar gear hands you that entire column as a vector. The matrix-like way uses square brackets with a row position and a column position. Both are correct, and which one you reach for depends on whether you are thinking of the object as a collection of named columns or as a rectangle of values. The line in red is a promise: we are going to spend a great deal of time doing exactly this kind of work with the tidyverse, and it will be considerably more pleasant than square brackets.
+And here is that dual nature in action. The list-like way uses the dollar sign with a column name, so mtcars dollar gear hands you that entire column as a vector, one gear count for every car. The matrix-like way uses square brackets with a row position and a column position. Mtcars bracket one comma two selects the first row and second column, which the label identifies as cylinders, and the value returned is six. Both are correct, and which one you reach for depends on whether you are thinking of the object as a collection of named columns or as a rectangle of values. The line in red is a promise: we are going to spend a great deal of time doing exactly this kind of work with the tidyverse, and it will be considerably more pleasant than square brackets.
 
 </details>
 
@@ -1471,8 +1507,6 @@ mtcars[1, 2]
 ## Next class: Quarto
 
 <html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
-
-
 
 
 
