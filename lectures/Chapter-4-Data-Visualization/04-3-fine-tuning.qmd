@@ -22,9 +22,9 @@ webr:
   cell-options:
     editor-font-scale: 0.7
     dpi: 216
-    fig-width: 7
-    fig-height: 4.5
-    out-width: 55%
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
 filters:
   - webr
 ---
@@ -196,12 +196,12 @@ This is content-altering, side by side with the original. On the right we have g
 
 ```{webr-r}
 #| context: setup
-county_yield_s_b2010 <- 
-  county_yield %>% 
+county_yield_s_b2010 <-
+  county_yield %>%
   filter(year >= 2005, year <= 2010)
 
-g_box <- 
-  ggplot(data = county_yield_s_b2010) + 
+g_box <-
+  ggplot(data = county_yield_s_b2010) +
   geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))
 ```
 
@@ -215,7 +215,7 @@ Original
 
 ```{webr-r}
 #| autorun: true
-g_box 
+g_box
 ```
 
 :::
@@ -258,7 +258,7 @@ Original
 
 ```{webr-r}
 #| autorun: true
-g_box 
+g_box
 ```
 
 :::
@@ -317,14 +317,14 @@ We are going to build on this figure in this section:
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
-county_yield_s_b2010 <- 
-  county_yield %>% 
+county_yield_s_b2010 <-
+  county_yield %>%
   filter(year >= 2005, year <= 2010)
 
 (
-g_box <- 
-  ggplot(data = county_yield_s_b2010) + 
-  geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))
+  g_box <-
+    ggplot(data = county_yield_s_b2010) +
+    geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name))
 )
 ```
 
@@ -367,10 +367,10 @@ The simplest thing to change is the axis title, and there are two ways of doing 
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 70%
-g_box + 
-  scale_x_discrete(name = "Year") + 
-  scale_y_continuous(name = "Corn Yield (bu/acre)") 
+#| code-track: 0.45
+g_box +
+  scale_x_discrete(name = "Year") +
+  scale_y_continuous(name = "Corn Yield (bu/acre)")
 ```
 
 :::
@@ -383,10 +383,10 @@ Or just this,
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 70%
-g_box + 
+#| code-track: 0.45 
+g_box +
   xlab("Year") +
-  ylab("Corn Yield (bu/acre)") 
+  ylab("Corn Yield (bu/acre)")
 ```
 
 ### limit
@@ -401,18 +401,19 @@ Limits control the range of an axis, and again you get the long form through the
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 #| warning: false
-g_box + 
+g_box +
   scale_x_discrete(
-    name = "Year" 
+    name = "Year"
   ) +
   scale_y_continuous(
     name = "Corn Yield (bu/acre)",
     #--- first min, second max ---#
     limit = c(100, 200)
-  ) 
+  )
 ```
 
 :::
@@ -422,7 +423,8 @@ g_box +
 Or just,
 
 ```{webr-r}
-g_box + 
+#| code-track: 0.4
+g_box +
   xlab("Year") +
   ylab("Corn Yield (bu/acre)") +
   ylim(100, 200)
@@ -489,13 +491,14 @@ Now you do it. The instruction tab builds a line plot of mean arrival delay by m
 Run the following code to create `gg_delay`, which you will build on.
 
 ```{webr-r}  
+#| layout: stacked
 #| autorun: true
 (
-gg_delay <- 
-  flights %>% 
-  group_by(origin, month) %>% 
-  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
-  ggplot(.) +
+  gg_delay <-
+    flights %>%
+    group_by(origin, month) %>%
+    summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+    ggplot(.) +
     geom_line(aes(y = mean_arr_delay, x = month, color = origin))
 )
 ```
@@ -524,7 +527,7 @@ Here are the list of changes you need to make:
 #| context: output
 #| out-width: 100%
 #| warning: false
-gg_delay + 
+gg_delay +
   scale_x_continuous(
     name = "Month",
     limit = c(4, 8),
@@ -533,7 +536,7 @@ gg_delay +
   scale_y_continuous(
     name = "Average Arrival Delay (minutes)",
     limit = c(0, 25)
-  ) 
+  )
 ```
 
 :::
@@ -548,12 +551,6 @@ gg_delay +
 
 ```{webr-r}
 #--- work here ---#
-
-
-
-
-
-
 ```
 
 ##### Answer
@@ -561,7 +558,7 @@ gg_delay +
 ```{r}
 #| code-fold: true
 #| eval: false
-gg_delay + 
+gg_delay +
   scale_x_continuous(
     name = "Month",
     limit = c(4, 8),
@@ -602,18 +599,18 @@ We are going to build on this figure in this section:
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
-( 
-g_axis <-
-  g_box +
-  scale_x_discrete(
-    name = "Year",
-    labels = ~ gsub("20", "", .x)
-  ) +
-  scale_y_continuous(
-    name = "Corn Yield (bu/acre)",
-    limit = c(100, 200),
-    breaks = seq(100, 200, by = 10)
-  )
+(
+  g_axis <-
+    g_box +
+    scale_x_discrete(
+      name = "Year",
+      labels = ~ gsub("20", "", .x)
+    ) +
+    scale_y_continuous(
+      name = "Corn Yield (bu/acre)",
+      limit = c(100, 200),
+      breaks = seq(100, 200, by = 10)
+    )
 )
 ```
 
@@ -631,9 +628,11 @@ The first thing to fix on almost any legend is its title, because by default it 
 ::: {.side-out}
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
-g_axis + scale_fill_brewer(name = "State")
+g_axis +
+  scale_fill_brewer(name = "State")
 ```
 
 :::
@@ -651,9 +650,14 @@ The same function also chooses the colours, through the palette argument. Set1 i
 ::: {.side-out}
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
-g_axis + scale_fill_brewer(name = "State", palette = "Set1")
+g_axis +
+  scale_fill_brewer(
+    name = "State",
+    palette = "Set1"
+  )
 ```
 
 :::
@@ -671,13 +675,16 @@ Now the layout of the legend itself, which is controlled through the guide argum
 ::: {.side-out}
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
-g_axis + 
+g_axis +
   scale_fill_brewer(
     name = "State",
     palette = "Set1",
-    guide = guide_legend(title.position = "left")
+    guide = guide_legend(
+      title.position = "left"
+    )
   )
 ```
 
@@ -695,13 +702,17 @@ The other layout control you will reach for is the number of rows or columns. Se
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
-g_axis + 
+g_axis +
   scale_fill_brewer(
     name = "State",
     palette = "Set1",
-    guide = guide_legend(title.position = "left", nrow = 2)
+    guide = guide_legend(
+      title.position = "left",
+      nrow = 2
+    )
   )
 ```
 
@@ -726,12 +737,13 @@ Run the following code to create `gg_delay`, which you will build on.
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| layout: stacked
 (
-gg_delay <- 
-  flights %>% 
-  group_by(origin, month) %>% 
-  summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
-  ggplot(.) +
+  gg_delay <-
+    flights %>%
+    group_by(origin, month) %>%
+    summarize(mean_arr_delay = mean(arr_delay, na.rm = TRUE)) %>%
+    ggplot(.) +
     geom_line(aes(y = mean_arr_delay, x = month, color = origin))
 )
 ```
@@ -757,7 +769,7 @@ Here are the list of changes you need to make:
 
 ```{webr-r}
 #| context: output
-gg_delay + 
+gg_delay +
   scale_color_brewer(
     name = "Airports in NY",
     palette = "Set2",
@@ -765,7 +777,7 @@ gg_delay +
       title.position = "bottom",
       ncol = 3
     )
-  ) 
+  )
 ```
 
 :::
@@ -902,12 +914,19 @@ Two text elements, and notice they use different levels of the naming hierarchy 
 </details>
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_axis +
   theme(
-    axis.title.x = element_text(size = 8, color = "red"),
-    axis.text = element_text(size = 14, family = "Times")
+    axis.title.x = element_text(
+      size = 8,
+      color = "red"
+    ),
+    axis.text = element_text(
+      size = 14,
+      family = "Times"
+    )
   )
 ```
 
@@ -921,13 +940,23 @@ Now a line element. axis.line.y draws the axis line itself, and because it is a 
 </details>
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_axis +
   theme(
-    axis.title.x = element_text(size = 8, color = "red"),
-    axis.text = element_text(size = 14, family = "Times"),
-    axis.line.y = element_line(linewidth = 2, color = "blue")
+    axis.title.x = element_text(
+      size = 8,
+      color = "red"
+    ),
+    axis.text = element_text(
+      size = 14,
+      family = "Times"
+    ),
+    axis.line.y = element_line(
+      linewidth = 2,
+      color = "blue"
+    )
   )
 ```
 
@@ -941,13 +970,23 @@ And a measurement. axis.ticks.length.x controls how long the tick marks are, and
 </details>
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_axis +
   theme(
-    axis.title.x = element_text(size = 8, color = "red"),
-    axis.text = element_text(size = 14, family = "Times"),
-    axis.line.y = element_line(linewidth = 2, color = "blue"),
+    axis.title.x = element_text(
+      size = 8,
+      color = "red"
+    ),
+    axis.text = element_text(
+      size = 14,
+      family = "Times"
+    ),
+    axis.line.y = element_line(
+      linewidth = 2,
+      color = "blue"
+    ),
     axis.ticks.length.x = unit(2, "cm")
   )
 ```
@@ -994,15 +1033,19 @@ This is what we will build on:
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
-(  
-g_l <- 
-  g_axis +
-  scale_fill_brewer(
-    palette = "Paired",
-    guide = guide_legend(title.position = "left", nrow = 2)
-  )
+(
+  g_l <-
+    g_axis +
+    scale_fill_brewer(
+      palette = "Paired",
+      guide = guide_legend(
+        title.position = "left",
+        nrow = 2
+      )
+    )
 )
 ```
 
@@ -1020,6 +1063,7 @@ The single most useful legend theme setting is position. By default the legend g
 </details>
 
 ```{webr-r}
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_l +
@@ -1037,6 +1081,7 @@ The keys are the little coloured swatches next to each label, and their size is 
 </details>
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_l +
@@ -1045,7 +1090,7 @@ g_l +
     legend.position = "bottom",
     legend.key.height = unit(0.5, "cm"),
     legend.key.width = unit(2, "cm")
-  ) 
+  )
 ```
 
 ### font
@@ -1058,6 +1103,7 @@ Fonts for the two text parts of a legend, and they are named separately because 
 </details>
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_l +
@@ -1066,8 +1112,15 @@ g_l +
     legend.position = "bottom",
     legend.key.height = unit(0.5, "cm"),
     legend.key.width = unit(2, "cm"),
-    legend.text = element_text(size = 16, family = "Times"),
-    legend.title = element_text(size = 6, family = "Courier", color = "red")
+    legend.text = element_text(
+      size = 16,
+      family = "Times"
+    ),
+    legend.title = element_text(
+      size = 6,
+      family = "Courier",
+      color = "red"
+    )
   )
 ```
 
@@ -1081,6 +1134,7 @@ And the panel behind the legend, which is a box, so it takes element_rect and yo
 </details>
 
 ```{webr-r}  
+#| code-track: 0.4
 #| autorun: true
 #| out-width: 70%
 g_l +
@@ -1092,7 +1146,7 @@ g_l +
     legend.text = element_text(size = 16, family = "Times"),
     legend.title = element_text(size = 6, family = "Courier", color = "red"),
     legend.background = element_rect(fill = "lightblue", linetype = "solid")
-  ) 
+  )
 ```
 
 :::
@@ -1117,10 +1171,10 @@ Install and library  `ggthemes` package first:
 
 ```{r eval = F}
 #--- install ---#
-install.packages("ggthemes") 
+install.packages("ggthemes")
 
 #--- library ---#
-library("ggthemes") 
+library("ggthemes")
 ```
 
 <br>
@@ -1255,7 +1309,9 @@ g_axis_bw <- g_axis + theme_bw()
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
-g_axis_bw + theme(panel.grid.minor = element_blank())
+#| code-track: 0.4 
+g_axis_bw +
+  theme(panel.grid.minor = element_blank())
 ```
 
 
@@ -1264,12 +1320,17 @@ g_axis_bw + theme(panel.grid.minor = element_blank())
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| code-track: 0.4
 g_axis +
   theme_bw() +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_blank(),
-    panel.grid.major.y = element_line(linewidth = 1, color = "blue", linetype = "dotted")
+    panel.grid.major.y = element_line(
+      linewidth = 1,
+      color = "blue",
+      linetype = "dotted"
+    )
   )
 ```
 
@@ -1299,11 +1360,11 @@ Here, I am creating my own theme off of `theme_economist()`, where axis titles a
 
 ```{webr-r}
 #| autorun: true
-my_theme <- 
+my_theme <-
   theme_economist() +
   theme(
     axis.title = element_blank(),
-    panel.grid.major = element_blank()  
+    panel.grid.major = element_blank()
   )
 ```
 
@@ -1409,7 +1470,7 @@ Create a dataset for this section:
 
 ```{webr-r}
 #| autorun: true
-county_yield_f <- 
+county_yield_f <-
   county_yield %>%
   filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>%
   filter(year %in% c(2005, 2006))
@@ -1425,13 +1486,13 @@ Create a faceted figure we will build on:
 #| autorun: true
 #| out-width: 70%
 (
-g_f <-
-  ggplot(data = county_yield_f) + 
-  geom_histogram(aes(x = corn_yield)) +
-  facet_grid(
-    state_name ~ year, 
-    scales = "free_x"
-  )
+  g_f <-
+    ggplot(data = county_yield_f) +
+    geom_histogram(aes(x = corn_yield)) +
+    facet_grid(
+      state_name ~ year,
+      scales = "free_x"
+    )
 )
 ```
 
@@ -1450,10 +1511,19 @@ Strip text, and notice it uses the suffix rule from earlier: strip.text.x is the
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| code-track: 0.4 
 g_f +
   theme(
-    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
-    strip.text.y = element_text(angle = 0, size = 6, color = "blue")
+    strip.text.x = element_text(
+      size = 12,
+      family = "Times",
+      color = "red"
+    ),
+    strip.text.y = element_text(
+      angle = 0,
+      size = 6,
+      color = "blue"
+    )
   )
 ```
 
@@ -1470,13 +1540,24 @@ The strip backgrounds, which are boxes, so element_rect. Two different treatment
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| code-track: 0.4 
 g_f +
   theme(
-    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
-    strip.text.y = element_text(angle = 0, size = 6, color = "blue"),
-    strip.background.x = element_rect(color = "blue"),
+    strip.text.x = element_text(
+      size = 12,
+      family = "Times",
+      color = "red"
+    ),
+    strip.text.y = element_text(
+      angle = 0,
+      size = 6,
+      color = "blue"
+    ),
+    strip.background.x = element_rect(
+      color = "blue"
+    ),
     strip.background.y = element_blank()
-  ) 
+  )
 ```
 
 ### panel spacing
@@ -1491,15 +1572,26 @@ And the gaps between panels, set with panel.spacing, again with x and y variants
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| code-track: 0.4
 g_f +
   theme(
-    strip.text.x = element_text(size = 12, family = "Times", color = "red"),
-    strip.text.y = element_text(angle = 0, size = 6, color = "blue"),
-    strip.background.x = element_rect(color = "blue"),
+    strip.text.x = element_text(
+      size = 12,
+      family = "Times",
+      color = "red"
+    ),
+    strip.text.y = element_text(
+      angle = 0,
+      size = 6,
+      color = "blue"
+    ),
+    strip.background.x = element_rect(
+      color = "blue"
+    ),
     strip.background.y = element_blank(),
     panel.spacing.x = unit(2, "cm"),
     panel.spacing.y = unit(0.01, "cm")
-  ) 
+  )
 ```
 
 :::
@@ -1547,8 +1639,12 @@ You can use HEX color codes for any color-related elements in a figure.
 ```{webr-r}
 #| autorun: true
 #| out-width: 70%
+#| code-track: 0.4 
 ggplot(data = county_yield) +
-  geom_point(aes(y = corn_yield, x = d3_5_9), color = "#824283") 
+  geom_point(
+    aes(y = corn_yield, x = d3_5_9),
+    color = "#824283"
+  )
 ```
 
 :::{.callout-note title="Try"}
@@ -1661,15 +1757,16 @@ Four of the palettes shown together on the same data so you can compare them fai
 data("geyser", package = "MASS")
 
 ggplot(geyser, aes(x = duration, y = waiting)) +
-  xlim(0.5, 6) + ylim(40, 110) +
+  xlim(0.5, 6) +
+  ylim(40, 110) +
   stat_density2d(aes(fill = after_stat(level)), geom = "polygon") +
   theme_bw() +
-  theme(panel.grid=element_blank()) -> gg
+  theme(panel.grid = element_blank()) -> gg
 
-((gg + scale_fill_viridis_c(option="A") + labs(x="magma (option A)", y=NULL)) |
-(gg + scale_fill_viridis_c(option="B") + labs(x="inferno (option B)", y=NULL)))/ 
-((gg + scale_fill_viridis_c(option="C") + labs(x="plasma (option C)", y=NULL)) |
-(gg + scale_fill_viridis_c(option="D") + labs(x="viridis (default)", y=NULL)))
+((gg + scale_fill_viridis_c(option = "A") + labs(x = "magma (option A)", y = NULL)) |
+  (gg + scale_fill_viridis_c(option = "B") + labs(x = "inferno (option B)", y = NULL))) /
+  ((gg + scale_fill_viridis_c(option = "C") + labs(x = "plasma (option C)", y = NULL)) |
+    (gg + scale_fill_viridis_c(option = "D") + labs(x = "viridis (default)", y = NULL)))
 ```
 
 ### Example 1
@@ -1774,7 +1871,7 @@ These three tabs display every palette in each family, and they are worth spendi
 
 ```{webr-r}
 #| autorun: true
-display.brewer.all(type = "seq")  
+display.brewer.all(type = "seq")
 ```
 
 :::
@@ -1785,7 +1882,7 @@ display.brewer.all(type = "seq")
 
 ```{webr-r}
 #| autorun: true
-display.brewer.all(type = "div")  
+display.brewer.all(type = "div")
 ```
 
 :::
@@ -1796,7 +1893,7 @@ display.brewer.all(type = "div")
 
 ```{webr-r}
 #| autorun: true
-display.brewer.all(type = "qual")  
+display.brewer.all(type = "qual")
 ```
 
 :::
@@ -1817,8 +1914,8 @@ Generate a dataset for visualization:
 
 ```{webr-r}  
 #| autorun: true
-county_yield_s_b2010 <- 
-  county_yield %>% 
+county_yield_s_b2010 <-
+  county_yield %>%
   filter(year >= 2005, year <= 2010)
 ```
 
@@ -1829,7 +1926,7 @@ Create a figure:
 ```{webr-r}
 #| autorun: true
 #| out-width: 70% 
-ggplot(data = county_yield_s_b2010) + 
+ggplot(data = county_yield_s_b2010) +
   geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +
   scale_fill_brewer(palette = "Set2")
 ```
@@ -1883,7 +1980,7 @@ For example, consider the box plot of corn yield for the three states in `county
 
 ```{r eval = F}
 (
-cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "#ff0080")
+  cols <- c("Colorado" = "red", "Nebraska" = "blue", "Kansas" = "#ff0080")
 )
 ```
 
@@ -1913,7 +2010,7 @@ Create a figure:
 ```{webr-r}
 #| autorun: true
 #| out-width: 70% 
-ggplot(data = county_yield_s_b2010) + 
+ggplot(data = county_yield_s_b2010) +
   geom_boxplot(aes(x = factor(year), y = corn_yield, fill = state_name)) +
   scale_fill_manual(values = cols)
 ```
@@ -1969,9 +2066,9 @@ Create a figure:
 ::: {.side-out}
 
 ```{webr-r}
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_point(
-    aes(x = d1_5_9, y = corn_yield,color = corn_yield),
+    aes(x = d1_5_9, y = corn_yield, color = corn_yield),
     size = 0.3
   ) +
   scale_color_gradientn(

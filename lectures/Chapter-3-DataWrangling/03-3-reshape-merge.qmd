@@ -21,9 +21,9 @@ webr:
   cell-options:
     editor-font-scale: 0.7
     dpi: 216
-    fig-width: 7
-    fig-height: 4.5
-    out-width: 55%
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
 execute:
   echo: true
 filters:
@@ -409,7 +409,7 @@ Notice `year` is character. Convert it to numeric using `as.numeric()` if you us
 <details class="transcript">
 <summary>Transcript</summary>
 
-This is the hardest thing in this lecture, so take it slowly through the four tabs. The situation is that we widened two variables at once, so every column name now encodes two pieces of information, the variable and the year, glued together with an underscore. Going back is not a single pivot_longer, and the second tab shows you the failed attempt so you can see exactly how it falls short. The trick is to pivot everything into one long column first, then split the combined name into its two parts with separate, and then widen just the variable part back out again. Three steps, and the last tab puts them together.
+This is the hardest thing in this lecture, so take it slowly through the four tabs. The situation is that we widened two variables at once, so every column name now encodes two pieces of information, the variable and the year, glued together with an underscore. A single advanced pivot_longer can do this with .value, but these tabs use an explicit three-step route so you can see each part. The second tab shows you why an ordinary pivot_longer falls short. The trick taught here is to pivot everything into one long column first, then split the combined name into its two parts with separate, and then widen just the variable part back out again. Three steps, and the last tab puts them together.
 
 </details>
 
@@ -1102,6 +1102,7 @@ Let's create a weather dataset where you have more than one observation per coun
 
 ```{webr-r}
 #| autorun: true
+#| code-track: 0.65
 ( 
 weather_data <- 
   data.frame(
@@ -1320,7 +1321,7 @@ jan_weather <-
 
 <br>
 
-Both carry a `time_hour` column, so this looks like an ordinary equality join on airport and hour.
+Both timestamps come from `time_hour`, renamed here to `dep_time` and `obs_time` so the two are easy to tell apart. This looks like an ordinary equality join on airport and hour.
 
 #### A join that quietly fails
 
@@ -1476,7 +1477,7 @@ This is an [inequality join]{style="color: blue;"}. It is progress, but look at 
 <details class="transcript">
 <summary>Transcript</summary>
 
-The inequality join gave us every earlier reading, but we only wanted one, the most recent. Wrapping the comparison in `closest` says exactly that: of all the rows satisfying the inequality, keep only the one where the two dates are nearest. Now every irrigation event gets at most one reading. This is what is normally called a rolling join, because the value rolls forward in time until a newer one replaces it. Look at the last row though. Field B irrigated on the second of May, with no reading at or before that date, so it is NA; `closest` cannot invent a match. Then the last tab takes this straight back to the flights, where fifty-two missing temperatures become zero.
+The inequality join gave us every earlier reading, but we only wanted one, the most recent. Wrapping the comparison in `closest` says exactly that: of all the rows satisfying the inequality, keep only the one where the two dates are nearest. Now every irrigation event usually gets one reading, although duplicate rows on the nearest date can return multiple matches. This is what is normally called a rolling join, because the value rolls forward in time until a newer one replaces it. Look at the last row though. Field B irrigated on the second of May, with no reading at or before that date, so it is NA; `closest` cannot invent a match. Then the last tab takes this straight back to the flights, where fifty-two missing temperatures become zero.
 
 </details>
 

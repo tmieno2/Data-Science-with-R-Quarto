@@ -120,7 +120,7 @@ browser.
 
 5. **Never pipe `quarto render`.** `quarto render 2>&1 | tail -6` reports
    `tail`'s exit code, not quarto's, so a render that halted partway looks like
-   a success. This has already caused a partial build (28 of 41 files) to be
+   a success. This has already caused a partial build (28 of 51 files) to be
    reported as complete. Redirect instead, then read the code:
 
    ```bash
@@ -128,18 +128,27 @@ browser.
    find docs -name '*.html' | wc -l     # expect 52
    ```
 
-6. **This repo lives in Dropbox, and Dropbox fights Quarto's cache.** There are
-   `conflicted copy` files inside `.quarto/` — including of
-   `project-cache/deno-kv-file-shm`, which is a live database Quarto writes
-   during a project render. Symptoms are weird, non-reproducible, and *not* your
-   edits: a traceback naming a file that has never existed in this repo, or
-   `ERROR: NotFound ... rename '<file>.html' -> 'docs/<file>.html'` at the final
-   move step. A single-file render of the same deck then succeeds.
+6. **`ERROR: NotFound ... rename '<file>.html' -> 'docs/<file>.html'` means a
+   stray intermediate, not a broken deck.** Quarto writes each page's HTML at
+   the repo root and moves it into `docs/` at the end. Render a single file, and
+   that intermediate can be left behind; the next project render then tries to
+   move a file that is no longer there and stops partway. It stopped at 16 of 24
+   files in AE-MS this way on 2026-08-21.
 
-   Before blaming a `.qmd`, check `find .quarto -name "*conflicted*"`, and
-   confirm the deck renders alone. Excluding `.quarto/` from Dropbox sync would
-   remove the whole class of failure — not done, as it changes the user's
-   Dropbox setup.
+   The fix is to clear the strays and render again:
+
+   ```bash
+   rm -f *.html            # repo root only; docs/ is the real output
+   quarto render > /tmp/render.log 2>&1; echo "EXIT: $?"
+   ```
+
+   This repo used to live in Dropbox and then in Google Drive, and both produced
+   their own versions of this failure: Dropbox left `conflicted copy` files
+   inside `.quarto/`, and Google Drive would briefly report whole directories as
+   empty while its file provider reconciled. **Neither applies now** — the repo
+   lives on local disk at `~/Teaching/`, see `../README.md`. If you ever see a
+   traceback naming a file that has never existed here, check first whether
+   someone has moved the repo back inside a synced folder.
 
 7. **`webr::install(repos = ...)` searches only the repos you name.** It does
    not fall back to the main webR repo for *dependencies*. Ten decks installed
@@ -292,8 +301,7 @@ To replicate this system in a **different** course project, hand that project's
 agent [.claude/prompts/replicate-transcripts.md](.claude/prompts/replicate-transcripts.md).
 Copy the whole file — it is nothing but the prompt. Its reference paths are
 absolute and assume this repo stays at
-`/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto`; update them if
-it moves.
+`~/Teaching/Data-Science-with-R-Quarto`; update them if it moves.
 
 ## Rule: anything meant to be copied must be copiable
 
@@ -309,3 +317,34 @@ purpose is to be pasted somewhere else:
 
 `.claude/prompts/` holds these. Everything in that directory is a pure,
 copy-whole-file artifact.
+
+---
+
+## Never delete a file you cannot account for
+
+Do not describe a file as debris, junk, or a leftover, and do not offer to
+delete it, until you have established what wrote it and whether anything is
+still writing it. A command returning is not the same as its work being
+finished.
+
+A `quarto render` of this site writes each deck's HTML next to its `.qmd` and
+moves it into `docs/` afterwards, and it keeps working after the parent command
+has reported an error. Deck HTML sitting beside a `.qmd` is therefore ambiguous:
+it may be output still in flight. On 2026-08-21 four such files were called
+debris and proposed for deletion; minutes later the render moved all four into
+`docs/` by itself. Deleting them would have destroyed live output.
+
+The same rule applies to naming causes. Do not attribute a missing or odd file
+to a sync client, a watcher, or any other part of the environment without
+checking it on this machine (`df`, `mount`, `ls -ld`, `ps`).
+
+Know where the Drive boundary actually is, because it runs through this repo
+rather than around it. `AE-MS/assignments/submission` is a symlink into Google
+Drive, where the file-request web app writes student uploads, and the published
+student folders are a Drive path too. Those really can show a file that is
+listed but not materialised, and `../README.md` explains what that does to
+`git add -A`. Everything else, the lecture sources and the rendered `docs/`
+tree, is on local disk, so a file that appears or disappears there needs a
+different explanation. Check which side of that line you are on before blaming
+Drive. "I do not know what caused this" is a better answer than a plausible
+culprit you have not verified.

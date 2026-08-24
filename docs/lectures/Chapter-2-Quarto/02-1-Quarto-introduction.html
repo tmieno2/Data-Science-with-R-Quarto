@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-bf1223c773699056cca1ada9baf1738b.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -1435,7 +1435,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>One related idea, which you will want in the very next lecture. Cache speeds up repeated renders of a single document. Freeze solves the neighbouring problem: when you have a whole website or project made of many documents, you do not want to rebuild all of them every time you edit one. Putting freeze auto in _quarto.yml means only the documents whose source has actually changed get re-rendered. If you build the website in 02-3 and find yourself waiting through a full rebuild for a one-line edit, this is the setting you want.</p>
+<p>One related idea, which is useful when you work with a multi-document project. Cache speeds up repeated renders of a single document. Freeze solves the neighbouring problem: when you have a whole website or project made of many documents, you do not want to rebuild all of them every time you edit one. Putting freeze auto in _quarto.yml means only the documents whose source has actually changed get re-rendered. If you build a website and find yourself waiting through a full rebuild for a one-line edit, this is the setting you want.</p>
 </details>
 <p><code>cache</code> speeds up repeated renders of <strong>one document</strong>. When you have a whole Quarto <strong>website</strong> or project of many documents (Chapter 02-3), you want something else: <code>freeze</code> stops a document from being re-rendered at all unless its source has changed.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>execute:</span>
@@ -1483,11 +1483,11 @@ Transcript
 </div>
 <p><br></p>
 <ul>
-<li><p>In my case, <code>sample_qmd.qmd</code> is located in <span style="color: blue;"> /Users/taromieno/Library/CloudStorage/GoogleDrive-taro.mieno.pf@gmail.com/My Drive/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto </span>. <!-- CHANGED (A5): was here::here("Chapter-2-Quarto"), which printed a path that
+<li><p>In my case, <code>sample_qmd.qmd</code> is located in <span style="color: blue;"> /Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto </span>. <!-- CHANGED (A5): was here::here("Chapter-2-Quarto"), which printed a path that
      does not exist. here::here() builds the string whether or not the folder is
      real, so the slide was confidently displaying a fake location. The actual
      folder is lectures/Chapter-2-Quarto. --></p></li>
-<li><p>This means that R tries to find <span style="color: blue;"> /Users/taromieno/Library/CloudStorage/GoogleDrive-taro.mieno.pf@gmail.com/My Drive/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto/corn_price.csv</span>.</p></li>
+<li><p>This means that R tries to find <span style="color: blue;"> /Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto/corn_price.csv</span>.</p></li>
 <li><p>If the file is not there, R cannot import it and returns an error. Everything downstream that depends on the dataset fails too.</p></li>
 </ul>
 </div>

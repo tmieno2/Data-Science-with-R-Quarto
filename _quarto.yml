@@ -12,12 +12,17 @@ project:
     - "!sample-project-reproducible/writing/*.qmd"
     # - "!lectures/Chapter-8-Table/08-2-modelsummary.qmd"
     - "!templates/"
+  # Measure what every WebR cell prints, before the render, so the side-by-side
+  # layout is decided from the real output. Only decks whose .qmd is newer than
+  # their .js are re-measured, so this costs nothing on an unchanged render.
+  pre-render:
+    - lectures/measure-webr-output.R
   # Measured output sizes for the WebR cells, written by
   # _lecture-shared/measure-webr-output.R and read at load by webr-layout.html.
   # Without this they are not copied into the site and every cell falls back to
   # judging its layout on the code alone.
   resources:
-    - "lectures/**/*.webr-output.json"
+    - "lectures/**/*.webr-output.js"
 
 website:
   title: "Data Science with R (AECN 896-05)"

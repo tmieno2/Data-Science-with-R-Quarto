@@ -22,9 +22,9 @@ webr:
   cell-options:
     editor-font-scale: 0.7
     dpi: 216
-    fig-width: 7
-    fig-height: 4.5
-    out-width: 55%
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
 filters:
   - webr
 ---
@@ -179,6 +179,7 @@ Let's start by using R as nothing more than a calculator, because it is a comfor
 </details>
  
 ```{webr-r}
+#| code-track: 0.5
 #--- addition ---#
 2 + 3.3
 
@@ -223,6 +224,7 @@ Anything after a `#` on a line is ignored by R. Use comments to explain what
 your code is doing, to yourself and to anyone else who reads it.
 
 ```{webr-r}
+#| code-track: 0.6
 #--- this whole line is a comment ---#
 2 + 3
 
@@ -300,6 +302,7 @@ R uses `NA` to mean "this value is missing". It is not zero, and it is not the
 text `"NA"`.
 
 ```{webr-r}
+#| code-track: 0.5
 x <- c(4, 3, NA, 9)
 
 x
@@ -314,6 +317,7 @@ Most calculations involving a missing value return `NA`, because the answer
 genuinely is unknown:
 
 ```{webr-r}
+#| code-track: 0.5
 mean(x)
 ```
 
@@ -322,8 +326,11 @@ mean(x)
 Ask for the mean of what remains with `na.rm = TRUE`:
 
 ```{webr-r}
+#| code-track: 0.5
 mean(x, na.rm = TRUE)
 ```
+
+<br>
 
 :::{.callout-important}
 Do not reach for `na.rm = TRUE` out of habit. It silently drops observations, so
@@ -513,11 +520,17 @@ A `vector` is a class of object whose elements are all of the **same** type. Use
 **Example** 
 
 ```{webr-r}
+#| code-track: 0.6
 #--- create a vector of numbers ---#
 a <- c(4, 3, 5, 9, 1)
 
 a
+```
 
+<br>
+
+```{webr-r}
+#| code-track: 0.6
 #--- create a vector of characters ---#
 b <- c("python", "is", "better", "than", "R")
 b
@@ -530,6 +543,7 @@ b
 What happens if we put elements of different types into one vector?  
 
 ```{webr-r}
+#| code-track: 0.6
 #--- mix numbers and a character ---#
 a_vector <- c(4, 3, "5", 9, 1)
 
@@ -586,6 +600,7 @@ A `matrix` is a class of object whose elements are all of the **same** type, arr
 **Examples**
 
 ```{webr-r}
+#| code-track: 0.6
 #--- create a matrix of numbers ---#
 M_num <- matrix(c(2, 4, 3, 1, 5, 7), nrow = 3)
 
@@ -595,6 +610,7 @@ M_num
 <br>
 
 ```{webr-r}
+#| code-track: 0.6
 #--- create a matrix of characters ---#
 M_char <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3)
 
@@ -742,8 +758,9 @@ Four functions you will use constantly, so they are worth meeting properly. seq 
 + create a sequence of values 
 
 ```{webr-r}
-v1 <- seq(0, 100, by = 5)
-v2 <- seq(0, 100, length = 21)
+#| code-track: 0.5
+seq(0, 100, by = 5)
+seq(0, 100, length = 21)
 ```
 
 <br>
@@ -751,7 +768,8 @@ v2 <- seq(0, 100, length = 21)
 + repeat values 
 
 ```{webr-r}
-v3 <- rep(10, 5)
+#| code-track: 0.5
+rep(10, 5)
 ```
 
 <br>
@@ -759,7 +777,8 @@ v3 <- rep(10, 5)
 + sum values 
 
 ```{webr-r}
-v1_sum <- sum(v1)
+#| code-track: 0.5
+sum(v1)
 ```
 
 <br>
@@ -767,7 +786,8 @@ v1_sum <- sum(v1)
 + find the length of a vector
 
 ```{webr-r}
-v1_len <- length(v1)
+#| code-track: 0.5
+length(v1)
 ```
 
 ### Exercises
@@ -811,6 +831,227 @@ This formula divides by $n$. R's built-in `var()` divides by $n-1$, so the two w
 
 
 ```
+
+:::
+<!--end of panel-->
+
+## Getting help
+
+::: {.panel-tabset}
+
+### Where to look
+
+::: {.panel-tabset}
+
+
+#### From inside R
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it, but they all share the same structure and two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.
+
+</details>
+
+Put a `?` in front of any function name to open its help page in the
+**Help** pane:
+
+```{r}
+#| eval: false
+?seq
+?mean
+```
+
+Every help page has the same sections. The two worth reading first are
+**Usage**, which lists the arguments and their defaults, and **Examples** at
+the very bottom, which you can copy and run.
+
+#### When you do not know the name
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+That works when you know the function's name. When you do not, there are three options. Two question marks searches the help system for a phrase rather than a name. Searching the web works genuinely well, because R is popular enough that somebody has almost certainly asked your question already; phrase it as r how to and then what you want. And the practical tip in the third bullet is worth taking: include the package name in your search, because dplyr filter multiple conditions gets you a useful answer where filter multiple conditions does not.
+
+</details>
+
++ `??regression` searches the help system for a phrase rather than a function name
++ Searching the web for "r how to ..." works well, because R is popular enough that someone has almost certainly asked already
++ Include the package name in your search, for example "dplyr filter multiple conditions"
+
+#### Reading an error message
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks R to sum a character string, and look at what comes back. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.
+
+</details>
+
+When something goes wrong, R prints an error. Read it before doing anything
+else: it usually names the function that failed and what it objected to.
+
+```{webr-r}
+sum("a")
+```
+
+:::{.callout-note}
+Copying the error message into a search engine is a perfectly respectable way
+to solve a problem, and it is what practising researchers do daily.
+:::
+
+
+:::
+<!--end of nested panel-->
+
+### Reading a help page
+
+::: {.panel-tabset}
+
+
+#### Orientation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: every help page, for every function, has the same sections in the same order. So once you can read one, you can read all of them. Three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.
+
+</details>
+
+Running `?seq` opens the page shown in the next tabs. Every help page---no matter the function---is laid out with the **same sections in the same order**, so once you can read one, you can read them all.
+
+```{r}
+#| eval: false
+?seq
+```
+
+<br>
+
+The three sections you will actually use are **Usage**, **Arguments**, and **Examples**. We take them one at a time, using `seq()` as the example.
+
+#### Description
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Right at the top is the Description, which is a sentence or two saying what the function does. For seq it is simply: generate regular sequences. That is usually all you need in order to decide whether you are in the right place. Treat this section as a filter. If the description does not match what you want, close the page and keep looking rather than reading on. If it does match, go straight to Usage.
+
+</details>
+
+At the very top, the **Description** states in a sentence or two what the
+function does. Run
+
+```{r}
+#| eval: false
+?seq
+```
+
+and the first thing on the page is:
+
+<br>
+
+> Generate regular sequences.
+
+<br>
+
+That is usually enough to decide whether this is the function you want. If it is not, move on; if it is, read **Usage** next.
+
+#### Usage
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change.
+
+</details>
+
+**Usage** is the single most useful section. It shows how the function is called and, crucially, its **arguments and their default values**.
+
+```r
+seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)),
+    length.out = NULL, along.with = NULL, ...)
+```
+
+Read it like this:
+
++ Each `name = value` is an argument together with its **default**. If you do not supply `from`, it is `1`; if you do not supply `length.out`, it is `NULL`.
++ Arguments are matched **by position** when you do not name them, or **by name** when you do. So `seq(0, 10)` means `from = 0, to = 10`.
++ `...` means the function accepts further arguments (here, passed on to methods). You can ignore it at first.
+
+:::{.callout-note title="Defaults are your friend"}
+You only need to supply the arguments whose defaults you want to change. That is why `seq(0, 10)` works even though the function lists five arguments.
+:::
+
+#### Arguments
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Arguments goes through each one in turn and says what it means and what sort of value it expects. For seq: from is where the sequence starts, to is where it ends, by is the step size, and length.out is how many values you want. Now notice the observation underneath, because that is the real lesson of this tab. There is more than one way to describe the same sequence: you can say how big the steps are, or you can say how many values you want. You would never have guessed that from the function's name. Reading Arguments is how you discover options you did not know existed.
+
+</details>
+
+**Arguments** explains, one by one, what each argument means and what kind of value it expects.
+
++ `from`: the starting value of the sequence
++ `to`: the end value of the sequence
++ `by`: the increment between consecutive values
++ `length.out`: the desired number of values
+
+<br>
+
+Notice there is more than one way to describe the same sequence: you can say **how big each step is** (`by`) *or* **how many values you want** (`length.out`). Reading **Arguments** is how you discover options like this.
+
+#### Examples
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Scroll to the very bottom of any help page and you reach Examples, which is runnable code written by the person who made the function. Copying one of those and running it is very often the fastest way to understand what a function does. The two examples here show the two routes we just discussed: stepping by two, and asking for eleven evenly spaced values. The callout gives you a habit worth forming, and it is the opposite of what people naturally do. When you meet a new function, go to Examples first, run one, and then look back up at Usage to see which arguments it used.
+
+</details>
+
+Scroll to the very bottom and you reach **Examples**---runnable code the author provided. Copying an example and running it is often the fastest way to understand a function.
+
+```{webr-r}
+#| code-track: 0.5
+seq(1, 9, by = 2)          # step of 2
+seq(0, 1, length.out = 11) # 11 evenly spaced values
+```
+
+:::{.callout-note title="A habit worth forming"}
+When you meet a new function, jump straight to **Examples**, run one, then look back up at **Usage** to see which arguments it used.
+:::
+
+
+:::
+<!--end of nested panel-->
+
+### Your turn
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time.
+
+</details>
+
+Open the help page for `rep()` and use **Usage** and **Arguments** to answer these---read, do not guess.
+
+```{r}
+#| eval: false
+?rep
+```
+
+1. What does the `times` argument do?
+2. What does the `each` argument do?
+3. Predict the output of each line below, then run it to check.
+
+```{webr-r}
+rep(c(1, 2), times = 3)
+rep(c(1, 2), each = 3)
+```
+
 
 :::
 <!--end of panel-->
@@ -883,206 +1124,6 @@ You install a package only once on a given computer. You have to load it with `l
 :::
 <!--end of panel-->
 
-## Getting help
-
-::: {.panel-tabset}
-
-### From inside R
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it, but they all share the same structure and two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.
-
-</details>
-
-Put a `?` in front of any function name to open its help page in the
-**Help** pane:
-
-```{r}
-#| eval: false
-?seq
-?mean
-```
-
-Every help page has the same sections. The two worth reading first are
-**Usage**, which lists the arguments and their defaults, and **Examples** at
-the very bottom, which you can copy and run.
-
-### When you do not know the name
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-That works when you know the function's name. When you do not, there are three options. Two question marks searches the help system for a phrase rather than a name. Searching the web works genuinely well, because R is popular enough that somebody has almost certainly asked your question already; phrase it as r how to and then what you want. And the practical tip in the third bullet is worth taking: include the package name in your search, because dplyr filter multiple conditions gets you a useful answer where filter multiple conditions does not.
-
-</details>
-
-+ `??regression` searches the help system for a phrase rather than a function name
-+ Searching the web for "r how to ..." works well, because R is popular enough that someone has almost certainly asked already
-+ Include the package name in your search, for example "dplyr filter multiple conditions"
-
-### Reading an error message
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks for the mean of a character string, and look at what comes back. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.
-
-</details>
-
-When something goes wrong, R prints an error. Read it before doing anything
-else: it usually names the function that failed and what it objected to.
-
-```{webr-r}
-mean("a")
-```
-
-:::{.callout-note}
-Copying the error message into a search engine is a perfectly respectable way
-to solve a problem, and it is what practising researchers do daily.
-:::
-
-:::
-<!--end of panel-->
-
-## Anatomy of a help page
-
-::: {.panel-tabset}
-
-### Orientation
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: every help page, for every function, has the same sections in the same order. So once you can read one, you can read all of them. Three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.
-
-</details>
-
-Running `?seq` opens the page shown in the next tabs. Every help page---no matter the function---is laid out with the **same sections in the same order**, so once you can read one, you can read them all.
-
-```{r}
-#| eval: false
-?seq
-```
-
-<br>
-
-The three sections you will actually use are **Usage**, **Arguments**, and **Examples**. We take them one at a time, using `seq()` as the example.
-
-### Description
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Right at the top is the Description, which is a sentence or two saying what the function does. For seq it is simply: generate regular sequences. That is usually all you need in order to decide whether you are in the right place. Treat this section as a filter. If the description does not match what you want, close the page and keep looking rather than reading on. If it does match, go straight to Usage.
-
-</details>
-
-At the very top, the **Description** states in a sentence or two what the function does.
-
-<br>
-
-> Generate regular sequences.
-
-<br>
-
-That is usually enough to decide whether this is the function you want. If it is not, move on; if it is, read **Usage** next.
-
-### Usage
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change.
-
-</details>
-
-**Usage** is the single most useful section. It shows how the function is called and, crucially, its **arguments and their default values**.
-
-```r
-seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)),
-    length.out = NULL, along.with = NULL, ...)
-```
-
-Read it like this:
-
-+ Each `name = value` is an argument together with its **default**. If you do not supply `from`, it is `1`; if you do not supply `length.out`, it is `NULL`.
-+ Arguments are matched **by position** when you do not name them, or **by name** when you do. So `seq(0, 10)` means `from = 0, to = 10`.
-+ `...` means the function accepts further arguments (here, passed on to methods). You can ignore it at first.
-
-:::{.callout-note title="Defaults are your friend"}
-You only need to supply the arguments whose defaults you want to change. That is why `seq(0, 10)` works even though the function lists five arguments.
-:::
-
-### Arguments
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Arguments goes through each one in turn and says what it means and what sort of value it expects. For seq: from is where the sequence starts, to is where it ends, by is the step size, and length.out is how many values you want. Now notice the observation underneath, because that is the real lesson of this tab. There is more than one way to describe the same sequence: you can say how big the steps are, or you can say how many values you want. You would never have guessed that from the function's name. Reading Arguments is how you discover options you did not know existed.
-
-</details>
-
-**Arguments** explains, one by one, what each argument means and what kind of value it expects.
-
-+ `from`: the starting value of the sequence
-+ `to`: the end value of the sequence
-+ `by`: the increment between consecutive values
-+ `length.out`: the desired number of values
-
-<br>
-
-Notice there is more than one way to describe the same sequence: you can say **how big each step is** (`by`) *or* **how many values you want** (`length.out`). Reading **Arguments** is how you discover options like this.
-
-### Examples
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Scroll to the very bottom of any help page and you reach Examples, which is runnable code written by the person who made the function. Copying one of those and running it is very often the fastest way to understand what a function does. The two examples here show the two routes we just discussed: stepping by two, and asking for eleven evenly spaced values. The callout gives you a habit worth forming, and it is the opposite of what people naturally do. When you meet a new function, go to Examples first, run one, and then look back up at Usage to see which arguments it used.
-
-</details>
-
-Scroll to the very bottom and you reach **Examples**---runnable code the author provided. Copying an example and running it is often the fastest way to understand a function.
-
-```{webr-r}
-seq(1, 9, by = 2)          # step of 2
-seq(0, 1, length.out = 11) # 11 evenly spaced values
-```
-
-:::{.callout-note title="A habit worth forming"}
-When you meet a new function, jump straight to **Examples**, run one, then look back up at **Usage** to see which arguments it used.
-:::
-
-### Your turn
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time.
-
-</details>
-
-Open the help page for `rep()` and use **Usage** and **Arguments** to answer these---read, do not guess.
-
-```{r}
-#| eval: false
-?rep
-```
-
-1. What does the `times` argument do?
-2. What does the `each` argument do?
-3. Predict the output of each line below, then run it to check.
-
-```{webr-r}
-rep(c(1, 2), times = 3)
-rep(c(1, 2), each = 3)
-```
-
-:::
-<!--end of panel-->
-
 ## Working with R (or any computer programs)
 
 <details class="transcript">
@@ -1136,6 +1177,7 @@ Now add, subtract, multiply, and divide the two vectors, and look carefully at w
 
 
 ```{webr-r}
+#| code-track: 0.5
 #--- addition ---#
 a + b
 
@@ -1168,6 +1210,7 @@ To get at part of a vector you use square brackets with a position inside them. 
 To access element(s) of a vector, you use `[]` like below:
 
 ```{webr-r}
+#| code-track: 0.5
 #--- second element of vector a ---#
 a[2]
 
@@ -1180,6 +1223,7 @@ b[3]
 You can access multiple elements of a vector 
 
 ```{webr-r}
+#| code-track: 0.5
 #--- first and second elements of vector a ---#
 a[c(1, 2)]
 
@@ -1204,6 +1248,7 @@ Two ways to build a matrix, shown side by side. The first fills a three-by-two m
 </details>
 
 ```{webr-r}
+#| code-track: 0.5
 #--- define matrix ---#
 # A <- matrix(a value, # of rows, # of cols)
 A <- matrix(2, 3, 2)
@@ -1224,6 +1269,7 @@ Adding and multiplying matrices with the ordinary plus and asterisk works elemen
 </details>
 
 ```{webr-r}
+#| code-track: 0.5
 #--- matrix addition by element ---#
 A + B
 
@@ -1241,6 +1287,7 @@ Two genuine matrix operations here. t transposes, turning rows into columns. And
 </details>
 
 ```{webr-r}
+#| code-track: 0.5
 #--- transpose ---#
 t(B)
 
@@ -1268,6 +1315,7 @@ matrix[indices for rows, indices for columns]
 **Examples** 
 
 ```{webr-r}
+#| code-track: 0.5
 #--- 1st row, 2nd column ---#
 A[1, 2]
 
@@ -1298,6 +1346,7 @@ Back to lists, now with something more realistic in one. This list holds three c
 As mentioned earlier, a single `list` can hold objects of any type.
 
 ```{webr-r}
+#| code-track: 0.5.6
 a_list <- list(
   a = matrix(2, 3, 2),
   b = c("R", "rocks"),
@@ -1323,6 +1372,7 @@ To access elements of a **list**, use `[[]]` for a single element and `[]` for m
 **Example: single element**
 
 ```{webr-r}
+#| code-track: 0.5
 #--- 2nd element ---#
 a_list[[2]]
 ```
@@ -1332,6 +1382,7 @@ a_list[[2]]
 **Example: multiple elements** 
 
 ```{webr-r}
+#| code-track: 0.5
 #--- 1st and 3rd elements ---#
 a_list[c(1, 3)]
 ```
@@ -1348,6 +1399,7 @@ The third way in, and in practice the one you will use most, is the dollar sign,
 You can also use the `$` operator to access a single element of a list, as long as that element has a name.
 
 ```{webr-r}
+#| code-track: 0.5
 #--- check the name of the elements ---#
 names(a_list)
 
@@ -1394,11 +1446,18 @@ Accessing parts of a `data.frame` works like accessing elements of a matrix or a
 
 **Examples**
 
-```{webr-r}
-#--- list-like: access the gear column by name ---#
-mtcars$gear
+list-like: access the gear column by name
 
-#--- matrix-like: 1st row, 2nd column (cyl) ---#
+```{webr-r}
+mtcars$gear
+```  
+
+<br>
+
+matrix-like: 1st row, 2nd column (cyl)
+
+```{webr-r}
+#| code-track: 0.5
 mtcars[1, 2]
 ```
 
@@ -1412,7 +1471,6 @@ mtcars[1, 2]
 ## Next class: Quarto
 
 <html><div style='float:left'></div><hr color='#EB811B' size=2px width=1280px></html>
-
 
 
 

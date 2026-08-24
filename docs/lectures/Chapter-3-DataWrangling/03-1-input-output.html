@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-bf1223c773699056cca1ada9baf1738b.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -413,11 +413,16 @@ could be deleted and gitignored.
 -->
 <!-- CHANGED (C3): labelled the chunk, and added `here`, which this lecture now
      teaches instead of only using it invisibly. -->
-<!-- ADDED (A2): a single place where the data folder is resolved. The original
-     pasted "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into
-     chunks that actually ran, so the lecture only rendered on Taro's computer.
-     Note it also spelled the folder "Lectures" with a capital L while the real
-     folder is "lectures"; that survived only because macOS ignores case. -->
+<!-- CHANGED (A2): the original pasted
+     "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into chunks
+     that actually ran, so the lecture only rendered on Taro's computer. A
+     revision then replaced that with a hidden dir_ch3 <- here::here(...) chunk,
+     which was just as unusable for a student: every example on the slide read
+     through a variable they had never seen defined. Every example now reads the
+     plain file name, exactly as a student runs it with the data file in their
+     working directory. That is also what Quarto uses when it renders, because
+     the working directory is the folder holding this .qmd, and the data files
+     sit next to it. -->
 </section>
 <section>
 <section id="importing-and-exporting-datasets" class="title-slide slide level1 center">
@@ -518,7 +523,7 @@ Transcript
 <p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>corn_yields_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>corn_yields_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-2-2">
@@ -537,7 +542,7 @@ Transcript
 <p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>corn_yields_tbl <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>corn_yields_tbl <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-2-3">
@@ -590,7 +595,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now a real-world problem the clean examples hide. read_csv guesses each column’s type by looking at the first rows, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.</p>
+<p>Now a real-world problem the clean examples hide. read_csv guesses each column’s type by sampling up to guess_max rows spread throughout the file, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.</p>
 </details>
 <!-- ADDED (B6): entire tab. read_csv guessing a column type wrongly is the most
      common real-world import problem and the original never mentioned it. -->
@@ -646,7 +651,7 @@ Transcript
      matching what 02-1 teaches and what this file already did in its own
      hidden chunks. -->
 <div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Working directory</a></li><li><a href="#tabset-3-2">Relative paths</a></li><li><a href="#tabset-3-3">RStudio projects</a></li><li><a href="#tabset-3-4"><code>here()</code> (recommended)</a></li><li><a href="#tabset-3-5">Avoid <code>setwd()</code></a></li><li><a href="#tabset-3-6">Windows paths</a></li><li><a href="#tabset-3-7">File not found</a></li></ul>
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Working directory</a></li><li><a href="#tabset-3-2">Relative paths</a></li><li><a href="#tabset-3-3">RStudio projects</a></li><li><a href="#tabset-3-4"><code>here()</code> (recommended)</a></li><li><a href="#tabset-3-5">Windows paths</a></li><li><a href="#tabset-3-6">File not found</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1">
 <details class="transcript">
@@ -659,7 +664,7 @@ Transcript
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Library/CloudStorage/GoogleDrive-taro.mieno.pf@gmail.com/My Drive/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling"</code></pre>
+<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling"</code></pre>
 </div>
 </div>
 <p>So if the working directory is your project folder, this is enough:</p>
@@ -725,16 +730,17 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>And here is the recommendation. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.</p>
+<p>And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.</p>
 </details>
 <!-- ADDED (B1): entire tab. -->
 <p>Inside an R Project, the <code>here</code> package builds paths from the project root:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"lectures"</span>, <span class="st">"Chapter-3-DataWrangling"</span>, <span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Library/CloudStorage/GoogleDrive-taro.mieno.pf@gmail.com/My Drive/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/corn_yields.csv"</code></pre>
+<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/corn_yields.csv"</code></pre>
 </div>
 </div>
+<p><br></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -760,54 +766,18 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>You will see setwd in older code and all over the internet, and I want you to avoid it, for two independent reasons. The first is specific to the way we work and it surprises people: when you render a document, R resets the working directory after every single chunk. So calling setwd in one chunk has no effect at all on the next one, and the file-not-found error you get looks completely mysterious. The second reason is more general: the path you would write only exists on your computer, so your code cannot run anywhere else, including wherever it is being graded. getwd is a useful thing to check. setwd is not the way to change it.</p>
-</details>
-<!-- ADDED (B2): entire tab. The original taught setwd() with no warning. This
-     behaviour was verified by rendering a test document. -->
-<p>You will see <code>setwd()</code> in older code and on the internet:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">setwd</span>(<span class="st">"/Users/tmieno2/Dropbox/Data-Science-with-R-Quarto"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Avoid it, for two separate reasons.</p>
-<p><strong>1. It does not survive from one chunk to the next.</strong></p>
-<p>When you render, R resets the working directory after <strong>every</strong> chunk. So this does not do what it looks like it does:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a></a>```{r}</span>
-<span id="cb19-2"><a></a>setwd("some/other/folder")   # applies only inside this chunk</span>
-<span id="cb19-3"><a></a>```</span>
-<span id="cb19-4"><a></a></span>
-<span id="cb19-5"><a></a>```{r}</span>
-<span id="cb19-6"><a></a>read_csv("corn_yields.csv")  # back to the original folder. File not found.</span>
-<span id="cb19-7"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>2. The path only exists on your computer.</strong></p>
-<p>Nobody else has <code>/Users/tmieno2/...</code>, so your code cannot run anywhere else, including on the computer of whoever is grading it.</p>
-<div class="callout callout-important no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Important</strong></p>
-</div>
-<div class="callout-content">
-<p><code>getwd()</code> is useful for checking where you are. <code>setwd()</code> is not the way to change it. Use an R Project plus <code>here()</code> instead.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-6">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
 <p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
 </details>
 <!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
      first week. -->
 <p>Windows shows paths with backslashes, but a backslash means something special inside an R string. Copying a path straight from File Explorer gives you this, which errors:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:\Users</span><span class="sc">\t</span><span class="st">aro\data\corn_yields.csv"</span>)   <span class="co"># does not work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:\Users</span><span class="sc">\t</span><span class="st">aro\data\corn_yields.csv"</span>)   <span class="co"># does not work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Two fixes, both fine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>)    <span class="co"># forward slashes</span></span>
-<span id="cb21-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>)    <span class="co"># forward slashes</span></span>
+<span id="cb19-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -820,7 +790,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-3-7">
+<div id="tabset-3-6">
 <details class="transcript">
 <summary>
 Transcript
@@ -839,8 +809,8 @@ Transcript
 <li>Check spelling and capitalization. <code>Corn_Yields.csv</code> and <code>corn_yields.csv</code> are different files on some systems.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">getwd</span>()</span>
-<span id="cb23-2"><a></a><span class="fu">list.files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">getwd</span>()</span>
+<span id="cb21-2"><a></a><span class="fu">list.files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -850,7 +820,7 @@ Transcript
 <section id="read-a-sheet-from-an-xlsx-file" class="slide level2">
 <h2>Read a sheet from an xls(x) file</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Instruction</a></li><li><a href="#tabset-4-2">Syntax and Examples</a></li><li><a href="#tabset-4-3">Sheets by name</a></li><li><a href="#tabset-4-4">Messy spreadsheets</a></li><li><a href="#tabset-4-5">Note</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Instruction</a></li><li><a href="#tabset-4-2">Syntax and Examples</a></li><li><a href="#tabset-4-3">Sheets by name</a></li><li><a href="#tabset-4-4">Note</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
 <details class="transcript">
@@ -868,7 +838,7 @@ Transcript
      replaced "you need to library the package", which uses library as a verb. --></p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-2">
@@ -880,12 +850,12 @@ Transcript
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">read_excel</span>(<span class="st">"path to the file"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">read_excel</span>(<span class="st">"path to the file"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Examples</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">1</span>) <span class="co"># 1st sheet</span></span>
-<span id="cb26-2"><a></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">2</span>) <span class="co"># 2nd sheet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">1</span>) <span class="co"># 1st sheet</span></span>
+<span id="cb24-2"><a></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">2</span>) <span class="co"># 2nd sheet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-3">
@@ -901,40 +871,22 @@ Transcript
 <p>Referring to a sheet by number is fragile: insert a sheet and every number shifts. Use the name instead.</p>
 <p>First, list what is in the workbook:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">excel_sheets</span>(<span class="fu">file.path</span>(dir_ch3, <span class="st">"corn_yields.xls"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">excel_sheets</span>(<span class="st">"corn_yields.xls"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "corn_yields_08" "corn_yields_09"</code></pre>
 </div>
 </div>
+<p><br></p>
 <p>Then read the one you want:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="st">"2008"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="st">"corn_yields_08"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<!-- CHANGED (A12): this said sheet = "2008", which is not a sheet in the
+     workbook; the sheets are corn_yields_08 and corn_yields_09, as the
+     excel_sheets() output above now shows. It never errored only because the
+     chunk did not run. -->
 </div>
 <div id="tabset-4-4">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>And now the reality of spreadsheets made by human beings, which almost never begin with a tidy header in the very first cell. There is usually a title, maybe a blank row, sometimes notes off to one side. Three arguments handle nearly all of it. skip ignores a given number of lines from the top, so the header row is found correctly. na lets you declare which strings should count as missing, and a dash or an empty cell often should. range reads one rectangle only, which is how you ignore notes scattered elsewhere on the sheet. And col_names FALSE for when there is genuinely no header.</p>
-</details>
-<!-- ADDED (B3): entire tab. Real spreadsheets almost never start with a clean
-     header in cell A1, and the original assumed they do. -->
-<p>Spreadsheets made by people rarely start with a tidy header row. Useful arguments:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">read_excel</span>(</span>
-<span id="cb30-2"><a></a>  <span class="st">"corn_yields.xlsx"</span>,</span>
-<span id="cb30-3"><a></a>  <span class="at">sheet =</span> <span class="st">"2008"</span>,</span>
-<span id="cb30-4"><a></a>  <span class="at">skip  =</span> <span class="dv">3</span>,               <span class="co"># a title and a blank row above the header</span></span>
-<span id="cb30-5"><a></a>  <span class="at">na    =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"-"</span>) <span class="co"># what counts as missing</span></span>
-<span id="cb30-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<ul>
-<li><code>range = "B3:F120"</code>: read one rectangle only, ignoring notes elsewhere on the sheet</li>
-<li><code>col_names = FALSE</code>: there is no header row at all</li>
-</ul>
-</div>
-<div id="tabset-4-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -942,7 +894,7 @@ Transcript
 <p>One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.</p>
 </details>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
@@ -967,7 +919,7 @@ Transcript
 </details>
 <p>Use the <code>read_dta()</code> function from the <code>haven</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">library</span>(haven)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">library</span>(haven)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A3): the original had this twice, once with eval=FALSE to show and
      once with echo=FALSE to actually run. One visible chunk that runs does the
@@ -975,12 +927,12 @@ Transcript
 <p><br></p>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"corn_yields.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"corn_yields.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-5-2">
@@ -991,7 +943,7 @@ Transcript
 <p>Check the class and you will see three things listed: tbl_df, tbl, and data.frame. So what did you actually get? A tibble, the same as everywhere else. The reason data.frame appears at the end of that list is explained in the callout, and it is worth understanding properly because it causes real confusion. A tibble is built on top of a data.frame, with extra behaviour layered over it, so it truthfully reports that it is also a data.frame. Seeing data.frame in that list does not mean you have a plain data.frame.</p>
 </details>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
@@ -1027,7 +979,7 @@ Transcript
      time a column refuses to behave like a plain number. -->
 <p>STATA files often carry labels that R keeps as a <code>haven_labelled</code> column. If a column will not cooperate in arithmetic or plotting, strip the labels:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">zap_labels</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">zap_labels</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1063,12 +1015,12 @@ Transcript
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a><span class="fu">readRDS</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">readRDS</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>corn_yields <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"corn_yields.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>corn_yields <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"corn_yields.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-6-3">
@@ -1079,7 +1031,7 @@ Transcript
 <p>Check the class here and you get a tibble again, but for a completely different reason than before. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
 </details>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
@@ -1122,20 +1074,20 @@ Transcript
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="fu">export_function</span>(object_name, <span class="st">"file name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">export_function</span>(object_name, <span class="st">"file name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A10): "obeject" -> "object". -->
 <p><br></p>
 <p><strong>Examples</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co">#--- export as csv ---#</span></span>
-<span id="cb44-2"><a></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(corn_yields, <span class="st">"corn_yields_exp.csv"</span>)</span>
-<span id="cb44-3"><a></a></span>
-<span id="cb44-4"><a></a><span class="co">#--- export as dta ---#</span></span>
-<span id="cb44-5"><a></a>haven<span class="sc">::</span><span class="fu">write_dta</span>(corn_yields, <span class="st">"corn_yields_exp.dta"</span>)</span>
-<span id="cb44-6"><a></a></span>
-<span id="cb44-7"><a></a><span class="co">#--- export as rds ---#</span></span>
-<span id="cb44-8"><a></a><span class="fu">saveRDS</span>(corn_yields, <span class="st">"corn_yields_exp.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="co">#--- export as csv ---#</span></span>
+<span id="cb41-2"><a></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(corn_yields, <span class="st">"corn_yields_exp.csv"</span>)</span>
+<span id="cb41-3"><a></a></span>
+<span id="cb41-4"><a></a><span class="co">#--- export as dta ---#</span></span>
+<span id="cb41-5"><a></a>haven<span class="sc">::</span><span class="fu">write_dta</span>(corn_yields, <span class="st">"corn_yields_exp.dta"</span>)</span>
+<span id="cb41-6"><a></a></span>
+<span id="cb41-7"><a></a><span class="co">#--- export as rds ---#</span></span>
+<span id="cb41-8"><a></a><span class="fu">saveRDS</span>(corn_yields, <span class="st">"corn_yields_exp.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A11): the csv filename was "corn_yields_exp_rownames.csv". There
      are no row names involved anywhere here; write_csv has no such concept.
@@ -1170,13 +1122,13 @@ Transcript
 <div id="tabset-7-1">
 <p>You can export any kind of R object as an <strong>rds</strong> file, not just a dataset.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>a_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="st">"R"</span>, <span class="st">"rocks"</span>), <span class="at">b =</span> corn_yields)</span>
-<span id="cb45-2"><a></a></span>
-<span id="cb45-3"><a></a>rds_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"a_list.rds"</span>)</span>
-<span id="cb45-4"><a></a></span>
-<span id="cb45-5"><a></a><span class="fu">saveRDS</span>(a_list, rds_path)</span>
-<span id="cb45-6"><a></a></span>
-<span id="cb45-7"><a></a><span class="fu">readRDS</span>(rds_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>a_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="st">"R"</span>, <span class="st">"rocks"</span>), <span class="at">b =</span> corn_yields)</span>
+<span id="cb42-2"><a></a></span>
+<span id="cb42-3"><a></a>rds_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"a_list.rds"</span>)</span>
+<span id="cb42-4"><a></a></span>
+<span id="cb42-5"><a></a><span class="fu">saveRDS</span>(a_list, rds_path)</span>
+<span id="cb42-6"><a></a></span>
+<span id="cb42-7"><a></a><span class="fu">readRDS</span>(rds_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$a
 [1] "R"     "rocks"
@@ -1210,11 +1162,11 @@ $b
      simply stopped, leaving the question hanging. Here is the answer, plus the
      part that actually matters more than size. -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="fu">data.frame</span>(</span>
-<span id="cb47-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
-<span id="cb47-3"><a></a>  <span class="at">KB   =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(dir_ch3,</span>
-<span id="cb47-4"><a></a>           <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>))) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
-<span id="cb47-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">data.frame</span>(</span>
+<span id="cb44-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
+<span id="cb44-3"><a></a>  <span class="at">KB   =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
+<span id="cb44-4"><a></a>           <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
+<span id="cb44-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             file   KB
 1 corn_yields.csv 14.7

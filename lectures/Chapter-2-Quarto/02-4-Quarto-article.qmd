@@ -252,7 +252,7 @@ html output does not accept an image saved as a pdf file. I would suggest that y
 <details class="transcript">
 <summary>Transcript</summary>
 
-There is a real decision to make about which table package to learn, and it is worth a minute of thought. The most powerful ones, gt and flextable, cannot output directly in a format LaTeX will accept. The packages that can include xtable, huxtable, and kableExtra. So on the face of it you are choosing between power and LaTeX compatibility. But look at the third bullet, because it dissolves the problem entirely: gt and flextable can both export a table as an image, and LaTeX is perfectly happy to accept images. So there is no real penalty for investing your time in the more capable package.
+There is a real decision to make about which table package to learn, and it is worth a minute of thought. The most powerful ones, gt and flextable, can output for LaTeX, as can xtable, huxtable, and kableExtra. But look at the third bullet, because it gives you a reliable fallback when direct LaTeX output does not suit your document: gt and flextable can both export a table as an image, and LaTeX is perfectly happy to accept images. So there is no real penalty for investing your time in the more capable package.
 
 </details>
 
@@ -277,7 +277,7 @@ In order to cross-reference a table with captions, you can use the `label` and `
 
 ````{verbatim}
 ```{r}
-#| label: fig-sample-label
+#| label: tbl-sample-label
 #| tbl-cap: "Sample table title"
 table_sample 
 ```
@@ -312,7 +312,7 @@ You can then type `@tbl-sample-label` in the qmd file to cross-reference the tab
 <details class="transcript">
 <summary>Transcript</summary>
 
-Mathematical notation is where the output format you chose on the first slide starts to matter, which is exactly why this tab splits in two. If you are going to PDF through LaTeX, or to HTML, you can wrap your maths in an equals-tex block and write raw LaTeX, and because that passes straight through you can use any LaTeX maths tool you like. If you are going to HTML or Word, you enclose the expression in double dollar signs instead. Both put the equation on its own line. The catch, in the second callout, is that the dollar-sign route does not support every LaTeX construct, so complicated expressions may not survive.
+Mathematical notation is where the output format you chose on the first slide starts to matter, which is exactly why this tab splits in two. If you are going to PDF through LaTeX, you can wrap your maths in an equals-tex block and write raw LaTeX, and because that passes straight through to LaTeX you can use any LaTeX maths tool you like. For maths that also works in HTML or Word, enclose the expression in double dollar signs instead. Both put the equation on its own line. The catch, in the second callout, is that the dollar-sign route does not support every LaTeX construct, so complicated expressions may not survive.
 
 </details>
 
@@ -807,4 +807,3 @@ One last detail, and it is a small one that looks like a bug when you first hit 
 
 :::
 <!--end of panel-->
-

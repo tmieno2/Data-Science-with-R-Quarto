@@ -4,10 +4,10 @@ I want to apply the "Notebook" slide theme to the Quarto revealjs lecture decks 
 
 These live outside this project. Read them; do not edit them. If you cannot reach this path, stop and ask me to copy the files over.
 
-- `/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/notebook.scss` — THE THEME. 615 lines, and roughly half of it is comments explaining why each constant is what it is. Read it in full before you copy it. Do not strip the comments.
-- `/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/custom.scss` — the base theme it layers on top of. You need lines ~195 (answer boxes) and ~217-330 (WebR side-by-side) to understand the two couplings described below.
-- `/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/03-2-data-wrangling-dplyr.qmd` — a deck running the finished theme. Use it as the reference for a correct YAML header.
-- `/Users/taromieno/Library/CloudStorage/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/CLAUDE.md` — trap list. Items 1, 3, 4 and 5 apply to any Quarto revealjs project.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/notebook.scss` — THE THEME. 615 lines, and roughly half of it is comments explaining why each constant is what it is. Read it in full before you copy it. Do not strip the comments.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/custom.scss` — the base theme it layers on top of. You need lines ~195 (answer boxes) and ~217-330 (WebR side-by-side) to understand the two couplings described below.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/03-2-data-wrangling-dplyr.qmd` — a deck running the finished theme. Use it as the reference for a correct YAML header.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/CLAUDE.md` — trap list. Items 1, 3, 4 and 5 apply to any Quarto revealjs project.
 
 ## What the theme is
 

@@ -22,9 +22,9 @@ webr:
   cell-options:
     editor-font-scale: 0.7
     dpi: 216
-    fig-width: 7
-    fig-height: 4.5
-    out-width: 55%
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
 filters:
   - webr
 ---
@@ -610,6 +610,7 @@ What if the object before the piping operator is not the first argument of the s
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 a_string <- "I do not like space"
 
 gsub(" ", "", a_string)
@@ -624,6 +625,7 @@ This does not work:
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 a_string %>%  gsub(" ", "") 
 ```
 
@@ -651,6 +653,7 @@ You can refer to the preceding object by `.` like this:
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 a_string %>% gsub(" ", "", .)  
 ```
 
@@ -1793,290 +1796,5 @@ daily_weather %>%
 
 
 
-# Extensions (may be helpful occasionally)
 
-<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
-
-
-## `across()`
-
-::: {.panel-tabset} 
-
-### What
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-This last section is labelled extensions, and the honest framing is that you do not need it today but you will be glad of it later. across lets you apply the same operation to many columns at once. It works inside summarize and mutate, and it exists because the alternative is writing out the same expression once per column, which is tedious to type and worse to read. If you ever find yourself copying and pasting a mean call four times and changing only the variable name, this is the tool you wanted.
-
-</details>
-
-+ `across()` lets you apply the same operation (function) to multiple columns at the same time.
-
-+ It is used with `summarize()` and `mutate()`
-
-+ It is useful when you want to apply the same function to many variables.
-
-### Syntax and Example
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-The syntax has two parts: which columns to apply the function to, and which function to apply. The function is written in a slightly odd-looking way, as a backslash and then x in parentheses, which is R's shorthand for an anonymous function, meaning a function with no name defined on the spot. So backslash x, mean of x with na.rm true, means apply this particular version of mean. The reason for that wrapper is that it gives you somewhere to put the na.rm argument, which you almost always need with real data.
-
-</details>
-
-**Syntax** 
-
-```{r}
-#| eval: false
-across(which variables to apply the function, function to apply)
-```
-
-The function is written as `\(x) f(x, options)`, an anonymous function:
-
-```{r}
-#| eval: false
-across(c(arr_delay, dep_delay), \(x) mean(x, na.rm = TRUE))
-```
-<!-- CHANGED (A9): rewritten from `across(cols, mean, na.rm = TRUE)` to
-     `across(cols, \(x) mean(x, na.rm = TRUE))`. Passing extra arguments through
-     `...` has been deprecated since dplyr 1.1.0; verified by running the old
-     form, which emits "The `...` argument of `across()` is deprecated". The old
-     form still works today but warns, and students copy what they see. -->
-
-**Examples** 
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(
-      c(arr_delay, dep_delay, air_time, time_hour),
-      \(x) mean(x, na.rm = TRUE)
-    )
-  ) %>% head()
-```
-
-Note: `na.rm = TRUE` is an option for the `mean()` function, passed inside the anonymous function `\(x) mean(x, na.rm = TRUE)`.
-
-### Compare
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-This tab makes the case by showing both versions of the same thing. Without across, four nearly identical lines, differing only in a variable name, with all the copy-paste errors that invites. With across, one expression naming four columns. They produce the same answer. Beyond the typing saved, the second version states the intent more clearly: take the mean of these four columns, rather than here are four separate calculations that happen to be the same. That clarity is the real argument.
-
-</details>
-
-Without `across()`
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    mean_arr_delay = mean(arr_delay, na.rm = TRUE),
-    mean_dep_delay = mean(dep_delay, na.rm = TRUE),
-    mean_air_time = mean(air_time, na.rm = TRUE),
-    mean_time_hour = mean(time_hour, na.rm = TRUE)
-  ) 
-```
-
-<br>
-
-With `across()`
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(
-      c(arr_delay, dep_delay, air_time, time_hour),
-      \(x) mean(x, na.rm = TRUE)
-    )
-  )
-```
-
-:::
-
-# `across()` with pattern functions
-
-::: {.panel-tabset} 
-
-### What
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-across becomes much more useful when combined with helper functions that select columns by pattern rather than by name. The list shows four: is.numeric and is.character select by column type, and starts_with and ends_with select by name pattern. The reason this matters is robustness. If you name four columns explicitly and someone adds a fifth, your code silently misses it. If you said all the numeric columns, it does not.
-
-</details>
-
-<br>
-
-You can use `across()`, and other `dplyr` functions, together with helper functions that select variables matching a pattern you specify:
-
-+ `is.numeric()`  
-+ `is.character()`  
-+ `starts_with()`  
-+ `ends_with()`  
-
-### numeric
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-The first pattern is by type. Wrapping is.numeric inside where gives you every numeric column, so this computes the mean of all of them at once, whatever they happen to be called and however many there are. Note the where wrapper, because it is required and easy to forget: is.numeric is a test applied to a column, and where is what tells across to use it as a selector rather than as the function to apply.
-
-</details>
-
-<br>
-
-Applying the same function to all numeric variables using `where(is.numeric)`:
-
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(
-      where(is.numeric),
-      \(x) mean(x, na.rm = TRUE)
-    )
-  ) %>% head()
-```
-
-### character
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-The same idea for character columns, but note that the function applied is different, and sensibly so. Taking the mean of a text column is meaningless, so instead we use n_distinct, which counts how many unique values there are. That is genuinely informative: it tells you how many carriers, or how many airports, appear in each group. This is a good habit generally, asking how many distinct values a text column contains, because it tells you quickly whether something is a category or free text.
-
-</details>
-
-<br>
-
-Applying the same function to all character variables using `where(is.character)`:
-
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(
-      where(is.character),
-      n_distinct
-    )
-  ) %>% head()
-```
-
-
-+ `n_distinct()` counts the number of unique values.
-
-### end with
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-Now selection by name pattern. ends_with of delay picks up every column whose name ends in delay, which in this dataset gets you both arrival and departure delay without naming either. starts_with does the mirror image for prefixes. This is why consistent variable naming pays off: if all your outcome variables end in the same word, you can operate on the whole family in one line, and it keeps working when you add another one next month.
-
-</details>
-
-<br>
-
-Applying the same function to all the variables that end with `delay`:
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(
-      ends_with("delay"),
-      \(x) mean(x, na.rm = TRUE)
-    )
-  ) %>% head()
-
-```
-
-+ Use `starts_with()` to apply the same function to every variable beginning with a particular string of characters.
-
-### logical operator
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-These selectors are ordinary expressions, so you can negate and combine them with logical operators. The exclamation mark in front of where is.numeric means everything that is not numeric. That is often the tidiest way to say what you want, because describing the small set and inverting it is easier than enumerating the large one. And a note in passing: this is the same logical vocabulary you learned in Chapter 1, being reused in a new place, which is a recurring pattern in R.
-
-</details>
-
-<br>
-
-You can use logical operators:
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(!where(is.numeric), n_distinct)
-  ) %>% head()
-```
-
-### mix
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-And finally you can mix approaches freely: name some columns explicitly, use a pattern for others, and use more than one across in a single summarize. The example does exactly that, taking the mean of month and all the delay columns, and counting distinct values in all the character columns, in one call. This is where across stops being a typing shortcut and becomes a way of saying precisely what you mean about a dataset whose exact shape you do not want to hard-code.
-
-</details>
-
-<br>
-
-You can mix explicitly named variables with these helper functions:
-
-```{webr-r}
-flights %>% 
-  group_by(carrier) %>% 
-  summarize(
-    across(c(month, ends_with("delay")), \(x) mean(x, na.rm = TRUE)),
-    across(where(is.character), n_distinct)
-  ) %>% head()
-```
-
-
-:::
-
-
-## `select()` and `relocate()`
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-One last point to close on, and it generalizes everything in the previous section. These pattern-based ways of referring to columns are not special to across; they work in the other dplyr functions too. So you can select all the numeric columns, or select everything ending in delay, or relocate all the character columns to the front, using exactly the same helpers. Try the three examples. Once you notice that the same vocabulary keeps working in new places, dplyr gets a great deal smaller to learn.
-
-</details>
-
-The same ways of referring to variables by pattern work in other `dplyr` functions too:
-
-Try:
-
-```{webr-r}
-flights %>% 
-  select(c(origin, where(is.numeric)))  
-```
-
-<br>
-
-```{webr-r}
-flights %>% 
-  select(ends_with("delay"))  
-```
-
-<br>
-
-```{webr-r}
-flights %>% 
-  relocate(where(is.character))  
-```
 

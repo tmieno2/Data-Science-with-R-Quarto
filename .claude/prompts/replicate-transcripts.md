@@ -4,12 +4,12 @@ I want to add collapsible "Transcript" panels to the revealjs lecture decks in t
 
 These files live outside this project. Read them; do not edit them.
 
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/.claude/docs/lecture-transcripts.md` — the design, conventions, writing style, and the measurements behind every layout constant. READ THIS IN FULL FIRST.
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/.claude/docs/revealjs-preview.md` — how to preview and screenshot revealjs decks. Saves an hour of blank captures.
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/CLAUDE.md` — trap list. Items 1-3 apply to any Quarto revealjs project.
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/transcript-support.html` — the shared CSS + JS to copy.
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto/02-2-Quarto-revealjs.qmd` — a finished deck with 31 transcripts. The model for tone and placement.
-- `/Users/tmieno2/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/lectures/custom.scss` — theme. Lines ~129-180 are the tabset styling; line ~195 is a trap (see below).
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/.claude/docs/lecture-transcripts.md` — the design, conventions, writing style, and the measurements behind every layout constant. READ THIS IN FULL FIRST.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/.claude/docs/revealjs-preview.md` — how to preview and screenshot revealjs decks. Saves an hour of blank captures.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/CLAUDE.md` — trap list. Items 1-3 apply to any Quarto revealjs project.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/transcript-support.html` — the shared CSS + JS to copy.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto/02-2-Quarto-revealjs.qmd` — a finished deck with 31 transcripts. The model for tone and placement.
+- `/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/custom.scss` — theme. Lines ~129-180 are the tabset styling; line ~195 is a trap (see below).
 
 ## What to build here
 

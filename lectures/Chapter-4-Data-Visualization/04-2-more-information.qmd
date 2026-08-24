@@ -22,9 +22,9 @@ webr:
   cell-options:
     editor-font-scale: 0.7
     dpi: 216
-    fig-width: 7
-    fig-height: 4.5
-    out-width: 55%
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
 filters:
   - webr
 ---
@@ -169,6 +169,7 @@ Here is an example:
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 #| autorun: true
 ggplot(data = county_yield_mean) +
   geom_line(
@@ -212,6 +213,7 @@ county_yield_mean <-
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 ggplot(data = county_yield_mean) +
   geom_line(
     aes(
@@ -229,6 +231,7 @@ ggplot(data = county_yield_mean) +
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 ggplot(data = county_yield_mean) + 
   geom_density(
     aes(
@@ -246,6 +249,7 @@ ggplot(data = county_yield_mean) +
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 county_yield %>% 
   filter(state_name %in% c("Nebraska", "Kansas")) %>% 
   ggplot(data = .) + 
@@ -266,6 +270,7 @@ county_yield %>%
 ::: {.side-out}
 
 ```{webr-r}
+#| code-track: 0.5
 county_yield %>% 
   filter(state_name %in% c("Nebraska", "Kansas")) %>%
   ggplot(data = .) +
@@ -575,6 +580,7 @@ ggplot(data = county_yield_s) +
 ```
 
 :::
+:::
 <!--end of the 2nd column-->
 :::
 <!--end of the columns-->
@@ -710,7 +716,7 @@ ggplot(data = county_yield_s) +
 <details class="transcript">
 <summary>Transcript</summary>
 
-A small but genuinely useful piece of polish. By default the strip labels along the edge of each panel show the bare value, so you get 2017 rather than Year equals 2017, and a reader coming to your figure cold has to guess what that number means. There is no label argument to set; the trick is to build the label you want as a new variable with mutate, pasting the text onto the value, and then facet on that variable instead. It is slightly indirect, but it is the standard way of doing it and it gives you complete control over the wording.
+A small but genuinely useful piece of polish. By default the strip labels along the edge of each panel show the bare value, so you get 2017 rather than Year equals 2017, and a reader coming to your figure cold has to guess what that number means. You could do this with the labeller argument and label_both, but the approach taught here is to build the label you want as a new variable with mutate, pasting the text onto the value, and then facet on that variable instead. It is slightly indirect, but it gives you complete control over the wording.
 
 </details>
 
@@ -941,7 +947,7 @@ This works with `county_yield` used in both `geom_point()` and `geom_smooth()`.
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 70%
+#| code-track: 0.45
 ggplot(data = county_yield) + 
   geom_point(aes(y = corn_yield, x = d3_5_9)) +
   geom_smooth(aes(y = corn_yield, x = d3_5_9))
@@ -962,8 +968,8 @@ This does not work because no global dataset is set inside `ggplot()` and no dat
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 70%
-ggplot() + 
+#| layout: stacked 
+ggplot() +
   geom_point(data = county_yield, aes(y = corn_yield, x = d3_5_9)) +
   geom_smooth(aes(y = corn_yield, x = d3_5_9))
 ```
@@ -983,7 +989,7 @@ To use multiple datasets inside a single `ggplot` object (or a figure), you just
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 70%
+#| code-track: 0.45
 ggplot() +
   geom_point(
     data = county_yield, 
@@ -999,7 +1005,6 @@ ggplot() +
 
 :::
 <!--end of panel-->
-
 
 
 

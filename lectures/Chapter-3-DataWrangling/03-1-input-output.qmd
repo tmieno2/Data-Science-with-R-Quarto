@@ -61,18 +61,16 @@ source(here::here("lectures/_lecture-theme.R"))
 <!-- CHANGED (C3): labelled the chunk, and added `here`, which this lecture now
      teaches instead of only using it invisibly. -->
 
-```{r}
-#| label: paths
-#| include: false
-# every executed example below reads through here(), so the slides build on
-# any machine that has the repository
-dir_ch3 <- here::here("lectures", "Chapter-3-DataWrangling")
-```
-<!-- ADDED (A2): a single place where the data folder is resolved. The original
-     pasted "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into
-     chunks that actually ran, so the lecture only rendered on Taro's computer.
-     Note it also spelled the folder "Lectures" with a capital L while the real
-     folder is "lectures"; that survived only because macOS ignores case. -->
+<!-- CHANGED (A2): the original pasted
+     "~/Dropbox/TeachingUNL/Data-Science-with-R-Quarto/Lectures/..." into chunks
+     that actually ran, so the lecture only rendered on Taro's computer. A
+     revision then replaced that with a hidden dir_ch3 <- here::here(...) chunk,
+     which was just as unusable for a student: every example on the slide read
+     through a variable they had never seen defined. Every example now reads the
+     plain file name, exactly as a student runs it with the data file in their
+     working directory. That is also what Quarto uses when it renders, because
+     the working directory is the folder holding this .qmd, and the data files
+     sit next to it. -->
 
 
 # Importing and Exporting Datasets
@@ -179,7 +177,7 @@ data <- read.csv("path to the file to import")
 
 ```{r}
 #| label: read-data-csv
-corn_yields_df <- read.csv(file.path(dir_ch3, "corn_yields.csv"))
+corn_yields_df <- read.csv("corn_yields.csv")
 ```
 
 ### `read_csv()`
@@ -209,7 +207,7 @@ data <- readr::read_csv("path to the file to import")
 ```{r}
 #| label: read-data-readr
 #| message: false
-corn_yields_tbl <- readr::read_csv(file.path(dir_ch3, "corn_yields.csv"))
+corn_yields_tbl <- readr::read_csv("corn_yields.csv")
 ```
 
 ### Compare
@@ -258,7 +256,7 @@ Use `read_csv()`. It is faster on large files, it does not rename your columns b
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now a real-world problem the clean examples hide. read_csv guesses each column's type by looking at the first rows, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.
+Now a real-world problem the clean examples hide. read_csv guesses each column's type by sampling up to guess_max rows spread throughout the file, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.
 
 </details>
 
@@ -387,7 +385,7 @@ This is the foundation for the next tab: it gives your project a fixed root that
 <details class="transcript">
 <summary>Transcript</summary>
 
-And here is the recommendation. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody's computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.
+And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody's computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.
 
 </details>
 
@@ -399,6 +397,8 @@ Inside an R Project, the `here` package builds paths from the project root:
 #| label: here-demo
 here::here("lectures", "Chapter-3-DataWrangling", "corn_yields.csv")
 ```
+
+<br>
 
 ```{r}
 #| eval: false
@@ -413,49 +413,6 @@ Why this is the one to use:
 
 :::{.callout-note}
 Run `here::here()` on its own to see which folder it decided is the root. It looks for your `.Rproj` file.
-:::
-
-### Avoid `setwd()`
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-You will see setwd in older code and all over the internet, and I want you to avoid it, for two independent reasons. The first is specific to the way we work and it surprises people: when you render a document, R resets the working directory after every single chunk. So calling setwd in one chunk has no effect at all on the next one, and the file-not-found error you get looks completely mysterious. The second reason is more general: the path you would write only exists on your computer, so your code cannot run anywhere else, including wherever it is being graded. getwd is a useful thing to check. setwd is not the way to change it.
-
-</details>
-
-<!-- ADDED (B2): entire tab. The original taught setwd() with no warning. This
-     behaviour was verified by rendering a test document. -->
-
-You will see `setwd()` in older code and on the internet:
-
-```{r}
-#| eval: false
-setwd("/Users/tmieno2/Dropbox/Data-Science-with-R-Quarto")
-```
-
-Avoid it, for two separate reasons.
-
-**1. It does not survive from one chunk to the next.**
-
-When you render, R resets the working directory after **every** chunk. So this does not do what it looks like it does:
-
-````{verbatim}
-```{r}
-setwd("some/other/folder")   # applies only inside this chunk
-```
-
-```{r}
-read_csv("corn_yields.csv")  # back to the original folder. File not found.
-```
-````
-
-**2. The path only exists on your computer.**
-
-Nobody else has `/Users/tmieno2/...`, so your code cannot run anywhere else, including on the computer of whoever is grading it.
-
-:::{.callout-important}
-`getwd()` is useful for checking where you are. `setwd()` is not the way to change it. Use an R Project plus `here()` instead.
 :::
 
 ### Windows paths
@@ -571,15 +528,9 @@ read_excel("path to the file", sheet = 1)
 **Examples**
 
 ```{r}
-#| eval: false
+#| label: read-excel
 corn_08 <- read_excel("corn_yields.xls", sheet = 1) # 1st sheet
 corn_09 <- read_excel("corn_yields.xls", sheet = 2) # 2nd sheet
-```
-
-```{r}
-#| label: read-excel-real
-#| echo: false
-corn_08 <- read_excel(file.path(dir_ch3, "corn_yields.xls"), sheet = 1)
 ```
 
 ### Sheets by name
@@ -601,42 +552,21 @@ First, list what is in the workbook:
 
 ```{r}
 #| label: excel-sheets
-excel_sheets(file.path(dir_ch3, "corn_yields.xls"))
+excel_sheets("corn_yields.xls")
 ```
+
+<br>
 
 Then read the one you want:
 
 ```{r}
-#| eval: false
-corn_08 <- read_excel("corn_yields.xls", sheet = "2008")
+#| label: read-excel-by-name
+corn_08 <- read_excel("corn_yields.xls", sheet = "corn_yields_08")
 ```
-
-### Messy spreadsheets
-
-<details class="transcript">
-<summary>Transcript</summary>
-
-And now the reality of spreadsheets made by human beings, which almost never begin with a tidy header in the very first cell. There is usually a title, maybe a blank row, sometimes notes off to one side. Three arguments handle nearly all of it. skip ignores a given number of lines from the top, so the header row is found correctly. na lets you declare which strings should count as missing, and a dash or an empty cell often should. range reads one rectangle only, which is how you ignore notes scattered elsewhere on the sheet. And col_names FALSE for when there is genuinely no header.
-
-</details>
-
-<!-- ADDED (B3): entire tab. Real spreadsheets almost never start with a clean
-     header in cell A1, and the original assumed they do. -->
-
-Spreadsheets made by people rarely start with a tidy header row. Useful arguments:
-
-```{r}
-#| eval: false
-read_excel(
-  "corn_yields.xlsx",
-  sheet = "2008",
-  skip  = 3,               # a title and a blank row above the header
-  na    = c("", "NA", "-") # what counts as missing
-)
-```
-
-+ `range = "B3:F120"`: read one rectangle only, ignoring notes elsewhere on the sheet
-+ `col_names = FALSE`: there is no header row at all
+<!-- CHANGED (A12): this said sheet = "2008", which is not a sheet in the
+     workbook; the sheets are corn_yields_08 and corn_yields_09, as the
+     excel_sheets() output above now shows. It never errored only because the
+     chunk did not run. -->
 
 ### Note
 
@@ -694,14 +624,8 @@ haven::read_dta("path to the file")
 **Example**
 
 ```{r}
-#| eval: false
+#| label: read-dta
 corn_yields <- haven::read_dta("corn_yields.dta")
-```
-
-```{r}
-#| label: read-dta-real
-#| echo: false
-corn_yields <- haven::read_dta(file.path(dir_ch3, "corn_yields.dta"))
 ```
 
 ### Note
@@ -796,14 +720,8 @@ readRDS("path to the file")
 **Example**
 
 ```{r}
-#| eval: false
+#| label: read-rds
 corn_yields <- readRDS("corn_yields.rds")
-```
-
-```{r}
-#| label: read-rds-real
-#| echo: false
-corn_yields <- readRDS(file.path(dir_ch3, "corn_yields.rds"))
 ```
 
 ### Note
@@ -934,8 +852,8 @@ A list goes in, and a list comes back out, with every column type intact.
 #| label: file-size-compare
 data.frame(
   file = c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds"),
-  KB   = round(file.size(file.path(dir_ch3,
-           c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds"))) / 1024, 1)
+  KB   = round(file.size(
+           c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds")) / 1024, 1)
 )
 ```
 

@@ -164,7 +164,7 @@ logo does not overlap the panel       (panel starts x 731px)
 
 ## Rollout status
 
-**Chapters 1-9 are complete: 706 transcripts across 24 decks**, all rendering
+**Chapters 1-9 are complete: 694 transcripts across 24 decks**, all rendering
 clean.
 
 | Deck | Transcripts |
@@ -175,8 +175,8 @@ clean.
 | `02-2-Quarto-revealjs.qmd` | 31 |
 | `02-3-Quarto-website.qmd` | 5 |
 | `02-4-Quarto-article.qmd` | 16 |
-| `03-1-input-output.qmd` | 29 |
-| `03-2-data-wrangling-dplyr.qmd` | 49 |
+| `03-1-input-output.qmd` | 27 |
+| `03-2-data-wrangling-dplyr.qmd` | 39 |
 | `03-3-reshape-merge.qmd` | 30 |
 | `04-1-data-visualization-basics.qmd` | 29 |
 | `04-2-more-information.qmd` | 18 |
