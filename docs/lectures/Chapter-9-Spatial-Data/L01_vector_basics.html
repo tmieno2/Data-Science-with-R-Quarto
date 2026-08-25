@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-9f9fb851b2c68f17b9a22372e75d240b.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -1300,7 +1300,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"nc <-\n  st_read(system.file(\"shape/nc.shp\", package = \"sf\")) %>%\n  dplyr::select(AREA, NAME, FIPS)\n\n#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\n\n#--- load datasets ---#\n#--- ADDED: fairway_grid, loaded here for explicitness. NOTE: this was not a  ---#\n#--- bug fix. r.spatial.workshop.datasets is LazyData: true, so every dataset ---#\n#--- is available by name as soon as the package is attached, with or without ---#\n#--- a data() call — verified in the WebR runtime, not just locally.          ---#\ndata(wells_ne)\ndata(fairway_grid)\n\n# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the\n# browser against a virtual filesystem that does not hold the repo, so it\n# cannot source that file and has to carry a copy. Edit the shared file first,\n# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy\n# has drifted and prints the block to paste.\nlecture_theme <- function(base_size = 16) {\n  ggplot2::theme_bw(base_size = base_size) +\n    ggplot2::theme(\n      axis.text = ggplot2::element_text(size = base_size * 0.9),\n      axis.title = ggplot2::element_text(size = base_size),\n      legend.text = ggplot2::element_text(size = base_size * 0.9),\n      legend.title = ggplot2::element_text(size = base_size * 0.9),\n      plot.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      panel.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.key = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      # theme_bw's grey92 grid was chosen against a white panel and all but\n      # disappears on the warm paper once the panel stops being opaque.\n      panel.grid = ggplot2::element_line(colour = \"grey87\")\n    )\n}\n\n# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas\n# every size ggplot measures in points or millimetres comes out a third of what\n# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by\n# the same factor puts WebR figures at the same type size as the knitr ones.\n# Keep this in step with `dpi` in the header: change one, change the other.\nwebr_scale <- 216 / 72\nassignInNamespace(\".pt\", ggplot2::.pt * webr_scale, \"ggplot2\")\nassignInNamespace(\".stroke\", ggplot2::.stroke * webr_scale, \"ggplot2\")\ntheme_lecture <- lecture_theme(18 * webr_scale) +\n  # base_size also sets the theme's line widths, which are in millimetres and\n  # already pass through the scaled .pt; pin them to what 18pt gives, or they\n  # come out nine times too thick.\n  ggplot2::theme(\n    line = ggplot2::element_line(linewidth = 18 / 22),\n    rect = ggplot2::element_rect(linewidth = 18 / 22)\n  )\nggplot2::theme_set(theme_lecture)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc <-\n  st_read(system.file(\"shape/nc.shp\", package = \"sf\")) %>%\n  dplyr::select(AREA, NAME, FIPS)","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(nc)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc  ","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc, geometry)","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_geometry(nc[1, ])[[1]][[1]][[1]] %>% head(10)","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- point ---# \na_point <- st_point(c(2, 1))\n#--- line ---#\ns1 <- rbind(c(2, 3), c(3, 4), c(3, 5), c(1, 5))\na_linestring <- sf::st_linestring(s1)\n#--- polygon ---#\np1 <- rbind(c(0, 0), c(3, 0), c(3, 2), c(2, 5), c(1, 3), c(0, 0))\na_polygon <- st_polygon(list(p1))\n#--- polygon with hole ---#\np2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))\na_polygon_with_a_hole <- st_polygon(list(p1,p2))\n#--- another polygon ---#\np3 <- rbind(c(4,0), c(5,0), c(5,3), c(4,2), c(4,0)) \n#--- multiplolygon ---#\na_multipolygon <- \n  st_multipolygon(\n    list(\n      list(p1,p2), # the polygon with a hole\n      list(p3) # the new polygon created above\n    )\n  )","id":7,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a POINT ---#\n(a_point <- st_point(c(2, 1)))","id":8,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check the class of the object ---#\nclass(a_point)","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- collection of points in a matrix form ---#\n(s1 <- rbind(c(2,3),c(3,4),c(3,5),c(1,5)))","id":10,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a \"LINESTRING\" ---#\na_linestring <- sf::st_linestring(s1)\n\n#--- check the class ---#\nclass(a_linestring)","id":11,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_linestring)","id":12,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(p1 <- rbind(c(0,0), c(3,0), c(3,2), c(2,5), c(1,3), c(0,0)))","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"a_polygon <- st_polygon(list(p1))\n\nclass(a_polygon)","id":14,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_polygon, col = \"red\")","id":15,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- a hole within p1 ---#\np2 <- rbind(c(1,1), c(1,2), c(2,2), c(1,1))\n\n#--- create a polygon with hole ---#\na_polygon_with_a_hole <- st_polygon(list(p1,p2))","id":16,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- see what it looks like ---#\nplot(a_polygon_with_a_hole, col = \"red\")","id":17,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a matrix for another polygon ---#\np3 <- rbind(c(4,0), c(5,0), c(5,3), c(4,2), c(4,0)) ","id":18,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"a_multipolygon <- \n  st_multipolygon(\n    list(\n      list(p1,p2), # the polygon with a hole\n      list(p3) # the new polygon created above\n    )\n  )","id":19,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_multipolygon, col = \"red\")","id":20,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":21,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":22,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-22","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create an sfc ---#\nsfc_ex <- sf::st_sfc(\n  list(\n    a_point,\n    a_linestring,\n    a_polygon,\n    a_multipolygon\n  )\n)","id":24,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(sfc_ex)","id":25,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a data.frame ---#\ndf_ex <- data.frame(\n  name = c('A', 'B', 'C', 'D')\n)\n\n#--- add the sfc as a column ---#\ndf_ex$geometry <- sfc_ex ","id":26,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(df_ex)","id":27,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- let R recognize the data frame as sf ---#\nsf_ex <- st_as_sf(df_ex)\n\n#--- see what it looks like ---#\nsf_ex","id":28,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check the class ---#\nclass(sf_ex)","id":29,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"a_point \n\na_polygon","id":30,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":31,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc)","id":32,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_utm <- st_transform(nc, 26917)","id":33,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc_utm)","id":34,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc, geometry)","id":35,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc_utm, geometry)","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_set_crs(nc, 26914)","id":37,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- transform ---#\nnc_utm_back_to_original <-\n  st_transform(\n    nc_utm,\n    st_crs(nc)\n  )","id":38,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc_utm_back_to_original)","id":39,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":40,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(nc) ","id":42,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-42","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- read irrigation well registration data ---#\ndata(wells_ne)\n\n#--- check its class ---#\nclass(wells_ne)","id":43,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-43","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- take a look ---#\nhead(wells_ne)","id":44,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-44","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- recognize it as an sf ---#\nwells_ne_sf <- sf::st_as_sf(\n  wells_ne,\n  coords = c(\n    \"longdd\",\n    \"latdd\"\n  ),\n  crs = 4269\n)","id":45,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-45","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- recognize it as an sf ---#\nwells_ne_sf <- sf::st_as_sf(\n  wells_ne,\n  coords = c(\n    \"longdd\",\n    \"latdd\"\n  ),\n  crs = 4269\n)","id":46,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-46","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data(mower_sensor)\n\n#--- write the code below ---#\n","id":47,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-47","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_ne_sp <- as(wells_ne_sf, \"Spatial\")\n\nclass(wells_ne_sp)","id":48,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-48","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_ne_sf_again <- sf::st_as_sf(wells_ne_sp)\n\nclass(wells_ne_sf_again)","id":49,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-49","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- here is what the data looks like ---#\ndplyr::select(wells_ne_sf, wellid)","id":50,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-50","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- do some transformations ---#\nwells_ne_sf %>% \n  #--- select variables (geometry will always remain after select) ---#\n  dplyr::select(wellid) %>% \n  #--- removes observations with wellid <= 20000 ---#\n  dplyr::filter(wellid > 20000) %>% \n  #--- modify wellid ---#\n  dplyr::mutate(wellid = wellid + 20) ","id":51,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-51","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_grouped <- \n  nc %>%\n  dplyr::mutate(grp = rep(c(\"a\", \"b\"), length.out = nrow(.))) %>%\n  dplyr::group_by(grp) %>%\n  dplyr::summarize(mean_area = mean(AREA))\n\nnc_grouped","id":52,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-52","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc_grouped, aes(fill = grp), alpha = 0.5) +\n  theme_void()","id":53,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-53","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- with geometry ---#\nsystem.time(\n  for (i in 1:5) {\n    nc %>% dplyr::group_by(NAME) %>% dplyr::summarize(m = mean(AREA))\n  }\n)\n\n#--- without ---#\nsystem.time(\n  for (i in 1:5) {\n    nc %>% sf::st_drop_geometry() %>% dplyr::group_by(NAME) %>% dplyr::summarize(m = mean(AREA))\n  }\n)","id":54,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-54","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_pop <- data.frame(NAME = nc$NAME, pop = seq_len(nrow(nc)))\n\n#--- sf first ---#\njoined_a <- dplyr::left_join(nc, county_pop, by = \"NAME\")\nclass(joined_a)\n\n#--- data.frame first ---#\njoined_b <- dplyr::left_join(county_pop, nc, by = \"NAME\")\nclass(joined_b)","id":55,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-55","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- what does the geometry become? ---#\nas.data.frame(nc[1, ]) %>% format() %>% substr(1, 90)","id":56,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-56","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_buffer <- st_buffer(nc[1, ], dist = 2000)","id":57,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-57","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc[1, ], color = \"red\") +\n  geom_sf(data = nc_buffer, fill = \"blue\", alpha = 0.3)","id":58,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-58","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_buffer <- \n  #--- project first (to UTM 17N, the zone North Carolina is in) ---#\n  #--- CHANGED: was 32615, UTM zone 15N, which is ~1000km west of NC ---#\n  st_transform(nc[1, ], 32617) %>% \n  #--- dist in meter ---#\n  st_buffer(dist = 2000)","id":59,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-59","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc[1, ], color = \"red\") +\n  geom_sf(data = nc_buffer, fill = \"blue\", alpha = 0.3)","id":60,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-60","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nnc <- \n  dplyr::mutate(nc, area = st_area(nc)) %>% \n  dplyr::select(area)\n)","id":61,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-61","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(nc$area)","id":62,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-62","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc <- dplyr::mutate(nc, \n  area = st_area(nc) %>% as.numeric(),\n  ) %>% \n  dplyr::select(area)\n\nclass(nc$area)","id":63,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-63","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_centroids <- st_centroid(nc)","id":64,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-64","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc) +\n  geom_sf(data = nc_centroids)","id":65,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-65","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_centroid(nc_centroids) %>% st_coordinates() %>% head()","id":66,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-66","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"cbind(nc, st_coordinates(nc_centroids)) %>% head()","id":67,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-67","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_distance(\n    st_centroid(nc[1:5, ]),\n    st_centroid(nc[6:15, ])\n)","id":68,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-68","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_one <- st_union(nc)\nclass(nc_one)","id":69,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-69","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(nc_one)","id":70,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-70","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_utm <- st_transform(nc, 32617)\n\n#--- both describe North Carolina, in different CRS ---#\nst_crs(nc) == st_crs(nc_utm)","id":71,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-71","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection(nc[1:5, ], nc_utm[1:5, ])","id":72,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-72","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- a \"bowtie\": the outline crosses itself in the middle ---#\nbowtie <- \n  st_sf(\n    name = \"bowtie\",\n    geometry = st_sfc(\n      st_polygon(list(rbind(c(0, 0), c(2, 2), c(2, 0), c(0, 2), c(0, 0)))),\n      crs = 32617\n    )\n  )\n\nggplot() +\n  geom_sf(data = bowtie, fill = \"red\", alpha = 0.3) +\n  theme_void()","id":73,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-73","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_is_valid(bowtie)\n\n#--- \"Self-intersection[1 1]\" — the coordinates where it crosses itself ---#\nst_is_valid(bowtie, reason = TRUE)","id":74,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-74","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_area(bowtie)","id":75,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-75","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection(bowtie, bowtie)","id":76,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-76","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"bowtie_fixed <- st_make_valid(bowtie)\n\nst_is_valid(bowtie_fixed)\nst_area(bowtie_fixed)","id":77,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-77","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_1 <- nc[1, ]\n\n#--- UTM zone 17N: units are metres ---#\nnc_metres <- st_transform(nc_1, 32617)\n\n#--- NC State Plane: units are US survey FEET ---#\nnc_feet <- st_transform(nc_1, 2264)\n\nst_crs(nc_metres)$units\nst_crs(nc_feet)$units","id":78,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-78","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"buf_m  <- st_buffer(nc_metres, dist = 2000)\nbuf_ft <- st_buffer(nc_feet,   dist = 2000)\n\n#--- areas in km2 ---#\nc(\n  metres = as.numeric(st_area(buf_m)) / 1e6,\n  feet   = as.numeric(st_area(buf_ft)) / 1e6\n)","id":79,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-79","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data(fairway_grid)","id":80,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-80","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#\n#--- CHANGED: this was a bare plot(), which errors if a student clicks Run ---#","id":81,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-81","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":82,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-82","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":83,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-83","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":84,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-84","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":85,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-85","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
+  globalThis.qwebrCellDetails = [{"code":"nc <-\n  st_read(system.file(\"shape/nc.shp\", package = \"sf\")) %>%\n  dplyr::select(AREA, NAME, FIPS)\n\n#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\n\n#--- load datasets ---#\n#--- ADDED: fairway_grid, loaded here for explicitness. NOTE: this was not a  ---#\n#--- bug fix. r.spatial.workshop.datasets is LazyData: true, so every dataset ---#\n#--- is available by name as soon as the package is attached, with or without ---#\n#--- a data() call — verified in the WebR runtime, not just locally.          ---#\ndata(wells_ne)\ndata(fairway_grid)\n\n# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the\n# browser against a virtual filesystem that does not hold the repo, so it\n# cannot source that file and has to carry a copy. Edit the shared file first,\n# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy\n# has drifted and prints the block to paste.\nlecture_theme <- function(base_size = 16) {\n  ggplot2::theme_bw(base_size = base_size) +\n    ggplot2::theme(\n      axis.text = ggplot2::element_text(size = base_size * 0.9),\n      axis.title = ggplot2::element_text(size = base_size),\n      legend.text = ggplot2::element_text(size = base_size * 0.9),\n      legend.title = ggplot2::element_text(size = base_size * 0.9),\n      plot.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      panel.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.key = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      # theme_bw's grey92 grid was chosen against a white panel and all but\n      # disappears on the warm paper once the panel stops being opaque.\n      panel.grid = ggplot2::element_line(colour = \"grey87\")\n    )\n}\n\n# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas\n# every size ggplot measures in points or millimetres comes out a third of what\n# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by\n# the same factor puts WebR figures at the same type size as the knitr ones.\n# Keep this in step with `dpi` in the header: change one, change the other.\nwebr_scale <- 216 / 72\nassignInNamespace(\".pt\", ggplot2::.pt * webr_scale, \"ggplot2\")\nassignInNamespace(\".stroke\", ggplot2::.stroke * webr_scale, \"ggplot2\")\ntheme_lecture <- lecture_theme(18 * webr_scale) +\n  # base_size also sets the theme's line widths, which are in millimetres and\n  # already pass through the scaled .pt; pin them to what 18pt gives, or they\n  # come out nine times too thick.\n  ggplot2::theme(\n    line = ggplot2::element_line(linewidth = 18 / 22),\n    rect = ggplot2::element_rect(linewidth = 18 / 22)\n  )\nggplot2::theme_set(theme_lecture)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc <-\n  st_read(system.file(\"shape/nc.shp\", package = \"sf\")) %>%\n  dplyr::select(AREA, NAME, FIPS)","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(nc)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc, geometry)","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_geometry(nc[1, ])[[1]][[1]][[1]] %>% head(10)","id":6,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- point ---#\na_point <- st_point(c(2, 1))\n#--- line ---#\ns1 <- rbind(c(2, 3), c(3, 4), c(3, 5), c(1, 5))\na_linestring <- sf::st_linestring(s1)\n#--- polygon ---#\np1 <- rbind(c(0, 0), c(3, 0), c(3, 2), c(2, 5), c(1, 3), c(0, 0))\na_polygon <- st_polygon(list(p1))\n#--- polygon with hole ---#\np2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))\na_polygon_with_a_hole <- st_polygon(list(p1, p2))\n#--- another polygon ---#\np3 <- rbind(c(4, 0), c(5, 0), c(5, 3), c(4, 2), c(4, 0))\n#--- multiplolygon ---#\na_multipolygon <-\n  st_multipolygon(\n    list(\n      list(p1, p2), # the polygon with a hole\n      list(p3) # the new polygon created above\n    )\n  )","id":7,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a POINT ---#\n(a_point <- st_point(c(2, 1)))","id":8,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check the class of the object ---#\nclass(a_point)","id":9,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- collection of points in a matrix form ---#\n(s1 <- rbind(c(2, 3), c(3, 4), c(3, 5), c(1, 5)))","id":10,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a \"LINESTRING\" ---#\na_linestring <- sf::st_linestring(s1)\n\n#--- check the class ---#\nclass(a_linestring)","id":11,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_linestring)","id":12,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(p1 <- rbind(c(0, 0), c(3, 0), c(3, 2), c(2, 5), c(1, 3), c(0, 0)))","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"a_polygon <- st_polygon(list(p1))\n\nclass(a_polygon)","id":14,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_polygon, col = \"red\")","id":15,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- a hole within p1 ---#\np2 <- rbind(c(1, 1), c(1, 2), c(2, 2), c(1, 1))\n\n#--- create a polygon with hole ---#\na_polygon_with_a_hole <- st_polygon(list(p1, p2))","id":16,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- see what it looks like ---#\nplot(a_polygon_with_a_hole, col = \"red\")","id":17,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a matrix for another polygon ---#\n(\n  p3 <- rbind(c(4, 0), c(5, 0), c(5, 3), c(4, 2), c(4, 0))\n)","id":18,"options":{"autorun":"true","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\na_multipolygon <-\n  st_multipolygon(\n    list(\n      list(p1, p2), # the polygon with a hole\n      list(p3) # the new polygon created above\n    )\n  )\n)","id":19,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(a_multipolygon, col = \"red\")","id":20,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":21,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":22,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-22","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create an sfc ---#\n(\nsfc_ex <- sf::st_sfc(\n  list(\n    a_point,\n    a_linestring,\n    a_polygon,\n    a_multipolygon\n  )\n)\n)","id":24,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(sfc_ex)","id":25,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create a data.frame ---#\ndf_ex <- data.frame(\n  name = c(\"A\", \"B\", \"C\", \"D\")\n)\n\n#--- add the sfc as a column ---#\ndf_ex$geometry <- sfc_ex\n\n#--- see it ---#\ndf_ex","id":26,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(df_ex)","id":27,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- let R recognize the data frame as sf ---#\nsf_ex <- st_as_sf(df_ex)\n\n#--- see what it looks like ---#\nsf_ex","id":28,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- check the class ---#\nclass(sf_ex)","id":29,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"a_point\n\na_polygon","id":30,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":31,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc)","id":32,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_utm <- st_transform(nc, 26917)","id":33,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc_utm)","id":34,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc, geometry)","id":35,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"dplyr::select(nc_utm, geometry)","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_set_crs(nc, 26914)","id":37,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- transform ---#\n(\nnc_utm_back_to_original <-\n  st_transform(\n    nc_utm,\n    st_crs(nc)\n  )\n)","id":38,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_crs(nc_utm_back_to_original)","id":39,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":40,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(nc)","id":42,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-42","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- read irrigation well registration data ---#\ndata(wells_ne)\n\n#--- check its class ---#\nclass(wells_ne)","id":43,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-43","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- take a look ---#\nhead(wells_ne)","id":44,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-44","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- recognize it as an sf ---#\nwells_ne_sf <- sf::st_as_sf(\n  wells_ne,\n  coords = c(\n    \"longdd\",\n    \"latdd\"\n  ),\n  crs = 4269\n)","id":45,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-45","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- recognize it as an sf ---#\n(\nwells_ne_sf <- \n  sf::st_as_sf(\n    wells_ne,\n    coords = c(\n      \"longdd\",\n      \"latdd\"\n    ),\n    crs = 4269\n  )\n)","id":46,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-46","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data(mower_sensor)\n\n#--- write the code below ---#","id":47,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-47","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_ne_sp <- as(wells_ne_sf, \"Spatial\")\n\nclass(wells_ne_sp)","id":48,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-48","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_ne_sf_again <- sf::st_as_sf(wells_ne_sp)\n\nclass(wells_ne_sf_again)","id":49,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-49","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- here is what the data looks like ---#\ndplyr::select(wells_ne_sf, wellid)","id":50,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-50","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- do some transformations ---#\nwells_ne_sf %>%\n  #--- select variables (geometry will always remain after select) ---#\n  dplyr::select(wellid) %>%\n  #--- removes observations with wellid <= 20000 ---#\n  dplyr::filter(wellid > 20000) %>%\n  #--- modify wellid ---#\n  dplyr::mutate(wellid = wellid + 20)","id":51,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-51","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_grouped <-\n  nc %>%\n  dplyr::mutate(grp = rep(c(\"a\", \"b\"), length.out = nrow(.))) %>%\n  dplyr::group_by(grp) %>%\n  dplyr::summarize(mean_area = mean(AREA))\n\nnc_grouped","id":52,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-52","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = nc_grouped, \n    aes(fill = grp), \n    alpha = 0.5\n  ) +\n  theme_void()","id":53,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-53","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- with geometry ---#\nsystem.time(\n  for (i in 1:5) {\n    nc %>%\n      dplyr::group_by(NAME) %>%\n      dplyr::summarize(m = mean(AREA))\n  }\n)\n\n#--- without ---#\nsystem.time(\n  for (i in 1:5) {\n    nc %>%\n      sf::st_drop_geometry() %>%\n      dplyr::group_by(NAME) %>%\n      dplyr::summarize(m = mean(AREA))\n  }\n)","id":54,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-54","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_pop <- \n  data.frame(\n    NAME = nc$NAME, \n    pop = seq_len(nrow(nc))\n  )\n\n#--- see the first 6 rows ---#\nhead(county_pop)","id":55,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-55","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  joined_a <- \n    dplyr::left_join(\n      nc, \n      county_pop, \n      by = \"NAME\"\n    )\n)","id":56,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-56","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  joined_b <- \n    dplyr::left_join(\n      county_pop, nc, \n      by = \"NAME\"\n    )\n)","id":57,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-57","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- what does the geometry become? ---#\nas.data.frame(nc[1, ]) %>%\n  format() %>%\n  substr(1, 90)","id":58,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-58","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  nc_buffer <- st_buffer(nc[1, ], dist = 2000)\n) ","id":59,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-59","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc[1, ], color = \"red\") +\n  geom_sf(data = nc_buffer, fill = \"blue\", alpha = 0.3) +\n  theme_void()","id":60,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-60","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_buffer <-\n  #--- project first (to UTM 17N, the zone North Carolina is in) ---#\n  #--- CHANGED: was 32615, UTM zone 15N, which is ~1000km west of NC ---#\n  st_transform(nc[1, ], 32617) %>%\n  #--- dist in meter ---#\n  st_buffer(dist = 2000)","id":61,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-61","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc[1, ], color = \"red\") +\n  geom_sf(data = nc_buffer, fill = \"blue\", alpha = 0.3)","id":62,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-62","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  nc <-\n    dplyr::mutate(nc, area = st_area(nc)) %>%\n    dplyr::select(area)\n)","id":63,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-63","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"class(nc$area)","id":64,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-64","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc <- \n  dplyr::mutate(nc,\n    area = st_area(nc) %>% as.numeric(),\n  ) %>%\n  dplyr::select(area)\n\nclass(nc$area)","id":65,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-65","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  nc_centroids <- st_centroid(nc)\n) ","id":66,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-66","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = nc) +\n  geom_sf(data = nc_centroids)","id":67,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-67","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_centroid(nc_centroids) %>%\n  st_coordinates() %>%\n  head()","id":68,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-68","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"cbind(nc, st_coordinates(nc_centroids)) %>% head()","id":69,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-69","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_distance(\n  st_centroid(nc[1:5, ]),\n  st_centroid(nc[6:15, ])\n)","id":70,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-70","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_one <- st_union(nc)\nclass(nc_one)","id":71,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-71","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"plot(nc_one)","id":72,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-72","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_utm <- st_transform(nc, 32617)\n\n#--- both describe North Carolina, in different CRS ---#\nst_crs(nc) == st_crs(nc_utm)","id":73,"options":{"autorun":"true","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-73","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection(nc[1:5, ], nc_utm[1:5, ])","id":74,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-74","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"bowtie <-\n  st_sf(\n    name = \"bowtie\",\n    geometry = st_sfc(\n      st_polygon(list(rbind(\n        c(0, 0), \n        c(2, 2),\n        c(2, 0),\n        c(0, 2),\n        c(0, 0)\n      ))),\n      crs = 32617\n    )\n  )\n\nggplot() +\n  geom_sf(\n    data = bowtie, \n    fill = \"red\", \n    alpha = 0.3\n  ) +\n  theme_void()","id":75,"options":{"autorun":"true","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-75","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_is_valid(bowtie)","id":76,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-76","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_is_valid(bowtie, reason = TRUE)","id":77,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-77","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_area(bowtie)","id":78,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-78","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection(bowtie, bowtie)","id":79,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-79","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"bowtie_fixed <- st_make_valid(bowtie)\n\nst_is_valid(bowtie_fixed)\nst_area(bowtie_fixed)","id":80,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-80","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"nc_1 <- nc[1, ]\n\n#--- UTM zone 17N: units are metres ---#\nnc_metres <- st_transform(nc_1, 32617)\n\n#--- NC State Plane: units are US survey FEET ---#\nnc_feet <- st_transform(nc_1, 2264)\n\nst_crs(nc_metres)$units\nst_crs(nc_feet)$units","id":81,"options":{"autorun":"true","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-81","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"buf_m <- st_buffer(nc_metres, dist = 2000)\nbuf_ft <- st_buffer(nc_feet, dist = 2000)\n\n#--- areas in km2 ---#\nc(\n  metres = as.numeric(st_area(buf_m)) / 1e6,\n  feet   = as.numeric(st_area(buf_ft)) / 1e6\n)","id":82,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-82","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"data(fairway_grid)","id":83,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-83","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":84,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-84","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":85,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-85","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":86,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-86","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":87,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-87","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- type codes below ---#","id":88,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-88","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
 
   </script>
   <script type="module">
@@ -2377,6 +2377,10 @@
 
           // Design an output object for messages
           const pre = document.createElement("pre");
+          // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+          // or tinytable table). It keeps the output box, but not the whitespace
+          // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+          if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
           if (/\S/.test(out)) {
               // Display results as HTML elements to retain output styling
               const div = document.createElement("div");
@@ -2395,6 +2399,22 @@
           }
 
           elements.outputCodeDiv.appendChild(pre);
+
+          // PATCHED: HTML written by `output: asis` may carry its own <script>,
+          // which is how tinytable, modelsummary's default HTML output, fills its
+          // cells. innerHTML never runs a script, so the table arrived empty.
+          // Re-creating each script node runs it, and it must happen after the
+          // output is in the document or a detached node still does nothing.
+          if (!showMarkup) {
+              pre.querySelectorAll("script").forEach((original) => {
+                  const script = document.createElement("script");
+                  for (const attribute of original.attributes) {
+                      script.setAttribute(attribute.name, attribute.value);
+                  }
+                  script.textContent = original.textContent;
+                  original.replaceWith(script);
+              });
+          }
 
           // Determine if we have graphs to display
           if (result.images.length > 0) {
@@ -2919,8 +2939,6 @@ Transcript
 <p>Two practical notes before we start. The navigation aids are the usual ones: stacked lines bottom left for a table of contents, letter o for a panel view. But the second half of this slide matters more than usual here. Spatial packages are large, and the first time you load one of these decks your browser has to download sf and its dependencies before anything will run. That takes a while, and there is no progress bar worth watching. So open the deck, give it a minute, and judge readiness by whether a cell actually produces output rather than by any status message.</p>
 </details>
 <p><br></p>
-<div class="columns">
-<div class="column" style="width:70%;">
 <h3 id="interactive-navigation-tools">Interactive navigation tools</h3>
 <ul>
 <li><p>Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want</p></li>
@@ -2935,9 +2953,6 @@ Transcript
 <li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
 <li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
 </ul>
-</div><div class="column" style="width:30%;">
-
-</div></div>
 </section>
 <section id="getting-started" class="slide level2">
 <h2>Getting started</h2>
@@ -2976,8 +2991,6 @@ Transcript
 </summary>
 <p>What the sf package gives you, and the first bullet is the important idea. A simple feature holds the geographic information and the attributes together in one dataset. That sounds obvious, but it is exactly what older R spatial packages did not do, and it is why sf feels natural if you already know data frames. Then the list underneath is a preview of the whole spatial section of this course: projection, reading and writing, non-interactive operations like buffers and areas, and interactive ones like spatial joins. Almost everything you will need for applied work is in that list.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>The <code>sf</code> package provides a simple way of storing geographic information and the attributes of the geographic units in a single dataset called simple feature (<code>sf</code>).</p></li>
 <li><p>The <code>sf</code> package allows you to do almost all the spatial operations you would need for your research</p>
@@ -2997,11 +3010,6 @@ Transcript
 </ul></li>
 </ul></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-1-3">
 <details class="transcript">
@@ -3136,8 +3144,6 @@ Transcript
 </summary>
 <p>Starting with the simplest, and building one by hand is the point of the next few tabs. A POINT is just two numbers, so st point of a vector of two values makes one. Run it and look at how it prints: sf shows you the type in capitals followed by the coordinates. Then run the class check, and note that you get two things back, POINT and sfg. That pairing matters. Every geometry you make is an sfg of some particular type, and functions that work on sfg objects work on all of them regardless of type.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p><code>POINT</code> is the simplest geometry type and is represented by a vector of two numeric values. An example below shows how a <code>POINT</code> feature can be made from scratch:</p>
 <div id="qwebr-insertion-location-8"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3147,11 +3153,6 @@ Transcript
 <div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>you can see that it’s indeed a <code>POINT</code> object. But, it’s also an <code>sfg</code> object. So, <code>a_point</code> is an <code>sfg</code> object of type <code>POINT</code>.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-3-3">
 <details class="transcript">
@@ -3160,8 +3161,6 @@ Transcript
 </summary>
 <p>A line is a sequence of points, so it needs a matrix rather than a vector. The first cell builds that matrix with rbind, four points, each a pair of coordinates. Then st linestring turns it into a geometry. Run the plot at the bottom and compare it against the numbers in the matrix. Each consecutive pair of points is joined by a straight line, in the order they appear. That ordering matters: shuffle the rows of the matrix and you get a different, probably self-crossing, shape from exactly the same set of points.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>A <code>LINESTRING</code> object is represented by a sequence of points in a matrix:</p>
 <div id="qwebr-insertion-location-10"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3174,11 +3173,6 @@ Transcript
 <div id="qwebr-insertion-location-12"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>As you can see, each pair of consecutive points in the matrix are connected by a straight line to form a line.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-3-4">
 <details class="transcript">
@@ -3187,8 +3181,6 @@ Transcript
 </summary>
 <p>A polygon is also a matrix of points, with one extra requirement stated in the sentence above the code: the first and last points must be identical, so that the boundary closes. Look at the matrix and check that, the first row and the last row are both zero zero. If you leave that out, you have a line rather than a region. Then note that st polygon takes the matrix wrapped in a list, which looks like unnecessary ceremony until the next tab, where the list is exactly what lets a polygon have more than one ring.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Just like the <code>LINESTRING</code> object we created earlier, a <code>POLYGON</code> is represented by a collection of points.</p>
 <p>However, the first and last points in the matrix have to be the same to form a polygon</p>
 <div id="qwebr-insertion-location-13"></div>
@@ -3201,11 +3193,6 @@ Transcript
 <p>Let’s plot it.</p>
 <div id="qwebr-insertion-location-15"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-3-5">
 <details class="transcript">
@@ -3214,8 +3201,6 @@ Transcript
 </summary>
 <p>And here is why the list mattered. A polygon can have holes, and the rule is in the first sentence: the first matrix in the list is the outer boundary, and every matrix after it is a hole cut out of it. So we reuse p one as the exterior and add p two, a small triangle inside it, as a hole. Run the plot and you can see the gap. This is not an exotic case. Any polygon with a lake in it, or a country surrounding an enclave, needs exactly this structure, and it is the reason st polygon has the interface it does.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>A <code>POLYGON</code> can have holes in it. The first matrix of a list becomes the exterior ring, and all the subsequent matrices will be holes within the exterior ring.</p>
 <div id="qwebr-insertion-location-16"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3223,11 +3208,6 @@ Transcript
 <p>Let’s plot it.</p>
 <div id="qwebr-insertion-location-17"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-3-6">
 <details class="transcript">
@@ -3236,8 +3216,6 @@ Transcript
 </summary>
 <p>One more level of nesting, for a single feature made of several separate polygons. The structure is a list of lists: each inner list is one polygon, in the same first-ring-then-holes format from the previous tab. Read the example carefully. The first inner list is the polygon with its hole, the second is a brand new polygon off to the side, and together they form one MULTIPOLYGON. Run the plot and you will see two disconnected shapes that R nonetheless treats as a single geometry. That is precisely how a county with an offshore island is stored.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>To create a <code>MULTIPOLYGON</code> object you create a list of lists of matrices, with each inner list representing a polygon.</p>
 <div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3249,11 +3227,6 @@ Transcript
 <p>Each of <code>list(p1,p2)</code> and <code>list(p3)</code> represents a polygon.</p>
 <div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-3-7">
 <details class="transcript">
@@ -3262,8 +3235,6 @@ Transcript
 </summary>
 <p>Your turn, and these three are deliberately unguided. Build a POINT, a LINESTRING and a POLYGON from scratch. You have seen all three, so this is about whether the structural rules have stuck rather than whether you can recall function names. Two things to watch. A line needs a matrix, not a vector, even if you only want two points. And a polygon needs its first and last rows to match, or sf will object. Plot each one as you make it, because seeing the shape is the quickest way to catch a coordinate you typed wrong.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <h4 id="create-a-point">Create a <code>POINT</code></h4>
 <div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3275,11 +3246,6 @@ Transcript
 <h4 id="create-a-polygon">Create a <code>POLYGON</code></h4>
 <div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 </div>
 </div>
@@ -3359,14 +3325,7 @@ Transcript
 <p><br></p>
 </div>
 <div id="tabset-5-2">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Create an <code>sf</code> object using the <code>sfc</code> object you created in the previous exercise, where the additional variable in the <code>sf</code> object is <code>id</code> with the <code>POINT</code> and <code>POLYGON</code> assigned <code>id = 1</code> and <code>id = 2</code>, respectively.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -3389,8 +3348,6 @@ Transcript
 </summary>
 <p>A section about file formats, and the first bullet explains why we have to care. Most of the GIS world runs on ArcGIS, whose native format is the shapefile, so your collaborators will send you shapefiles and much public data is published as shapefiles. Then read the list of components, because it is the practical thing to remember. A shapefile is not one file, it is at least four, and all of them are required. Sending somebody the dot s h p on its own gives them something unreadable, which is exactly the annoyance the rest of this section goes on to complain about.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>The vast majority of people still use ArcGIS software to handle spatial data, which has its own system of storing spatial data called <span style="color:red">shapefile</span> system.</p></li>
 <li><p>shapefile is a collection of files, of which four are required:</p>
@@ -3408,11 +3365,6 @@ Transcript
 <li><p>There are many GIS data online that are available only as shapefiles.</p></li>
 <li><p>So, it is important to learn how to read and write shapefiles</p></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-8-2">
 <details class="transcript">
@@ -3432,7 +3384,7 @@ Transcript
 <p><br></p>
 <h4 id="example">Example</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>nc_imported <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"Data/nc_practice.shp"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>nc_imported <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"Data/nc_practice.shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here, a file named <code>nc_practice.shp</code> (along with its supporting files) is read from the <code>Data</code> folder.</p>
 <p><br></p>
@@ -3502,8 +3454,6 @@ Transcript
 <ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Motivation</a></li><li><a href="#tabset-7-2">GeoJSON</a></li><li><a href="#tabset-7-3">Geopackage</a></li><li><a href="#tabset-7-4">R data set (rds)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-7-1">
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>If your collaborators are using ArcGIS and demanding that they need a shapefile for their work, sure you can write to a shapefile.</p></li>
 <li><p>But, there is really no need to work with the shapefile system if you are not using ArcGIS.</p></li>
@@ -3511,15 +3461,8 @@ Transcript
 <li><p>Indeed, there are some limitations to shape files (see <a href="https://carto.com/blog/fgdb-gpkg/">here</a>).</p></li>
 <li><p>But, first and foremost, it is annoying to have many files for a single spatial object.</p></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-7-2">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>A format that is increasingly popular is <a href="https://geojson.org/">GeoJSON</a>.</p>
 <ul>
 <li><p>Unlike the shapefile system, it produces only a single file with <strong>.geojson</strong> extension.</p></li>
@@ -3538,15 +3481,8 @@ Transcript
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>nc <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"Data/nc_exported.geojson"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-7-3">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>One of the alternative data formats that is considered superior to the shapefile system is <a href="https://www.geopackage.org/">GeoPackage</a>, which overcomes various limitations associated with shapefile.</p>
 <ul>
 <li><p>Unlike the shapefile system, it produces only a single file with <strong>.gpkg</strong> extension.</p></li>
@@ -3565,15 +3501,8 @@ Transcript
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>nc <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"Data/nc_exported.gpkg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-7-4">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Or better yet, if your collaborator uses R (or if it is only you who is going to use the data), then just save the <code>sf</code> object as an <strong>.rds</strong> file using <code>saveRDS()</code>, which can be of course read using <code>readRDS()</code>.</p>
 <p><br></p>
 <p><strong>Save</strong></p>
@@ -3600,11 +3529,6 @@ Transcript
 </div>
 </div>
 </div>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 </div>
 </div>
@@ -3626,14 +3550,7 @@ Transcript
 </summary>
 <p>A short motivation tab, and the reason it is short is that the need is entirely practical. Two spatial datasets can only be combined, joined or plotted together if they share a coordinate reference system. So most of the time you reproject not because you have chosen a projection on its merits, but because something else you are working with is already in one. That is worth saying plainly, because it means the skill you need is not choosing projections well, it is checking and matching them reliably, which is what the next few tabs cover.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>You often need to project or re-project an <code>sf</code> using a different coordinate reference system (CRS) because you need it to have the same CRS as an <code>sf</code> object that you are interacting it with (spatial join) or mapping it with.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-11-2">
 <details class="transcript">
@@ -3642,8 +3559,6 @@ Transcript
 </summary>
 <p>Checking what you have, with st crs. Run it and read the output, because it is verbose and mostly ignorable. What you are looking for is the last line, the EPSG code, which here is four two six seven. The bullets explain the surrounding format, Well Known Text, and the EPSG system: a catalogue of numbers standing in for full CRS definitions, so you can write one number instead of a paragraph. Note the caveat at the bottom, though. Only common systems have EPSG codes, so occasionally you will meet a CRS with no number and have to pass the full definition.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>In order to check the current CRS for an <code>sf</code> object, you can use the <code>sf::st_crs()</code> function.</p>
 <div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3661,11 +3576,6 @@ Transcript
 <li>Only the commonly-used CRS have been assigned EPSG SRID.</li>
 </ul></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-11-3">
 <details class="transcript">
@@ -3707,8 +3617,6 @@ pick the zone your data is actually in, so the example now does that. -->
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-9-3">
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>There is a function that <span style="color: red;"> sets </span> CRS, namely <code>sf::st_set_crs()</code>.</p></li>
 <li><p>This function literally <span style="color: red;"> sets </span> the CRS, but does not transform geometry accordingly unlike <code>sf::st_transform()</code>.</p></li>
@@ -3716,11 +3624,6 @@ pick the zone your data is actually in, so the example now does that. -->
 </ul>
 <div id="qwebr-insertion-location-37"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 </div>
 </div>
@@ -3733,8 +3636,6 @@ Transcript
 </summary>
 <p>A small but genuinely useful trick. When you are reprojecting only in order to match another dataset, you do not need to look up its EPSG code at all. Pass st crs of that other object directly to st transform, and the two are guaranteed to agree. The example transforms back to where we started by asking for the CRS of the original. Prefer this over hard-coding numbers whenever the target is another dataset rather than a deliberate choice, because it cannot go subtly wrong the way a mistyped four-digit code can.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>You often need to change the CRS of an <code>sf</code> object when you interact (e.g., spatial subsetting, joining, etc) it with another <code>sf</code> object.</p></li>
 <li><p>In such a case, you can extract the CRS of the other <code>sf</code> object using <code>st_crs()</code> and use it for transformation.</p></li>
@@ -3749,11 +3650,6 @@ Transcript
 <p>Let’s confirm the transformation:</p>
 <div id="qwebr-insertion-location-39"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-11-5">
 <details class="transcript">
@@ -3811,19 +3707,12 @@ Transcript
 </summary>
 <p>One more viewing option, and note the instruction above the code: run this one on your own computer rather than here. mapView gives you an interactive map, a real slippy map you can pan and zoom, with a basemap underneath and your features on top, and clicking a feature shows its attributes. That is enormously useful for checking whether your data is where you think it is, which plot cannot really tell you. It does not run in these slides because the package is not loaded here, so copy it across and try it in RStudio.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Sometimes it is useful to be able to tell where certain spatial objects are and what values are associated with them on a map.</p>
 <p>The <code>mapView()</code> function from the <code>mapview</code> package can create an interactive map where you can point to a spatial object and the associated information is revealed on the map.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <p>Run the following codes on your computer.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>nc <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(<span class="fu">system.file</span>(<span class="st">"shape/nc.shp"</span>, <span class="at">package =</span> <span class="st">"sf"</span>), <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-2"><a></a>mapview<span class="sc">::</span><span class="fu">mapView</span>(nc)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a></a>mapview<span class="sc">::</span><span class="fu">mapView</span>(nc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -4099,6 +3988,13 @@ Transcript
 <div id="qwebr-insertion-location-55"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
+<p><code>sf</code> first:</p>
+<div id="qwebr-insertion-location-56"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br> <code>data.frame</code> first:</p>
+<div id="qwebr-insertion-location-57"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
 <div title="The second one is not an `sf`">
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -4120,7 +4016,7 @@ Transcript
 </summary>
 <p>The last one, and it is the most disappointing to discover late. CSV has no way to represent a polygon, so if you write an sf to CSV the geometry is flattened into a text dump of the raw coordinate list. One county turns into a five-hundred-character line, and nothing on earth will read the shape back out of it. The rule is straightforward. If you want the attributes, drop the geometry and write that. If you want the spatial object, use st_write with a geopackage or geojson extension, which we covered in the reading and writing section earlier in this deck.</p>
 </details>
-<div id="qwebr-insertion-location-56"></div>
+<div id="qwebr-insertion-location-58"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="Do not `write.csv()` an `sf`">
@@ -4170,22 +4066,22 @@ Transcript
 </div>
 <div id="tabset-17-2">
 <p>Let’s create a buffer of 2000 meter.</p>
-<div id="qwebr-insertion-location-57"></div>
+<div id="qwebr-insertion-location-59"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Here is what it looks like:</p>
-<div id="qwebr-insertion-location-58"></div>
+<div id="qwebr-insertion-location-60"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Yes, you see zig-zag. You can read up on this <a href="https://github.com/r-spatial/sf/issues/1692">here</a>. For now, I would recommend that you project first and then create a buffer.</p>
 </div>
 <div id="tabset-17-3">
 <p>Let’s first project and then create a buffer:</p>
-<div id="qwebr-insertion-location-59"></div>
+<div id="qwebr-insertion-location-61"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Here is what it looks like:</p>
-<div id="qwebr-insertion-location-60"></div>
+<div id="qwebr-insertion-location-62"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -4204,17 +4100,17 @@ Transcript
 <div class="tab-content">
 <div id="tabset-18-1">
 <p>You can use <code>st_area()</code> to calculate the area of all the polygons in an <code>sf</code> object.</p>
-<div id="qwebr-insertion-location-61"></div>
+<div id="qwebr-insertion-location-63"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 </div>
 <div id="tabset-18-2">
 <p>By default, area calculated by <code>st_area()</code> is <code>units</code>.</p>
-<div id="qwebr-insertion-location-62"></div>
+<div id="qwebr-insertion-location-64"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>So, you want to convert it to a numeric variable like this if you want to subject it to numeric operations later:</p>
-<div id="qwebr-insertion-location-63"></div>
+<div id="qwebr-insertion-location-65"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -4233,21 +4129,21 @@ Transcript
 <div class="tab-content">
 <div id="tabset-19-1">
 <p>You can use <code>st_centroid()</code> to find the centroid of each of all the polygons in an <code>sf</code> object.</p>
-<div id="qwebr-insertion-location-64"></div>
+<div id="qwebr-insertion-location-66"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>As you can see, <code>st_centroid()</code> returns an <code>sf</code> of centroids as points. The centroids look like this:</p>
 <p><br></p>
-<div id="qwebr-insertion-location-65"></div>
+<div id="qwebr-insertion-location-67"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 </div>
 <div id="tabset-19-2">
 <p>If you want longitude (X) and latitude (Y) of the centroids, you can further apply <code>st_coordinates()</code>.</p>
-<div id="qwebr-insertion-location-66"></div>
+<div id="qwebr-insertion-location-68"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Of course, you can easily add the XY matrix to the original <code>sf</code> file using <code>cbind()</code>:</p>
-<div id="qwebr-insertion-location-67"></div>
+<div id="qwebr-insertion-location-69"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -4272,10 +4168,8 @@ Transcript
 <p>This finds the distance between each of the points in <code>sf_1</code> and each of the points in <code>sf_2</code>.</p>
 </div>
 <div id="tabset-20-2">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Get a matrix of distances whose <span class="math inline">[i,j]</span> element is the distance between the <span class="math inline">i</span>th <code>sfg</code> of <code>st_centroid(nc[1:5, ])</code> and <span class="math inline">j</span>th <code>sfg</code> of <code>st_centroid(nc[6:15, ])</code>:</p>
-<div id="qwebr-insertion-location-68"></div>
+<div id="qwebr-insertion-location-70"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
@@ -4288,11 +4182,6 @@ Transcript
 </div>
 </div>
 </div>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 </div>
 </div>
@@ -4305,21 +4194,14 @@ Transcript
 </summary>
 <p>The last operation: dissolving many geometries into one with st union. The example collapses a hundred counties into a single outline of the state, which is what you want when you need a boundary rather than its subdivisions. Note the warning in the text, though, because it is easy to trip over. What comes back is an sfc, not an sf. The attributes are gone, and reasonably so, since there is no single sensible answer for what the name or area column of a merged object should be. If you need attributes, you have to decide how to aggregate them yourself.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>Sometimes you want to combine all the geometries in a single <code>sf</code>. For example, you may want to get the centroid of North Carolina using <code>nc</code> (of course, you can alternatively get <code>sf</code> of NC state boundary, instead of counties in this case).</p>
 <p>You can use <code>sf::st_union()</code> to achieve this. Note that the returned object is <code>sfc</code>, not <code>sf</code>.</p>
-<div id="qwebr-insertion-location-69"></div>
+<div id="qwebr-insertion-location-71"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Here is what it looks like.</p>
-<div id="qwebr-insertion-location-70"></div>
+<div id="qwebr-insertion-location-72"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 </div>
 </div>
@@ -4352,11 +4234,11 @@ Transcript
 <p>This is far and away the most common failure, and it has a signature. Whenever two objects do not share a coordinate reference system, sf refuses to combine them and says st_crs of x equals st_crs of y is not TRUE. Learn that sentence by sight. It comes from intersection, from joins, from distance, from almost everything that takes two objects. The fix is always a transform, and the only judgement is which object to move. Move vector data rather than raster data, because re-projecting a raster resamples its values and you cannot undo it.</p>
 </details>
 <p>This is the most common failure by a wide margin, and it has a signature message:</p>
-<div id="qwebr-insertion-location-71"></div>
+<div id="qwebr-insertion-location-73"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Now try to combine them:</p>
-<div id="qwebr-insertion-location-72"></div>
+<div id="qwebr-insertion-location-74"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="`st_crs(x) == st_crs(y) is not TRUE`">
@@ -4389,16 +4271,21 @@ Transcript
 <ul id="tabset-22" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-22-1">A broken shape</a></li><li><a href="#tabset-22-2">It answers anyway</a></li><li><a href="#tabset-22-3">When it does complain</a></li><li><a href="#tabset-22-4">Repairing it</a></li></ul>
 <div class="tab-content">
 <div id="tabset-22-1">
-<div id="qwebr-insertion-location-73"></div>
+<p>A “bowtie”: the outline crosses itself in the middle</p>
+<div id="qwebr-insertion-location-75"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Ask whether it is valid, and why not:</p>
-<div id="qwebr-insertion-location-74"></div>
+<div id="qwebr-insertion-location-76"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>“Self-intersection[1 1]” — the coordinates where it crosses itself</p>
+<div id="qwebr-insertion-location-77"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-22-2">
 <p>Now watch carefully. Ask for its area:</p>
-<div id="qwebr-insertion-location-75"></div>
+<div id="qwebr-insertion-location-78"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="It answered. The answer is wrong.">
@@ -4416,7 +4303,7 @@ Transcript
 </div>
 <div id="tabset-22-3">
 <p>Other operations do refuse:</p>
-<div id="qwebr-insertion-location-76"></div>
+<div id="qwebr-insertion-location-79"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="What the complaint looks like">
@@ -4434,7 +4321,7 @@ Transcript
 </div>
 <div id="tabset-22-4">
 <p><code>st_make_valid()</code> repairs it:</p>
-<div id="qwebr-insertion-location-77"></div>
+<div id="qwebr-insertion-location-80"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="Repairing changes the geometry">
@@ -4467,13 +4354,13 @@ Transcript
 <ul id="tabset-23" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-23-1">Two CRS, two units</a></li><li><a href="#tabset-23-2">Same number, different distance</a></li><li><a href="#tabset-23-3">Lon/lat is the exception</a></li></ul>
 <div class="tab-content">
 <div id="tabset-23-1">
-<div id="qwebr-insertion-location-78"></div>
+<div id="qwebr-insertion-location-81"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 </div>
 <div id="tabset-23-2">
 <p>The same number now means two very different distances:</p>
-<div id="qwebr-insertion-location-79"></div>
+<div id="qwebr-insertion-location-82"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div title="`dist = 2000` is not a distance until you know the CRS">
@@ -4525,7 +4412,7 @@ Transcript
 <p>Now a sequence of four exercises that chain together, using the fairway grid dataset from a Nebraska golf course. Start here by loading it and looking at it, and do actually plot it before moving on, because each exercise builds on the one before and a mistake early will follow you through all four. The sequence mirrors the whole deck: project, then buffer, then find centroids, then measure distances between them. If you can do those four in order, you can do most of what applied vector work asks for.</p>
 </details>
 <p>Run the following code to get <code>fairway_grid</code> data. Then, inspect the data (e.g., by plotting) to get a good sense of what the data looks like.</p>
-<div id="qwebr-insertion-location-80"></div>
+<div id="qwebr-insertion-location-83"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-25-2">
@@ -4536,18 +4423,18 @@ Transcript
 <p>The first exercise, in two parts. Plot the data, then transform it to NAD eighty three UTM zone fourteen north, whose code you are given. Note that fourteen north is correct here even though the North Carolina examples used seventeen north. This dataset is in Nebraska, and the whole point of UTM is that you use the zone your data is in. Getting that habit right is more valuable than remembering any particular number. Name the result exactly as the exercise asks, because the next three exercises all expect to find it under that name.</p>
 </details>
 <p>First, plot <code>fairway_grid</code> to get a sense of what the dataset looks like:</p>
-<div id="qwebr-insertion-location-81"></div>
+<div id="qwebr-insertion-location-84"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Transform <code>fairway_grid</code> so that its CRS is NAD 83/UTM zone 14N (its EPSG code is 26914) and name it <code>fairway_grid_utm</code>.</p>
-<div id="qwebr-insertion-location-82"></div>
+<div id="qwebr-insertion-location-85"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <h4 id="answer-codes">Answer codes</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">plot</span>(fairway_grid) </span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">plot</span>(fairway_grid)</span>
 <span id="cb18-2"><a></a></span>
 <span id="cb18-3"><a></a>fairway_grid_utm <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(fairway_grid, <span class="dv">26914</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -4561,7 +4448,7 @@ Transcript
 <p>The second exercise: ten metre buffers around each grid polygon. This is where projecting in the previous exercise pays off, and it is worth pausing on why. Because the data is now in UTM, the units are metres, so distance ten means ten metres and nothing further is needed. Had you skipped the transform and buffered the unprojected data, you would have got the zig-zag edges from the buffers tab. So the order of these two exercises is itself the lesson, rather than an accident of how they happen to be written.</p>
 </details>
 <p>Create buffers around the grid polygons in <code>fairway_grid_utm</code> where the radius of the buffer is 10 meter, and name it <code>fairway_grid_buffers</code>.</p>
-<div id="qwebr-insertion-location-83"></div>
+<div id="qwebr-insertion-location-86"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <h4 id="answer-codes-1">Answer codes</h4>
@@ -4580,7 +4467,7 @@ Transcript
 <p>The third exercise: centroids of the buffers you just made. Mechanically this is one call to st centroid, so it should be quick. Worth thinking about what you expect before you run it, though. The centroid of a buffer around a polygon should sit at essentially the same place as the centroid of the polygon itself, since buffering expands a shape evenly in all directions. If your centroids come out somewhere unexpected, that is a signal that something went wrong back in exercise one or two rather than here in exercise three.</p>
 </details>
 <p>Find the centroid of each of the buffer polygons you created in Exercise 2, and then name it <code>buffers_centroids</code>.</p>
-<div id="qwebr-insertion-location-84"></div>
+<div id="qwebr-insertion-location-87"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <h4 id="answer-codes-2">Answer codes</h4>
@@ -4599,7 +4486,7 @@ Transcript
 <p>And the last one: distances between those centroids. Note that this is st distance with a single argument rather than two, which computes every pairwise distance within one object. So what you get back is a square matrix with zeros down the diagonal, since every point is zero from itself. That diagonal is a useful sanity check. And because you projected back in exercise one, these distances are in metres from the CRS rather than computed on the sphere, which is exactly what you want for a dataset at the scale of a single field.</p>
 </details>
 <p>Calculate the distances between the centroids in <code>buffers_centroids</code>.</p>
-<div id="qwebr-insertion-location-85"></div>
+<div id="qwebr-insertion-location-88"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <h4 id="answer-codes-3">Answer codes</h4>

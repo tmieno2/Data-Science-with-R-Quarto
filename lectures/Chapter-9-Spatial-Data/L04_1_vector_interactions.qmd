@@ -27,7 +27,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -165,9 +165,6 @@ The usual arrangement. One thing specific to this deck: it leans on small made-u
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -185,10 +182,6 @@ The usual arrangement. One thing specific to this deck: it leans on small made-u
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
 
 
-:::
-::: {.column width="30%"}
-:::
-:::
 
 ## Topological Relations {#sec-topological}
 
@@ -459,9 +452,18 @@ points_set_2 <- lapply(1:5, function(x) st_point(runif(2))) %>%
 Here is the visualization of the two sets of points we just created.
 
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
-  geom_sf_text(data = points_set_1, aes(label = id), color = "red") +
-  geom_sf_text(data = points_set_2, aes(label = id), color = "blue") 
+  geom_sf_text(
+    data = points_set_1,
+    aes(label = id),
+    color = "red"
+  ) +
+  geom_sf_text(
+    data = points_set_2,
+    aes(label = id),
+    color = "blue"
+  ) 
 ```
 
 #### Expected Outcomes
@@ -471,39 +473,58 @@ We want to know which of the blue points (`points_set_2`) are located within 0.2
 The following figure gives us the answer visually.
 
 ```{webr-r}
-#| autorun: true 
-#--- create 0.2 buffers around points in points_set_1 ---#
+#| autorun: true
+#| code-track: 0.4
+#--- 0.2 buffers around points in points_set_1 ---#
 buffer_1 <- st_buffer(points_set_1, dist = 0.2)
 
 ggplot() +
-  geom_sf(data = buffer_1, color = "red", fill = NA) +
-  geom_sf_text(data = points_set_1, aes(label = id), color = "red") +
-  geom_sf_text(data = points_set_2, aes(label = id), color = "blue") 
+  geom_sf(
+    data = buffer_1, 
+    color = "red", 
+    fill = NA
+  ) +
+  geom_sf_text(
+    data = points_set_1, 
+    aes(label = id), 
+    color = "red"
+  ) +
+  geom_sf_text(
+    data = points_set_2, 
+    aes(label = id), 
+    color = "blue"
+  ) 
 ```
 
 #### Apply the function
 
-:::: {.columns}
+```{webr-r}
+#| out-width: 100%
+#| code-track: 0.4 
+ggplot() +
+  geom_sf(
+    data = st_buffer(points_set_1, dist = 0.2), color = "red", 
+    fill = NA
+  ) +
+  geom_sf_text(
+    data = points_set_1, 
+    aes(label = id), 
+    color = "red"
+  ) +
+  geom_sf_text(
+    data = points_set_2, 
+    aes(label = id), 
+    color = "blue"
+  )
+```  
 
 <br>
 
-::: {.column width="45%"}
 ```{webr-r}
-#| out-width: 100%
-ggplot() +
-  geom_sf(data = st_buffer(points_set_1, dist = 0.2), color = "red", fill = NA) +
-  geom_sf_text(data = points_set_1, aes(label = id), color = "red") +
-  geom_sf_text(data = points_set_2, aes(label = id), color = "blue")
-```  
-
-:::
-
-::: {.column width="50%"}
-
-```{webr-r}
+#| code-track: 0.4
 st_is_within_distance(
-  points_set_1, 
-  points_set_2, 
+  points_set_1,
+  points_set_2,
   dist = 0.2
 )
 ```
@@ -512,9 +533,6 @@ st_is_within_distance(
 
 Confirm that your visual inspection results are consistent with the outcome of the `st_is_within_distance()` code above.
 
-:::
-
-::::
 :::
 
 ### `st_nearest_feature()`  
@@ -538,27 +556,34 @@ st_nearest_feature(sf_1, sf_2)
 
 #### Example
 
-::: {.columns}
-
-::: {.column}
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
-  geom_sf(data = buffer_1, color = "red", fill = NA) +
-  geom_sf_text(data = points_set_1, aes(label = id), color = "red") +
-  geom_sf_text(data = points_set_2, aes(label = id), color = "blue")
+  geom_sf(
+    data = buffer_1, 
+    color = "red", 
+    fill = NA
+  ) +
+  geom_sf_text(
+    data = points_set_1, 
+    aes(label = id), 
+    color = "red"
+  ) +
+  geom_sf_text(
+    data = points_set_2, 
+    aes(label = id), 
+    color = "blue"
+  )
 ```
 
-:::
+<br>
 
-::: {.column}
 ```{webr-r}
 st_nearest_feature(points_set_1, points_set_2)
 ```
 
 Confirm that your visual inspection results are consistent with the outcome of the `st_nearest_feature()` code above.
 
-:::
-:::
 :::
 
 ### Exercises
@@ -591,6 +616,7 @@ data(fairway_grid, package = "r.spatial.workshop.datasets")
 Visualize the datasets.
 
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
   geom_sf(data = fairway_grid, col = "red") +
   geom_sf(data = mower_sensor_sf)
@@ -598,9 +624,6 @@ ggplot() +
 
 #### `st_intersects()`
 
-::: {.columns}
-
-::: {.column width="70%"}
 Use `sf::st_intersects()` to find out which of the points in `mower_sensor_sf` are inside of any of the polygons in `fairway_grid`.
 
 ```{webr-r}
@@ -622,14 +645,6 @@ That is okay for now. We will later learn how to filter `sf` objects spatially.
 #| eval: false 
 st_intersects(mower_sensor_sf, fairway_grid)
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 :::
@@ -651,18 +666,7 @@ Subsetting is the natural next step. Topological relations told you which featur
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 Spatial subsetting refers to operations that narrow down the geographic scope of a spatial object based on another spatial object. 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### Data preparation
@@ -816,7 +820,9 @@ Assign 1 or 0 to a new variable called `in_hpa` based on the list.
 
 ```{webr-r}
 #| autorun: true
+(
 ne_counties <- dplyr::mutate(ne_counties, in_hpa = ifelse(countyfp %in% county_fp_intersected_list, 1, 0))
+)
 ```
 
 #### Other topological relations
@@ -843,6 +849,7 @@ ne_counties_completely_within_hpa <- ne_counties[hp_boundary, , op = st_within]
 Check visually:
 
 ```{webr-r}	
+#| layout: stacked
 ggplot() +
   geom_sf(data = ne_counties_completely_within_hpa) +
   geom_sf(data = hp_boundary, fill = "blue" ,alpha = 0.4) +
@@ -923,7 +930,9 @@ Assign 1 or 0 to a new variable called `in_hpa` based on the list.
 
 ```{webr-r}
 #| autorun: true
+(
 wells_ne <- dplyr::mutate(wells_ne, in_hpa = ifelse(wellid %in% wellid_list, 1, 0))
+)
 ```
 
 :::
@@ -951,6 +960,7 @@ lancaster_county <- dplyr::filter(ne_counties, name == "Lancaster")
 <br>
 
 ```{webr-r}
+#| code-track: 0.3
 ggplot() +
   geom_sf(
     data = ne_counties,
@@ -983,6 +993,7 @@ railroads_lancaster <- railroads_ne[lancaster_county, ]
 Successful?
 
 ```{webr-r}
+#| code-track: 0.3
 ggplot() +
   geom_sf(
     data = ne_counties,
@@ -1017,9 +1028,9 @@ Assign 1 or 0 to a new variable called `in_lancaster` based on the list.
 
 ```{webr-r}
 #| autorun: true
-#--- CHANGED: the flag was called in_hpa, copied from the wells example. This ---#
-#--- subset is by Lancaster county, not the High-Plains aquifer.              ---#
+(
 railroads_ne <- dplyr::mutate(railroads_ne, in_lancaster = ifelse(LINEARID %in% railroads_id_list, 1, 0))
+) 
 ```
 
 :::
@@ -1041,22 +1052,11 @@ Cropping is the operation that does change geometry. You give it a spatial objec
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + We can use `st_crop()` to crop spatial objects to a spatial bounding box (extent) of a spatial object. 
 
 + The bounding box of an `sf` is a rectangle represented by the minimum and maximum of `x` and `y` that encompass/contain all the spatial objects in the `sf`. 
 
 + You can use `st_bbox()` to find the bounding box of an `sf` object.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### Bounding box
@@ -1068,20 +1068,18 @@ st_bbox gives you four numbers, the minimum and maximum of x and y. Check its cl
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 Let's get the bounding box of the High-Plains aquifer using `st_bbox()`.
 
 ```{webr-r}
 #| autorun: true
-#--- find the coordinates of the bounding box ---#
+#| code-track: 0.4
 hp_bbox <- st_bbox(hp_boundary)
 ```
 <br>
 
 Check its class:
 ```{webr-r}
+#| code-track: 0.4
 class(hp_bbox)
 ```
 
@@ -1098,18 +1096,15 @@ hp_bbox_sfc <- st_as_sfc(hp_bbox)
 The bounding box looks like this (red rectangle):
 
 ```{webr-r}
- ggplot() +
+#| code-track: 0.4
+ggplot() +
   geom_sf(data = hp_boundary) +
-  geom_sf(data = hp_bbox_sfc, fill = NA, color = "red")
+  geom_sf(
+    data = hp_bbox_sfc, 
+    fill = NA, 
+    color = "red"
+  )
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### Crop
@@ -1121,14 +1116,12 @@ The crop itself is one line. Note the remark that passing the aquifer object and
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 Now, let's crop Nebraska counties to the bounding box of the High-Plains aquifer boundary.
 
 ```{webr-r}
-ne_counties_cropped_to_hp <- st_crop(ne_counties, 
-hp_boundary)
+(
+ne_counties_cropped_to_hp <- st_crop(ne_counties, hp_boundary)
+)
 ``` 
 <br>
 
@@ -1140,20 +1133,28 @@ st_crop(ne_counties, hp_bbox_sfc)
 <br>
 
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
-  geom_sf(data = hp_boundary, color = "blue", linewidth = 1) +
-  geom_sf(data = ne_counties, fill = NA) +
-  geom_sf(data = hp_bbox_sfc, fill = NA, color = "red") +
-  geom_sf(data = ne_counties_cropped_to_hp, fill = "orange", alpha = 0.4)
+  geom_sf(
+    data = hp_boundary, 
+    color = "blue", 
+    linewidth = 1
+  ) +
+  geom_sf(
+    data = ne_counties, 
+    fill = NA
+  ) +
+  geom_sf(
+    data = hp_bbox_sfc, 
+    fill = NA, 
+    color = "red"
+  ) +
+  geom_sf(
+    data = ne_counties_cropped_to_hp, 
+    fill = "orange", 
+    alpha = 0.4
+  )
 ```
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### Cropping vs Subset
@@ -1168,11 +1169,20 @@ The summary slide, and worth a moment because the two operations are easy to con
 Note that `st_crop()` will chop off the parts that are not intersecting.
 
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
   #--- subsetted ---#
-  geom_sf(data = ne_counties_in_hpa, fill = "green", alpha = 0.3) +
+  geom_sf(
+    data = ne_counties_in_hpa, 
+    fill = "green", 
+    alpha = 0.3
+  ) +
   #--- cropped ---#
-  geom_sf(data = ne_counties_cropped_to_hp, fill = "blue", alpha = 0.3)
+  geom_sf(
+    data = ne_counties_cropped_to_hp, 
+    fill = "blue", 
+    alpha = 0.3
+  )
   # +
   # #--- HPA ---#
   # geom_sf(data = hp_boundary, fill = NA, color = "red")

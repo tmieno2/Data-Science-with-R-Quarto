@@ -216,6 +216,10 @@ globalThis.qwebrComputeEngine = async function(
 
         // Design an output object for messages
         const pre = document.createElement("pre");
+        // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+        // or tinytable table). It keeps the output box, but not the whitespace
+        // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+        if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
         if (/\S/.test(out)) {
             // Display results as HTML elements to retain output styling
             const div = document.createElement("div");
@@ -234,6 +238,22 @@ globalThis.qwebrComputeEngine = async function(
         }
 
         elements.outputCodeDiv.appendChild(pre);
+
+        // PATCHED: HTML written by `output: asis` may carry its own <script>,
+        // which is how tinytable, modelsummary's default HTML output, fills its
+        // cells. innerHTML never runs a script, so the table arrived empty.
+        // Re-creating each script node runs it, and it must happen after the
+        // output is in the document or a detached node still does nothing.
+        if (!showMarkup) {
+            pre.querySelectorAll("script").forEach((original) => {
+                const script = document.createElement("script");
+                for (const attribute of original.attributes) {
+                    script.setAttribute(attribute.name, attribute.value);
+                }
+                script.textContent = original.textContent;
+                original.replaceWith(script);
+            });
+        }
 
         // Determine if we have graphs to display
         if (result.images.length > 0) {

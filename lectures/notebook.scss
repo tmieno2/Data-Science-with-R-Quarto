@@ -178,6 +178,25 @@ div.cell-output.cell-output-stderr > pre > code { background-color: $nb-out-bg; 
   margin-top: 0;
 }
 
+// A cell marked `#| output: asis` hands back real HTML (a gt, kableExtra or
+// tinytable table), and the engine marks its output box `qwebr-output-asis`.
+// The box keeps its background and accent edge. What has to go is `white-space:
+// pre`, which turns every newline in that HTML into blank space and pushes the
+// table to the bottom of the box, and the code font, which is not what a table
+// should be set in. The table itself is sized by its content rather than
+// stretched across the box.
+.reveal div.qwebr-output-code-area pre.qwebr-output-asis {
+  white-space: normal;
+  // reveal's own body font, so the table is set like slide text rather
+  // than like code.
+  font-family: var(--r-main-font, sans-serif);
+
+  table {
+    width: auto;
+    margin: 0 auto;
+  }
+}
+
 // Plots get the same edge, but only once one exists — the graph area is present
 // and empty until a cell is run.
 .reveal div.qwebr-output-graph-area:not(:empty) {

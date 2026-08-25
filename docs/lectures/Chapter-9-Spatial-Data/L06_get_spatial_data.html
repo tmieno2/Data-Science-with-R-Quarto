@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-9f9fb851b2c68f17b9a22372e75d240b.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -1284,7 +1284,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\ndata(wells_ne_sf)\ndata(ne_counties)\ndata(treatment_blocks)\ndata(corn_yield)\ndata(NDRE)\nNDRE <- terra::rast(NDRE)\ndata(prism_us)\nprism_us <- terra::rast(prism_us)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"all_items <- tidyUSDA::allDataItem\n\n#--- just see a few ---#\nhead(all_items)","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"all_items %>%\n  #--- find data items that include CORN ---#\n  grep(pattern = \"CORN\", ., value = TRUE) %>%\n  #--- find data items that include YIELD ---#\n  grep(pattern = \"YIELD\", ., value = TRUE) %>%\n  #--- find data items that include IRRIGATED ---#\n  grep(pattern = \"IRRIGATED\", ., value = TRUE)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"55%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
+  globalThis.qwebrCellDetails = [{"code":"#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\ndata(wells_ne_sf)\ndata(ne_counties)\ndata(treatment_blocks)\ndata(corn_yield)\ndata(NDRE)\nNDRE <- terra::rast(NDRE)\ndata(prism_us)\nprism_us <- terra::rast(prism_us)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"all_items <- tidyUSDA::allDataItem\n\n#--- just see a few ---#\nhead(all_items)","id":2,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"all_items %>%\n  #--- find data items that include CORN ---#\n  grep(pattern = \"CORN\", ., value = TRUE) %>%\n  #--- find data items that include YIELD ---#\n  grep(pattern = \"YIELD\", ., value = TRUE) %>%\n  #--- find data items that include IRRIGATED ---#\n  grep(pattern = \"IRRIGATED\", ., value = TRUE)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
 
   </script>
   <script type="module">
@@ -2361,6 +2361,10 @@
 
           // Design an output object for messages
           const pre = document.createElement("pre");
+          // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+          // or tinytable table). It keeps the output box, but not the whitespace
+          // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+          if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
           if (/\S/.test(out)) {
               // Display results as HTML elements to retain output styling
               const div = document.createElement("div");
@@ -2379,6 +2383,22 @@
           }
 
           elements.outputCodeDiv.appendChild(pre);
+
+          // PATCHED: HTML written by `output: asis` may carry its own <script>,
+          // which is how tinytable, modelsummary's default HTML output, fills its
+          // cells. innerHTML never runs a script, so the table arrived empty.
+          // Re-creating each script node runs it, and it must happen after the
+          // output is in the document or a detached node still does nothing.
+          if (!showMarkup) {
+              pre.querySelectorAll("script").forEach((original) => {
+                  const script = document.createElement("script");
+                  for (const attribute of original.attributes) {
+                      script.setAttribute(attribute.name, attribute.value);
+                  }
+                  script.textContent = original.textContent;
+                  original.replaceWith(script);
+              });
+          }
 
           // Determine if we have graphs to display
           if (result.images.length > 0) {
@@ -2879,8 +2899,6 @@ Transcript
 <p>One important difference on this deck. Most of the code here is shown but not run, because it downloads from servers that will not answer a request coming from inside your browser, and some of it needs an API key that is yours rather than mine. So this deck is closer to a reference you will come back to than a set of cells to click through. Read the syntax, then try it in RStudio on your own machine, where it genuinely works. The pieces that do run in the browser are marked by having a Run button that does something.</p>
 </details>
 <p><br></p>
-<div class="columns">
-<div class="column" style="width:70%;">
 <h3 id="interactive-navigation-tools">Interactive navigation tools</h3>
 <ul>
 <li><p>Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want</p></li>
@@ -2895,9 +2913,6 @@ Transcript
 <li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
 <li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
 </ul>
-</div><div class="column" style="width:30%;">
-
-</div></div>
 </section>
 <section id="sec-tigris" class="slide level2">
 <h2>U.S. county and state boundary</h2>
@@ -3005,18 +3020,11 @@ Transcript
 </summary>
 <p>Quick Stats is the USDA’s statistical warehouse, and it holds a great deal: acres planted and harvested, yields, prices, livestock counts, by state and by county, from both the annual surveys and the five-yearly census. The tidyUSDA package wraps its API. The feature that makes it worth using over the raw API is the geometry argument, which returns the data already joined to boundaries as an sf object, so you can map it or spatially join it immediately, with no separate boundary download and no merge to get wrong. That saves a surprising amount of tedious work.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p><a href="https://quickstats.nass.usda.gov/">USDA NASS Quick Stats</a> provides a wealth of agriculture-related datasets such as harvested acres or irrigated acres by crop at different spatial resolutions (e.g., state, county) from both survey and census.</p></li>
 <li><p>We use the <code>tidyUSDA</code> package to download data from USDA NASS Quick Stats.</p></li>
 <li><p>A nice thing about <code>tidyUSDA</code> is that it gives you an option to download data as an <code>sf</code> object, which means you can immediately visualize the data or spatially interact it with other spatial objects.</p></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-7-2">
 <details class="transcript">
@@ -3348,15 +3356,8 @@ Transcript
 <ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Caveat 1</a></li><li><a href="#tabset-4-2">Caveat 2</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>You cannot retrieve more than 50,000 (the limit is set by QuickStat) rows of data. The query below requests far more than 50,000 observations, and fails. In this case, you need to narrow the search and chop the task into smaller tasks.</p>
 <p>Replace <code>nass_api_key</code> with your own API key and run the code on your computer.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a>many_states_corn <span class="ot">&lt;-</span></span>
 <span id="cb10-2"><a></a>  <span class="fu">getQuickstat</span>(</span>
@@ -3371,14 +3372,7 @@ Transcript
 </div>
 </div>
 <div id="tabset-4-2">
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>A query returns an error when no observation satisfies your query criteria. For example, even though “CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE” does exists as a <code>data_item</code>, there is no entry for the statistic in Illinois in 2018. Therefore, the following query fails.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>many_states_corn <span class="ot">&lt;-</span></span>
 <span id="cb11-2"><a></a>  <span class="fu">getQuickstat</span>(</span>
@@ -3526,14 +3520,7 @@ Transcript
 </summary>
 <p>PRISM is the standard source for United States weather in applied work: daily precipitation and maximum and minimum temperature, modelled onto a four kilometre grid covering the whole country. It is raster data, so everything from the raster deck applies, and the map on this slide is a single day of maximum temperature. If you need weather as a control variable, or you are estimating anything at all about climate and agriculture, this is very likely where your data will come from. It is free, and it covers several decades at daily resolution.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>The <a href="https://prism.oregonstate.edu/">PRISM dataset</a> provides model-based estimates of daily precipitation, maximum temperature, and minimum temperature for the U.S. at the 4km by 4km spatial resolution.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -3593,8 +3580,6 @@ Transcript
 </summary>
 <p>This one you genuinely have to run yourself, since it writes files to disk. Five days of precipitation is enough to see the shape of the thing. Pay attention to what you end up with, because it is the reason the next tab exists: one folder per day, each holding several files that share a name and differ only by extension. That is the BIL format from the raster deck, where the values, the header describing the grid, and the projection information all live in separate files that have to stay together in the same folder.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>First set the path:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">library</span>(prism)</span>
@@ -3611,11 +3596,6 @@ Transcript
 <span id="cb20-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This will create a single folder for each day of the specified date range. Inside each folder you will see a bunch of files sharing one name and differing only in extension.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-9-4">
 <details class="transcript">
@@ -3624,15 +3604,8 @@ Transcript
 </summary>
 <p>The practical problem: a year of daily data is three hundred and sixty-five folders, and you are not going to type those paths. So list them programmatically. The code recurses through the folder, keeps only the files ending in bil, and drops the auxiliary ones, which would otherwise sneak in. Then terra reads the whole vector in a single call and gives you one multi-layer object with a layer per day. That last step is the one worth remembering: terra’s rast function accepts a whole vector of paths, not just a single one, and stacks them for you.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <p>As you have seen, we would have many files to open unless the specified date range is very short. Rather than naming them one by one, list them programmatically.</p>
 <p>First, the following code gives you the names of all the PRISM files with the <strong>.bil</strong> extension.</p>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>(</span>
 <span id="cb21-2"><a></a>prism_files_list <span class="ot">&lt;-</span> </span>
@@ -3752,19 +3725,12 @@ Transcript
 </summary>
 <p>The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre resolution, classifying every pixel of the contiguous United States by what crop is growing on it, every year back to the late nineties. For agricultural economics it is close to indispensable, since it tells you what was actually growing on a given field rather than what somebody reported at the county level. CropScape is the interactive front end you may have seen in a browser, and the CropScapeR package talks to exactly the same service from R, which is what we use here.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>The Cropland Data Layer (CDL) is a data product produced by the National Agricultural Statistics Service of U.S. Department of Agriculture.</p></li>
 <li><p>CDL provides geo-referenced, high accuracy, 30 (after 2007) or 56 (in 2006 and 2007) meter resolution, crop-specific cropland land cover information for up to 48 contiguous states in the U.S. from 1997 to the present.</p></li>
 <li><p>This data product has been extensively used in agricultural research. CropScape is an <a href="https://nassgeodata.gmu.edu/CropScape/">interactive Web CDL exploring system</a>, and it was developed to query, visualize, disseminate, and analyze CDL data geospatially through standard geospatial web services in a publicly accessible on-line environment (Han et al., 2012).</p></li>
 <li><p>This section shows how to use the CropScapeR package (Chen 2020) to download and explore the CDL data.</p></li>
 </ul>
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-12-2">
 <details class="transcript">
@@ -3773,8 +3739,6 @@ Transcript
 </summary>
 <p>The package offers four functions, but one of them does the work. GetCDLData downloads the raw layer, and the other three return it pre-summarised in ways that occasionally match what you want. Learn that one properly and treat the other three as a bonus you may never need. One thing to note before you go looking for it: what comes back is a RasterLayer from the old raster package, not a terra SpatRaster, so you will usually pass it straight through terra’s rast function to convert it, exactly as the final exercise does.</p>
 </details>
-<div class="columns">
-<div class="column" style="width:70%;">
 <ul>
 <li><p>The package implements some of the most useful geospatial processing services provided by the CropScape, and it allows users to efficiently process the CDL data within the R environment.</p></li>
 <li><p>Specifically, the CropScapeR package provides four functions that implement different kinds of geospatial processing services provided by the CropScape.</p></li>
@@ -3782,11 +3746,6 @@ Transcript
 <li><p>The other functions provide the users with the CDL data summarized or transformed in particular manners that may suit the need of some users.</p></li>
 </ul>
 <!-- Note: There is a known problem with Mac users requesting CDL data services using the CropScape API, which causes errors when using the functions provided by the package. Please see section 9.2.4 for a workaround. -->
-</div><!--end of the 1st column--><div class="column" style="width:30%;">
-
-</div><!--end of the 2nd column-->
-</div>
-<!--end of the columns-->
 </div>
 <div id="tabset-12-3">
 <details class="transcript">

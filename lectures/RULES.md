@@ -489,7 +489,7 @@ command. A correctly rendered formula never contains a backslash.
 
 ## 7. The WebR extension is vendored and patched
 
-`_extensions/coatless/webr/qwebr-compute-engine.js` carries three edits that
+`_extensions/coatless/webr/qwebr-compute-engine.js` carries four edits that
 must be re-applied if the extension is ever updated:
 
 1. the canvas background is transparent, not white, so a figure sits on the
@@ -499,6 +499,37 @@ must be re-applied if the extension is ever updated:
 3. any stderr line starting with `Error` is kept even though the decks set
    `message: false, warning: false`. Upstream drops errors with the rest, so a
    failing line printed nothing and looked to a student as though it had run.
+4. output from a cell marked `#| output: asis` is marked `qwebr-output-asis` on
+   its output box, and any `<script>` it contains is re-created so that it runs.
+
+The fourth one is what makes an HTML table usable in a WebR cell. Upstream
+already stops escaping the output when a cell says `output: asis`, so the HTML
+reaches the page, but two things then went wrong with it:
+
+- **The table arrived empty.** `tinytable`, which is what `modelsummary()`
+  returns by default, writes its values into the cells from a `<script>` that
+  ships with the table. The output is inserted with `innerHTML`, and that never
+  runs a script. Re-creating each script node runs it. It has to happen after
+  the output is in the document, because a script node in a detached element
+  still does nothing.
+- **The table was pushed to the bottom of a tall empty box.** The output box is
+  a `pre`, so every newline in the HTML source was rendered as blank space.
+  `notebook.scss` gives `pre.qwebr-output-asis` `white-space: normal`, reveal's
+  body font instead of the code font, and a content-sized rather than
+  full-width table.
+
+Three things to know before using it on a deck.
+
+- `output: asis` stops the escaping for everything the cell prints, not just the
+  table, so put it only on cells whose whole job is a table.
+- `modelsummary` must be told to produce HTML: `output = "html"` is the one to
+  teach, since that is its own default table engine and needs no other package.
+  `output = "gt"` and `output = "kableExtra"` work too, and kableExtra also
+  wants `escape = FALSE`, because the model column names are padded with
+  `&nbsp;` and kableExtra escapes the ampersand into visible text.
+- `options(tinytable_print_output = "html")` looks like a way to skip that
+  argument, but it makes printing return a whole standalone HTML document
+  rather than a fragment. Pass `output = "html"` per call instead.
 
 `_extensions/coatless/webr/qwebr-monaco-editor-element.js` carries two more,
 each marked `PATCHED` at the line it changes:

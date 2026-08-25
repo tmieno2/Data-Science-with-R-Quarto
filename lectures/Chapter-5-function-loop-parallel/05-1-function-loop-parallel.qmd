@@ -1754,6 +1754,7 @@ Two ways to pull the best row out. The first filters for the row where profit eq
 Once the profit-N relationship is found, we can use `dplyr::filter()` combined with `max()` to identify the optimal N rate.
 
 ```{webr-r}
+#| code-track: 0.5
 dplyr::filter(data_main, profit == max(profit))
 ```
 
@@ -1762,6 +1763,7 @@ dplyr::filter(data_main, profit == max(profit))
 Alternatively, you can sort the data by profit in the ascending order (default) and pick the last row using `dplyr::slice(n())`.
 
 ```{webr-r}
+#| code-track: 0.5
 dplyr::arrange(data_main, profit) %>% 
   dplyr::slice(n())
 ```

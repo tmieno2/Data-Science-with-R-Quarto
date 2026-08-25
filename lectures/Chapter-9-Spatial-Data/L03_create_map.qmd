@@ -27,7 +27,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -161,9 +161,6 @@ The usual arrangement, with one caution for this deck in particular. It loads te
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -181,10 +178,6 @@ The usual arrangement, with one caution for this deck in particular. It loads te
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
 
 
-:::
-::: {.column width="30%"}
-:::
-:::
 
 
 
@@ -560,18 +553,9 @@ A real map almost never shows one thing. You want the county boundaries for cont
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + It is often the case that you want to create a map using more than one spatial object. 
 
 + For example, you want to have county boundary (`ne_counties`), railroads (`railroads_ne`), and wells (`wells_ne_sf`) all in one map.
-:::
-
-::: {.column width="30%"}
-:::
-
-:::
 
 
 ### How
@@ -579,7 +563,7 @@ A real map almost never shows one thing. You want the county boundaries for cont
 <details class="transcript">
 <summary>Transcript</summary>
 
-This slide is about where you put the data argument, and it is worth slowing down. Data named inside ggplot is global and every later geom inherits it. Data named inside a geom_sf belongs to that layer alone. The two cells look nearly identical and behave differently once you uncomment the extra layer: the first works because the global data is still available, the second fails because there is nothing for the new layer to draw. Read the second callout too, on why writing fill equals red inside aes gives you salmon and a stray legend rather than red polygons.
+This slide is about where you put the data argument, and it is worth slowing down. Data named inside ggplot is global and every later geom inherits it. Data named inside a geom_sf belongs to that layer alone. The two cells look nearly identical and behave differently once you uncomment the extra layer: the first works because the global data is still available, the second fails because there is nothing for the new layer to draw.
 
 </details>
 
@@ -596,7 +580,7 @@ This slide is about where you put the data argument, and it is worth slowing dow
 #| out-width: 100%
 ggplot(data = ne_counties) +
   geom_sf() 
-  # geom_sf(aes(fill = "red"))
+  # geom_sf(fill = "red")
 ```
 :::
 
@@ -605,7 +589,7 @@ ggplot(data = ne_counties) +
 #| out-width: 100%
 ggplot() +
   geom_sf(data = ne_counties)
-  # geom_sf(aes(fill = "red"))
+  # geom_sf(fill = "red")
 ```
 :::
 
@@ -617,17 +601,6 @@ ggplot() +
 + Uncomment line 3, add `+` at the end of line 2, run, and see what happens
 + Confirm the first one works fine because data is set globally to `ne_counties` in line 1.
 + Confirm the second one does not, because the global dataset is not set.
-:::
-
-:::{.callout-important title="`aes(fill = \"red\")` does not fill red"}
-Look at what the first one actually draws: salmon polygons and a legend with one
-entry reading `red`. Anything inside `aes()` is treated as a **variable**, so
-`fill = "red"` maps every polygon to the constant character value `"red"` and then
-asks `ggplot2` to pick a colour for that category — which comes out `#F8766D`.
-
-To actually set a colour, put it **outside** `aes()`: `geom_sf(fill = "red")`.
-The same rule applies to `color`, `size` and `shape`. A stray legend appearing
-where you expected none is the usual sign you have done this by accident.
 :::
 
 
@@ -1098,11 +1071,20 @@ three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Du
 We now create the base map. You use `geom_sf()` to create base map layers.
 
 ```{webr-r}
+#| code-track: 0.4
 (
 g_base <- 
   ggplot() +
-    geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
-    geom_sf(data = three_counties, fill = "red", alpha = 0.4) +
+    geom_sf(
+      data = ne_counties, 
+      fill = "blue", 
+      alpha = 0.4
+    ) +
+    geom_sf(
+      data = three_counties, 
+      fill = "red", 
+      alpha = 0.4
+    ) +
     theme_void()
 )
 ```
@@ -1126,16 +1108,18 @@ We now configure (specify) the inset using `configure_inset()`. Here is the list
 + `units`: length unit 
 
 ```{webr-r}
-inset_config <- 
-  configure_inset(
-    #--- centroid of the three counties as the center, and the radius ---#
-    shape = shape_circle(st_centroid(st_union(three_counties)), 80),
-    # shape = shape_rectangle(st_centroid(st_union(three_counties)), 80),
-    #--- move 300 east and 250 south ---#
-    translation = c(300, -250),
-    #--- scale up by 2 ---#
-    scale = 2,
-    units = "km"
+(
+  inset_config <- 
+    configure_inset(
+      #--- centroid of the three counties as the center, and the radius ---#
+      shape = shape_circle(st_centroid(st_union(three_counties)), 80),
+      # shape = shape_rectangle(st_centroid(st_union(three_counties)), 80),
+      #--- move 300 east and 250 south ---#
+      translation = c(300, -250),
+      #--- scale up by 2 ---#
+      scale = 2,
+      units = "km"
+    )
   )
 ```
 
@@ -1283,6 +1267,7 @@ Give geom_spatraster a raster with more than one layer and it does something unh
 How does `geom_spatraster()` behave with a multi-layer `SpatRaster`?
 
 ```{webr-r}
+#| code-track: 0.5
 nir_red <- c(NIR, RED)
 
 ggplot() +
@@ -1296,6 +1281,7 @@ As the warning message suggests, both layers are plotted by default. You can spe
 <br>
 
 ```{webr-r}
+#| code-track: 0.5
 ggplot() +
   geom_spatraster(data = nir_red, aes(fill = NIR))
 ```
@@ -1312,10 +1298,6 @@ The other resolution: leave fill unmapped and add facet_wrap by lyr, and you get
 When you want to create maps for individual attributes at the same time, you can add `facet_wrap(~lyr)`. 
 
 ```{webr-r}
-#--- CHANGED: aes(fill = NIR) removed. Naming a single layer and then         ---#
-#--- faceting by layer produces exactly ONE panel, so the old code did not    ---#
-#--- demonstrate faceting at all. Leave fill unmapped and you get one panel   ---#
-#--- per layer, which is the point.                                           ---#
 ggplot() +
   geom_spatraster(data = nir_red) +
   facet_wrap( ~ lyr)

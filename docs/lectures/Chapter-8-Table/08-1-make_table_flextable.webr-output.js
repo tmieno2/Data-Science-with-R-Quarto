@@ -1,1 +1,1 @@
-window.webrOutputSizes = {"?fp_text":{"cols":0,"rows":0,"plot":false},"?fp_par":{"cols":0,"rows":0,"plot":false},"?fp_border":{"cols":0,"rows":0,"plot":false},"?footnote":{"cols":0,"rows":0,"plot":false}};
+window.webrOutputSizes = {"?fp_text":{"cols":0,"rows":0,"plot":false},"?fp_par":{"cols":0,"rows":0,"plot":false},"?fp_cell":{"cols":0,"rows":0,"plot":false},"?fp_border":{"cols":0,"rows":0,"plot":false},"?footnote":{"cols":0,"rows":0,"plot":false}};

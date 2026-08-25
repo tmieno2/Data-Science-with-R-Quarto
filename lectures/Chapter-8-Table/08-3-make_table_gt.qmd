@@ -1,0 +1,2146 @@
+---
+title: "08-3: Making Tables with `gt`"
+abstract: "Chapter 8: Make Tables"
+format:
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+      - ../katex-amd-fix.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)"
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+    fig-dpi: 400
+webr:
+  packages: ['dplyr', 'ggplot2', 'gt', 'tidyr']
+  cell-options:
+    editor-font-scale: 0.7
+    dpi: 216
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+```{r}
+#| include: false
+library(gt)
+library(tidyr)
+library(flipbookr)
+library(tidyverse)
+
+#--- Quarto-compatible chunk_reveal() ---#
+#--- remotes::install_github("tmieno2/flipbookrq") ---#
+library(flipbookrq)
+
+source(here::here("lectures/_lecture-theme.R"))
+```
+
+```{r ref.label = "data-prep", include = FALSE}
+```
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks: the stacked lines bottom left for a table of contents, and the letter o for a panel view of every slide. This deck has three animated walkthroughs in it, each stepping through one long pipeline a line at a time, and each taking up a good number of slides. If you are hunting for a particular function rather than watching an animation, the table of contents is much faster than arrowing through. You can come back to the animations once you know what you are looking for.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes work as usual: blue area is an editor, Run Code runs it, copy button takes it to your machine. As with the flextable deck, almost every table you see here was built when the slides were rendered, on my machine, rather than in your browser. A gt table is a block of HTML, and that does not come back through browser R as a table. So treat the code here as something to copy into RStudio rather than something to run in place. The genuinely live cells on this deck are the help pages.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+# Create tables with the `gt` package
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1000px></html>
+
+```{r }
+#| label: taste-gt
+#| cache: false
+#| include: false
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005, pop_ratio_05_15) %>% #BREAK
+  gt(rowname_col = "country_name", groupname_col = "region") %>% #BREAK
+  tab_header(
+    title = md("**Population of selected Pacific countries**"),
+    subtitle = "1995 and 2005"
+  ) %>% #BREAK
+  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% #BREAK
+  fmt_percent(columns = pop_ratio_05_15, decimals = 0) %>% #BREAK
+  cols_label(
+    y_1995 = "1995",
+    y_2005 = "2005",
+    pop_ratio_05_15 = "2015 vs 2005"
+  ) %>% #BREAK
+  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% #BREAK
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>% #BREAK
+  tab_style(
+    style = cell_fill(color = "#fdf1d8"),
+    locations = cells_body(rows = y_2005 > 2e5)
+  ) %>% #BREAK
+  data_color(columns = pop_ratio_05_15, palette = c("white", "#C90000")) %>% #BREAK
+  tab_footnote(
+    footnote = "2015 population divided by 2005 population.",
+    locations = cells_column_labels(columns = pop_ratio_05_15)
+  ) %>% #BREAK
+  tab_source_note(source_note = md("Source: `countrypops` in the **gt** package.")) %>% #BREAK
+  opt_row_striping()
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "taste-gt",
+  title = "Taste of the gt package",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Getting started
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One package to install, and no companion package this time. Everything gt needs is inside gt itself, which is one practical difference from flextable, where the fp underscore functions you reach for constantly live in officer. The name stands for grammar of tables, and that is the claim being made: that a table has parts, and that you build one by naming a part and saying what goes there. gt is developed by Posit, the same people who make RStudio and the tidyverse, so the argument conventions will feel familiar.
+
+</details>
+
+Install the following package and library it.
+
+```{r}
+#| eval: false
+#--- install if you have not ---#
+install.packages("gt")
+
+#--- library ---#
+library(gt)
+```
+
+<br>
+
+`gt` stands for **g**rammar of **t**ables. Unlike `flextable`, it does not need a companion package: `officer` is to `flextable` what nothing at all is to `gt`.
+
+### Data Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same dataset the flextable deck used, so you can hold the two side by side and compare how each package does the same job. It comes from countrypops in the gt package, filtered to ten Pacific and Australasian countries and three years, then pivoted so each year becomes its own column. Ten rows, small enough to see whole on a slide. The region column built with case when matters here more than it did before, because gt can turn a column like that into row groups, which is something flextable has no direct equivalent for.
+
+</details>
+
+```{r data-prep}
+#--- Define regions ---#
+Australasia <- c("AU", "NZ")
+Melanesia <- c("NC", "PG", "SB", "VU")
+Polynesia <- c("PF", "WS", "TO", "TV")
+
+#--- create a dataset ---#
+(
+tab_data <-
+  countrypops %>%
+  dplyr::filter(country_code_2 %in% c(
+    Australasia, Melanesia, Polynesia
+  )) %>%
+  dplyr::filter(year %in% c(1995, 2005, 2015)) %>%
+  mutate(region = case_when(
+    country_code_2 %in% Australasia ~ "Australasia",
+    country_code_2 %in% Melanesia ~ "Melanesia",
+    country_code_2 %in% Polynesia ~ "Polynesia",
+  )) %>%
+  pivot_wider(
+    values_from = population,
+    names_from = year,
+    names_prefix = "y_"
+  ) %>%
+  dplyr::arrange(region, desc(y_2015)) %>%
+  dplyr::select(-starts_with("country_code")) %>%
+  mutate(
+    pop_ratio_05_15 = y_2015 / y_2005,
+    date = "2013-11-14"
+  )
+)
+```
+
+### Initiate a table
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Turning a data frame into a gt table is one function call with no arguments needed. Note what is missing compared with flextable: there is no col keys argument, so you cannot pick and order columns in the same call. You select before, with dplyr, or you hide and reorder after, with cols hide and cols move. That is deliberate. gt assumes the data reaching it is already the data you want, and treats column choice as a data question rather than a table question.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name,
+    region,
+    y_1995,
+    y_2005
+  ) %>%
+  gt()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt()
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+There is no `col_keys` equivalent. Select the columns you want **before** `gt()`, or drop and reorder them **after** with `cols_hide()` and `cols_move()`.
+
+:::
+<!--end of panel-->
+
+## The parts of a table
+
+::: {.panel-tabset}
+
+### The anatomy
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the list that makes the whole package predictable, so it is worth a minute. A gt table has a header at the top holding a title and subtitle, then column labels which can sit under spanners, then the body, and at the left edge of the body an optional stub holding row names and row group labels. Underneath there can be summary rows, and at the bottom a footer holding footnotes and source notes. Everything gt does is adding something to one of those parts or changing how one of them looks.
+
+</details>
+
+A `gt` table is built out of named parts, and almost every function you will use adds something to a part or changes how a part looks:
+
++ **table header**: title and subtitle
++ **column labels**: the names above the columns, optionally grouped under **spanners**
++ **the stub**: the left-hand column of row names, and the **row group** labels that break the body into blocks
++ **the body**: the data itself
++ **summary rows**: totals and averages, per group or for the whole table
++ **the footer**: footnotes and source notes
+
+### The naming convention
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Learn the prefixes and you can guess most of the package. tab underscore something adds or changes a part of the table. fmt underscore something changes how values are displayed. cols underscore something works on columns. opt underscore something sets a whole-table option, and tab options is the general version of those. cells underscore something names a location rather than doing anything itself. This is genuinely how the package is organised, so when you want to do something new, the first guess should be the prefix, and then autocomplete will usually finish the job.
+
+</details>
+
+Function names in `gt` are prefixed by what they act on:
+
+| Prefix | What it does | Examples |
+|---|---|---|
+| `tab_*()` | add or change a **part** of the table | `tab_header()`, `tab_footnote()`, `tab_spanner()`, `tab_style()` |
+| `fmt_*()` | change how **values are displayed** | `fmt_number()`, `fmt_percent()`, `fmt_date()` |
+| `cols_*()` | act on **columns** | `cols_label()`, `cols_move()`, `cols_hide()`, `cols_width()` |
+| `cells_*()` | name a **location** (does nothing on its own) | `cells_body()`, `cells_column_labels()`, `cells_stub()` |
+| `opt_*()` | set a **whole-table option** | `opt_row_striping()`, `opt_stylize()` |
+
+When you want something new, guess the prefix first and let autocomplete finish it.
+
+### The stub
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The stub is the left-hand column that labels the rows rather than holding data, and you create it by naming a column in the rowname col argument. Look at what changes: country name moves out of the data area and into its own column at the left, with no column label above it, and a vertical rule separating it from the numbers. That is the published-table convention. It also changes how you select those cells later, because they are no longer part of the body. Cells stub, not cells body, reaches them.
+
+</details>
+
+`rowname_col =` moves a column into the **stub**: it labels the rows instead of being data.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(rowname_col = "country_name")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(rowname_col = "country_name")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Stub cells are no longer part of the body, so `cells_stub()` reaches them, not `cells_body()`.
+
+### Row groups
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the thing gt does that flextable does not have a direct answer for. Name a column in groupname col and its values become labels that break the body into blocks, with each label on its own row above the rows it covers. In the flextable deck we approximated this with merge v, which collapsed repeated values into one tall cell. This is the other convention, and for grouped rows it is usually the one published tables use. Note that the groups appear in the order the rows are sorted, which is why the data was arranged by region.
+
+</details>
+
+`groupname_col =` turns a column into **row group labels**, which split the body into blocks.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(rowname_col = "country_name", groupname_col = "region")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+This is the `gt` answer to `merge_v()` in `flextable`.
+
+### Groups as a column
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A variant worth knowing. Setting row group as column to TRUE puts the group labels in their own column at the left instead of on separate rows above each block. The result looks very much like a merge v table in flextable, so if you are converting a table between the two packages, this is the setting that makes them match. Which of the two you want is a house-style question rather than a technical one. Journals differ, and both are considered correct.
+
+</details>
+
+`row_group_as_column = TRUE` puts group labels in a column of their own instead of on rows above each block. This is what a `merge_v()` table looks like in `flextable`.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region",
+    row_group_as_column = TRUE
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region",
+    row_group_as_column = TRUE
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Reordering groups
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Groups appear in the order their rows appear in the data, so normally you control the order by sorting before you build the table. When that is inconvenient, row group order takes the labels in the order you want them. Give it every group name, not a subset, or the ones you leave out end up somewhere you did not choose. Sorting the data is usually the cleaner route, because then the order is visible where the data is prepared rather than buried in the table code.
+
+</details>
+
+`row_group_order()` sets the order of the groups directly. Sorting the data before `gt()` does the same job and is usually clearer.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(groupname_col = "region") %>%
+  row_group_order(
+    groups = c(
+      "Polynesia",
+      "Melanesia",
+      "Australasia"
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(groupname_col = "region") %>%
+  row_group_order(
+    groups = c("Polynesia", "Melanesia", "Australasia")
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Locations
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the one place where gt and flextable really diverge, so slow down here. In flextable you said i for rows and j for columns, and every formatting function took them. In gt you name a location instead, using a cells underscore something function, and hand that to whatever function needs to know where. Cells body is the one you will use most, and it takes columns and rows arguments. The rest of the list names the other parts: the column labels, the stub, the row groups, the title, the summary rows, the footer.
+
+</details>
+
+`flextable` said **where** with `i` (rows) and `j` (columns). `gt` says where with a `cells_*()` function:
+
++ `cells_body(columns =, rows =)`: the data cells
++ `cells_stub(rows =)`: the row names
++ `cells_column_labels(columns =)`: the labels above the columns
++ `cells_column_spanners(spanners =)`: the labels above those
++ `cells_row_groups(groups =)`: the row group labels
++ `cells_title(groups = "title")`: the title or subtitle
++ `cells_summary()`, `cells_grand_summary()`: summary rows
++ `cells_source_notes()`, `cells_footnotes()`: the footer
+
+A `cells_*()` function does nothing on its own. You hand it to a function that needs to be told where, through a `locations =` argument.
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This creates gt tbl, the table we build on for most of the rest of the lecture. Four columns, ten rows, no formatting. Same idea as ft in the flextable deck: build it once, then pipe it into different experiments without rebuilding it each time. Every example from here starts from gt tbl and adds one thing, so you can see exactly what each function did. Look at the plain version now so you have a baseline to compare the later slides against.
+
+</details>
+
+We will be building on `gt_tbl` created below:
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+gt_tbl <-
+  tab_data %>%
+  dplyr::select(
+    country_name,
+    region,
+    y_1995,
+    y_2005
+  ) %>%
+  gt()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `rows`: a condition
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The rows argument accepts a condition written with the column names directly, unquoted, exactly the way you would write it inside dplyr filter. So rows equals y two thousand five greater than two hundred thousand selects the rows where that holds. This is the same idea as the formula form in flextable, and for the same reason it is the one to default to. The condition describes itself, so somebody reading it later sees which rows and why, instead of numbers they have to work out. It also keeps working when the data changes.
+
+</details>
+
+**Syntax**
+
+```{r eval = F}
+cells_body(
+  columns = <columns>,
+  rows = <condition using the column names>
+)
+```
+
+<br>
+
+**Example**
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(color = "red"),
+    locations = cells_body(
+      columns = c(country_name, region),
+      rows = y_2005 > 2e5
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(color = "red"),
+    locations = cells_body(
+      columns = c(country_name, region),
+      rows = y_2005 > 2e5
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `rows`: numbers and logicals
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same job with row numbers, and with a vector of TRUEs and FALSEs. Both work, and the logical vector has to be exactly as long as the table has rows, which is why the example builds ten values for a ten-row table. Hard-coded row numbers are the risky form. They break silently when your data changes, because there will still be a row three, it will just be a different country. Use them when you genuinely mean the third row, and use a condition whenever you mean a row that satisfies something.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_body(
+      columns = country_name,
+      rows = c(2, 4:9)
+    )
+  ) %>%
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = c(1, 3),
+      rows = rep(c(TRUE, FALSE), each = 5)
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_body(columns = country_name, rows = c(2, 4:9))
+  ) %>%
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = c(1, 3),
+      rows = rep(c(TRUE, FALSE), each = 5)
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `columns`: tidyselect
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The columns argument takes the same selection language dplyr select takes, which is more than flextable's j ever offered. Bare names, c of several names, numbers, and the helpers: starts with, ends with, contains, where, everything. The example uses starts with y underscore to catch both year columns without naming them, which keeps working if you add another year to the data later. That is the argument for the helpers generally. A selection that describes a pattern survives changes to the data, and a list of names does not.
+
+</details>
+
+`columns =` accepts anything `dplyr::select()` accepts: bare names, numbers, and helpers like `starts_with()`, `ends_with()`, `contains()`, `where()`, `everything()`.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(color = "#fdf1d8"),
+    locations = cells_body(
+      columns = starts_with("y_")
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(color = "#fdf1d8"),
+    locations = cells_body(columns = starts_with("y_"))
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### Several locations at once
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+When the same change applies in more than one part of the table, wrap the locations in a list rather than repeating the call. The example makes the column labels and one column of the body bold in a single step. This is worth knowing because it is the answer to a question the flextable deck handled with the part argument. gt has no part equals all. Instead you list the parts you mean, which is more typing but leaves no doubt about which parts were included.
+
+</details>
+
+There is no `part = "all"` in `gt`. List the locations you mean instead.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = list(
+      cells_column_labels(),
+      cells_body(columns = country_name)
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = list(
+      cells_column_labels(),
+      cells_body(columns = country_name)
+    )
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Style
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One function does all the styling in gt, and its shape mirrors the style function in flextable closely. You say what to change with the style argument and where with the locations argument. The what comes from one of three functions: cell text for the characters, cell fill for the background, cell borders for the lines. Notice how much smaller this is than the flextable equivalent, which needed fp text, fp par and fp cell from officer, and a paragraph-versus-cell distinction on top. gt has no paragraph layer at all.
+
+</details>
+
+`tab_style()` does all the styling.
+
+**Syntax**
+
+```{r eval = F}
+tab_style(
+  data,
+  style = <what to change>,
+  locations = <where>
+)
+```
+
+<br>
+
+The `style =` argument takes one of these, or a `list()` of them:
+
++ `cell_text()`: color, size, weight, style, alignment, font
++ `cell_fill()`: background color
++ `cell_borders()`: borders around the selected cells
+
+There is no paragraph layer here. `flextable` distinguished paragraphs from cells and needed `fp_par()` and `fp_cell()` for the two. `gt` has only cells.
+
+### `cell_text()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first of the three, and the one you reach for most. Cell text controls everything about the characters: color, size, weight, italics, alignment, the font itself. Note that alignment lives here, which is a real difference from flextable, where alignment was a paragraph property because text sat inside a paragraph inside a cell. gt has no paragraph, so alignment is simply part of the text. The help page is worth opening once, because there are more arguments than you would guess and you will look them up every time anyway.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`cell_text()` changes the appearance of the characters themselves.
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?cell_text
+```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(
+      color = "red",
+      weight = "bold",
+      decorate = "underline"
+    ),
+    locations = cells_body(
+      columns = country_name,
+      rows = 4:6
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_text(
+      color = "red",
+      weight = "bold",
+      decorate = "underline"
+    ),
+    locations = cells_body(columns = country_name, rows = 4:6)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### `cell_fill()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The background color of the selected cells, and it takes a color and optionally an alpha value between zero and one for transparency. The example shades the region cells of the smaller countries, using a condition on a column that is not the one being shaded, which is a pattern you will use constantly. Where the shading goes and what decides the shading are separate questions, and gt keeps them separate: columns says where, rows says which, and neither has to be the column you are looking at.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`cell_fill()` sets the background color of the selected cells. `alpha =` between 0 and 1 makes it transparent.
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?cell_fill
+```
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(
+      color = "grey",
+      alpha = 0.5
+    ),
+    locations = cells_body(
+      columns = region,
+      rows = y_2005 < 2e5
+    )
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_fill(color = "grey", alpha = 0.5),
+    locations = cells_body(columns = region, rows = y_2005 < 2e5)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### `cell_borders()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Borders in gt are one function rather than the dozen flextable had. You say which sides, in what color, what weight and what style, and where. Sides accepts all, or any combination of top, bottom, left and right. Weight takes a pixel value through the px helper, and getting that wrong fails quietly. Write a bare two rather than px of two and there is no error at all: the number reaches the HTML with no unit on it, the browser ignores the whole declaration, and you get the default border width instead of the one you asked for. The example draws a thick red dotted line under row three, which is the same table this deck's flextable counterpart drew with hline.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`cell_borders()` draws borders. `sides =` accepts `"all"` or any of `"top"`, `"bottom"`, `"left"`, `"right"`.
+
+<br>
+
+**Syntax**
+
+```{webr-r}
+?cell_borders
+```
+
+<br>
+
+:::{.callout-note}
+Give `weight =` a size with units: `px(2)`, not `2`. A bare number reaches the HTML as `border-bottom-width: 2`, which the browser ignores, so you silently get the default border rather than the one you asked for.
+:::
+
+#### Example
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = cell_borders(
+      sides = "bottom",
+      color = "red",
+      weight = px(4),
+      style = "dotted"
+    ),
+    locations = cells_body(rows = 3)
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = cell_borders(
+      sides = "bottom",
+      color = "red",
+      weight = px(4),
+      style = "dotted"
+    ),
+    locations = cells_body(rows = 3)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+### Combining styles
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+When you want more than one kind of change in the same place, pass a list of style functions instead of one. The example fills the column labels dark red and makes the text on them white and bold, which takes one call rather than three. This is the everyday shape of gt styling code: a pipeline where each step names one place and everything that should be true about it. If a table comes out looking wrong, comment out one tab style call at a time, which is much the fastest way to find which one did it.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#C90000"),
+      cell_text(
+        color = "white",
+        weight = "bold"
+      )
+    ),
+    locations = cells_column_labels()
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#C90000"),
+      cell_text(color = "white", weight = "bold")
+    ),
+    locations = cells_column_labels()
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+```{r style-flip, cache = F, include = F}
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005) %>% #BREAK
+  gt() %>% #BREAK
+  #--- text color ---#
+  tab_style(
+    style = cell_text(color = "#fcba03"),
+    locations = cells_body(columns = region, rows = 1)
+  ) %>% #BREAK
+  #--- background ---#
+  tab_style(
+    style = cell_fill(color = "grey"),
+    locations = cells_body(columns = region, rows = y_2005 < 2e5)
+  ) %>% #BREAK
+  #--- font type ---#
+  tab_style(
+    style = cell_text(font = "Times New Roman"),
+    locations = cells_body(columns = c(country_name, y_2005), rows = 5)
+  ) %>% #BREAK
+  #--- font size ---#
+  tab_style(
+    style = cell_text(size = px(20)),
+    locations = cells_body(rows = 7)
+  ) %>% #BREAK
+  #--- italicize ---#
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(columns = region)
+  ) %>% #BREAK
+  #--- bold ---#
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = y_2005)
+  ) %>% #BREAK
+  #--- vertical alignment ---#
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body(columns = y_2005, rows = region == "Australasia")
+  ) %>% #BREAK
+  #--- borders ---#
+  tab_style(
+    style = cell_borders(sides = "all", color = "black", weight = px(1)),
+    locations = cells_body()
+  ) %>% #BREAK
+  #--- the column labels ---#
+  tab_style(
+    style = list(cell_fill(color = "#C90000"), cell_text(color = "white")),
+    locations = cells_column_labels()
+  )
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "style-flip",
+  title = "Demonstration: Styling",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Formatting values
+
+::: {.panel-tabset}
+
+### Instruction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the part of gt with no real counterpart in what we covered for flextable, and it is the reason many people prefer gt for numbers. The fmt functions change how a value is displayed without changing the value. So after you have formatted a population column with thousands separators, you can still select rows with a condition on the raw number, because the raw number is still there. Formatting is a display layer over the data. That property is what lets you format early in a pipeline and keep working with the real values afterwards.
+
+</details>
+
+The `fmt_*()` functions change how values are **displayed**. They do not change the values, so conditions like `rows = y_2005 > 2e5` still work on the raw numbers afterwards.
+
++ `fmt_number()`, `fmt_integer()`: decimals, thousands separators, suffixes
++ `fmt_percent()`, `fmt_currency()`, `fmt_scientific()`
++ `fmt_date()`, `fmt_datetime()`, `fmt_time()`
++ `fmt_markdown()`, `fmt_url()`, `fmt_image()`
++ `sub_missing()`, `sub_zero()`: replace `NA` and zero with something readable
+
+Each takes `columns =` and `rows =`, so you can format part of a column.
+
+### `fmt_number()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The workhorse. Decimals says how many places, and use seps puts in the thousands separators, which is on by default and is most of why you would call this. Compare the two columns on this slide with the unformatted table earlier: nine million is far easier to read as nine comma something than as a run of digits. There is a locale argument too, which switches the separator and decimal marks to another country's convention, and that is worth remembering if you ever publish to a European journal.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  fmt_number(
+    columns = c(y_1995, y_2005),
+    decimals = 0,
+    use_seps = TRUE
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  fmt_number(
+    columns = c(y_1995, y_2005),
+    decimals = 0,
+    use_seps = TRUE
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `fmt_integer()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For whole numbers, and its interesting argument is suffixing. Turn it on and large numbers are shortened with a K for thousands and an M for millions, so eighteen million something becomes eighteen point one M. Whether you want that depends entirely on your audience. It reads well on a slide, where the point is the comparison rather than the exact count. It reads badly in a table somebody might need to take numbers out of, because you have thrown away the digits they need.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  fmt_integer(
+    columns = c(y_1995, y_2005),
+    suffixing = TRUE
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  fmt_integer(columns = c(y_1995, y_2005), suffixing = TRUE)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `fmt_percent()` and `fmt_date()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two more, on a table that includes the ratio column and the date column so there is something to format. Fmt percent multiplies by a hundred and appends the sign, so a ratio of one point one three shows as a hundred and thirteen percent. Note that it multiplies, so give it a proportion and not a number that is already a percentage. Fmt date takes a date style, either by name or by number, and there are a lot of them. The help page prints the full list with an example of each, which is quicker than guessing.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name,
+    pop_ratio_05_15,
+    date
+  ) %>%
+  gt() %>%
+  fmt_percent(
+    columns = pop_ratio_05_15,
+    decimals = 1
+  ) %>%
+  fmt_date(
+    columns = date,
+    date_style = "wd_m_day_year"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, pop_ratio_05_15, date) %>%
+  gt() %>%
+  fmt_percent(columns = pop_ratio_05_15, decimals = 1) %>%
+  fmt_date(columns = date, date_style = "wd_m_day_year")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+`fmt_percent()` multiplies by 100, so hand it a proportion rather than a number that is already a percentage.
+
+### Formatting part of a column
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The rows argument works inside the fmt functions exactly as it did inside cells body, which means you can format part of a column differently from the rest. The example gives the Melanesian rows two decimal places and leaves the others alone. This sounds like a strange thing to want until you have a table mixing quantities of very different sizes in one column, where a single number of decimal places is either too many for the large values or too few for the small ones.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  fmt_number(
+    columns = y_1995,
+    rows = region == "Melanesia",
+    decimals = 2
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  fmt_number(
+    columns = y_1995,
+    rows = region == "Melanesia",
+    decimals = 2
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Columns
+
+::: {.panel-tabset}
+
+### `cols_label()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Column labels default to your variable names, which are written for typing rather than for reading. Cols label renames them, taking the existing column name on the left and the label you want on the right. The label can be plain text, or you can wrap it in md for markdown, which is how you get bold or italic or a subscript into a header. As in flextable, this changes only what is displayed. Later code still refers to y underscore nineteen ninety five, not to the pretty label, so rename late or keep selecting by the original name.
+
+</details>
+
+`cols_label()` renames the displayed labels. Wrap a label in `md()` for markdown, or `html()` for HTML.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  cols_label(
+    country_name = "Country",
+    region = "Region",
+    y_1995 = md("**1995**"),
+    y_2005 = md("**2005**")
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  cols_label(
+    country_name = "Country",
+    region = "Region",
+    y_1995 = md("**1995**"),
+    y_2005 = md("**2005**")
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Selectors keep using the original column names, not the new labels.
+
+### `cols_move()`, `cols_hide()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is where the missing col keys argument comes back. Cols move takes columns and puts them after, or before, another column, and there are cols move to start and cols move to end for the two common cases. Cols hide drops a column from the display while leaving it in the data, which matters more than it sounds, because a hidden column can still be used in a condition. So you can hide the region column and still write rows equals region equals Melanesia. That is not possible in flextable, where a column left out of col keys is simply gone.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  cols_move(
+    columns = region,
+    after = y_2005
+  ) %>%
+  cols_hide(columns = y_1995)
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  cols_move(columns = region, after = y_2005) %>%
+  cols_hide(columns = y_1995)
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+A **hidden** column is still in the data, so `rows = y_1995 > 1e5` keeps working after `cols_hide(columns = y_1995)`.
+
+### `cols_width()`, `cols_align()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Widths and alignment. Cols width uses a two-sided formula, with the columns on the left and the width on the right, and the width needs units, so px for pixels or pct for a percentage of the table. The everything on the last line catches whatever you did not name, which is a good habit, because a table with some widths set and others not can lay out unpredictably. Cols align is simpler and takes a direction and some columns. Note gt has no autofit. It sizes columns to their content by default and you override only where you need to.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  cols_width(
+    country_name ~ px(150),
+    region ~ px(120),
+    everything() ~ px(90)
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(y_1995, y_2005)
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  cols_width(
+    country_name ~ px(150),
+    region ~ px(120),
+    everything() ~ px(90)
+  ) %>%
+  cols_align(align = "center", columns = c(y_1995, y_2005))
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+There is no `autofit()` in `gt`: columns size to their content unless you say otherwise.
+
+### `cols_merge()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Putting two columns into one cell, with a pattern saying how they combine. The numbers in curly braces refer to the columns in the order you listed them, so one space open bracket two close bracket puts the second value in parentheses after the first. The second column then disappears from the display. This is how published tables show an estimate with its standard error underneath or beside it, and it is worth remembering when you get to regression tables, because it is the same idea modelsummary uses.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  fmt_number(
+    columns = c(y_1995, y_2005),
+    decimals = 0
+  ) %>%
+  cols_merge(
+    columns = c(y_2005, y_1995),
+    pattern = "{1} ({2})"
+  ) %>%
+  cols_label(y_2005 = "2005 (1995)")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>%
+  cols_merge(columns = c(y_2005, y_1995), pattern = "{1} ({2})") %>%
+  cols_label(y_2005 = "2005 (1995)")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+`{1}` and `{2}` refer to the columns in the order you listed them. This is how an estimate and its standard error end up in one cell.
+
+:::
+<!--end of panel-->
+
+## Spanners
+
+::: {.panel-tabset}
+
+### `tab_spanner()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A spanner is a label sitting above several column labels, grouping them. Give it a label and the columns it covers, and gt draws the rule under it for you. This is the same table the flextable deck built with add header row and colwidths, and the difference is worth noticing. There you counted how many columns each label spanned. Here you name the columns, so the label stays over the right ones even if you reorder the table later. Spanners can be stacked, so a second call over a group that includes a spanner puts a third row above.
+
+</details>
+
+A **spanner** is a label above several column labels. Name the columns rather than counting them, which is what `add_header_row()` in `flextable` made you do.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_spanner(
+    label = "Population",
+    columns = c(y_1995, y_2005)
+  ) %>%
+  cols_label(
+    y_1995 = "1995",
+    y_2005 = "2005"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>%
+  cols_label(y_1995 = "1995", y_2005 = "2005")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `tab_spanner_delim()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A shortcut worth knowing if your column names carry structure. Give it a separator, and gt splits every column name on that separator and turns the first piece into a spanner and the second into the label. Our columns are called y underscore nineteen ninety five and y underscore two thousand five, so splitting on the underscore produces a y spanner over labels of nineteen ninety five and two thousand five. This is exactly the shape pivot wider leaves behind when it builds names with a prefix, so the two functions pair well.
+
+</details>
+
+`tab_spanner_delim()` splits column names on a separator and builds the spanner from the first piece. Names left behind by `pivot_wider()` often have this shape already.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name,
+    y_1995,
+    y_2005
+  ) %>%
+  gt() %>%
+  tab_spanner_delim(delim = "_")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, y_1995, y_2005) %>%
+  gt() %>%
+  tab_spanner_delim(delim = "_")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Header and footer
+
+::: {.panel-tabset}
+
+### `tab_header()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The title and subtitle at the top of the table. Both accept md, so you can make the title bold and leave the subtitle plain, which is the usual convention. Keep in mind that a table inside a Quarto document may already get a caption from the chunk options, and having both a Quarto caption and a gt title is how you end up with the same words printed twice. Decide which one owns the title. For a table going into a Word document, the gt title travels with the table, and that is usually the argument for putting it here.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_header(
+    title = md("**Population of selected Pacific countries**"),
+    subtitle = "Ten countries, 1995 and 2005"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_header(
+    title = md("**Population of selected Pacific countries**"),
+    subtitle = "Ten countries, 1995 and 2005"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+A Quarto chunk caption and a `gt` title are two different things. Using both prints the title twice.
+
+### `tab_footnote()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Footnotes attach to a location, and gt places the reference symbol at that location and beside the note at the bottom, so the two stay linked without you typing anything. One call per footnote, and the symbols are numbered in the order the locations appear in the table rather than the order you wrote the calls. Opt footnote marks changes the symbols to letters, or to the standard sequence of asterisk, dagger and double dagger, which is what many journals ask for.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_footnote(
+    footnote = "This is footnote 1",
+    locations = cells_column_labels(
+      columns = country_name
+    )
+  ) %>%
+  tab_footnote(
+    footnote = "This is footnote 2",
+    locations = cells_body(
+      columns = y_2005,
+      rows = 1
+    )
+  ) %>%
+  opt_footnote_marks(marks = "letters")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_footnote(
+    footnote = "This is footnote 1",
+    locations = cells_column_labels(columns = country_name)
+  ) %>%
+  tab_footnote(
+    footnote = "This is footnote 2",
+    locations = cells_body(columns = y_2005, rows = 1)
+  ) %>%
+  opt_footnote_marks(marks = "letters")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Marks are numbered by where the locations sit in the table, not by the order you wrote the calls. `opt_footnote_marks()` switches them to letters or to `c("*", "†", "‡")`.
+
+### `tab_source_note()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A source note is a line at the bottom of the table with no reference symbol attached to it, which is where the data source belongs. Call it more than once and you get more than one line, in the order you called them. The distinction from a footnote is worth keeping: a footnote explains something about a particular cell and carries a mark, a source note says where the whole table came from and does not.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_source_note(
+    source_note = md(
+      "Source: `countrypops` in the **gt** package."
+    )
+  ) %>%
+  tab_source_note(
+    source_note = "Populations are mid-year estimates."
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_source_note(
+    source_note = md("Source: `countrypops` in the **gt** package.")
+  ) %>%
+  tab_source_note(
+    source_note = "Populations are mid-year estimates."
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Summary rows
+
+::: {.panel-tabset}
+
+### `summary_rows()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Totals and averages per row group, computed by gt rather than by you. It needs a stub to put the labels in, so the table has to have been built with rowname col, and it needs row groups for there to be groups to summarise. Fns takes a named list where the name becomes the label and the right-hand side is a formula, with the dot standing for the column being summarised. Fmt says how to display the results, and it is a separate argument because summary rows are not formatted by the fmt calls you applied to the body.
+
+</details>
+
+`summary_rows()` adds a summary row to each row group. The table needs a stub for the labels to sit in, and it needs row groups: called on a table with none, it is an error, and `grand_summary_rows()` is the function you want instead.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region"
+  ) %>%
+  summary_rows(
+    fns = list(
+      Total = ~ sum(.),
+      Average = ~ mean(.)
+    ),
+    fmt = ~ fmt_number(., decimals = 0)
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(rowname_col = "country_name", groupname_col = "region") %>%
+  summary_rows(
+    fns = list(Total = ~ sum(.), Average = ~ mean(.)),
+    fmt = ~ fmt_number(., decimals = 0)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Summary rows are **not** covered by the `fmt_*()` calls you applied to the body, which is why `fmt =` is a separate argument.
+
+### `grand_summary_rows()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The same idea for the table as a whole rather than per group, and it appears at the bottom below everything else. You can use both together, which gives you a total per region and then a total across all regions, which is the standard shape of a published summary table. Note that it works without row groups, so a plain table can have a grand total even with nothing to group by.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+tab_data %>%
+  dplyr::select(
+    country_name, region,
+    y_1995, y_2005
+  ) %>%
+  gt(
+    rowname_col = "country_name",
+    groupname_col = "region"
+  ) %>%
+  grand_summary_rows(
+    fns = list(`Grand total` = ~ sum(.)),
+    fmt = ~ fmt_number(., decimals = 0)
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt(rowname_col = "country_name", groupname_col = "region") %>%
+  grand_summary_rows(
+    fns = list(`Grand total` = ~ sum(.)),
+    fmt = ~ fmt_number(., decimals = 0)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Color from the data
+
+::: {.panel-tabset}
+
+### `data_color()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Shading cells according to their own values, in one call. Give it columns and a palette, and gt works out the range and maps the colors across it. You can name a palette that ships with the package, or give two or more colors and it interpolates between them. Read the caution though. A colored table is easy to make and easy to overdo, and once every column is shaded the reader has no idea which comparison you wanted them to make. One column shaded in a table of six says look here. Six columns shaded says nothing.
+
+</details>
+
+`data_color()` shades cells by their own values.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  data_color(
+    columns = y_2005,
+    palette = c("white", "#C90000")
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  data_color(columns = y_2005, palette = c("white", "#C90000"))
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::{.callout-note}
+One shaded column in a table says "look here". Six shaded columns say nothing.
+:::
+
+### `domain =`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+By default the palette is stretched across the range of the values present, which means the same color means different things in two tables built from different data. Setting domain fixes the range, so a value maps to the same color regardless of what else is in the column. If you are producing several tables that a reader will compare, this is not optional. Values outside the domain are left uncolored unless you say otherwise with the na color argument.
+
+</details>
+
+Without `domain =`, the palette is stretched across whatever values are present, so the same color means different things in two tables. Fix the range when the tables will be compared.
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  data_color(
+    columns = c(y_1995, y_2005),
+    palette = c("white", "#C90000"),
+    domain = c(0, 3e7)
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  data_color(
+    columns = c(y_1995, y_2005),
+    palette = c("white", "#C90000"),
+    domain = c(0, 3e7)
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+:::
+<!--end of panel-->
+
+## Whole-table options
+
+::: {.panel-tabset}
+
+### `opt_stylize()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A finished look in one call. Style takes a number from one to six and color takes one of six names, and between them you get thirty-six ready-made appearances. This is the fastest way to make a table look deliberate rather than default, and it is a reasonable starting point that you then adjust. It is the counterpart of the theme functions in flextable, theme vanilla and the rest. Try a few numbers and pick one, rather than reading about what each does.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  opt_stylize(style = 6, color = "blue")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  opt_stylize(style = 6, color = "blue")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+`style` is 1 to 6 and `color` is one of six names, so there are 36 ready-made looks. This is the `gt` counterpart of `theme_vanilla()` and friends in `flextable`.
+
+### Small `opt_*()` functions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Each of these does one thing to the whole table. Row striping shades alternate rows. Table font sets the font everywhere. Align table header moves the title and subtitle. There are more, and they all begin with opt, so autocomplete will show you the list. Reach for these before tab options, because they say what you mean in one argument where tab options would need three.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_header(title = "Population") %>%
+  opt_row_striping() %>%
+  opt_table_font(font = "Times New Roman") %>%
+  opt_align_table_header(align = "left")
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_header(title = "Population") %>%
+  opt_row_striping() %>%
+  opt_table_font(font = "Times New Roman") %>%
+  opt_align_table_header(align = "left")
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `tab_options()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The general version, and it has around two hundred arguments. Do not try to learn them. Learn the naming pattern instead, because the argument names are the part of the table, then a dot, then the property. Table dot font dot size. Column labels dot background dot color. Data row dot padding. Once you see that, you can guess an argument name and let autocomplete confirm it, which is how everyone actually uses this function. The help page lists them all if guessing fails.
+
+</details>
+
+::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| eval: false
+gt_tbl %>%
+  tab_options(
+    table.font.size = px(14),
+    column_labels.font.weight = "bold",
+    column_labels.background.color = "#f2f2f2",
+    data_row.padding = px(2),
+    table.border.top.color = "red"
+  )
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+```{r}
+#| echo: false
+gt_tbl %>%
+  tab_options(
+    table.font.size = px(14),
+    column_labels.font.weight = "bold",
+    column_labels.background.color = "#f2f2f2",
+    data_row.padding = px(2),
+    table.border.top.color = "red"
+  )
+```
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+Argument names are **part** `.` **property**: `table.font.size`, `column_labels.background.color`, `data_row.padding`. Guess the name and let autocomplete confirm it.
+
+:::
+<!--end of panel-->
+
+```{r options-flip, cache = F, include = F}
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005) %>% #BREAK
+  gt(rowname_col = "country_name", groupname_col = "region") %>% #BREAK
+  #--- format the numbers ---#
+  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% #BREAK
+  #--- rename the labels ---#
+  cols_label(y_1995 = "1995", y_2005 = "2005") %>% #BREAK
+  #--- a label above both year columns ---#
+  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% #BREAK
+  #--- a total per region ---#
+  summary_rows(
+    fns = list(Total = ~ sum(.)),
+    fmt = ~ fmt_number(., decimals = 0)
+  ) %>% #BREAK
+  #--- a ready-made look ---#
+  opt_stylize(style = 5, color = "gray") %>% #BREAK
+  #--- alternate row shading ---#
+  opt_row_striping() %>% #BREAK
+  #--- tighten the rows ---#
+  tab_options(data_row.padding = px(2)) %>% #BREAK
+  #--- shrink the type ---#
+  tab_options(table.font.size = px(14)) %>% #BREAK
+  #--- a title ---#
+  tab_header(title = md("**Population of selected Pacific countries**")) %>% #BREAK
+  #--- and where it came from ---#
+  tab_source_note(source_note = md("Source: `countrypops` in the **gt** package."))
+```
+
+`r chunk_reveal_quarto(
+  chunk_name = "options-flip",
+  title = "Demonstration: A finished table",
+  break_type = "user",
+  display_type = "both",
+  left_assign = FALSE
+  )
+`
+
+## Output
+
+::: {.panel-tabset}
+
+### Introduction
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far produced a table object. This section is about getting it out of R. One function does all of it, and the file extension you give decides the format, which is a nice piece of design because there is nothing else to remember. The list is on screen. Note that PNG and PDF go through a headless browser, so they need the webshot2 package installed, and the other formats do not need anything extra. The cell here builds a plain table to demonstrate with.
+
+</details>
+
+`gtsave()` writes the table to a file. The **extension decides the format**:
+
++ `.html`, `.htm`: a self-contained web page
++ `.docx`: a Word file, as a real editable Word table
++ `.rtf`: rich text
++ `.tex`, `.rnw`: LaTeX
++ `.png`, `.pdf`: an image, through the `webshot2` package
+
+Let's create a table for demonstration:
+
+```{r}
+table_temp <-
+  tab_data %>%
+  dplyr::select(country_name, region, y_1995, y_2005) %>%
+  gt()
+```
+
+### HTML and Word
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two lines, and the second is the one that matters for most of you. A gt table saved to docx arrives in Word as a real table, not a picture, so a coauthor can click into a cell and edit it. That is the same argument the flextable deck made, and it is the main practical reason to build tables with code at all. HTML is the format gt was designed around first, so that is the one where everything you have seen on these slides is guaranteed to survive.
+
+</details>
+
+**HTML**
+
+```{r eval = F}
+gtsave(table_temp, "temp_table.html")
+```
+
+<br>
+
+**WORD**
+
+```{r eval = F}
+gtsave(table_temp, "temp_table.docx")
+```
+
+<br>
+
+What arrives in Word is an editable table, not an image.
+
+### Image
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For when you need a picture rather than an editable table, usually for slides. This route needs webshot2, which drives a headless browser to take the screenshot, and it is on CRAN so a plain install packages call is all you need. Look at the two extra arguments in the example. Zoom raises the resolution, which matters if the image is going anywhere near print, and expand adds a margin around the table so it is not cropped tight to the border.
+
+</details>
+
+First install the `webshot2` package.
+
+```{r eval = F}
+#--- install ---#
+install.packages("webshot2")
+```
+
+<br>
+
+**png**
+
+```{r eval = F}
+gtsave(table_temp, "temp_table.png", zoom = 3, expand = 10)
+```
+
+<br>
+
+**pdf**
+
+```{r eval = F}
+gtsave(table_temp, "temp_table.pdf", zoom = 3)
+```
+
+### Inside a Quarto document
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Inside a Quarto document you do not save the table at all. Print it from a chunk and gt works out the right form for whatever you are rendering to, HTML on a website, LaTeX in a PDF. That is the everyday case and it needs no arguments. The as functions below are for when you want the converted object rather than a rendered document, and as raw html is the one that comes up in practice, when you need to paste a table into something that is not Quarto.
+
+</details>
+
+In a Quarto document, print the table from a chunk and `gt` produces the right form for the output format you are rendering to.
+
+<br>
+
+When you want the converted object rather than a file:
+
++ `as_raw_html()`: the HTML as a character string
++ `as_latex()`: LaTeX
++ `as_rtf()`: rich text
++ `as_word()`: the Word XML
+
+:::
+<!--end of panel-->
+
+## `gt` or `flextable`?
+
+::: {.panel-tabset}
+
+### Where they differ
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Both packages make good tables, so this is not a question with one right answer. The differences that actually decide it are in the table on screen. gt formats numbers far better, has row groups and summary rows built in, and needs no second package. flextable was designed around Word and PowerPoint output first, so a table that has to land in a Word document with a specific look tends to be less work there. If you are writing to a website or a Quarto HTML document, gt is the more natural fit.
+
+</details>
+
+| | `gt` | `flextable` |
+|---|---|---|
+| Designed around | HTML first | Word and PowerPoint first |
+| Companion package | none | `officer` for the `fp_*()` functions |
+| Saying where | `cells_*()` location functions | `i =` and `j =` |
+| Number formatting | `fmt_*()`, extensive | `colformat_*()`, fewer options |
+| Row groups | built in, `groupname_col =` | approximated with `merge_v()` |
+| Summary rows | built in | done by hand before the table |
+| Column widths | set explicitly, no autofit | `autofit()` |
+
+### Which to use
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three plain recommendations rather than a discussion. Writing to a website or a Quarto HTML document, use gt. A table that has to arrive in Word looking a particular way, flextable is usually less work, though gt writes docx too and is worth trying first. And regression tables from modelsummary, which is the next lecture, can be handed to either, so the choice there is whichever you already know.
+
+</details>
+
++ Writing to a **website** or a Quarto HTML document: `gt`.
++ A table that must arrive in **Word** looking a particular way: try `gt` first, fall back to `flextable`.
++ **Regression tables** from `modelsummary` (next lecture): it produces either, so use whichever you know.
+
+:::
+<!--end of panel-->

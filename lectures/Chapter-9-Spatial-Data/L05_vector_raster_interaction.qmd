@@ -27,7 +27,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -164,9 +164,6 @@ The usual arrangement, and this deck is one of the more practical ones, built ar
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -184,10 +181,6 @@ The usual arrangement, and this deck is one of the more practical ones, built ar
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
 
 
-:::
-::: {.column width="30%"}
-:::
-:::
 
 ## Cropping and masking raster data {#sec-crop-mask}
 
@@ -238,9 +231,6 @@ Two operations, and they sound similar but do different things. Cropping cuts th
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 
 **Objective 1**
 
@@ -260,14 +250,6 @@ Two operations, and they sound similar but do different things. Cropping cuts th
 
 + We can create a map without any unnecessary cells presented 
 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ### Crop
 
@@ -633,9 +615,6 @@ Back to the field experiment, and here is the reason for everything in this sect
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + Right now, corn yields (`corn_yield`), NDRE (`NDRE`), and treatment blocks (`treatment_blocks`) are separate R objects. 
 
 + We would like to conduct two kinds of analysis
@@ -645,14 +624,6 @@ Back to the field experiment, and here is the reason for everything in this sect
 + To achieve this, we would like to `join` them based on their locations
   + extract values from `NDRE` to `corn_yield`
   + extract values from `NDRE` to `treatment_blocks`
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### How (to points)
@@ -893,9 +864,6 @@ NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDR
 
 ##### Why
 
-::: {.columns}
-
-::: {.column width="70%"}
 + In the previous cases of extraction and summarization tasks, all the intersecting cells are given the same weight irrespective of the degree of spatial overlap. 
 
 + This is very much acceptable in the current application, because the resolution of the raster data is high (cells are so small) relative to the size of the polygons.
@@ -904,14 +872,6 @@ NDRE_extracted_tb <- terra::extract(NDRE, st_transform(treatment_blocks, crs(NDR
 
 <br>
 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ##### How
 

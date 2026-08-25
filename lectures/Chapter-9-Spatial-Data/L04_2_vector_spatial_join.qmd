@@ -26,7 +26,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -179,9 +179,6 @@ Same arrangement as always. One habit that pays off particularly on this deck: a
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -199,10 +196,6 @@ Same arrangement as always. One habit that pays off particularly on this deck: a
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
 
 
-:::
-::: {.column width="30%"}
-:::
-:::
 
 ## Spatial join {#sec-spatial-join}
 
@@ -923,20 +916,9 @@ Back to the problem the polygons-against-polygons section left open. A simple av
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + In the example of finding average nitrogen use by HUC unit using `st_join()`, we had a problem of not knowing how much of each of the intersecting counties shares the same area with the HUC unit.
 
 + If we can get the geometry of the intersecting part of the HUC unit and the county, then we can calculate its area, which in turn allows us to find area-weighted averages of joined attributes.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### How
@@ -948,22 +930,11 @@ The function is st_intersection, and the name is confusingly close to st_interse
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 For these purposes, we can use `sf::st_intersection()`.
 
 + While `st_intersects()` returns the indices of intersecting objects, `st_intersection()` returns intersecting spatial objects with the non-intersecting parts of the `sf` objects cut out. 
 
 + Moreover, attribute values of the source `sf` will be merged to its intersecting `sfg` in the target `sf`. 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### lines vs polygons

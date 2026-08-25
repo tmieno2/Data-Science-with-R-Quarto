@@ -112,6 +112,7 @@ R has an object class called `Date`.
 This is a date as `character`.
 
 ```{webr-r}
+#| code-track: 0.4
 a_date <- "2024-09-12"
 class(a_date)
 ```
@@ -121,6 +122,7 @@ class(a_date)
 This is a date as `Date`.
 
 ```{webr-r}
+#| code-track: 0.4
 #--- date as Date ---#
 a_date_as_Date <- as.Date(a_date)
 class(a_date_as_Date)
@@ -255,9 +257,7 @@ Often you do not want the whole date, you want a piece of it. The year for group
 
 </details>
 
-::: {.columns}
 
-::: {.column width="40%"}
 You can extract components (year, month, day) from a `Date` object using various helper functions offered by `lubridate`. 
 
 + `year()`: year
@@ -265,13 +265,12 @@ You can extract components (year, month, day) from a `Date` object using various
 + `mday()`: day of month 
 + `yday()`: day of year
 + `wday()`: day of week
-:::
-<!--end of the 1st column-->
-::: {.column width="60%"}
+
 **Examples**
 
 ```{webr-r}
 #| autorun: true
+#| code-track: 0.5 
 pizzaplace %>% 
   mutate(date = ymd(date)) %>%
   distinct(date) %>% 
@@ -285,11 +284,6 @@ pizzaplace %>%
   ) %>% 
   select(year, month, mday, yday, wday)
 ```
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
-
 
 
 ### math
@@ -323,11 +317,25 @@ You can use `seq()` to create a sequence of dates, where the incremental step is
 
 <br>
 
+By year:
+
 ```{webr-r}
 seq(ymd("2015-05-01"), ymd("2020-05-01"), by = "years")
+```
 
+<br>
+
+By week:
+
+```{webr-r}
 seq(ymd("2015-05-01"), ymd("2015-06-01"), by = "weeks")
+```
 
+<br>
+
+By day:
+
+```{webr-r}
 seq(ymd("2015-05-01"), ymd("2015-05-09"), by = "days")
 ```
 
@@ -424,6 +432,7 @@ Joining strings together, with str underscore c. Read the sentence at the top ca
 **concatenate**
 
 ```{webr-r}
+#| code-track: 0.5
 stringr::str_c("R", "rocks")
 ```
 
@@ -432,6 +441,7 @@ stringr::str_c("R", "rocks")
 **order matters**
 
 ```{webr-r}
+#| code-track: 0.5
 stringr::str_c("rocks", "R")
 ```
 
@@ -440,6 +450,7 @@ stringr::str_c("rocks", "R")
 **separator**
 
 ```{webr-r}
+#| code-track: 0.5
 stringr::str_c("R", "rocks", sep = "+")
 ```
 
@@ -449,6 +460,7 @@ stringr::str_c("R", "rocks", sep = "+")
 
 
 ```{webr-r}
+#| code-track: 0.5
 stringr::str_c("R ", "rocks", ", right", "?", sep = "")
 ```
 
@@ -914,18 +926,21 @@ stringr::str_pad(strings, string length, side, padding symbol)
 **Examples**
 
 ```{webr-r}
+#| code-track: 0.6
 stringr::str_pad("I am sick of R", 20, side = "left", pad = "?") 
 ```
 
 <br>
 
 ```{webr-r}
+#| code-track: 0.6
 stringr::str_pad("I am sick of R", 30, side = "both", pad = "?") 
 ```
 
 <br>
 
 ```{webr-r}
+#| code-track: 0.6
 stringr::str_pad("I am sick of R", 20, side = "right", pad = "-") 
 ```
 

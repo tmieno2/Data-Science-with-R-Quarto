@@ -751,7 +751,7 @@ The third of the three, controlling the cell itself: background colour, margins,
 
 **Syntax**
 
-```{r}
+```{webr-r}
 ?fp_cell
 ```
 
@@ -1429,7 +1429,7 @@ ft %>%  merge_v(j = ~ region)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Autofit adjusts column widths to suit the content. The example makes the point by putting an absurdly long country name into the first column and showing before and after. Before, the text wraps badly. After, the column has widened so more fits on a single line. Read the last sentence carefully though, because it is the useful caveat. Autofit will not let the whole table exceed the page width. So it is balancing the columns against each other within a fixed budget, rather than simply making each one as wide as its content would like.
+Autofit adjusts column widths to suit the content. The example makes the point by putting an absurdly long country name into the first column and showing before and after. Before, the text wraps badly. After, the column has widened so more fits on a single line. Read the last sentence carefully though, because it corrects something this slide used to get wrong. Autofit does not stop the table from running off the page. It sizes each column to its content and lets the total go wherever it goes, so one long value can push the table far wider than the paper. The function that caps the total width is fit to width, and it is on the next tab.
 
 </details>
 
@@ -1462,7 +1462,54 @@ tab_data %>%
   merge_v(j = ~ region) %>% autofit()
 ```
 
-It adjusted the width of the 1st column so that more texts are displayed in a single row. But, the width of the entire table does not go over the limit of the paper.
+It adjusted the width of the 1st column so that more texts are displayed in a single row.
+
+:::{.callout-warning}
+`autofit()` does [not]{style="color: blue;"} keep the table inside the page width. It sizes every column to fit its content and lets the total width go wherever that lands. Here the table ends up far wider than a page. Use `fit_to_width()` (next tab) when you need a ceiling. <!-- CHANGED: said "the width of the entire table does not go over the limit of the paper". Verified false: a 2-column table with one long cell goes from 1.5 in to 12.0 in after autofit(), with no cap. -->
+:::
+:::
+<!--end of the 2nd column-->
+:::
+<!--end of the columns-->
+
+### `fit_to_width()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the one that does what people expect autofit to do. You give it a maximum width in inches and it shrinks the columns until the whole table fits inside it. Same overlong country name as the previous tab, same autofit call, then a ceiling of six inches on top. The columns end up narrower and the long text wraps again, which is the trade you are making. Reach for this when a table is going into a document with a fixed page width and you would rather have wrapped text than a table running off the edge.
+
+</details>
+
+`fit_to_width()` shrinks the columns until the whole table fits inside the maximum width you give it (in inches).
+
+::: {.columns}
+
+::: {.column width="50%"}
+**`autofit()` only**
+
+```{r}
+tab_data %>%
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  autofit()
+```
+:::
+<!--end of the 1st column-->
+::: {.column width="50%"}
+**`autofit()` then `fit_to_width()`**
+
+```{r}
+tab_data %>%
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  flextable(
+    col_keys = c("country_name", "region", "y_1995", "y_2005")
+  ) %>% 
+  autofit() %>% 
+  fit_to_width(max_width = 6)
+```
 :::
 <!--end of the 2nd column-->
 :::
@@ -1524,7 +1571,9 @@ We can save the table in various formats.
 
 + `save_as_docx()`: docx (WORD)
 + `save_as_pptx()`: pptx (Power Point)
-+ `save_as_image()`: image (png, pdf, jpeg) with help from the `webshot2` package
++ `save_as_image()`: image (`png` or `svg` only) <!-- CHANGED: said "(png, pdf, jpeg) with help from the webshot2 package". flextable 0.9 draws the image with R's own graphics; webshot2 is not involved and pdf/jpeg are rejected. -->
++ `save_as_html()`: html
++ `save_as_rtf()`: rtf
 
 Let's create a table for demonstration:
 
@@ -1562,23 +1611,16 @@ save_as_pptx(table_temp, path = "temp_table.pptx")
 <details class="transcript">
 <summary>Transcript</summary>
 
-And saving as an image, for when you need a picture rather than an editable table, typically for slides or a preprint. This route needs the webshot2 package, which drives a headless browser to take the screenshot. Note the install line has been updated: webshot2 is on CRAN now, so a plain install packages call is all you need rather than pulling it from GitHub. For pdf output, look at the zoom argument in the last example. Raising it increases the resolution, which matters if the image is going anywhere near print.
+And saving as an image, for when you need a picture rather than an editable table, typically for slides or a preprint. This used to need the webshot2 package and a headless browser. It no longer does. Current flextable draws the image with R's own graphics, so there is nothing extra to install. Two things to note. Only png and svg are accepted now, and asking for a pdf is an error rather than a fallback. And resolution is set with res rather than the old zoom argument, so res equals three hundred is what you want if the image is going anywhere near print.
 
 </details>
 
-First install the `webshot2` package.
+<!-- CHANGED: this tab used to install webshot2 and export a pdf with zoom =/webshot =.
+     None of that works any more. save_as_image() is now
+     save_as_image(x, path, expand = 10, res = 200), it needs no extra package,
+     and a .pdf path errors with: 'arg' should be one of "png", "svg". -->
 
-```{r eval = F}
-#--- install ---#
-#--- CHANGED: was remotes::install_github("rstudio/webshot2"). webshot2 has
-#--- been on CRAN since 2021 (currently 0.1.2), so no GitHub install needed.
-install.packages("webshot2")
-
-#--- library ---#
-library(webshot2)
-```
-
-<br>
+No extra package to install. `save_as_image()` draws the table with R's own graphics.
 
 **png**
 
@@ -1588,10 +1630,24 @@ save_as_image(table_temp, path = "temp_table.png")
 
 <br>
 
-**pdf**
+**png, at print resolution**
 
 ```{r eval = F}
-save_as_image(table_temp, path = "temp_table.pdf", zoom = 10, webshot = "webshot2") 
+save_as_image(table_temp, path = "temp_table.png", res = 300) 
 ```
+
+<br>
+
+**svg** (vector, so it stays sharp at any size)
+
+```{r eval = F}
+save_as_image(table_temp, path = "temp_table.svg") 
+```
+
+<br>
+
+:::{.callout-note}
+`path` must end in `.png` or `.svg`. Asking for a `.pdf` or a `.jpeg` is an error, not a silent fallback. If you need a pdf, save the `svg` and convert it, or put the table straight into a document with `save_as_docx()`.
+:::
 :::
 <!--end of panel-->

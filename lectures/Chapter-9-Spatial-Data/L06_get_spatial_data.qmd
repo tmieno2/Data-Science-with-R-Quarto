@@ -27,7 +27,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -131,9 +131,6 @@ One important difference on this deck. Most of the code here is shown but not ru
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -150,10 +147,6 @@ One important difference on this deck. Most of the code here is shown but not ru
 + If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
 
-:::
-::: {.column width="30%"}
-:::
-:::
 
 ## U.S. county and state boundary {#sec-tigris}
 
@@ -259,22 +252,11 @@ Quick Stats is the USDA's statistical warehouse, and it holds a great deal: acre
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + [USDA NASS Quick Stats](https://quickstats.nass.usda.gov/) provides a wealth of agriculture-related datasets such as  harvested acres or irrigated acres by crop at different spatial resolutions (e.g., state, county) from both survey and census.
 
 + We use the `tidyUSDA` package to download data from USDA NASS Quick Stats.
 
 + A nice thing about `tidyUSDA` is that it gives you an option to download data as an `sf` object, which means you can immediately visualize the data or spatially interact it with other spatial objects.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ### How
 
@@ -452,19 +434,9 @@ Two ways this API will refuse you, both worth knowing before they happen. The fi
 
 #### Caveat 1 {#sec-caveat-num-limit}
 
-::: {.columns}
-
-::: {.column width="70%"}
 You cannot retrieve more than 50,000 (the limit is set by QuickStat) rows of data. The query below requests far more than 50,000 observations, and fails. In this case, you need to narrow the search and chop the task into smaller tasks.
 
 Replace `nass_api_key` with your own API key and run the code on your computer.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ```{r, eval = F}
@@ -483,18 +455,7 @@ many_states_corn <-
 
 #### Caveat 2
 
-::: {.columns}
-
-::: {.column width="70%"}
 A query returns an error when no observation satisfies your query criteria. For example, even though "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE" does exists as a `data_item`, there is no entry for the statistic in Illinois in 2018. Therefore, the following query fails.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ```{r, eval = F}
@@ -654,18 +615,7 @@ PRISM is the standard source for United States weather in applied work: daily pr
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 The [PRISM dataset](https://prism.oregonstate.edu/) provides model-based estimates of daily precipitation, maximum temperature, and minimum temperature for the U.S. at the 4km by 4km spatial resolution.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ```{r, echo = FALSE}
@@ -740,9 +690,6 @@ This one you genuinely have to run yourself, since it writes files to disk. Five
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 
 First set the path:
 
@@ -767,14 +714,6 @@ prism::get_prism_dailys(
 ```
 
 This will create a single folder for each day of the specified date range. Inside each folder you will see a bunch of files sharing one name and differing only in extension.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ### Read PRISM files 
 
@@ -785,21 +724,10 @@ The practical problem: a year of daily data is three hundred and sixty-five fold
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 As you have seen, we would have many files to open unless the specified date range is very short. Rather than naming them one by one, list them programmatically.
 
 First, the following code gives you the names of all the PRISM files with the **.bil** extension.
 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ```{r}
 (
@@ -904,9 +832,6 @@ The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + The Cropland Data Layer (CDL) is a data product produced by the National Agricultural Statistics Service of U.S. Department of Agriculture. 
 
 + CDL provides geo-referenced, high accuracy, 30 (after 2007) or 56 (in 2006 and 2007) meter resolution, crop-specific cropland land cover information for up to 48 contiguous states in the U.S. from 1997 to the present. 
@@ -914,14 +839,6 @@ The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre
 + This data product has been extensively used in agricultural research. CropScape is an [interactive Web CDL exploring system](https://nassgeodata.gmu.edu/CropScape/), and it was developed to query, visualize, disseminate, and analyze CDL data geospatially through standard geospatial web services in a publicly accessible on-line environment (Han et al., 2012).
 
 + This section shows how to use the CropScapeR package (Chen 2020) to download and explore the CDL data. 
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns--> 
 
 
 ### `CropScapeR` package
@@ -933,9 +850,6 @@ The package offers four functions, but one of them does the work. GetCDLData dow
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 + The package implements some of the most useful geospatial processing services provided by the CropScape, and it allows users to efficiently process the CDL data within the R environment. 
 
 + Specifically, the CropScapeR package provides four functions that implement different kinds of geospatial processing services provided by the CropScape. 
@@ -945,14 +859,6 @@ The package offers four functions, but one of them does the work. GetCDLData dow
 + The other functions provide the users with the CDL data summarized or transformed in particular manners that may suit the need of some users.
 
 <!-- Note: There is a known problem with Mac users requesting CDL data services using the CropScape API, which causes errors when using the functions provided by the package. Please see section 9.2.4 for a workaround. -->
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 ### How

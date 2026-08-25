@@ -26,7 +26,7 @@ webr:
     dpi: 216
     fig-width: 7
     fig-height: 4.5
-    out-width: 55%
+    out-width: 100%
 filters:
   - webr
 ---
@@ -178,9 +178,6 @@ Same arrangement as the other decks. The blue-tinted boxes are live R sessions r
 
 <br>
 
-::: {.columns}
-
-::: {.column width="70%"}
 ### Interactive navigation tools
 
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
@@ -196,14 +193,6 @@ Same arrangement as the other decks. The blue-tinted boxes are live R sessions r
 + You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
 + If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
 + You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ## The `terra` and `raster` packages: Basics {#sec-basics}
 
@@ -218,9 +207,6 @@ There are two packages for raster data and you need to know both names, though y
 
 </details>
 
-::: {.columns}
-
-::: {.column width="50%"}
 + The most popular R packages to handle raster data is the `raster` and `terra` packages. They are authored by the same person and `terra` is the successor of `raster`. 
 
 + The `terra` package is now mature and does everything faster than `raster`
@@ -228,14 +214,6 @@ There are two packages for raster data and you need to know both names, though y
 + There are lots of packages that still depend on `raster` and do not work well with R object class defined by `terra`. 
 
 + We primarily learn how to use the `terra` package
-:::
-<!--end of the 1st column-->
-::: {.column width="50%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ### Object class
 
@@ -634,9 +612,6 @@ Raster data arrives in an unreasonable number of file formats. GeoTIFF, with the
 
 </details>
 
-::: {.columns}
-
-::: {.column width="70%"}
 Raster data files can come in numerous different formats. 
 
 + The most common format is GeoTiff (.tif as the file extension)
@@ -645,10 +620,6 @@ Raster data files can come in numerous different formats.
 + Other popular formats include SAGA, ENVI, and many others. 
 
 You can read data of almost all the existing file formats with the `terra` package.
-:::
-::: {.column width="30%"}
-:::
-:::
 
 ### Read with `terra`
 
@@ -846,20 +817,9 @@ Confirm that  `reflec_all_re_read` is the same as `reflec_all`.
 
 #### Let's try (.nc)
 
-::: {.columns}
-
-::: {.column width="70%"}
 While you can use `terra::writeRaster()` to write to a netCDF file, you will get a note saying that you should consider using `terra::writeCDF()`. 
 
 Write `reflec_all` to a netCDF file. Mine looks like this.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 ```{r, eval = FALSE}
 terra::writeCDF(reflec_all, "data/reflec_all.nc")
@@ -886,9 +846,6 @@ Raster arithmetic works cell by cell, exactly like vector arithmetic. Add two la
 
 #### Introduction
 
-::: {.columns}
-
-::: {.column width="70%"}
 + You can do basic arithmetic operations (addition, subtraction, division, etc) using raster layers as long as they share the same spatial extent and resolution
   
 + You can also apply a function like `log()` to transform the value of the cells
@@ -896,20 +853,14 @@ Raster arithmetic works cell by cell, exactly like vector arithmetic. Add two la
 + Raster arithmetic operations are done element-by-element (cell-by-cell) just like vector arithmetic operations.
 
 For example, when two `RasterLayer`s are added, then the two values associated with the same cell are added and the resulting value becomes the new value for the cell in the newly created `RasterLayer`.
-:::
-<!--end of the 1st column-->
-::: {.column width="30%"}
-
-:::
-<!--end of the 2nd column-->
-:::
-<!--end of the columns-->
 
 
 #### Example
 
 ```{webr-r}
-reflec_b_plus_g <- reflec_blue + log(reflec_green)
+(
+  reflec_b_plus_g <- reflec_blue + log(reflec_green)
+)
 ```
 
 <br>
@@ -917,12 +868,7 @@ reflec_b_plus_g <- reflec_blue + log(reflec_green)
 Did it work? The first number below should be the sum of the other two.
 
 ```{webr-r}
-#--- CHANGED: unlist() added. Each [] returns a one-row data.frame, so a bare  ---#
-#--- c() of three of them builds a list of three data.frames, printed as three ---#
-#--- separate blocks — two of which are labelled "blue". unlist() collapses it ---#
-#--- to one named numeric vector you can read across.                          ---#
-c(reflec_b_plus_g[10100], reflec_blue[10100], log(reflec_green[10100])) %>%
-  unlist()
+c(reflec_b_plus_g[10100], reflec_blue[10100], log(reflec_green[10100])) %>% unlist()
 ```
 
 <br>
@@ -1005,9 +951,6 @@ Aggregating makes cells bigger and the grid coarser. The reason is usually pract
 
 #### Motivation
 
-::: {.columns}
-
-::: {.column width="70%"}
 Sometimes, you want to make your raster data have a lower resolution. For example, satellite image is often very fine with spatial resolution of say 30cm. When trying to create a map using the data, it takes a long time for R to render a plot and also the size of the figure can be very large.
 
 ```{webr-r}
@@ -1016,13 +959,6 @@ reflec_blue
 
 <br>
 
-:::
-
-::: {.column width="30%"}
-
-:::
-
-:::
 
 #### How and Example
 
@@ -1049,6 +985,7 @@ there, which takes the most common value in the block.
 **Example**
 
 ```{webr-r}
+#| autorun: true
 (
 reflec_blue_agg_5 <- aggregate(reflec_blue, fact = 5)
 )
@@ -1058,22 +995,20 @@ reflec_blue_agg_5 <- aggregate(reflec_blue, fact = 5)
 
 Let's compare before and after. After aggregating by a factor of 5, the map is visibly coarser. Maybe this was too much. 
 
-::: {.columns}
-
-::: {.column width="50%"}
 
 ```{webr-r}
+#| autorun: true
+#| code-track: 0.3
 plot(reflec_blue)
 ```
-:::
 
-::: {.column width="50%"}
+<br>
+
 ```{webr-r}
+#| autorun: true
+#| code-track: 0.3
 plot(reflec_blue_agg_5)
 ```
-:::
-
-:::
 
 #### Exercise 
 
@@ -1210,6 +1145,7 @@ which is neither. Pass `method = "near"` explicitly for any categorical layer.
 Since we are resampling values from the `soil` layer onto the grids of `precip`, `soil` comes first and `precip` second:
 
 ```{webr-r}
+#| layout: stacked
 soil_to_precip_grids <- resample(soil, precip, method = "cubicspline")
 
 plot(soil_to_precip_grids)
@@ -1243,9 +1179,11 @@ For demonstration purpose, we will use two `SpatRaster` objects: `prism_saunders
 
 ```{webr-r}
 #| autorun: true
+#| code-track: 0.4 
 ggplot() +
   geom_spatraster(data = prism_saunders) +
-  geom_spatraster(data = prism_douglas)
+  geom_spatraster(data = prism_douglas) +
+  scale_fill_viridis_c()
 ```
 
 :::{.callout-note}
@@ -1265,8 +1203,10 @@ prism_merged <- terra::merge(prism_saunders, prism_douglas)
 You can check the result of the merging below:
 
 ```{webr-r}
+#| code-track: 0.4 
 ggplot() +
-  geom_spatraster(data = prism_merged)
+  geom_spatraster(data = prism_merged) +
+  scale_fill_viridis_c()
 ```
 
 <br>
