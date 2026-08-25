@@ -345,9 +345,9 @@ We can use
 to control the following elements of axes:
 
 + `name`: an axis title 
-+ `limit`: the range of an axis
++ `limits`: the range of an axis
 + `breaks`: axis ticks positions
-+ `label`: axis texts at ticks
++ `labels`: axis texts at ticks
 
 :::{.callout-note}
 + We use `scale_x_discrete()` if `x` is a discrete variable (not numeric) and `scale_x_continuous()` if `x` is a continuous variable (numeric).
@@ -394,7 +394,7 @@ g_box +
 <details class="transcript">
 <summary>Transcript</summary>
 
-Limits control the range of an axis, and again you get the long form through the scale function and the shorthand ylim. But read the third option on this slide carefully, because it is the important one. Setting a limit does not zoom the plot; it throws away the data outside the range before drawing, which is why you may see a warning about removed rows. For a boxplot that genuinely matters, because a box computed from a truncated sample is not the same box. If what you want is to zoom in without changing the statistics, filter the data deliberately and say so, or look up coord_cartesian.
+Limits control the range of an axis, and again you get the long form through the scale function and the shorthand ylim. But read the third option on this slide carefully, because it is the important one. Setting a limit does not zoom the plot; it throws away the data outside the range before drawing, which is why you may see a warning about removed rows. For a boxplot that genuinely matters, because a box computed from a truncated sample is not the same box. To zoom without changing the computed statistics, use coord_cartesian with ylim set to 100 through 200.
 
 </details>
 
@@ -412,7 +412,7 @@ g_box +
   scale_y_continuous(
     name = "Corn Yield (bu/acre)",
     #--- first min, second max ---#
-    limit = c(100, 200)
+    limits = c(100, 200)
   )
 ```
 
@@ -434,14 +434,14 @@ g_box +
 
 Or,
 
-You can filter the data first and then use the filtered data.
+To zoom without changing computed statistics, use `coord_cartesian(ylim = c(100, 200))`.
 
 ### breaks and labels
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two related controls. breaks decides where the tick marks sit, and labels decides what text appears at them. Look at the y axis here: limits from 100 to 200 with breaks every 10. Now look at the x axis, where labels is given a little function that strips the 20 from the front of each year, so 2005 prints as 05. The callout explains why a function is better than a plain vector. A vector of labels has to match the number of breaks exactly, and if the data changes so that there are more or fewer breaks, your labels silently attach to the wrong ticks. A function is applied to whatever the breaks turn out to be, so it cannot fall out of step.
+Two related controls. breaks decides where the tick marks sit, and labels decides what text appears at them. Look at the y axis here: limits from 100 to 200 with breaks every 10. Now look at the x axis, where labels is given a little function that strips the 20 from the front of each year, so 2005 prints as 05. The callout explains why a function is better than a plain vector. A fixed vector of labels can become mismatched with automatically generated breaks and fail if the number of breaks changes. A function is applied to whatever the breaks turn out to be, so it cannot fall out of step.
 
 </details>
 
@@ -461,7 +461,7 @@ g_box +
   ) +
   scale_y_continuous(
     name = "Corn Yield (bu/acre)",
-    limit = c(100, 200),
+    limits = c(100, 200),
     breaks = seq(100, 200, by = 10)
   )
 ```
@@ -513,11 +513,11 @@ Here are the list of changes you need to make:
 
 + x-axis 
   * change the x-axis title to "Month"
-  * change the limit of the x-axis title to 4 through 8
+  * change the x-axis range to 4 through 8
   * change the breaks and their labels of the x-axis ticks to 4 through 8
 + y-axis 
   * change the y-axis title to "Average Arrival Delay (minutes)"
-  * change the limit of the y-axis title to 0 through 25
+  * change the y-axis range to 0 through 25
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
@@ -530,12 +530,12 @@ Here are the list of changes you need to make:
 gg_delay +
   scale_x_continuous(
     name = "Month",
-    limit = c(4, 8),
+    limits = c(4, 8),
     breaks = 4:8
   ) +
   scale_y_continuous(
     name = "Average Arrival Delay (minutes)",
-    limit = c(0, 25)
+    limits = c(0, 25)
   )
 ```
 
@@ -561,12 +561,12 @@ gg_delay +
 gg_delay +
   scale_x_continuous(
     name = "Month",
-    limit = c(4, 8),
+    limits = c(4, 8),
     breaks = 4:8
   ) +
   scale_y_continuous(
     name = "Average Arrival Delay (minutes)",
-    limit = c(0, 25)
+    limits = c(0, 25)
   )
 ```
 
@@ -608,7 +608,7 @@ We are going to build on this figure in this section:
     ) +
     scale_y_continuous(
       name = "Corn Yield (bu/acre)",
-      limit = c(100, 200),
+      limits = c(100, 200),
       breaks = seq(100, 200, by = 10)
     )
 )
@@ -695,7 +695,7 @@ g_axis +
 <details class="transcript">
 <summary>Transcript</summary>
 
-The other layout control you will reach for is the number of rows or columns. Setting nrow to two wraps the entries onto two lines instead of one. This matters when a legend has many categories: left to itself it makes one tall column down the right-hand side, which squeezes the plot area. Wrapping the entries into a short wide block, and then putting it underneath the figure, is often the difference between a figure that fits on a slide and one that does not.
+The other layout control you will reach for is the number of rows or columns. Setting nrow to two arranges the legend keys into two rows instead of the default single column. This matters when a legend has many categories: left to itself it makes one tall column down the right-hand side, which squeezes the plot area. Wrapping the entries into a short wide block, and then putting it underneath the figure, is often the difference between a figure that fits on a slide and one that does not.
 
 </details>
 
@@ -1024,7 +1024,7 @@ We will discuss how to change the color scheme of legends in much more detail la
 <details class="transcript">
 <summary>Transcript</summary>
 
-The starting point for this section, and it is worth looking at what it does. It takes our axis-styled figure and adds a fill scale with the Paired palette, arranged in two rows with the title on the left. So all the legend content decisions are already made. Everything in the following tabs is pure theme applied on top of that, which keeps the two kinds of change cleanly separated.
+The starting point for this section, and it is worth looking at what it does. It takes our axis-styled figure and adds a fill scale with the Paired palette, arranged in two rows with the title on the left. The following tabs combine one content change, labs fill set to State, with accumulating theme changes.
 
 </details>
 
@@ -1186,7 +1186,7 @@ See the full list of pre-made themes [here](https://yutannihilation.github.io/al
 <details class="transcript">
 <summary>Transcript</summary>
 
-Six themes on the same figure, so click through them and see the range. theme_bw is the sober one you will probably use most, white background with grid lines. theme_void removes essentially everything, which is what you want for a map. Then stata, gdocs, economist and excel, imitating other software and publications. Two things to notice as you click. First, how much changes with one function call. Second, that a theme only touches appearance; the data, the axis titles, and the colour meanings are identical throughout.
+Six themes on the same figure, so click through them and see the range. theme_bw is the sober one you will probably use most, white background with grid lines. theme_void removes essentially everything, which is what you want for a map. Then stata, gdocs, economist and excel, imitating other software and publications. Two things to notice as you click. First, how much changes with one function call. Second, that a theme only touches appearance; the underlying labels, mappings, and data remain unchanged, although themes such as theme_void hide the axis titles.
 
 </details>
 
@@ -1444,25 +1444,25 @@ After this, all of your figures will follow  `my_theme`.
 <details class="transcript">
 <summary>Transcript</summary>
 
-Faceted figures have parts that ordinary figures do not, and they need their own names. The strip is the little labelled bar along the edge of each panel telling you which group it holds. So there is strip.background for the bar itself, strip.text for the words in it, strip.placement for where it sits, and panel.spacing for the gaps between panels. If you have ever wanted to make those labels readable and not known what to call them, this is the vocabulary.
+Faceted figures have parts that ordinary figures do not, and they need their own names. The strip is the little labelled bar along the edge of each panel telling you which group it holds. So there is strip.background for the bar itself, strip.text for the words in it, and strip.placement for where it sits. The gaps between panels are controlled separately with panel.spacing. If you have ever wanted to make those labels readable and not known what to call them, this is the vocabulary.
 
 </details>
 
-Faceted figures have `strip` elements that do not exist for non-faceted figures, such as
+Faceted figures have `strip` elements that do not exist for non-faceted figures:
 
 + `strip.background`
 + `strip.placement`
 + `strip.text`
-+ `panel.spacing`
 
-We learn how to modify these elements. 
+They also have panel-spacing elements such as `panel.spacing`. We learn how to modify these elements.
+
 
 ### Preparation
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-The setup for this section, and note that it deliberately cuts the data down to three states and two years. That is not just to keep the example small; it is the lesson from the faceting lecture applied again. A grid of six panels can be read, and a grid of sixty cannot. Then we build the faceted histogram we will restyle, with free x scales so each panel gets an axis suited to its own data.
+The setup for this section, and note that it deliberately cuts the data down to three states and two years. That is not just to keep the example small; it is the lesson from the faceting lecture applied again. A grid of six panels can be read, and a grid of sixty cannot. Then we build the faceted histogram we will restyle. Each year column gets its own x scale, shared by the three state panels in that column.
 
 </details>
 
@@ -1859,7 +1859,7 @@ We use two types of scale functions for the palettes:
 <details class="transcript">
 <summary>Transcript</summary>
 
-These three tabs display every palette in each family, and they are worth spending a moment with. Look at the sequential ones and see the brightness climb steadily. Look at the diverging ones and see the pale midpoint with colour intensifying in both directions. Then look at the qualitative ones and notice that the colours are equally bright, deliberately, because none of those categories is meant to look more important than another. Matching the family to the kind of variable you have is most of what good colour choice consists of.
+These three tabs display every palette in each family, and they are worth spending a moment with. Look at the sequential ones and see the brightness climb steadily. Look at the diverging ones and see the pale midpoint with colour intensifying in both directions. Then look at the qualitative ones and notice that they primarily distinguish categories by hue rather than a steady lightness progression. Their colours are not equally bright, and palettes such as Paired and Accent vary substantially in lightness. Matching the family to the kind of variable you have is most of what good colour choice consists of.
 
 </details>
 
@@ -2102,4 +2102,3 @@ So the long stretch from 130 to 235 bu/acre is one slow orange-to-green blend, w
 
 :::
 <!--end of panel-->
-

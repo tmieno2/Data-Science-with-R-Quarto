@@ -53,11 +53,11 @@ Same code-box conventions as always, with one thing to flag. Unlike most decks i
 
 </details>
 
-+ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
-+ Hit the "Run Code" button to execute all the code inside the code area.
-+ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ The box area with a hint of blue as the background color displays read-only code (hereafter referred to as the "code area").
++ These chunks are read-only, so copy their code and run it in RStudio.
++ To evaluate all or part of the code, paste it into RStudio first.
 + If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
-+ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
++ The original code remains unchanged on the slide.
 
 :::
 <!--end of panel-->
@@ -561,7 +561,7 @@ Using the `output` option in `modelsummary::msummary()`, you can turn the regres
 **Example: flextable**
 
 ```{r}
-#--- create a regression table and turn it into a gt_tbl ---#
+#--- create a regression table and turn it into a flextable object ---#
 reg_table_ft <- list(model_1_corn, model_1_soy)%>% 
   modelsummary::msummary(output = "flextable")
 
@@ -909,19 +909,19 @@ For each of the variables on the left-hand side, each of the statistics on the r
 <details class="transcript">
 <summary>Transcript</summary>
 
-A shortcut for the common case of summarising everything numeric. All wraps your dataset and expands to all its numeric columns, so you do not have to name them. Note the caveat above the example, which is the sort of thing you would otherwise lose twenty minutes to. It does not work on a tibble, so you wrap the data in data dot frame on the fly. That is why the example has data dot frame around county yield inside All, which otherwise looks redundant. It is not. It is working around a limitation.
+A shortcut for the common case of summarising everything numeric. All wraps your dataset and expands to all its numeric columns, so you do not have to name them. In current modelsummary, All can summarise the numeric columns of a tibble directly. That is why the example passes county yield straight to All, without wrapping it in data dot frame.
 
 </details>
 
 You can use `All()` to create a summary table for all the numeric variables in the dataset.
 
-At the moment, `All()` does not work on `tibble`. So, if your dataset is `tibble`, convert it to a `data.frame` on the fly in the code like below:
+In current `modelsummary`, `All()` can summarize the numeric columns of a `tibble` directly.
 
 **Example**:
 
 ```{r all, cache = F}  
 modelsummary::datasummary(
-  All(data.frame(county_yield)) 
+  All(county_yield) 
   ~ Mean + SD, 
   data = county_yield
 )
@@ -1047,7 +1047,7 @@ If you do not like this way of changing labels, you can always use `gt` package.
 <details class="transcript">
 <summary>Transcript</summary>
 
-How to pass arguments to a statistic. You multiply the statistic by Arguments, in parentheses, listing what you want passed through. The example does two things with it. It adds na dot rm equals TRUE to the lowercase base mean and sd, which is exactly what the capitalised versions do for you automatically. And it passes prob equals nought point one to quantile, which is the only way to say which quantile you actually want. That second use is the one you will need, since quantile without a probability is not a well-defined request.
+How to pass arguments to a statistic. You multiply the statistic by Arguments, in parentheses, listing what you want passed through. The example does two things with it. It adds na dot rm equals TRUE to the lowercase base mean and sd, which is exactly what the capitalised versions do for you automatically. And it passes probs equals nought point one to quantile to request one scalar quantile suitable for this table. Without probs, quantile returns its five default quantiles rather than one scalar value.
 
 </details>
 
@@ -1064,7 +1064,7 @@ county_yield %>%
   modelsummary::datasummary(
     corn_yield 
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) +
-      quantile * Arguments(prob = 0.1, na.rm = TRUE), 
+      quantile * Arguments(probs = 0.1, na.rm = TRUE), 
     data = .
   )
 ```
@@ -1072,7 +1072,7 @@ county_yield %>%
 <br>
 
 + `(mean + sd) * Arguments(na.rm = TRUE)` adds `na.rm = TRUE` option to `mean()` and `sd()`
-+ `quantile * Arguments(prob = 0.1, na.rm = TRUE)` adds `prob = 0.1` and `na.rm = TRUE` to `quantile()`
++ `quantile * Arguments(probs = 0.1, na.rm = TRUE)` adds `probs = 0.1` and `na.rm = TRUE` to `quantile()`
 
 ### title and notes
 
@@ -1092,7 +1092,7 @@ county_yield %>%
   modelsummary::datasummary(
     corn_yield 
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + 
-      quantile * Arguments(prob = 0.1, na.rm = TRUE),  
+      quantile * Arguments(probs = 0.1, na.rm = TRUE),  
     data = .,
     title = "A title",
     notes = c("first note", "second note")
@@ -1104,7 +1104,7 @@ county_yield %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-Column alignment, controlled by the align argument. You pass a single string with one letter per column: l for left, r for right, c for centre. So the nth letter aligns the nth column, and the string needs to be as long as the table is wide. The example uses four letters for a four-column table. Only those three letters are valid, so a stray character will not do what you hope. In practice you want left for the label column and right for the numbers, which is what makes columns of figures line up.
+Column alignment, controlled by the align argument. You pass a single string with one letter per column: l for left, r for right, c for centre, and d for decimal alignment. So the nth letter aligns the nth column, and the string needs to be as long as the table is wide. The example uses four letters for a four-column table. Only those four letters are valid, so a stray character will not do what you hope. In practice you want left for the label column and either right or decimal alignment for the numbers, which is what makes columns of figures line up.
 
 </details>
 
@@ -1113,8 +1113,9 @@ You can use `align` to align columns. Available alignment are:
 + `l`: left
 + `r`: right
 + `c`: center
++ `d`: align numbers on the decimal point
 
-For `align`, you provide a sequence of the option letters (e.g., `"lrcl"`) <!-- CHANGED: was align() as though a function, and the example string "lrcle" contained an e, which is not one of the three valid letters -->
+For `align`, you provide a sequence of the option letters (e.g., `"lrcl"`) <!-- CHANGED: was align() as though a function, and the example string "lrcle" contained an e, which is not one of the four valid letters -->
 
 The `n`th letter corresponds to `n`th column.
 
@@ -1127,7 +1128,7 @@ county_yield %>%
   modelsummary::datasummary(
     corn_yield 
     ~ state_name * (`This is M E A N` = mean) * Arguments(na.rm = TRUE) + 
-      (`This is Q U A N T I L E` = quantile) * Arguments(prob = 0.1, na.rm = TRUE),
+      (`This is Q U A N T I L E` = quantile) * Arguments(probs = 0.1, na.rm = TRUE),
     data = .,
     align = "lrlc"
   )
@@ -1158,7 +1159,7 @@ This works exactly the same way as the `modelsummary::msummary()` function.
 <details class="transcript">
 <summary>Transcript</summary>
 
-A convenience function for a table economists produce constantly. If you have a treatment and a control group, datasummary balance gives you means and standard deviations for each group side by side, plus a difference, which is the standard way of showing that randomisation worked. The formula is simpler than the general case: variables to summarise on the left, the grouping variable on the right. The example uses state as the grouping variable, which is not really a treatment, but the shape of the output is exactly what you would produce for a real experiment.
+A convenience function for a table economists produce constantly. If you have a treatment and a control group, datasummary balance gives you means and standard deviations for each group side by side. This rendered table shows group means and standard deviations only; difference estimates require the optional estimatr support. The formula is simpler than the general case: variables to summarise on the left, the grouping variable on the right. The example uses state as the grouping variable, which is not really a treatment, but the shape of the output is exactly what you would produce for a real experiment.
 
 </details>
 
@@ -1199,7 +1200,7 @@ county_yield %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-And the last one, a correlation matrix, in a single call with no formula at all. Just pipe in the numeric columns you care about. Note the select calls before it, keeping only numeric variables and then dropping year, because year is numeric but correlating it with anything here would be meaningless. That is worth remembering generally. These convenience functions do not know which of your numeric columns are quantities of interest and which are identifiers or dates. Filtering down to the ones that matter is your job, not theirs.
+And the last one, a correlation matrix, in a single call with no formula at all. Note the select calls before it. The first retains state name plus the numeric columns, and the second drops year because correlating it with anything here would be meaningless. Datasummary correlation then uses the remaining numeric columns. That is worth remembering generally. These convenience functions do not know which of your numeric columns are quantities of interest and which are identifiers or dates. Filtering down to the ones that matter is your job, not theirs.
 
 </details>
 
@@ -1216,4 +1217,3 @@ county_yield %>%
 
 :::
 <!--end of panel-->
-

@@ -231,7 +231,7 @@ You understand
 <details class="transcript">
 <summary>Transcript</summary>
 
-What the sf package gives you, and the first bullet is the important idea. A simple feature holds the geographic information and the attributes together in one dataset. That sounds obvious, but it is exactly what older R spatial packages did not do, and it is why sf feels natural if you already know data frames. Then the list underneath is a preview of the whole spatial section of this course: projection, reading and writing, non-interactive operations like buffers and areas, and interactive ones like spatial joins. Almost everything you will need for applied work is in that list.
+What the sf package gives you, and the first bullet is the important idea. A simple feature holds the geographic information and the attributes together in a data-frame-compatible structure, which is why sf feels natural if you already know data frames. The older sp package also stored attributes and geometry together, but used separate S4 spatial data-frame classes. Then the list underneath is a preview of the whole spatial section of this course: projection, reading and writing, non-interactive operations like buffers and areas, and interactive ones like spatial joins. Almost everything you will need for applied work is in that list.
 
 </details>
 
@@ -431,7 +431,7 @@ Some of the most common types of spatial objects represented by `sfg` are the fo
 <details class="transcript">
 <summary>Transcript</summary>
 
-Starting with the simplest, and building one by hand is the point of the next few tabs. A POINT is just two numbers, so st point of a vector of two values makes one. Run it and look at how it prints: sf shows you the type in capitals followed by the coordinates. Then run the class check, and note that you get two things back, POINT and sfg. That pairing matters. Every geometry you make is an sfg of some particular type, and functions that work on sfg objects work on all of them regardless of type.
+Starting with the simplest, and building one by hand is the point of the next few tabs. A POINT is just two numbers, so st point of a vector of two values makes one. Run it and look at how it prints: sf shows you the type in capitals followed by the coordinates. Then run the class check. The result has dimension class XY, geometry type POINT, and base geometry class sfg. Every geometry you make is an sfg of some particular type, and functions that work on sfg objects work on all of them regardless of type.
 
 </details>
 
@@ -668,7 +668,7 @@ Your turn, and these three are deliberately unguided. Build a POINT, a LINESTRIN
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now upward from single geometries to a column of them. An sfg is one shape; an sfc is a list-column of shapes. st sfc is what builds one, and you hand it a list of sfg objects. Look at what we are combining here, though, because it is unusual: a point, a line, a polygon and a multipolygon all in one sfc. Real data almost never mixes types like this, but it demonstrates that an sfc is genuinely just a list and does not require its contents to be uniform. Run the class check and note that sfc appears alongside the types it contains.
+Now upward from single geometries to a column of them. An sfg is one shape; an sfc is a list-column of shapes. st sfc is what builds one, and you hand it a list of sfg objects. Look at what we are combining here, though, because it is unusual: a point, a line, a polygon and a multipolygon all in one sfc. Real data almost never mixes types like this, but it demonstrates that an sfc is genuinely just a list and does not require its contents to be uniform. Run the class check and note that a mixed geometry column has classes sfc GEOMETRY and sfc. Inspect individual elements to see their specific geometry types.
 
 </details>
 
@@ -817,18 +817,18 @@ Create an `sf` object using the `sfc` object you created in the previous exercis
 <details class="transcript">
 <summary>Transcript</summary>
 
-A section about file formats, and the first bullet explains why we have to care. Most of the GIS world runs on ArcGIS, whose native format is the shapefile, so your collaborators will send you shapefiles and much public data is published as shapefiles. Then read the list of components, because it is the practical thing to remember. A shapefile is not one file, it is at least four, and all of them are required. Sending somebody the dot s h p on its own gives them something unreadable, which is exactly the annoyance the rest of this section goes on to complain about.
+A section about file formats, and the first bullet explains why we have to care. Most of the GIS world runs on ArcGIS, whose native format is the shapefile, so your collaborators will send you shapefiles and much public data is published as shapefiles. Then read the list of components, because it is the practical thing to remember. A shapefile requires the dot s h p, dot s h x, and dot d b f files. The dot p r j file is optional, but it should normally accompany them to preserve the coordinate reference system. Sending somebody the dot s h p on its own gives them something unreadable, which is exactly the annoyance the rest of this section goes on to complain about.
 
 </details>
 
 
 + The vast majority of people still use ArcGIS software to handle spatial data, which has its own system of storing spatial data called [shapefile]{style="color:red"} system. 
 
-+ shapefile is a collection of files, of which four are required:
++ A shapefile requires three files, and a fourth should normally accompany them:
 	* `.shp`: stores geometry information (like `sfg`)
 	* `.shx`: a positional index into the `.shp`
 	* `.dbf`: the attribute table (everything that is not geometry)
-	* `.prj`: projection information
+	* `.prj`: optional, but preserves CRS information
 	<!-- CHANGED: only .shp and .prj were listed. Handing a collaborator a .shp
 	without its .shx and .dbf gives them an unreadable file, which is exactly the
 	annoyance this section goes on to complain about. -->
@@ -850,7 +850,7 @@ knitr::include_graphics(here::here("Lectures/assets/shpfiles.png"))
 <details class="transcript">
 <summary>Transcript</summary>
 
-Reading one in is a single function, st read, pointed at the dot s h p file. Note that you name only that one file even though the format needs four; sf finds the siblings itself, provided they are sitting in the same folder with the same base name. That is also the most common way this goes wrong, so if a read fails, check that all the pieces travelled together. Then do the exercise in the callout with the download link. Reading somebody else's shapefile off your own disk is the thing you will actually do first in a real project.
+Reading one in is a single function, st read, pointed at the dot s h p file. Note that you name only that one file even though the format requires three; sf finds the dot s h x and dot d b f siblings itself, provided they are sitting in the same folder with the same base name. The optional dot p r j file should travel with them so the coordinate reference system is preserved. That is also the most common way this goes wrong, so if a read fails, check that all the pieces travelled together. Then do the exercise in the callout with the download link. Reading somebody else's shapefile off your own disk is the thing you will actually do first in a real project.
 
 </details>
 
@@ -1043,7 +1043,7 @@ nc <- readRDS("Data/nc_exported.rds")
 <br>
 
 :::{.callout-note title="Note"}
-The use of rds files can be particularly attractive when the dataset is large because rds files are typically more memory efficient than shape files.
+The use of rds files can be particularly attractive when the dataset is large because rds files are often more storage-efficient on disk than shapefiles.
 :::
 
 
@@ -1062,12 +1062,12 @@ The use of rds files can be particularly attractive when the dataset is large be
 <details class="transcript">
 <summary>Transcript</summary>
 
-A short motivation tab, and the reason it is short is that the need is entirely practical. Two spatial datasets can only be combined, joined or plotted together if they share a coordinate reference system. So most of the time you reproject not because you have chosen a projection on its merits, but because something else you are working with is already in one. That is worth saying plainly, because it means the skill you need is not choosing projections well, it is checking and matching them reliably, which is what the next few tabs cover.
+A short motivation tab, and the reason it is short is that the need is entirely practical. Spatial operations such as joins require matching coordinate reference systems. Plotting is different: geom sf can plot layers with different known coordinate reference systems by transforming them automatically. So most of the time you reproject not because you have chosen a projection on its merits, but because something else you are working with is already in one. That is worth saying plainly, because it means the skill you need is not choosing projections well, it is checking and matching them reliably, which is what the next few tabs cover.
 
 </details>
 
 
-You often need to project or re-project an `sf` using a different coordinate reference system (CRS) because you need it to have the same CRS as an `sf` object that you are interacting it with (spatial join) or mapping it with. 
+Spatial operations such as joins require matching coordinate reference systems (CRSs). By contrast, `geom_sf()` can plot layers with different known CRSs by transforming them automatically.
 
 
 
@@ -1514,15 +1514,15 @@ class(wells_ne_sf_again)
 <details class="transcript">
 <summary>Transcript</summary>
 
-A short but important framing tab. Because an sf object is a data frame with an extra column, everything you already know about manipulating data frames applies unchanged. That is not a small convenience, it is the main reason sf displaced its predecessor. You do not need to learn a separate spatial dialect for filtering rows or computing a new variable. The dplyr verbs you spent Chapter three on work here, and the next tab demonstrates it. Anything that is genuinely spatial gets its own st function; everything else is just data manipulation.
+A short but important framing tab. Because an sf object is a data frame with an extra column, most of what you already know about manipulating data frames applies. That is not a small convenience, it is the main reason sf displaced its predecessor. You do not need to learn a separate spatial dialect for filtering rows or computing a new variable. The dplyr verbs you spent Chapter three on work here, and the next tab demonstrates them. Some verbs have geometry-specific behavior, such as sticky select and geometry-unioning summarize, which you need to understand.
 
 </details>
 
 + An important feature of an `sf` object is that it is basically a `data.frame` with geometric information stored as a variable (column). 
 
-+ This means that transforming an `sf` object works just like transforming a `data.frame`. 
++ Most data-frame verbs work on an `sf` object.
 
-+ Basically, everything you can do to a `data.frame`, you can do to an `sf` as well.
++ Some verbs have geometry-specific behavior, such as sticky `select()` and geometry-unioning `summarize()`.
 
 + `dplyr` verbs work well with `sf`
 
@@ -1531,7 +1531,7 @@ A short but important framing tab. Because an sf object is a data frame with an 
 <details class="transcript">
 <summary>Transcript</summary>
 
-And the demonstration. Select, filter and mutate applied to an sf object exactly as you would to a data frame. The one behaviour worth noticing is called out twice: the geometry column survives a select even when you did not ask for it. That is deliberate and it is what you want almost always, since a spatial object without its geometry is not spatial. It does mean select cannot be used to drop geometry, though. That takes a specific function, and the note at the bottom points out that none of this worked with sp objects.
+And the demonstration. Select, filter and mutate use the familiar data-frame syntax on an sf object. The one behaviour worth noticing is called out twice: the geometry column survives a select even when you did not ask for it. That is deliberate and it is what you want almost always, since a spatial object without its geometry is not spatial. It does mean select cannot be used to drop geometry, though. That takes a specific function, and the note at the bottom points out that none of this worked with sp objects.
 
 </details>
 
@@ -1690,7 +1690,7 @@ the result back on an ID column.
 <details class="transcript">
 <summary>Transcript</summary>
 
-This one is genuinely surprising the first time. When you join an sf to a plain data frame, the order of the arguments decides what class comes back. Put the sf first and you get an sf. Put the data frame first and you get a plain data frame, which still contains a column called geometry holding all the right shapes, so it prints perfectly happily and looks fine. But it is not an sf, and geom_sf and every st function will refuse it with an error that does not obviously point here. Put the sf first, or repair it afterwards with st_as_sf.
+This one is genuinely surprising the first time. When you join an sf to a plain data frame, the order of the arguments decides what class comes back. Put the sf first and you get an sf. Put the data frame first and you get a plain data frame, which still contains a column called geometry holding all the right shapes, so it prints perfectly happily and looks fine. But it is not an sf, so geom sf and many spatial operations require you to convert it first. The geometry column remains an sfc, which is why st as sf can convert it back. Put the sf first, or repair it afterwards with st as sf.
 
 </details>
 
@@ -1743,11 +1743,12 @@ head(county_pop)
 
 :::{.callout-important title="The second one is not an `sf`"}
 Put the `data.frame` first and you get a plain `data.frame` back. It still **has** a
-column called `geometry` holding the shapes, so it looks fine when you print it —
-but it is not an `sf`, and `geom_sf()` and every `st_*()` function will refuse it.
+column called `geometry` holding the shapes, so it looks fine when you print it;
+but it is not an `sf`, and `geom_sf()` and many spatial operations require conversion.
 
 Two ways out: put the `sf` first, which is the habit to build, or repair it
-afterwards with `st_as_sf(joined_b)`.
+afterwards with `st_as_sf(joined_b)`, which works because the geometry column
+remains an `sfc`.
 :::
 
 ### Writing to CSV
@@ -1877,7 +1878,7 @@ ggplot() +
 <details class="transcript">
 <summary>Transcript</summary>
 
-Computing areas, and the second nested tab is the one that catches people. st area gives you the area of every polygon, which is straightforward. But run the class check and note what comes back is not a plain number, it is a units object, carrying square metres around with it. That is genuinely helpful, because it stops you adding metres to feet. It is also a nuisance the moment you want to do ordinary arithmetic, so the Caveat tab wraps the result in as numeric. Do that deliberately rather than by accident, because you are discarding the unit information.
+Computing areas, and the second nested tab is the one that catches people. st area gives you the area of every polygon, which is straightforward. But run the class check and note what comes back is not a plain number, it is a units object, carrying square metres around with it. Units objects support arithmetic and automatically convert compatible units, while rejecting dimensionally incompatible operations. The Caveat tab shows how to wrap the result in as numeric when a downstream operation specifically requires plain numeric values. Do that deliberately rather than by accident, because you are discarding the unit information.
 
 </details>
 
@@ -1908,7 +1909,7 @@ class(nc$area)
 
 <br>
 
-So, you want to convert it to a numeric variable like this if you want to subject it to numeric operations later:
+Units objects support arithmetic with automatic conversion of compatible units. Drop the units like this only when a downstream operation specifically requires plain numeric values:
 
 ```{webr-r}
 #| code-track: 0.4
@@ -1930,7 +1931,7 @@ class(nc$area)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Centroids, in two nested tabs. st centroid replaces each polygon with a single point at its middle, which is what you want for labelling a map or computing rough distances between regions. Run the plot and check the points land inside their counties. Then the second tab pulls the raw coordinates out with st coordinates, giving you a plain matrix of x and y, and shows how to bind that onto the original object. That is the standard route when you need coordinates as ordinary columns, for example to pass them to something that is not spatially aware.
+Centroids, in two nested tabs. st centroid replaces each polygon with a point at its center of mass, which can be useful for computing rough distances between regions. A centroid can fall outside a concave polygon, so use st point on surface when a label point must lie inside. Then the second tab pulls the raw coordinates out with st coordinates, giving you a plain matrix of x and y, and shows how to bind that onto the original object. That is the standard route when you need coordinates as ordinary columns, for example to pass them to something that is not spatially aware.
 
 </details>
 
@@ -2220,11 +2221,11 @@ st_intersection(bowtie, bowtie)
 
 :::{.callout-note title="What the complaint looks like"}
 `TopologyException`, `side location conflict`, `Self-intersection`,
-`Loop 0 is not valid`, `Edge N crosses edge M` — the exact wording depends on which
+`Loop 0 is not valid`, `Edge N crosses edge M`: the exact wording depends on which
 geometry engine handled the call, and differs between `sf` versions and between
-projected and unprojected data. They all mean one thing: **the geometry is broken,
-and it was broken before you touched it.** Do not go hunting for the mistake in
-your own code.
+projected and unprojected data. They all mean that the geometry is invalid. Inspect
+the input geometry and preceding operations to determine where invalidity was
+introduced.
 :::
 
 #### Repairing it
@@ -2259,7 +2260,7 @@ still invalid, project the data first and repair it there.
 <details class="transcript">
 <summary>Transcript</summary>
 
-The last one, and the sneakiest, because nothing errors at all. A number you hand to st_buffer is in the units of the coordinate system, and those are not always metres. Buffer this county by two thousand on a UTM projection and it grows to about fourteen hundred square kilometres. Buffer it by the same two thousand on the North Carolina state plane system, which is measured in survey feet, and it balloons to over thirteen thousand. Same code, same number, different answer. Check st_crs units before passing any distance. Longitude and latitude, oddly, gives you metres.
+The last one, and the sneakiest, because nothing errors at all. A number you hand to st_buffer is in the units of the coordinate system, and those are not always metres. Buffer this county by two thousand on a UTM projection and it grows to about fourteen hundred and thirty-one square kilometres. Buffer it by the same two thousand on the North Carolina state plane system, which is measured in survey feet, and the smaller six-hundred-and-ten-metre buffer grows it to about twelve hundred and twenty-five square kilometres. Convert the areas to common units before dropping their units, and check st crs units before passing any distance. Longitude and latitude, oddly, gives you metres.
 
 </details>
 
@@ -2296,10 +2297,10 @@ The same number now means two very different distances:
 buf_m <- st_buffer(nc_metres, dist = 2000)
 buf_ft <- st_buffer(nc_feet, dist = 2000)
 
-#--- areas in km2 ---#
+#--- convert areas to km2 before dropping units ---#
 c(
-  metres = as.numeric(st_area(buf_m)) / 1e6,
-  feet   = as.numeric(st_area(buf_ft)) / 1e6
+  metres = as.numeric(units::set_units(st_area(buf_m), km^2)),
+  feet   = as.numeric(units::set_units(st_area(buf_ft), km^2))
 )
 ```
 
@@ -2307,8 +2308,9 @@ c(
 
 :::{.callout-important title="`dist = 2000` is not a distance until you know the CRS"}
 On the metre-based CRS the county grows to about **1,431 km²**. On the feet-based
-one it grows to about **13,186 km²**, because 2000 US survey feet is only 610
-metres — but the buffer is applied in the coordinate units, so the shape balloons.
+one it grows to about **1,225 km²**, because 2000 US survey feet is only about 610
+metres. Convert units before dropping them; dividing a raw square-foot value by
+one million does not convert it to square kilometres.
 
 Check `st_crs(x)$units` before passing any number as a distance. Plenty of US state
 plane systems are in feet, and nothing warns you.
@@ -2415,7 +2417,7 @@ fairway_grid_buffers <- st_buffer(fairway_grid_utm, dist = 10)
 <details class="transcript">
 <summary>Transcript</summary>
 
-The third exercise: centroids of the buffers you just made. Mechanically this is one call to st centroid, so it should be quick. Worth thinking about what you expect before you run it, though. The centroid of a buffer around a polygon should sit at essentially the same place as the centroid of the polygon itself, since buffering expands a shape evenly in all directions. If your centroids come out somewhere unexpected, that is a signal that something went wrong back in exercise one or two rather than here in exercise three.
+The third exercise: centroids of the buffers you just made. Mechanically this is one call to st centroid, so it should be quick. Worth thinking about what you expect before you run it, though. Buffering an irregular or asymmetric polygon can shift its centroid because the added area is not necessarily distributed symmetrically around the original centroid. Calculate and compare the centroids rather than assuming that buffering preserves their locations. If a shift looks unexpected, inspect the original shapes and the preceding operations.
 
 </details>
 

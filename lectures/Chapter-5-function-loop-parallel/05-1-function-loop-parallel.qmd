@@ -1258,7 +1258,7 @@ rev_data_2 <-
 <details class="transcript">
 <summary>Transcript</summary>
 
-And the timing comparison for the realistic case. Run it and look at the gap. The vectorized version computes every combination in a single pass. The loop version calls a function once per row, and each of those calls does its own data frame lookup and builds its own little one-row data frame, which then all have to be stitched together. All of that is overhead you simply do not pay in the vectorized version. Keep this result in mind for the parallel section that follows, because the temptation there is to reach for more cores. Very often the better move is to stop looping at all.
+And the timing comparison for the realistic case. Run it and look at the gap. The vectorized version computes every combination in a single pass. The loop version calls a function once per row, and each of those calls does its own data frame lookup and builds its own little one-row data frame, which bind rows then stitches together. All of that is overhead you simply do not pay in the vectorized version. Keep this result in mind for the parallel section that follows, because the temptation there is to reach for more cores. Very often the better move is to stop looping at all.
 
 </details>
 
@@ -1271,7 +1271,7 @@ microbenchmark(
   "vectorized" = { rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen)) },
 
   #--- not vectorized ---#
-  "not vectorized" = { parameters_data$revenue <- lapply(1:nrow(parameters_data), gen_rev_corn) },
+  "not vectorized" = { rev_data <- bind_rows(lapply(seq_len(nrow(parameters_data)), gen_rev_corn)) },
   times = 100, 
   unit = "ms"
 
@@ -1472,7 +1472,7 @@ microbenchmark(
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is the explanation. Handing a job to another core is itself work. The value has to be sent over, the worker has to be told what to do, and the answer has to come back. That overhead is small but it is not zero, and you pay it for every single iteration. Squaring a number takes almost no time at all, so the cost of the handover completely swamps the saving. The rule that follows is in the last bullet, and it is the one to remember. Parallelization pays when each individual iteration is slow. If your iterations are fast, adding cores makes things worse.
+Here is the explanation. Handing a job to another core is itself work. The values have to be sent over, the worker has to be told what to do, and the answers have to come back. With the default scheduling, that communication overhead is generally paid once per future chunk, with about one chunk per worker, while the function-call and result-building overhead remains for every element. Squaring a number takes almost no time at all, so the overhead completely swamps the saving. The rule that follows is in the last bullet, and it is the one to remember. Parallelization pays when each individual iteration is slow. If your iterations are fast, adding cores makes things worse.
 
 </details>
 
@@ -1535,14 +1535,14 @@ This Monte Carlo simulation is embarrassingly parallel because each process is i
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here are those three steps as a function, and notice it follows the advice from earlier in the chapter exactly. It takes i, a single index, and everything else it needs it creates internally. The sample size is set inside, the data is generated fresh on each call, the regression is run, and it returns just one number, the coefficient on x. Returning one number rather than the whole model object matters more than it looks. When you run this a thousand times in parallel, everything you return has to be sent back from the worker, and shipping a thousand full model objects around would cost you real time.
+Here are steps one and two as a function for one repetition, and notice it follows the advice from earlier in the chapter exactly. Step three happens later when you apply this function a thousand times. It takes i, a single index, and everything else it needs it creates internally. The sample size is set inside, the data is generated fresh on each call, the regression is run, and it returns just one number, the coefficient on x. Returning one number rather than the whole model object matters more than it looks. When you run this a thousand times in parallel, everything you return has to be sent back from the worker, and shipping a thousand full model objects around would cost you real time.
 
 </details>
 
-Here is a function that implements the steps described in the previous slide:
+Here is a function that implements steps 1 and 2 for one repetition. The later apply call implements step 3:
 
 ```{r}
-#--- repeat steps 1-3 B times ---#
+#--- one repetition of steps 1 and 2 ---#
 MC_sim <- function(i){
 
   N <- 50000 # sample size
@@ -1567,7 +1567,7 @@ MC_sim <- function(i){
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the numbers, and this is the payoff for the whole section. A single run takes a small fraction of a second, which tells you each iteration is doing real work, unlike the squaring example. Then the sequential version of all one thousand runs, and then the parallel version. Compare those last two figures. That is a substantial speed-up, achieved by changing one word in one line of code. Two caveats worth holding on to. These timings depend on how many cores this machine has, so yours will differ. And the gain is nowhere near the number of cores, because of the handover cost we just discussed.
+Now the numbers, and this is the payoff for the whole section. A single run takes a small fraction of a second, which tells you each iteration is doing real work, unlike the squaring example. Then the sequential version of all one thousand runs, and then the parallel version with parallel-safe random-number streams. Compare those last two figures. That is a substantial speed-up, achieved with a small change to one line of code. Two caveats worth holding on to. These timings depend on how many cores this machine has, so yours will differ. And the gain is nowhere near the number of cores, because of the handover cost we just discussed.
 
 </details>
 
@@ -1593,7 +1593,7 @@ toc()
 ```{r}
 #| cache: true
 tic()
-MC_results <- future_lapply(1:1000, MC_sim)
+MC_results <- future_lapply(1:1000, MC_sim, future.seed = TRUE)
 toc() 
 ```
 
@@ -1944,14 +1944,14 @@ Instead of writing a loop like above, we can actually vectorize the process. Her
 
 2. Calculate profits for all the combinations of **nitrogen rate**, corn price, and nitrogen price inside the `data.frame`
 
-3. Find the optimal N rate for each of the combinations of **nitrogen rate**, corn price, and nitrogen price 
+3. Find the optimal N rate for each combination of corn price and nitrogen price
 
 ### Step 1
 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is that combined grid. Three corn prices, two nitrogen prices and three nitrogen rates, expanded into every combination, which gives eighteen rows. Compare that with strategy one, where the grid held only the nine price combinations and the nitrogen rates were generated inside the function, over and over again. Everything is now in one table up front. This is also where the memory question starts to bite, and we come back to it shortly. With three short sequences this is trivially small, but the row count is the product of all three lengths, so it grows very quickly once the sequences get realistic.
+Here is that combined grid. Three corn prices, three nitrogen prices and three thousand nitrogen rates, expanded into every combination, which gives twenty-seven thousand rows. Compare that with strategy one, where the grid held only the nine price combinations and the nitrogen rates were generated inside the function, over and over again. Everything is now in one table up front. This is also where the memory question starts to bite, and we come back to it shortly. This grid is still manageable, but the row count is the product of all three lengths, so it grows very quickly once the sequences get larger.
 
 </details>
 
@@ -1960,8 +1960,8 @@ Here, we define all the combinations of **nitrogen rate**, corn price, and nitro
 ```{webr-r}
 #| autorun: true
 P_C_seq <- seq(2.5, 4.5, by = 1)
-P_N_seq <- seq(0.3, 0.6, by = 0.3)
-N_seq <- seq(100, 300, by = 100)
+P_N_seq <- seq(0.2, 0.6, by = 0.2)
+N_seq <- seq(0.1, 300, by = 0.1)
 
 #--- CHANGED: was also called `price_parameters`, colliding with Strategy 1's ---#
 (
@@ -2008,7 +2008,7 @@ profit_data %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-So which should you use? The deciding factor is memory. Strategy one holds one price combination at a time, so its memory footprint stays small no matter how many combinations there are. Strategy two builds every combination at once, which is why it is fast, and also why it can exhaust your RAM. Once you run out of RAM your machine starts swapping to disk and performance collapses, far worse than the loop would ever have been. So the rule is simple. If the full grid fits comfortably in memory, vectorize. If it does not, break the job into chunks and loop over those. The callout shows you how to watch memory usage on both platforms.
+So which should you use? The deciding factor is memory. Strategy one avoids materializing the full nitrogen-by-price grid, but each active worker can hold a working nitrogen grid and the result list retains every returned optimum row. Its memory use therefore grows with the worker count and the number of price combinations. Strategy two builds every combination at once, which is why it is fast, and also why it can exhaust your RAM. Once you run out of RAM your machine starts swapping to disk and performance collapses, far worse than the loop would ever have been. So the rule is simple. If the full grid fits comfortably in memory, vectorize. If it does not, break the job into chunks and loop over those. The callout shows you how to watch memory usage on both platforms.
 
 </details>
   
@@ -2017,7 +2017,7 @@ So which should you use? The deciding factor is memory. Strategy one holds one p
 + Going over the RAM memory limit will suffocate your computer, which leads to a substantial loss in computing performance. 
 
 + Vectorized version is more memory-hungry:
-  * Strategy 1: loops over the price combinations, holding **one** combination in memory at a time
+  * Strategy 1: avoids the full nitrogen-by-price grid, but peak memory includes concurrent worker grids and all returned optimum rows
   * Strategy 2: does not loop at all — it holds **every** combination in memory at once <!-- CHANGED: read "Strategy 2: loop over price (all the price combinations at the same time)", which contradicts the whole point of calling it vectorized -->
 
 + If you can fit the entire dataset in the RAM memory, then take Strategy 2. Otherwise, break up the entire task into pieces like Strategy 1. 

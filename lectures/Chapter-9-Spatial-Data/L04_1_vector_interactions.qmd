@@ -411,7 +411,7 @@ For polygons vs polygons interaction, `st_intersects()` identifies any polygons 
 <details class="transcript">
 <summary>Transcript</summary>
 
-The first of the two distance-based relations. Rather than asking whether two things touch, it asks whether anything in the second object lies within a given distance of each feature in the first. Note that the distance argument is required and carries no default, and that it is expressed in the units of the CRS, so a bare number means degrees on unprojected data and metres on most projected data. That catches people constantly. Work through the tabs in order: the expected outcome tab draws buffers of the right radius around each red point, so you can read the answer off the picture before you run the function.
+The first of the two distance-based relations. Rather than asking whether two things touch, it asks whether anything in the second object lies within a given distance of each feature in the first. Note that the distance argument is required and carries no default. A numeric distance uses metres for geographic coordinates and coordinate units for projected or CRS-free data. That catches people constantly. Work through the tabs in order: the expected outcome tab draws buffers of the right radius around each red point, so you can read the answer off the picture before you run the function.
 
 </details>
 
@@ -425,9 +425,9 @@ The first of the two distance-based relations. Rather than asking whether two th
 st_is_within_distance(sf_1, sf_2, dist)
 ```
 
-+ `dist`: the distance threshold. It is **required** — there is no default — and it
-is in the units of the CRS, so degrees for unprojected lon/lat data and metres for
-most projected data.
++ `dist`: the distance threshold. It is **required**; there is no default. A numeric
+distance uses metres for geographic coordinates and coordinate units for
+projected or CRS-free data.
 
 
 #### Data Preparation
@@ -863,7 +863,7 @@ ggplot() +
 <details class="transcript">
 <summary>Transcript</summary>
 
-Exactly the same syntax, now with points. Wells inside the aquifer boundary, in one line of brackets. There is a parenthetical worth noticing: for points, intersects and within give the same answer, because a point either is in the polygon or is not, with none of the partial overlap a polygon can have. The flagging tab repeats the pattern from before, pulling out the well identifiers that survived and marking every well as in or out. That flagged version, rather than the subset, is what you would carry into an analysis where you want to compare the two groups.
+Exactly the same syntax, now with points. Wells inside the aquifer boundary, in one line of brackets. There is a parenthetical worth noticing: for points, intersects and within give the same answer only when none of the points lies on the polygon boundary. A point on the boundary intersects the polygon but is not within it. The flagging tab repeats the pattern from before, pulling out the well identifiers that survived and marking every well as in or out. That flagged version, rather than the subset, is what you would carry into an analysis where you want to compare the two groups.
 
 </details>
  
@@ -871,7 +871,8 @@ Exactly the same syntax, now with points. Wells inside the aquifer boundary, in 
 
 #### Goal
 
-Select only the wells that intersect with (or equivalently inside) the HPA boundary.
+Select only the wells that intersect with the HPA boundary. This is equivalent to
+selecting wells within it only when no wells lie on the polygon boundary.
 
 ```{webr-r}
 ggplot() +
@@ -942,7 +943,7 @@ wells_ne <- dplyr::mutate(wells_ne, in_hpa = ifelse(wellid %in% wellid_list, 1, 
 <details class="transcript">
 <summary>Transcript</summary>
 
-The third combination, and by now it should feel routine: railroads intersecting Lancaster county, using the same brackets as before. What is worth pausing on is what intersects actually means for a line. A railroad that merely clips the corner of the county is kept in full, not trimmed at the boundary — the whole line survives, because subsetting selects features and never modifies their geometry. If what you want is the piece inside the county rather than the whole line, that is cropping, which is the next section and a genuinely different operation. The flagging tab closes the section by marking every railroad as in or out of Lancaster.
+The third combination, and by now it should feel routine: railroads intersecting Lancaster county, using the same brackets as before. What is worth pausing on is what intersects actually means for a line. A railroad that merely clips the corner of the county is kept in full, not trimmed at the boundary. The whole line survives because subsetting selects features and never modifies their geometry. If what you want is the piece inside the county rather than the whole line, use st_intersection to clip it to the county boundary. The st_crop function, covered in the next section, clips only to a rectangular bounding box. The flagging tab closes the section by marking every railroad as in or out of Lancaster.
 
 </details>
  

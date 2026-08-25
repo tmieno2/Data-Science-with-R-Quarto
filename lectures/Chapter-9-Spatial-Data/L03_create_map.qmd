@@ -270,7 +270,7 @@ ggplot() +
 <details class="transcript">
 <summary>Transcript</summary>
 
-Putting text on a map needs a different geom. geom_sf will not do it, and this trips people up because they expect a label argument somewhere. Instead you add a second layer, geom_sf_text, with the label mapped inside aes to whichever column holds the name. It works out where to put each label from the geometry, taking the centroid for a polygon. Watch the size argument in the example, set to two: at the default size, ninety-three county names cover the map completely. Labels on a busy map are usually a matter of restraint rather than technique.
+Putting text on a map needs a different geom. geom_sf will not do it, and this trips people up because they expect a label argument somewhere. Instead you add a second layer, geom_sf_text, with the label mapped inside aes to whichever column holds the name. It works out where to put each label from the geometry, computing a point on the surface of each polygon unless you supply fun.geometry. Watch the size argument in the example, set to two: at the default size, ninety-three county names cover the map completely. Labels on a busy map are usually a matter of restraint rather than technique.
 
 </details>
 
@@ -700,7 +700,7 @@ ggplot()  +
 <details class="transcript">
 <summary>Transcript</summary>
 
-By default ggplot2 draws using whatever CRS the sf object carries, so your projection choice shows up directly in the shape of the map. The two examples make the comparison. Unprojected, in longitude and latitude, the grid lines are straight. Projected into UTM zone fourteen, which is the right zone for Nebraska, the grid lines curve, because a projected map cannot keep meridians straight and areas honest at the same time. Notice also what does not change: the axis labels are still longitude and latitude even after projecting, which we deal with on the next slide.
+By default ggplot2 draws using whatever CRS the sf object carries, so your projection choice shows up directly in the shape of the map. The two examples make the comparison. Unprojected, in longitude and latitude, the grid lines are straight. Projected into UTM zone fourteen, which is the right zone for Nebraska, the grid lines curve because geographic meridians and parallels are being transformed into the UTM projection. Notice also what does not change: the axis labels are still longitude and latitude even after projecting, which we deal with on the next slide.
 
 </details>
 
@@ -991,7 +991,7 @@ g_county +
 <details class="transcript">
 <summary>Transcript</summary>
 
-An inset map answers a question every reader of a regional map silently has, which is where on earth this is. You show your study area at the scale you need, and a small panel places it in a wider context, or magnifies a corner that is too small to see. The image on this slide is the finished product we are building towards. It is genuinely useful in papers: reviewers ask about geographic context surprisingly often, and an inset costs you a few lines rather than a second figure.
+An inset map answers a question every reader of a regional map silently has, which is where on earth this is. You show your study area at the scale you need, and a small panel places it in a wider context, or magnifies a corner that is too small to see. The image is a general example of an inset map; the next slide shows the result built in this section. It is genuinely useful in papers: reviewers ask about geographic context surprisingly often, and an inset costs you a few lines rather than a second figure.
 
 </details>
 
@@ -1094,7 +1094,7 @@ g_base <-
 <details class="transcript">
 <summary>Transcript</summary>
 
-The configuration is a separate object, which is a slightly unusual design but a sensible one, because several layers all need to agree about where the inset goes. Four things to specify. The shape, either a circle or a rectangle, centred somewhere and given a radius. Translation, how far to shift the magnified copy away from its true position, in the units you name. Scale, how much to enlarge it. And units. Notice the centre is computed rather than typed: the centroid of the union of the three counties, which is a nice small use of what you learned last deck.
+The configuration is a separate object, which is a slightly unusual design but a sensible one, because several layers all need to agree about where the inset goes. Four things to specify. The shape: a circle by centre and radius, or a rectangle by centre, half-width, and optional half-height. Translation, how far to shift the magnified copy away from its true position, in the units you name. Scale, how much to enlarge it. And units. Notice the centre is computed rather than typed: the centroid of the union of the three counties, which is a nice small use of what you learned last deck.
 
 </details>
 
@@ -1242,7 +1242,7 @@ Notice that `geom_spatraster()` automatically bases the fill color of the cells 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Rasters are rectangles, but the things they describe rarely are, so most real raster data has missing cells around the edges, and by default those come out grey. Grey is fine on its own but wrong when the raster sits on top of something else, because it hides what is underneath. The fix is the na.value argument inside the fill scale, set to transparent. This becomes essential in the very last section of the deck, where a raster is drawn under county boundaries, and it is worth remembering as a general habit for layered maps.
+Rasters are rectangles, but the things they describe rarely are, so most real raster data has missing cells around the edges, and by default those come out grey. Grey is fine on its own but wrong when the raster sits on top of something else, because it hides what is underneath. The fix is the na.value argument inside the fill scale, set to transparent. Transparent NA cells are useful when a raster would otherwise obscure an underlying layer, but the final example does not apply this setting.
 
 </details>
 

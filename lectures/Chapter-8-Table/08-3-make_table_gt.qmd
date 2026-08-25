@@ -1126,7 +1126,7 @@ gt_tbl %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-For whole numbers, and its interesting argument is suffixing. Turn it on and large numbers are shortened with a K for thousands and an M for millions, so eighteen million something becomes eighteen point one M. Whether you want that depends entirely on your audience. It reads well on a slide, where the point is the comparison rather than the exact count. It reads badly in a table somebody might need to take numbers out of, because you have thrown away the digits they need.
+For whole numbers, and its interesting argument is suffixing. Turn it on and large numbers are shortened with a K for thousands and an M for millions, so eighteen million something becomes eighteen M. Use fmt number with suffixing set to true and n sigfig set to three when you want a result such as eighteen point one M. Whether you want that depends entirely on your audience. It reads well on a slide, where the point is the comparison rather than the exact count. It reads badly in a table somebody might need to take numbers out of, because you have thrown away the digits they need.
 
 </details>
 
@@ -1333,7 +1333,7 @@ A **hidden** column is still in the data, so `rows = y_1995 > 1e5` keeps working
 <details class="transcript">
 <summary>Transcript</summary>
 
-Widths and alignment. Cols width uses a two-sided formula, with the columns on the left and the width on the right, and the width needs units, so px for pixels or pct for a percentage of the table. The everything on the last line catches whatever you did not name, which is a good habit, because a table with some widths set and others not can lay out unpredictably. Cols align is simpler and takes a direction and some columns. Note gt has no autofit. It sizes columns to their content by default and you override only where you need to.
+Widths and alignment. Cols width uses a two-sided formula, with the columns on the left and the width on the right. Use px for pixels or pct for a percentage of the table to be explicit, although a bare number is accepted and treated as pixels. The everything on the last line catches whatever you did not name, which is a good habit, because a table with some widths set and others not can lay out unpredictably. Cols align is simpler and takes a direction and some columns. Note gt has no autofit. It sizes columns to their content by default and you override only where you need to.
 
 </details>
 
@@ -1654,11 +1654,11 @@ gt_tbl %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-Totals and averages per row group, computed by gt rather than by you. It needs a stub to put the labels in, so the table has to have been built with rowname col, and it needs row groups for there to be groups to summarise. Fns takes a named list where the name becomes the label and the right-hand side is a formula, with the dot standing for the column being summarised. Fmt says how to display the results, and it is a separate argument because summary rows are not formatted by the fmt calls you applied to the body.
+Totals and averages per row group, computed by gt rather than by you. It needs row groups for there to be groups to summarise, but if the table does not already have a stub, summary rows creates one for the labels. Fns takes a named list where the name becomes the label and the right-hand side is a formula, with the dot standing for the column being summarised. Fmt says how to display the results, and it is a separate argument because summary rows are not formatted by the fmt calls you applied to the body.
 
 </details>
 
-`summary_rows()` adds a summary row to each row group. The table needs a stub for the labels to sit in, and it needs row groups: called on a table with none, it is an error, and `grand_summary_rows()` is the function you want instead.
+`summary_rows()` adds a summary row to each row group. It requires row groups, but if the table does not already have a stub, it creates one for the summary labels. Called on a table with no row groups, it is an error, and `grand_summary_rows()` is the function you want instead.
 
 ::: {.columns}
 
@@ -1799,7 +1799,7 @@ One shaded column in a table says "look here". Six shaded columns say nothing.
 <details class="transcript">
 <summary>Transcript</summary>
 
-By default the palette is stretched across the range of the values present, which means the same color means different things in two tables built from different data. Setting domain fixes the range, so a value maps to the same color regardless of what else is in the column. If you are producing several tables that a reader will compare, this is not optional. Values outside the domain are left uncolored unless you say otherwise with the na color argument.
+By default the palette is stretched across the range of the values present, which means the same color means different things in two tables built from different data. Setting domain fixes the range, so a value maps to the same color regardless of what else is in the column. If you are producing several tables that a reader will compare, this is not optional. Values outside the domain receive the na color, which is gray by default and can be changed explicitly.
 
 </details>
 
@@ -2003,7 +2003,7 @@ tab_data %>% #BREAK
 <details class="transcript">
 <summary>Transcript</summary>
 
-Everything so far produced a table object. This section is about getting it out of R. One function does all of it, and the file extension you give decides the format, which is a nice piece of design because there is nothing else to remember. The list is on screen. Note that PNG and PDF go through a headless browser, so they need the webshot2 package installed, and the other formats do not need anything extra. The cell here builds a plain table to demonstrate with.
+Everything so far produced a table object. This section is about getting it out of R. One function does all of it, and the file extension you give decides the format, which is a nice piece of design because there is nothing else to remember. The list is on screen. Note that PNG and PDF go through a headless browser, so they need the webshot2 package installed, while DOCX needs rmarkdown. The cell here builds a plain table to demonstrate with.
 
 </details>
 
@@ -2080,7 +2080,7 @@ gtsave(table_temp, "temp_table.png", zoom = 3, expand = 10)
 **pdf**
 
 ```{r eval = F}
-gtsave(table_temp, "temp_table.pdf", zoom = 3)
+gtsave(table_temp, "temp_table.pdf")
 ```
 
 ### Inside a Quarto document

@@ -37,15 +37,15 @@ Two navigation tricks before we start. The three stacked lines in the bottom lef
 <details class="transcript">
 <summary>Transcript</summary>
 
-The usual note about the code boxes. The faintly blue area is an editor, Run Code executes it, and you can run part of it by highlighting and pressing Command Enter, or Control Enter on Windows. The copy button in the top right corner puts the code on your clipboard for pasting into RStudio, and the reload button restores the original if you have edited yourself into a mess. This particular chapter has less runnable code than most, because much of what we cover happens in the RStudio interface rather than in the console. Where there is code, though, it behaves the same way.
+The code boxes in this chapter are static examples. You can use the copy button in the top right corner to put the code on your clipboard and paste it into RStudio, but you cannot edit or run code within these slides. In RStudio, you can run part of an example by highlighting it and pressing Command Enter, or Control Enter on Windows.
 
 </details>
 
-+ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
-+ Hit the "Run Code" button to execute all the code inside the code area.
-+ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
-+ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
-+ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
++ The boxes with a hint of blue contain static code examples.
++ You cannot edit or execute these examples within the slides.
++ To run only part of an example, first copy it into RStudio, highlight the part you want, and press Command + Enter for Mac (Ctrl + Enter for Windows).
++ Click the icon with two sheets of paper stacked on top of each other at the top right corner of a code block to copy the example, then paste it into RStudio.
++ Make any edits to the examples in RStudio, not in the slides.
 
 :::
 <!--end of panel-->
@@ -257,7 +257,7 @@ At the top right corner of RStudio, navigate through:
 ::: {.column width="30%"}
 + type in a directory name
 + select the directory in which the project folder (directory) is going to be created
-+ hit the *create folder* button
++ hit the *Create Project* button
 :::
 <!--end of the 1st column-->
 ::: {.column width="70%"}
@@ -294,7 +294,7 @@ In this folder you just created, you have a single file named **<directory-name>
 <details class="transcript">
 <summary>Transcript</summary>
 
-A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data is the thing you can never regenerate, so it lives somewhere you only ever read from. Everything else can be rebuilt by rerunning your scripts.
+A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data and other source materials must be preserved because rerunning your scripts cannot regenerate them. Processed data and generated results should be rebuildable by rerunning your scripts.
 
 </details>
 
@@ -344,7 +344,7 @@ Use a **qmd** file instead of an **R** file whenever you write codes
 
 + It is much easier to make comments in a qmd file than an R file
 + You can better organize your codes with markdown section headers (e.g., #, ##)
-+ R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Use `Run All Chunks Above` button (click on the triangle right to the `Run` button and select the option, or hit `option` + `command` + `P`).  
++ R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Select `Run All Chunks Above` by clicking the triangle to the right of the `Run` button, or hit `option` + `shift` + `command` + `P` to run the previous Rmd code.
 
 + Easily move between sections and subsection using the navigator at the bottom lower corner of the source pane
 
@@ -525,7 +525,7 @@ Let's take a look at an example project that is designed to be reproducible. Fir
 <details class="transcript">
 <summary>Transcript</summary>
 
-Snippets are text expansion inside RStudio. You type a short trigger, hit tab, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. The line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.
+Snippets are text expansion inside RStudio. You type a short trigger and select the matching snippet from the completion list, or press shift tab to insert it immediately, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. Every line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.
 
 </details>
 
@@ -537,11 +537,11 @@ Code snippets map a short sequence of letters and symbols to a longer, more comp
 
 ```default
 snippet (combination of letters to invoke)
-  (what you want to print) 
+	(what you want to print)
 ```
 
 :::{.callout-note title="Important"}
-You need a tab before **(what you want to print)**
+You need a literal tab before **(what you want to print)**
 :::
 
 ### Examples
@@ -549,7 +549,7 @@ You need a tab before **(what you want to print)**
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two examples in the nested tabs, and they are the two worth setting up first. Typing p i then tab gives you the pipe. Typing a s then tab gives you the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Note the parenthetical about hitting enter if there are competing completions. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so you may need one extra keystroke to disambiguate. That is worth knowing before you decide a snippet is broken.
+Two examples in the nested tabs, and they are the two worth setting up first. Type p i and select the snippet from the completion list, or press shift tab to get the pipe. Do the same with a s to get the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so make sure you select the snippet when you use the completion list. That is worth knowing before you decide a snippet is broken.
 
 </details>
 
@@ -561,12 +561,12 @@ Two examples in the nested tabs, and they are the two worth setting up first. Ty
 
 ```default
 snippet pi
-  %>% 
+	%>%
 ```
 
 <br>
 
-Once you add this, you can type "pi" and hit `tab` (and hit `enter` if there are other competing shortcuts) to have `%>%` printed.
+Once you add this, type "pi", then select the snippet from the completion list or press `shift` + `tab` to have `%>%` printed.
 
 #### assignment operator
 
@@ -574,12 +574,12 @@ Once you add this, you can type "pi" and hit `tab` (and hit `enter` if there are
 
 ````markdown
 snippet as
-  <- 
+	<-
 ````
 
 <br>
 
-Once you add this, you can type "as" and hit `tab` (and hit `enter` if there are other competing shortcuts) to have `<-` printed.
+Once you add this, type "as", then select the snippet from the completion list or press `shift` + `tab` to have `<-` printed.
 :::
 <!--end of panel-->
 
@@ -588,7 +588,7 @@ Once you add this, you can type "as" and hit `tab` (and hit `enter` if there are
 <details class="transcript">
 <summary>Transcript</summary>
 
-Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, hit tab, and watch the arrow appear. And remember the tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.
+Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, then select the snippet from completion or press shift tab, and watch the arrow appear. And remember the literal tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.
 
 </details>
 
@@ -600,9 +600,9 @@ Follow <span style = "color: blue;"> Tools </span> $\rightarrow$ <span style = "
 + Place the following
 ````markdown
 snippet as
-  <-
+	<-
 ````
-+ type “as” and hit tab inside an R code chunk
++ type “as” inside an R code chunk, then select the snippet from completion or hit **shift**+**tab**
 :::
 
 ### Context-specificity
@@ -631,8 +631,8 @@ This snippet will let you create an R code chunk with typing "rmc". Place it in 
 
 ````markdown
 snippet rmc
-  `r ''````{r }
-  ```
+	`r ''````{r }
+	```
 ````
 
 Confirm that this snippet does not work in the R environment.
@@ -651,9 +651,9 @@ This is what makes snippets genuinely powerful rather than just shorter to type.
 
 ````markdown
 snippet rmc
-  `r ''````{r ${1:chunk_title}}
-    ${2:chunk_content}
-  ```
+	`r ''````{r ${1:chunk_title}}
+	  ${2:chunk_content}
+	```
 ````
 
 `$` is used as a special character to denote where the cursor should jump (by hitting `tab`) after completing each section of a snippet. 
@@ -663,16 +663,16 @@ snippet rmc
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and tab and you get a line plot skeleton, with your cursor waiting on the dataset name, then the y variable, then x. Type g d and you get a density plot the same way. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.
+Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and select the snippet from completion, or press shift tab, and you get a line plot skeleton with your cursor waiting on the dataset name, then the y variable, then x. Do the same with g d and you get a density plot. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.
 
 </details>
 
-**ggplot (scatter plot)**
+**ggplot (line plot)**
 
 ````default
 snippet gl
-  ggplot(data = ${1:dataset}) +
-  geom_line(aes(y = ${2:y}, x = ${3:x}))
+	ggplot(data = ${1:dataset}) +
+	geom_line(aes(y = ${2:y}, x = ${3:x}))
 ````
 
 <br>
@@ -681,8 +681,8 @@ snippet gl
 
 ````default
 snippet gd
-  ggplot(data = ${1:dataset}) +
-  geom_density(aes(x = ${2:x}))
+	ggplot(data = ${1:dataset}) +
+	geom_density(aes(x = ${2:x}))
 ````
 
 :::

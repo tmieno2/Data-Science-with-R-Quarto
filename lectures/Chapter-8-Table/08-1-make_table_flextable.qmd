@@ -427,7 +427,7 @@ ft %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-And the third form: a logical vector for rows, column numbers for columns. The logical vector has to be exactly as long as the table has rows, which is why the example builds ten TRUEs and FALSEs for a ten-row table. Get that length wrong and you get either an error or, worse, a recycled pattern selecting rows you did not intend. This form is most useful when you have computed the condition somewhere else and are carrying it around as a variable. If you are writing the condition inline, the formula version reads better.
+And the third form: a logical vector for rows, column numbers for columns. The logical vector has to be exactly as long as the table has rows, which is why the example builds ten TRUEs and FALSEs for a ten-row table. Get that length wrong and you get an error. This form is most useful when you have computed the condition somewhere else and are carrying it around as a variable. If you are writing the condition inline, the formula version reads better.
 
 </details>
 
@@ -1364,7 +1364,7 @@ tab_data %>%
 <details class="transcript">
 <summary>Transcript</summary>
 
-Layout is about the geometry of a table rather than its appearance: which cells are merged, how wide columns are, how tall rows are. The full list is on screen, but we work through only three, which are the three you will actually use. Merging vertically, autofitting, and setting an explicit width. Read the callout at the bottom too. Horizontal merging exists and is rarely wanted, and the honest admission that the instructor has never needed it is more useful to you than a complete tour of functions you will never reach for.
+Layout is about the geometry of a table rather than its appearance: which cells are merged, how wide columns are, how tall rows are. The full list is on screen, but we work through four, which are the four you will actually use. Merging vertically, autofitting, fitting to a maximum width, and setting an explicit width. Read the callout at the bottom too. Horizontal merging exists and is rarely wanted, and the honest admission that the instructor has never needed it is more useful to you than a complete tour of functions you will never reach for.
 
 </details>
 
@@ -1384,7 +1384,7 @@ Here is a list of functions you can use to change the layout of a table:
 + `as_grouped_data()`: grouped data transformation
 
 
-Use the selector syntax to specify where just like the other functions we have seen. We will look at `merge_v()`, `autofit()`, and `width()`. 
+Use the selector syntax to specify where just like the other functions we have seen. We will look at `merge_v()`, `autofit()`, `fit_to_width()`, and `width()`. 
 
 <br>
 
@@ -1477,11 +1477,11 @@ It adjusted the width of the 1st column so that more texts are displayed in a si
 <details class="transcript">
 <summary>Transcript</summary>
 
-This is the one that does what people expect autofit to do. You give it a maximum width in inches and it shrinks the columns until the whole table fits inside it. Same overlong country name as the previous tab, same autofit call, then a ceiling of six inches on top. The columns end up narrower and the long text wraps again, which is the trade you are making. Reach for this when a table is going into a document with a fixed page width and you would rather have wrapped text than a table running off the edge.
+This is the one that does what people expect autofit to do. You give it a maximum width in inches and it reduces the font size one point at a time, running autofit again after each reduction until the table fits inside the limit. Same overlong country name as the previous tab, same autofit call, then a ceiling of six inches on top. The text stays on one line, but the type and recomputed column widths get smaller. Reach for this when a table is going into a document with a fixed page width and you would rather use smaller type than let the table run off the edge.
 
 </details>
 
-`fit_to_width()` shrinks the columns until the whole table fits inside the maximum width you give it (in inches).
+`fit_to_width()` reduces the font size and recomputes the column widths until the table fits inside the maximum width you give it (in inches).
 
 ::: {.columns}
 

@@ -43,7 +43,7 @@ library(data.table)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Raster data is the other half of GIS, and it is a completely different animal from what we did last time. A raster is a grid: fixed rows and columns of equally sized cells, each holding a number. No geometry column, no attribute table, just a rectangle of values plus enough metadata to say where on Earth that rectangle sits. That difference drives everything in this deck. We will cover what the object looks like, how to read and write the various file formats weather and satellite data arrive in, and then three operations you will actually reach for: arithmetic across layers, aggregating to a coarser resolution, and resampling one grid onto another.
+Raster data is the other half of GIS, and it is a completely different animal from what we did last time. A raster is a grid: fixed rows and columns of equally sized cells, each holding a number. A raster has no vector-style geometry column or row-per-feature attribute table, though categorical layers can have associated category tables. Otherwise, it is a rectangle of values plus enough metadata to say where on Earth that rectangle sits. That difference drives everything in this deck. We will cover what the object looks like, how to read and write the various file formats weather and satellite data arrive in, and then three operations you will actually reach for: arithmetic across layers, aggregating to a coarser resolution, and resampling one grid onto another.
 
 </details>
 
@@ -522,7 +522,7 @@ what comes back is rectangular, because a `SpatRaster` can hold many layers:
 
 So `reflec_blue[10100]` is a one-row data.frame, not a number. If you need a plain
 numeric vector, ask for the column — `reflec_blue[10100:10120]$blue` — or use
-`terra::values(reflec_blue)`.
+`terra::values(reflec_blue, mat = FALSE)`.
 :::
 
 <br>
@@ -971,7 +971,8 @@ aggregate(SpatRaster, fact, fun)
 + `fact`: aggregation factor — how many cells in each direction get combined into
 one. `fact = 5` turns each 5-by-5 block of cells into a single cell, so the
 result has 25 times fewer cells. Give one number to use it both horizontally and
-vertically, or `c(x, y)` to differ.
+vertically, or `c(row_factor, column_factor)`, equivalently
+`c(y_factor, x_factor)`, to differ.
 + `fun`: how the values in each block are combined. **Defaults to `"mean"`.**
 Others include `"sum"`, `"min"`, `"max"`, `"median"` and `"modal"`.
 
@@ -1042,7 +1043,7 @@ plot(NIR_ag_2)
 <details class="transcript">
 <summary>Transcript</summary>
 
-Resampling is the fix for two rasters that do not line up, and you will need it more often than you would like, since weather data, soil data and satellite data all come on their own grids. It transfers the values of one raster onto the cell geometry of another so the two become comparable. Look at the picture in the second tab, with red and blue grids overlapping, to see the problem before the syntax. Then read the important note: the default method is bilinear, not nearest neighbour, so leaving method out interpolates your values. On categorical data that produces numbers that are not any category.
+Resampling is the fix for two rasters that do not line up, and you will need it more often than you would like, since weather data, soil data and satellite data all come on their own grids. It transfers the values of one raster onto the cell geometry of another so the two become comparable. Look at the picture in the second tab, with red and blue grids overlapping, to see the problem before the syntax. Then read the important note: the default is bilinear for noncategorical data and nearest neighbour when the first layer is categorical. Specifying `method` explicitly is still clearer.
 
 </details>
 
