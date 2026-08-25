@@ -759,7 +759,7 @@ The reference of all the cited articles will be automatically placed in the Refe
 
 :::{.callout-note title="Instruction"}
 + See the Introduction and Reference sections in the sample qmd and PDF files to confirm this rule.
-+ First create or provide `bibliography.json` before switching to it, or continue using the existing `bibliography.bib`. If you switch to a valid CSL-JSON file, render again and check that citations and references are still there.
++ The sample uses `bibliography.bib`. Quarto also accepts a CSL-JSON file, but you have to create one first; there is no `bibliography.json` in the templates folder to switch to.
 :::
 
 
@@ -768,7 +768,7 @@ The reference of all the cited articles will be automatically placed in the Refe
 <details class="transcript">
 <summary>Transcript</summary>
 
-Different journals want different citation styles, and you should never reformat references by hand. Styles are described by CSL files, and there is a public repository holding essentially every journal's style. You download the csl file you need, point at it with one line in the YAML header, and every citation and the entire reference list reformats. The instruction at the bottom is worth actually doing: the sample article is currently set to the Quarterly Journal of Economics style, so switch it to the PNAS one and render again. Watching a whole bibliography change from one line is the moment this stops feeling abstract.
+Different journals want different citation styles, and you should never reformat references by hand. Styles are described by CSL files, and there is a public repository holding essentially every journal's style. You download the csl file you need, point at it with one line in the YAML header, and every citation and the entire reference list reformats. The instruction at the bottom is worth actually doing: the sample article is currently set to the Quarterly Journal of Economics style, so download another journal's style from that repository, point the csl line at the file you downloaded, and render again. Watching a whole bibliography change from one line is the moment this stops feeling abstract.
 
 </details>
 
@@ -791,8 +791,9 @@ knitr::include_graphics("assets/pictures/yaml-bib-quarto.png")
 ```
 
 :::{.callout-note title="Instruction"}
-+ Comment `csl: qje.csl` and uncomment `csl: pnas.csl` so that the CSL for the Proceedings of the National Academy of Sciences (PNAS) is used
-+ Render the **sample_qmd_article.qmd** file to observe the changes in style
++ Download a different style from the [Zotero citation style repository](https://www.zotero.org/styles), for example the one for the Proceedings of the National Academy of Sciences, and save the `.csl` file next to your qmd
++ Change `csl: qje.csl` in the YAML header to the file you just downloaded
++ Render the **sample_qmd_article.qmd** file again to observe the changes in style
 :::
  
 ### Reference position
