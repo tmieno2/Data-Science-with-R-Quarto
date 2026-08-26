@@ -29,7 +29,7 @@ filters:
 ---
 
 ```{r}
-#| include: false 
+#| include: false
 library(dplyr)
 library(data.table)
 
@@ -42,11 +42,25 @@ source(here::here("lectures/_lecture-theme.R"))
 
 ### Interactive navigation tools
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Before we begin, make sure you know how to move around this deck. Look at the bottom-left corner of the slide. Clicking the button with three horizontal lines opens the table of contents, where you can jump directly to a section such as grouped operations, dot-S-D, or joins. You can also press the letter o to open reveal.js overview mode and see all the slides as a grid. That overview is useful both for navigation and for remembering where the current topic sits in the appendix. These controls do not run any R code. They only help you navigate the lecture.
+
+</details>
+
 + Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
 
 + Hit letter "o" on your keyboard and you will have a panel view of all the slides
 
 ### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The blue-tinted areas in this deck are live R editors. You can change the code and press Run Code to evaluate the whole cell in the browser. If you want to run only part of a cell, highlight that part and press Command plus Enter on a Mac, or Control plus Enter on Windows. The two-sheets icon in the top-right corner copies the cell, which is the easiest way to move an example into your own R session. The reload icon beside it restores the original code after you experiment. Remember that cells can depend on objects created earlier in the deck, so if an example says an object is missing, run the relevant preparation cell first.
+
+</details>
 
 + The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
 + Hit the "Run Code" button to execute all the code inside the code area.
@@ -60,6 +74,13 @@ source(here::here("lectures/_lecture-theme.R"))
 
 ## Learning objectives
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+This appendix gives you a second complete vocabulary for data wrangling. By the end, you should be able to manipulate rows and columns, calculate summaries by groups, reshape between long and wide forms, and merge tables using both ordinary and rolling joins. You already learned these broad tasks with dplyr and tidyr. Here the questions are the same, but the data.table syntax and its memory model are genuinely different. In particular, keep watching for dee-tee bracket i comma j comma by, for operations that modify an object by reference, and for dot-S-D. Those three ideas organize almost everything that follows.
+
+</details>
+
 The objectives of this chapter is to learn how to use the `data.table` package to 
 
 + manipulate data 
@@ -72,6 +93,13 @@ The objectives of this chapter is to learn how to use the `data.table` package t
 
 ### What is it?
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Data.table is an alternative system for working with rectangular data in R. It is especially well known for speed and memory efficiency on large datasets, and the first link on screen takes you to grouping benchmarks. The second link places common dplyr and data.table operations side by side, which is useful while you are translating familiar ideas. Data.table also names its own class, data.table. That class still inherits from data.frame, so ordinary data-frame functions usually work, but data.table adds a compact print method, bracket syntax for transformation, and operations that can change an object by reference. Those additions, rather than speed alone, are the point of this appendix.
+
+</details>
+
 + The `data.table` package is a popular alternative to `dplyr` that is **much faster** than `dplyr` for most data operations particularly when the dataset is large.
   * See [here](https://github.com/Rdatatable/data.table/wiki/Benchmarks-%3A-Grouping) for the speed comparison of `dplyr` and `data.table`.
   * [This website](https://atrebas.github.io/post/2019-03-03-datatable-dplyr/) compares `dply` vs `data.table` side by side.
@@ -80,13 +108,22 @@ The objectives of this chapter is to learn how to use the `data.table` package t
 
 ### preparation
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+The Package part shows the usual one-time installation and per-session loading steps. Install dot packages downloads data.table if you do not already have it, while library data.table attaches its functions for the current R session. The code is marked not to run in the rendered deck because installation is not something we repeat during every lecture.
+
+The Dataset part uses f-read to read the flights fourteen CSV directly into a data.table and assigns it to flights. F-read is data.table's fast file reader, and the surrounding parentheses both save and print the object. The autorun option means this setup runs when the browser session is ready. Many later cells depend on flights, so return here and run it if you restart the session. Once it appears, look at the column names and types rather than trying to read thousands of individual rows.
+
+</details>
+
 **Package**
 
 Install the package if you have not and library it.
 
 ```{r}
 #| eval: false
-#--- install ---# 
+#--- install ---#
 install.packages("data.table")
 
 #--- library ---#
@@ -95,7 +132,7 @@ library(data.table)
 
 **Dataset**
 
-We use the following `weather` dataset.
+We use the following `flights` dataset.
 
 ```{webr-r}
 #| autorun: true
@@ -105,6 +142,15 @@ We use the following `weather` dataset.
 ```
 
 ### how
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the grammar to keep in your head: dee-tee bracket i comma j comma by. The first position, i, answers which rows. That is where a logical condition or row numbers go, so it plays the role that filter usually plays in dplyr. The second position, j, answers what to calculate or return. It can select columns, compute a vector, build a result table, or update columns. The third position, by, says which variables define groups before j is evaluated.
+
+The important difference from a dplyr pipeline is that these are not three separate verbs. They are three parts of one bracket expression, and each part can be omitted. Read the expression as a sentence: from this data.table, use these rows, do this operation, separately for these groups. The next tab uses all three positions together.
+
+</details>
 
 Here is the general form of `data.table` operation.
 
@@ -122,6 +168,15 @@ data.table[i, j, by]
 
 ### key difference from `dplyr`
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here you can see the same question written in the two systems: count American Airlines flights for each origin and month. In the data.table version, carrier equals quote A-A lives in i and filters the rows. Dot parentheses dot-N lives in j and returns a one-column data.table containing the count. Dot-N is a special data.table symbol for the number of rows in the current group. By equals dot parentheses origin comma month defines the groups. Head then shows only the first six groups.
+
+The dplyr version spreads those jobs across filter, group-by, and summarize, then also uses head. The analytical steps are the same, but their organization differs. Data.table puts row selection, calculation, and grouping inside one dee-tee bracket i comma j comma by expression. Dplyr passes a copied result from one named verb to the next. Notice also that summarize n with no assigned name produces a count column with an automatically derived name, whereas the data.table expression here leaves the count named N. We will now slow down and study each bracket position separately.
+
+</details>
+
 You can implement all the three main actions in a single statement unlike `dplyr`:
 
 For example, the following set of codes below will give the same results (the number of flights by American Airline by origin-month):
@@ -138,11 +193,154 @@ flights[carrier == "AA", .(.N), by = .(origin, month)] %>% head()
 **`dplyr`** way :
 
 ```{webr-r}
-flights %>% 
-  filter(carrier == "AA") %>% 
-  group_by(origin, month) %>% 
-  summarize(n()) %>% head()
+flights %>%
+  filter(carrier == "AA") %>%
+  group_by(origin, month) %>%
+  summarize(n()) %>%
+  head()
 ```
+
+:::
+<!--end of panel-->
+
+## Display and accessing parts of the data
+
+::: {.panel-tabset}
+
+### Display method
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Run this cell and notice that printing a large data.table is deliberately compact. Flights is both a data.table and a data.frame, but the data.table print method shows the first five and last five rows with an omission marker between them instead of flooding the slide with the whole dataset. Under each column name it also prints an abbreviated type, such as int, num, or char. A plain data.frame normally attempts to print every row. This display difference is only presentation. It does not mean the middle rows are missing, and it does not change the data. The compact view exists so that typing an object's name remains useful even when the table is large.
+
+</details>
+
+A `data.table` is also a `data.frame`, but it uses a more compact display method.
+
+```{webr-r}
+flights
+```
+
++ A large `data.table` prints the first 5 and last 5 rows, with the omitted rows noted in between.
++ A plain `data.frame` tries to print all its rows by default.
++ Both display column names, but a `data.table` also displays each column's type below its name.
+
+This is why printing `flights` is useful even though it has many rows.
+
+### Rows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Rows go in i, before the comma. In the first example, one colon three is a positional index, so flights bracket one colon three comma returns the first three rows and all columns. In the second, origin equals quote J-F-K is a logical test evaluated using the origin column inside flights. Only matching rows survive, and head three limits the displayed result to three of them.
+
+This is the data.table counterpart to dplyr filter. The logical operators you already know still apply, but you do not write the dataset name in front of every column because data.table evaluates i inside the table. The blank j after the comma means no column operation, so every column is kept. Next we will fill in j and see why its return type matters.
+
+</details>
+
+Rows come before the comma in `data.table[i, j, by]`.
+
+**Rows by position**
+
+```{webr-r}
+flights[1:3, ]
+```
+
+<br>
+
+**Rows that satisfy a condition**
+
+```{webr-r}
+flights[origin == "JFK", ] %>% head(3)
+```
+
+### Columns and single values
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These examples all target arrival delay, but they return different shapes. Flights bracket comma arr-delay evaluates the column directly in j, so the result is a numeric vector. Double-bracket quote arr-delay also returns that vector, using ordinary data-frame-style extraction. Flights bracket comma dot parentheses arr-delay wraps the column in a list, and data.table turns each list element into a result column, so you get a one-column data.table. Head only shortens what you see.
+
+That vector-versus-table distinction affects what you can chain next. Use the bare column or double brackets when a later function needs a vector. Use dot parentheses when you want to preserve a rectangular table. The final expression supplies row one in i and the bare column in j, so it returns the single arrival-delay value from row one rather than a one-row table. The next tab handles the extra indirection needed when the column name is stored as text.
+
+</details>
+
+These three ways of selecting one column do not all return the same type of object:
+
+```{webr-r}
+#--- a vector ---#
+flights[, arr_delay] %>% head()
+
+#--- also a vector; the name is a character string ---#
+flights[["arr_delay"]] %>% head()
+
+#--- a one-column data.table ---#
+flights[, .(arr_delay)] %>% head()
+```
+
+To get one value, specify one row and let `j` return the column as a vector:
+
+```{webr-r}
+flights[1, arr_delay]
+```
+
+### A column name stored as text
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the name arr-delay is stored in an R object called column-name. Double brackets use the character value inside that object and return the corresponding column as a vector. Inside data.table j, dot-dot-column-name tells data.table to step outside the table and find the R object in the calling environment. Because that expression selects a column by name, the result remains a one-column data.table.
+
+Without the two leading dots, flights bracket comma column-name means something else: look inside flights for a column literally called column-name. This table has no such column, so it errors. This distinction exists because data.table normally treats names inside i and j as column names, which makes interactive expressions concise. Use double brackets for a vector and dot-dot for an externally stored name when you want a data.table. Do not confuse this two-dot pronoun with dot-S-D, which we meet later.
+
+</details>
+
+Suppose a column name is stored in an R object:
+
+```{webr-r}
+column_name <- "arr_delay"
+
+#--- a vector ---#
+flights[[column_name]] %>% head()
+
+#--- a one-column data.table ---#
+flights[, ..column_name] %>% head()
+```
+
+`flights[, column_name]` needs care: `data.table` looks for a column literally named `column_name`, rather than using the text stored inside the object. Here it gives an error because there is no such column. Use `[[column_name]]` when you want a vector, or `[, ..column_name]` when you want a `data.table`.
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This exercise combines row and column selection with scalar extraction. First, put twenty colon twenty-five in i to keep six rows. In j, wrap origin, carrier, and arr-delay in dot parentheses so the result stays a three-column data.table and follows that column order. Then write a second expression with row twenty in i and bare arr-delay in j to return one value. Predict the type of each result before you run it. Use the empty Work here tab for your code, and open the folded Answer only after you have tried. The answer tab itself needs no narration because it simply contains those two completed expressions.
+
+</details>
+
+##### Exercise 1
+
+Using `flights`, return rows 20 through 25 and keep `origin`, `carrier`, and `arr_delay` as a `data.table`. Then extract the `arr_delay` value from row 20 as a single value.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights[20:25, .(origin, carrier, arr_delay)]
+flights[20, arr_delay]
+```
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -152,6 +350,13 @@ flights %>%
 ::: {.panel-tabset}
 
 ### Filter rows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is row filtering in the i position. Read the expression as: from flights, keep rows whose origin is J-F-K and whose month is the integer six, then return all columns. The double ampersand condition shown here uses a single ampersand, which performs element-by-element logical and, so both tests must be true for a row to survive. The L suffix marks six as an integer, matching the month column's stored type, although an ordinary numeric six would compare equal here. The empty j after the comma means all columns, and there is no by argument, so no grouping occurs. Head limits the display rather than the filtered object. This is the same condition you would give dplyr filter, but data.table places it directly inside the brackets.
+
+</details>
 
 You can filter rows that satisfy certain conditions like below:
 
@@ -168,6 +373,13 @@ flights[origin == "JFK" & month == 6L, ] %>% head()
 ::: {.panel-tabset}
 
 #### Single column
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Look at the two cells and focus on the wrapper in j. Bare arr-delay returns the column itself as a vector. Dot parentheses arr-delay is shorthand for list of arr-delay, and a list result becomes a data.table, one list element per output column. Both calls show the same first values because head is applied afterwards, but the objects are not the same type. This differs from dplyr select, which consistently returns a table when you select one column. In data.table, you choose deliberately between a vector for calculation and a one-column table for further table operations. Flip to Multiple columns next, where the list form becomes essential.
+
+</details>
 
 **single column as a vector**
 
@@ -189,6 +401,15 @@ flights[, .(arr_delay)] %>% head()
 
 #### Multiple columns
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+To return several columns, j must produce a list. Dot parentheses arr-delay comma dep-delay is the short form, so the first output keeps those two original names. In the second example, a equals arr-delay and b equals dep-delay name the list elements, and those names become the result's column names. This is selection and renaming in one expression.
+
+The callout states the general rule: whenever j returns a list, data.table treats each list element as a column in the resulting data.table. The elements must have compatible lengths, typically one value per selected row or one value per group. This rule is why dot parentheses appears so often. It is not decorative punctuation. It controls the structure of the output. The next tab shows another selection style that is closer to base data.frame syntax.
+
+</details>
+
 **multiple column as a data.table**
 
 ```{webr-r}
@@ -209,6 +430,15 @@ As long as j-expression returns a list, each element of the list will be convert
 :::
 
 #### Like a `data.frame`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You can also supply a character vector of names in j. C of quote arr-delay comma quote dep-delay selects those two columns and returns a data.table, just as character-name selection does for a data.frame. To drop columns, put either an exclamation mark or a minus sign before that character vector. Both displayed calls remove arrival and departure delay while retaining the other columns, and head three shows the first three rows.
+
+This form is useful when names are already stored as text or when the keep and drop lists are long. It is different from dot-dot-column-name on the earlier slide, which refers to one external object holding a name. Here the character vector is written directly in j. With selection covered, move back to the outer tabs and look at j doing actual calculations.
+
+</details>
 
 **Select variables (like `data.frame`)**
 
@@ -234,10 +464,18 @@ flights[, -c("arr_delay", "dep_delay")] %>% head(3)
 
 ### Operations in `j`
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+J is not limited to selecting columns. In the first cell, data.table adds arrival delay and departure delay row by row, compares each sum with zero, and returns a logical vector. A row is true when the combined delay is negative. Because the expression is not wrapped in a list, the result is a vector rather than a table.
+
+The second cell uses i and j together. I keeps J-F-K flights in June. J computes mean arrival delay and mean departure delay and wraps the two named summaries in dot parentheses, so the output is a one-row, two-column data.table. There is no by, so each mean is calculated across all selected rows. The dplyr version performs the same row filter and summaries through two verbs and a pipe. This is the practical meaning of dee-tee bracket i comma j comma by: you can select the observations and calculate on them in one statement. One caution for your own work is to decide how missing values should be handled before taking a mean.
+
+</details>
+
 **An operation in `j`**
 
 ```{webr-r}
-
 flights[, (arr_delay + dep_delay) < 0] %>% head()
 ```
 
@@ -249,7 +487,7 @@ flights[, (arr_delay + dep_delay) < 0] %>% head()
 flights[
   origin == "JFK" & month == 6L, # i
   .(m_arr = mean(arr_delay), m_dep = mean(dep_delay)) # j
-  ]
+]
 ```
 
 Remember the rule? `.(m_arr = mean(arr_delay), m_dep = mean(dep_delay))` is a list, so the output is a `data.table`.
@@ -259,7 +497,7 @@ Remember the rule? `.(m_arr = mean(arr_delay), m_dep = mean(dep_delay))` is a li
 **`dplyr` way**:
 
 ```{webr-r}
-filter(flights, origin == "JFK" & month == 6L) %>% 
+filter(flights, origin == "JFK" & month == 6L) %>%
   summarize(m_arr = mean(arr_delay), m_dep = mean(dep_delay))
 ```
 
@@ -269,13 +507,22 @@ filter(flights, origin == "JFK" & month == 6L) %>%
 
 #### preparation
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+We need a small table so that changes are easy to see. The first expression starts from flights, groups by month, and evaluates head dot-S-D comma two inside each group. Dot-S-D means the current subset of data for that month, so this keeps two flights from every month one through four. The piped bracket then keeps year, month, day, departure delay, arrival delay, distance, and air time. The result is assigned to flights-mini and printed, giving eight rows, two per month.
+
+The second autorun cell creates flights-mini-no-change with copy. Copy is crucial because data.table updates can share memory and modify an existing object by reference. This independent snapshot gives us something to compare against after the next tabs change flights-mini. The context output option keeps this setup associated with the browser output context. Move to A variable to see the first by-reference assignment.
+
+</details>
+
 Create the following dataset we are going to use in this slide:
 
 ```{webr-r}
 #| autorun: true
 (
-flights_mini <- flights[month <= 4,head(.SD, 2), by = month] %>% 
-  .[, .(year, month, day, dep_delay, arr_delay, distance, air_time)] 
+  flights_mini <- flights[month <= 4, head(.SD, 2), by = month] %>%
+    .[, .(year, month, day, dep_delay, arr_delay, distance, air_time)]
 )
 ```
 
@@ -284,12 +531,21 @@ flights_mini <- flights[month <= 4,head(.SD, 2), by = month] %>%
 `flights_mini` has two observations per month.
 
 ```{webr-r}
-#| context: output 
+#| context: output
 #| autorun: true
 flights_mini_no_change <- copy(flights_mini)
 ```
 
 #### a variable
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Data.table uses colon-equals inside j to create or replace a column. Flights-mini bracket comma speed colon-equals distance divided by air-time computes one value per row and adds speed directly to flights-mini. The following bare object prints the changed table, including the new column.
+
+The callout is the key conceptual difference from dplyr. Colon-equals updates by reference, so the original object changes even though you did not assign the bracket expression back to it. A dplyr mutate call normally returns a modified copy and leaves its input unchanged unless you explicitly assign the result. This is fast and memory-efficient, but it means that a line can have a lasting side effect. The callout's reference to checking flights-mini is the right test: print the object after the operation and confirm speed is present. Every colon-equals example that follows has this same by-reference behavior.
+
+</details>
 
 In `data.table`, you use `:=` to create a new variable instead of `=`.
 
@@ -310,6 +566,15 @@ flights_mini
 
 #### copy
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+When you need to preserve the original values, use data.table copy before a by-reference update. Flights-mini-copy receives a deep copy of flights-mini, meaning the two objects no longer share the column memory that colon-equals will change. The next line adds constant equals one to flights-mini itself. Printing flights-mini-copy shows that constant is absent there, even though it now exists in flights-mini.
+
+Ordinary assignment, such as copy-name gets flights-mini, is not a safe substitute in this situation because data.table can initially share memory between the two names. Copy makes the independence explicit. Use it when you need a before version, when you are about to experiment destructively, or when a function should not surprise its caller by altering an input. Next we will use colon-equals to create several columns at once.
+
+</details>
+
 If you have a reason to not wanting the original data to be altered after `:=` operations. You can create a `deep copy` of the dataset using `data.table::copy()` function.
 
 The object created by `copy()` is independent of the original dataset in the sense that actions on one of them do not affect the other.
@@ -327,13 +592,22 @@ flights_mini_copy
 
 #### multiple
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+There are two supported forms for creating several columns by reference. In the first, the left side of colon-equals is a character vector containing total-delay and carrier-origin, while the right side is a list of two expressions. Data.table matches by position: arrival delay plus departure delay goes to the first name, and distance divided by air time goes to the second. That second name is only a label here, so read the formula rather than assuming it contains carrier or origin.
+
+The second form calls the colon-equals function explicitly and writes name equals expression pairs inside it. Total-delay and speed are updated in one j expression. This form is often easier to read because each name sits beside its calculation. Both cells modify flights-mini itself and return no separate transformed copy. Print flights-mini after running them to confirm the new or overwritten columns. The next tab combines row filtering in i with the same by-reference update in j.
+
+</details>
+
 Here are how you define multiple variables at the same time.
 
 **Multiple variable 1**
 
 ```{webr-r}
 #--- example ---#
-flights_mini[, c("total_delay", "carrier_origin") := list(arr_delay + dep_delay, distance/air_time)]
+flights_mini[, c("total_delay", "carrier_origin") := list(arr_delay + dep_delay, distance / air_time)]
 ```
 
 The results of the `n`th expression is assigned to `n`th variable name on the left.
@@ -344,12 +618,21 @@ The results of the `n`th expression is assigned to `n`th variable name on the le
 
 ```{webr-r}
 #--- example ---#
-flights_mini[, `:=`(total_delay = arr_delay + dep_delay, speed = distance/air_time)]
+flights_mini[, `:=`(total_delay = arr_delay + dep_delay, speed = distance / air_time)]
 ```
 
 Confirm that `flights_mini` was updated to have the new variables defined just above.
 
 #### selective update
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Selective updating is where the i comma j structure becomes especially useful. Month equals four in i selects only April rows, and arr-delay colon-equals arr-delay plus ten in j changes arrival delay for just those rows. This is the data.table counterpart to a dplyr mutate with if-else or a filtered update.
+
+Notice that the expression begins with copy of flights-mini. That temporary deep copy is the object being updated, so the flights-mini object in your session is protected. The returned table shows April arrival delays increased by ten and all other rows unchanged. Without copy, the same bracket expression would permanently alter flights-mini. This is a good pattern when you want to demonstrate or inspect a proposed update without committing it. Next we keep all rows but calculate within groups.
+
+</details>
 
 You can update column values for some rows that satisfy certain conditions by using logical evaluations in `i` and `:=` in `j`.
 
@@ -360,6 +643,15 @@ copy(flights_mini)[month == 4, arr_delay := arr_delay + 10]
 ```
 
 #### assign summary
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This expression calculates a group summary without collapsing the data. By equals month divides flights-mini into monthly groups. Within each group, mean of arr-delay with n-a dot r-m true removes missing delays and produces one number. Colon-equals assigns that number to mean-arr-delay for every row in the group. The display then selects month, each row's original arrival delay, and the repeated monthly mean, so you can see that both rows in a month share the same summary.
+
+This corresponds to dplyr group-by followed by mutate, not group-by followed by summarize. The rows remain because colon-equals attaches the group result to the existing table. It also changes flights-mini by reference and leaves no persistent grouping metadata behind. In data.table, by applies to this one expression; a later bracket call is ungrouped unless it supplies by again.
+
+</details>
 
 You can calculate grouped summary and assign the values to a variable by grouping in `by` and `:=` with summary expressions in `j`.
 
@@ -384,6 +676,15 @@ Of course, all the rows in the same month will have the same value (mean of the 
 
 ### By a single variable
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here dee-tee bracket i comma j comma by becomes a grouped count. I is omitted, so all flight rows are used. J is dot parentheses dot-N: dot-N is data.table's special symbol for the number of rows in the current group, and the list wrapper makes it a result column named N. By equals dot parentheses origin creates one group for each airport of origin. The output therefore has one row per origin, with its flight count.
+
+This is the data.table counterpart to dplyr group-by origin followed by summarize n equals n. Unlike a grouped dplyr object, the result does not carry grouping state into later expressions. By controls only this call. Move to the next tab to add a second grouping variable.
+
+</details>
+
 The number of flights by `origin`.
 
 ```{webr-r}
@@ -398,8 +699,17 @@ flights[, .(.N), by = .(origin)]
 
 ### By multiple variables
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+To group by a combination of variables, list them together in by. Dot parentheses origin comma month defines one group for every origin-month combination. J again returns dot-N, so each output row gives the number of flights for one combination. Head limits the display to six groups.
+
+Think of the grouping key as the pair, not as two separate summaries. A J-F-K flight in January belongs to a different group from J-F-K in February and from L-G-A in January. This matches dplyr group-by origin comma month, but data.table does not leave the returned table grouped after the calculation. The next tab fills i as well, completing all three parts of the grammar.
+
+</details>
+
 ```{webr-r}
-flights[, .(.N), by = .(origin, month)] %>% 
+flights[, .(.N), by = .(origin, month)] %>%
   head()
 ```
 
@@ -407,6 +717,15 @@ The number of flights by `origin` and `month`.
 
 
 ### Grouped operations for select observations  
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now all three positions do real work. Carrier equals quote A-A in i keeps only American Airlines flights. Dot parentheses dot-N in j counts rows. By equals dot parentheses origin comma month forms the groups, and head shows the first six. Read it aloud as: from flights, among A-A rows, return the number of observations for each origin and month.
+
+The dplyr pipeline below answers the same question in three named stages: filter the carrier, group by origin and month, then summarize the count. Data.table compresses those stages into one bracket expression, but the logic has not changed. When you debug a compact expression, separate it mentally into i, j, and by and verify each clause. This is also why data.table is not simply shorter dplyr syntax. Its bracket call is a small query language with three coordinated roles.
+
+</details>
 
 ```{webr-r}
 flights[carrier == "AA", .(.N), by = .(origin, month)] %>% head()
@@ -419,12 +738,47 @@ The number of flights by `origin` and `month` for `carrier == "AA"`
 **`dplyr`** way :
 
 ```{webr-r}
-flights %>% 
-  filter(carrier == "AA") %>% 
-  group_by(origin, month) %>% 
+flights %>%
+  filter(carrier == "AA") %>%
+  group_by(origin, month) %>%
   summarize(n()) %>%
   head()
 ```
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For this exercise, translate the English question into i, j, and by before writing code. Flights that left J-F-K in June gives i: origin equals J-F-K and month equals integer six. By carrier gives by equals carrier. J must return two named summaries: n-flights equals dot-N and mean-arr-delay equals mean of arrival delay with missing values removed. Wrap both in dot parentheses so the result is a data.table with one row per carrier. Predict that structure first, then work in the empty tab. The folded Answer is deliberately just a check after you have made the three-part translation yourself.
+
+</details>
+
+##### Exercise 2
+
+Using `flights`, find the number of flights and the mean arrival delay by carrier for flights that left JFK in June.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights[
+  origin == "JFK" & month == 6L,
+  .(n_flights = .N, mean_arr_delay = mean(arr_delay, na.rm = TRUE)),
+  by = carrier
+]
+```
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -435,6 +789,15 @@ flights %>%
 ::: {.panel-tabset}
 
 ### Sorting
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Sorting changes row order, so the first approach puts base R order in i. In the syntax box, order of one or more variables returns row positions arranged by those values. The example orders by origin first and distance second, both ascending, then head shows the earliest rows under that ordering. Flights itself is unchanged because bracket subsetting returns a sorted result.
+
+Set-order is the by-reference alternative. First copy protects flights and creates flights-sorted. Set-order then sorts that object by origin ascending and distance descending, with the minus sign requesting descending order. It returns invisibly, so you do not assign its result and you see no table until the next line prints selected columns. This differs from dplyr arrange, which returns a reordered copy. Choose the bracket form when you want a new result, and set-order when you intentionally want to reorder the existing data.table without allocating another full copy.
+
+</details>
 
 You can use `order()` from the base package to sort a `data.table`.
 
@@ -452,15 +815,73 @@ data.table[order(variable 1, vairable 2, ..), ]
 **Example**
 
 ```{webr-r}
-flights[order(origin, distance),] %>% head()
+flights[order(origin, distance), ] %>% head()
 ```
 
+<br>
+
+You can instead use `setorder()` to sort the existing `data.table` in place. Put `-` before a column for descending order.
+
+```{webr-r}
+flights_sorted <- copy(flights)
+
+setorder(flights_sorted, origin, -distance)
+
+flights_sorted[, .(origin, distance)] %>% head()
+```
+
+`setorder()` changes `flights_sorted` itself and prints nothing when it runs, so there is no new table to assign. In contrast, `flights[order(origin, -distance)]` returns a newly sorted `data.table` and leaves `flights` unchanged.
+
+### Reorder columns
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Set-col-order changes the physical column order of an existing data.table. We first copy flights so the original is protected. Supplying quote origin moves that column to the front, and the following print lets you see it there. The second call supplies carrier, origin, and distance as a character vector, so those become the first three columns in exactly that order.
+
+Every unnamed column stays behind them and retains its relative order, as the sentence on screen explains. This is the data.table counterpart to dplyr relocate, but the memory behavior is different: relocate returns a transformed table, while set-col-order modifies flights-ordered by reference and returns invisibly. Column values and row order do not change. Only where columns are stored and displayed changes.
+
+</details>
+
+`setcolorder()` is the `data.table` answer to `dplyr::relocate()`. It changes column order in place.
+
+**Move one column to the front**
+
+```{webr-r}
+flights_ordered <- copy(flights)
+
+setcolorder(flights_ordered, "origin")
+
+flights_ordered %>% head()
+```
+
+<br>
+
+**Move several columns to the front in a particular order**
+
+```{webr-r}
+setcolorder(flights_ordered, c("carrier", "origin", "distance"))
+
+flights_ordered %>% head()
+```
+
+Columns not named in `setcolorder()` stay behind the named columns in their existing relative order.
+
 ### Rename
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Set-names renames columns by reference. The first character vector gives the old names, destination and air-time as they exist before the call, and the second gives their replacements, destination spelled out and Air-Time with capitals. Because flights is piped into set-names, the function receives flights as its first argument.
+
+The note is essential: like colon-equals, set-names changes the original data.table itself. The pipe does not turn it into a copy. After this cell, the object called flights has the new names, and later code that expects dest or lower-case air-time would need either the new names or a fresh flights object. With dplyr rename, you normally write new name equals old name and assign the returned copy. With set-names, old names and new names are paired by position, and the input is altered. Use copy first if you need both naming schemes.
+
+</details>
 
 You can use `setnames()` to rename variables.
 
 ```{webr-r}
-flights %>% 
+flights %>%
   setnames(c("dest", "air_time"), c("destination", "Air_Time"))
 ```
 
@@ -468,6 +889,15 @@ Note: `setnames()` is one of the `data.table` operations that updates the datase
 
 
 ### Shift
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Shift creates lagged or leading values. In the first call, n equals one and type equals quote lag move air-time down by one row, so the first lag is N-A and each later row receives the preceding row's air time. The next call uses n equals two and type lead, so each row receives the value two rows ahead and the last two positions are N-A. Both new columns are attached to flights-mini by reference.
+
+The grouped example adds by equals month. Shift now restarts within every month, so the first row of each month gets N-A rather than borrowing the last air time from the preceding month. That is normally what you want for longitudinal calculations. The final selection prints the source and lag columns so you can compare them. This plays the same role as dplyr lag and lead, but the surrounding data.table syntax controls grouping and assignment in the same call.
+
+</details>
 
 The `data.table::shift()` function can move up or down a variable.
 
@@ -490,25 +920,52 @@ flights_mini[, .(air_time, air_time_lag)]
 
 ### Duplicated
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Duplicated returns one logical value per row. The by argument says that year, month, day, and hour together define the comparison key. A false value marks the first occurrence of a key, while true marks a later row whose key has already appeared. Head ten shows only the first ten flags, not a count and not the duplicated rows themselves.
+
+Because the code is piped, flights becomes the first argument to duplicated. This is a diagnostic you can use before joins: if duplicated is ever true for your intended key, that key does not uniquely identify rows on that side. One precision to keep in mind is that the first member of a repeated group is false, even though another identical-key row exists later. Use any duplicated or a grouped count when your question is whether any key repeats at all.
+
+</details>
+
 `duplicated()` checks whether each of the observations have other observations that are identical in values of the user-specified variables, and returns a TRUE/FALSE vector of length equal to the number of rows of the data.
 
 The following code checks if there are any other flights that fly on the same hour of the same day.
 
 ```{webr-r}
-flights %>% 
-  duplicated(by = c("year", "month", "day", "hour")) %>% 
+flights %>%
+  duplicated(by = c("year", "month", "day", "hour")) %>%
   head(10)
 ```
 
 ### Unique
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Unique keeps the first row for each distinct combination of year, month, day, and carrier and removes later rows with the same combination. The by argument controls which columns define sameness; columns outside that list are carried from the retained representative row. The returned object is a smaller data.table, while flights itself remains unchanged because there is no by-reference assignment.
+
+This is closely related to duplicated rather than literally its logical opposite. Duplicated flags later repetitions; unique uses that idea to retain one representative per key. A retained row is not necessarily a key that occurred only once in the original data. If you need only groups that were truly observed once, count dot-N by the key and filter to dot-N equals one instead.
+
+</details>
+
 `unique()` does the opposite of `duplicated()`. After applying `unique()`, you will be left with only the observations that are unique in all of the variables specified by the user (There will be only one observation that has the same values in all the user-specified variables).
 
 ```{webr-r}
-unique(flights, by = c("year", "month", "day", "carrier"))  
+unique(flights, by = c("year", "month", "day", "carrier"))
 ```
 
 ### `fcase()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+F-case is data.table's multi-branch conditional helper, similar to dplyr case-when. You provide condition and value pairs in order. For each element, the value associated with the first true condition is returned. The example classifies arrival delays below the overall mean as false and delays at or above the mean as true, then assigns the result by reference to above-average-delay and prints it beside the source column. In the displayed flights data, values such as 13 and 9 appear as true because they exceed the overall mean, while minus 26 and 1 appear as false. The whole result is a two-column data.table with the original arrival delay and its new logical label.
+
+Because this example has only two outcomes, f-if-else would be the simpler helper, which is what the note says. F-case becomes most useful with three or more ordered conditions. In your own data, also decide what should happen when an input or summary is missing, because a row that matches no condition receives a missing result unless you provide a fallback.
+
+</details>
 
 `fcase()` is like `case_when()` in `dplyr`. 
 
@@ -527,9 +984,9 @@ fcase(
 
 ```{webr-r}
 flights[, above_average_dealy := fcase(
-  arr_delay < mean(arr_delay), FALSE,  
-  arr_delay >= mean(arr_delay), TRUE  
-)]  
+  arr_delay < mean(arr_delay), FALSE,
+  arr_delay >= mean(arr_delay), TRUE
+)]
 
 flights[, .(arr_delay, above_average_dealy)]
 ```
@@ -538,17 +995,62 @@ Note: for this example, we could have just used `fifelse()` as the created varia
 
 ### Piping
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+You can chain data.table expressions with the magrittr pipe. The first bracket call counts flights by origin and month. On the right side of each later pipe, a leading dot stands for the data.table produced by the preceding step, and the following brackets apply another i comma j comma by operation to it. Read the template as: make one data.table, pass it forward as dot, and continue querying.
+
+This is visually similar to a dplyr pipeline, but each stage is still data.table bracket grammar rather than a named verb. Also remember that a stage containing colon-equals or a set function may modify the object it receives by reference. A pipe does not automatically make each stage non-destructive. The code is marked not to run because i, j, and by are placeholders rather than defined objects.
+
+</details>
+
 You can use `%>%` to chain piped operations just like `dplyr` using `.` to refer to the `data.table` generated through the preceding actions. 
 
 **Example:**
 
 ```{r}
 #| eval: false
-flights[, .(.N), by = .(origin, month)] %>% 
-  .[i, j, by] %>% 
-  .[i, j, by] %>% 
-  .[i, j, by]  
+flights[, .(.N), by = .(origin, month)] %>%
+  .[i, j, by] %>%
+  .[i, j, by] %>%
+  .[i, j, by]
 ```
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This exercise combines two by-reference tools, so begin by copying flights to flights-exercise. Set-col-order should receive carrier, origin, and distance in that order, moving them to the first three positions while leaving the rest behind. Then set-order should sort the same object by carrier ascending and distance descending, using a minus sign before distance. Neither set function needs assignment because each modifies flights-exercise directly and returns invisibly. Finally, print head to inspect both the column order and the leading rows. Use the empty Work here tab first; the folded Answer is only for checking that you protected the original and used the two set functions in the right sequence.
+
+</details>
+
+##### Exercise 3
+
+Make a copy of `flights`. Move `carrier`, `origin`, and `distance` to the first three columns in that order, then sort by `carrier` in ascending order and `distance` in descending order.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+flights_exercise <- copy(flights)
+
+setcolorder(flights_exercise, c("carrier", "origin", "distance"))
+setorder(flights_exercise, carrier, -distance)
+
+flights_exercise %>% head()
+```
+
+:::
+<!--end of panel-->
 
 :::
 <!--end of panel-->
@@ -559,19 +1061,37 @@ flights[, .(.N), by = .(origin, month)] %>%
 
 ### Instruction
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Dot-S-D stands for subset of data, and it represents the current data.table available to j. This preparation expression also gives you a preview of why that matters. Flights is grouped by month. For each month, head dot-S-D comma two returns the first two rows of that month's subset. The next piped bracket keeps year, month, departure delay, and arrival delay, producing a small flights-mini with two rows for every month.
+
+Do not think of dot-S-D as one permanent object stored somewhere. Its contents depend on the current i, by, and dot-S-D-cols settings. Without grouping it can represent the full selected table. With grouping it becomes one group at a time. That changing meaning is what makes the next examples powerful and what makes dot-S-D difficult at first. Move to What is it and watch the groups explicitly.
+
+</details>
+
 `.SD` (which stands for **S**ubset **D**ata) is a special symbol that allows you to do many cool things.
 
 Let's create a small `data.table` that will help us understand what `.SD` does (we will come back to the code later).
 
 ```{webr-r}
 (
-flights_mini <- flights[,head(.SD, 2), by = month] %>% 
-  .[, .(year, month, dep_delay, arr_delay)]
+  flights_mini <- flights[, head(.SD, 2), by = month] %>%
+    .[, .(year, month, dep_delay, arr_delay)]
 )
 ```
 
 
 ### What is it?
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Without by, flights-mini bracket comma dot-S-D simply returns the data.table available to j, so it is equivalent to flights-mini here. With by equals month, data.table splits the rows and evaluates j separately. Print dot-S-D lets you see each monthly subset as it is processed. Because month is the grouping column, it is excluded from dot-S-D by default. The printed subsets therefore contain the other columns, while the combined result of the full expression adds month back as the by column.
+
+This is different from dplyr grouping metadata. Dot-S-D is not a grouped table that persists after the call. It is a temporary view supplied during this j evaluation. Think of data.table repeatedly asking: for the current month, what is the subset of non-grouping columns, and what should j do with it? The next tab passes that subset to l-apply.
+
+</details>
 
 Without grouping specified in `by`, `.SD` is the `data.table` itself. So, `flights_mini[, .SD]` is the same as `flights_mini` 
 
@@ -585,6 +1105,15 @@ flights_mini[, print(.SD), by = month]
 Note that `.SD` contains all the columns except the grouping columns by default.
 
 ### Example 1
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+L-apply takes a list and applies the same function to every element. A data.table is a list of columns, so l-apply dot-S-D comma mean calculates the mean of every column in flights-mini. Because l-apply returns a named list inside j, data.table converts that list to a one-row data.table whose column names match the inputs.
+
+The base R call l-apply flights-mini comma mean performs the same column calculations, but outside data.table j it remains an ordinary list, which is why the slide contrasts the output types. The dplyr counterpart is summarize with across everything comma mean, which also returns one summary row. The analytical idea is identical across all three: send every selected column through the same function. Data.table's distinctive part is using dot-S-D to supply the current set of columns to l-apply.
+
+</details>
 
 Apply the same function across all the variables:
 
@@ -610,6 +1139,15 @@ summarize(flights_mini, across(everything(), mean))
 
 ### Example 2
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Adding by equals month changes the unit of calculation. Data.table now forms one monthly group, sets dot-S-D to that group's non-grouping columns, and applies mean to each column. The result has one row per month, the month key first, and a mean for every column that was inside dot-S-D. Head shortens the printed result.
+
+The dplyr pipeline expresses the same operation with group-by month and summarize across everything comma mean. In dplyr, across automatically avoids summarizing the grouping column. In data.table, the grouping column is excluded from dot-S-D by default for the same practical reason. The syntax differs, but both outputs pair each month with column-wise means. The next tab shows how to restrict dot-S-D so that only meaningful numeric columns are processed.
+
+</details>
+
 Apply the same function across all the variables by group:
 
 ```{webr-r}
@@ -621,12 +1159,22 @@ flights_mini[, lapply(.SD, mean), by = month] %>% head()
 **dplyr** way:
 
 ```{webr-r}
-flights_mini %>% 
-  group_by(month) %>% 
-  summarize(across(everything(), mean)) %>% head()
+flights_mini %>%
+  group_by(month) %>%
+  summarize(across(everything(), mean)) %>%
+  head()
 ```
 
 ### Columns of choice
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Dot-S-D-cols controls which columns dot-S-D contains. Here by equals month still defines the groups, but dot-S-D-cols is the character vector arr-delay and dep-delay. L-apply therefore calculates only those two monthly means, and the output contains month plus the two summary columns.
+
+Notice where dot-S-D-cols appears: it is another argument after by, not part of the three main positions. Also notice the required naming style. Dot-S-D-cols expects names, positions, or selection patterns. The failing cell uses dot parentheses arr-delay comma dep-delay, which tries to evaluate those names as objects while constructing a list outside the usual j column context. With the displayed setup it errors. Use a character vector for this explicit-name case. This separation between the data in dot-S-D and the columns selected into it is the key to using the feature safely.
+
+</details>
 
 Instead of let `.SD` contain all the columns, you can use `.SDcols` to pick variables to be included in `.SD` after `by,`.
 
@@ -645,6 +1193,15 @@ flights_mini[, lapply(.SD, mean), by = month, .SDcols = .(arr_delay, dep_delay)]
 ```
 
 ### Maximum
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This pattern returns rows rather than only summary values. By carrier and month, dot-S-D is the current group's non-grouping table. Inside it, which-max of arr-delay returns the position of the first maximum, and dot-S-D bracket that position selects the complete flight row. Data.table then adds carrier and month back to the result. You get one selected row for each group where a maximum position is available.
+
+The second form filters dot-S-D to rows whose arrival delay equals max arrival delay. It returns the same selected maximum when a group has one unique, nonmissing maximum, but it is not equivalent in every dataset. Which-max returns the first maximum position, while the equality form can return several tied rows. If a group contains missing values, max also needs an explicit missing-value policy. The slide should eventually qualify the word equivalently and define tie behavior. For now, keep the central idea: dot-S-D lets j select a whole row from within each group while preserving all of that row's other columns.
+
+</details>
 
 A very important use case of `.SD` is identifying the observation with the maximum (or minimum) value of a variable by group. 
 
@@ -668,15 +1225,24 @@ Remember that `.SD` is a list of `data.table`s grouped by carrier and month. `.S
   
 ### Data preparation
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+This cell creates the long-form table used in both reshaping directions. Repeating each state twice gives one row for 2019 and one for 2020. Repeating the two-year sequence four times pairs those years with all four states, and the eight yield values fill the measurements. Data-table constructs the object directly as a data.table. The surrounding parentheses assign it to yield-data-long and print it, so you should see eight rows and three columns: state, year, and yield.
+
+This is the same long structure used in the tidyr lecture. One yield column holds one variable, while year tells you which occasion each value belongs to. On the next tab, year values will become column headers and yield values will fill those new columns.
+
+</details>
+
 Create the following datasets in the long format:
 
 ```{webr-r}
 #| autorun: true
 (
-yield_data_long <- data.table(
-  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-  year = c(2019, 2020) %>% rep(4),
-  yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  yield_data_long <- data.table(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
   )
 )
 ```
@@ -684,12 +1250,21 @@ yield_data_long <- data.table(
 
 ### long to wide
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+D-cast converts a long data.table to wide form. Read the formula state tilde year as: state identifies the output rows, and the distinct year values identify new columns. Value dot var equals quote yield says that the cells should come from the yield column. The output has four rows, one per state, and columns state, 2019, and 2020. D-cast keys this result by the formula's left side, so the printed state order is sorted by that key.
+
+The bullets translate directly to tidyr pivot-wider. The right side B corresponds to names-from, value dot var C corresponds to values-from, and the variables on the left side A are the identifiers that stay as rows. Compare the original and wide tables side by side. Kansas's 200 and 240 have not changed; they have moved from two rows into the 2019 and 2020 columns. Move to Wide to long to reverse that organization.
+
+</details>
+
 You can use `dcast()` function to make a long dataset wide:
 
 **Syntax**
 
 ```{r eval = F}
-#--- NOT RUN ---#  
+#--- NOT RUN ---#
 dcast(data.table, A ~ B, value.var = C)
 ```
 
@@ -721,7 +1296,7 @@ Wide data:
 
 ```{webr-r}
 (
-yield_data_wide <- dcast(yield_data_long, state ~ year, value.var = "yield")
+  yield_data_wide <- dcast(yield_data_long, state ~ year, value.var = "yield")
 )
 ```
 
@@ -734,13 +1309,22 @@ yield_data_wide <- dcast(yield_data_long, state ~ year, value.var = "yield")
 
 ### wide to long
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+Melt reverses the operation. Yield-data-wide has state as its identifier and the year-named columns as measurements. Id dot vars equals quote state tells melt to keep state fixed while stacking every other column. The result has eight rows with state, a factor column called variable containing 2019 or 2020, and a numeric value column containing yield.
+
+This is the data.table counterpart to pivot-longer with minus state, names-to year, and values-to yield. Melt uses generic default names unless you supply variable dot name and value dot name, so the result on screen says variable and value rather than year and yield. The information is restored, but the labels may need refinement for analysis. Flip between the original wide data and the melted output and trace one state through both shapes.
+
+</details>
+
 You can use `melt()` function to make a wide dataset long:
 
 **Syntax**
 
 ```{r}
 #| eval: false
-melt(data.table, id.vars = "state")  
+melt(data.table, id.vars = "state")
 ```
 
 + `id.vars` are the variables except those that will be melt into long format
@@ -755,7 +1339,7 @@ melt(data.table, id.vars = "state")
 Original wide data:
 
 ```{webr-r}
-yield_data_wide 
+yield_data_wide
 ```
 
 
@@ -782,6 +1366,15 @@ melt(yield_data_wide, id.vars = "state")
 
 ### prep
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+This section raises the harder case where two measurement variables are widened at once. The long table on the left has one row per state-year and separate yield and rainfall columns. Repetition creates the same eight keys as before, and the two numeric vectors supply the measurements.
+
+The wide table on the right is produced with tidyr pivot-wider only to prepare the example, then converted back to data.table. Names-from year and values-from c of yield comma rainfall create four measurement columns: yield-2019, yield-2020, rainfall-2019, and rainfall-2020. Each name now encodes two pieces of information separated by an underscore. Our task in the next tabs is first to widen both values with d-cast, then to recover the original long roles with melt.
+
+</details>
+
 ::: {.columns}
 
 ::: {.column width="50%"}
@@ -789,11 +1382,11 @@ melt(yield_data_wide, id.vars = "state")
 
 ```{webr-r}
 (
-yield_data_long <- data.table(
-  state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-  year = c(2019, 2020) %>% rep(4),
-  yield = c(200, 240, 210, 220, 220, 230, 190, 150),
-  rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+  yield_data_long <- data.table(
+    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+    year = c(2019, 2020) %>% rep(4),
+    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
   )
 )
 ```
@@ -807,13 +1400,13 @@ This data has multiple rows to be spread: `yield` and `rainfall`.
 
 ```{webr-r}
 (
-yield_data_wide <- 
-  yield_data_long %>% 
-  pivot_wider(
-    names_from = year, 
-    values_from = c(yield, rainfall)
-  ) %>% 
-  data.table()
+  yield_data_wide <-
+    yield_data_long %>%
+    pivot_wider(
+      names_from = year,
+      values_from = c(yield, rainfall)
+    ) %>%
+    data.table()
 )
 ```
 
@@ -825,16 +1418,34 @@ This data has multiple sets of columns to be melted: `yield_*` and `rainfall_*`.
 
 ### long to wide
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+D-cast handles several value columns by receiving a character vector in value dot var. State tilde year still says one row per state and one set of output columns per year. Value dot var c of yield comma rainfall tells it to fill one such set for each measurement. The result is a keyed data.table with state followed by yield-2019, yield-2020, rainfall-2019, and rainfall-2020.
+
+This is the same transformation as pivot-wider with values-from c of yield comma rainfall. Data.table automatically combines the value-column name and the year with an underscore, so no separate prefix argument is needed. That convenient naming convention becomes the information we must unpack when going back to long form.
+
+</details>
+
 It is easy to cast multiple variables to make a long data wide. You just need to give a list of variable names to the `value.var` option.
 
 
 ```{webr-r}
-yield_data_long %>% 
-  dcast(state ~ year, value.var = c("yield", "rainfall"))   
+yield_data_long %>%
+  dcast(state ~ year, value.var = c("yield", "rainfall"))
 ```
 
 
 ### wide to long
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For multi-measure melting, the code first constructs two character vectors of column names. Col-A contains yield-2019 and yield-2020. Col-B contains rainfall-2019 and rainfall-2020. Measure equals list of Col-A comma Col-B tells melt that the first columns in those sets correspond to one occasion and the second columns correspond to the next. Value dot name supplies the two output measurement names, yield and rainfall.
+
+The output correctly lines up the two measurement values, but the automatically created variable column contains factor levels one and two, not the original years. One corresponds to the first column in each set, 2019, and two to the second, 2020. That loss of explicit year labels is why the prose recommends an additional step or the more transparent alternative on the next tab. This is genuinely different from a simple one-measure melt because several input columns must be coordinated as parallel sets.
+
+</details>
 
 It is not as simple to make a wide data with multiple sets of columns to long.
 
@@ -848,7 +1459,7 @@ colA <- paste("yield_", 2019:2020, sep = "")
 colB <- paste("rainfall_", 2019:2020, sep = "")
 
 #--- wide to long ---#
-yield_data_long <- melt(yield_data_wide, measure = list(colA, colB), value.name = c("yield", "rainfall")) 
+yield_data_long <- melt(yield_data_wide, measure = list(colA, colB), value.name = c("yield", "rainfall"))
 ```
 
 Note however that year information from the variable names are lost. In the resulting dataset, `variable == 1` and `variable == 2` correspond to 2019 and 2020, respectively. So, you need an additional step to recover the original long data format. 
@@ -856,6 +1467,15 @@ Note however that year information from the variable names are lost. In the resu
 Alternatively, it is probably better to follow the multi-step approach we took we used when we use `pivot_*()` in `dplyr`.
 
 ### better alternative
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This pipeline preserves the meaning encoded in the names. First, melt with id dot var state stacks every measurement column into variable and value, ignoring for the moment whether it came from yield or rainfall. Next, t-str-split separates each name at the fixed underscore into type and year. Colon-equals creates those two columns by reference from the two returned pieces. The next bracket removes the now-redundant combined variable column by assigning it N-U-L-L.
+
+Finally, d-cast with state plus year tilde type makes type values into the separate rainfall and yield columns, using value for the cells. The output returns to eight state-year rows with rainfall and yield beside each other. This mirrors the explicit multi-step tidyr strategy from the main lecture: lengthen combined names, split their meanings, then widen the measurement type. It takes more code than the list-of-sets melt, but the year values remain 2019 and 2020 instead of becoming anonymous positions one and two.
+
+</details>
 
 The strategy here is to 
 
@@ -865,11 +1485,11 @@ The strategy here is to
 
 ```{webr-r}
 (
-yield_data_wide %>% 
-  melt(id.var = "state") %>% 
-  .[, c("type", "year") := tstrsplit(variable, "_", fixed = TRUE)] %>% 
-  .[, variable := NULL] %>% 
-  dcast(state + year ~ type, value.var = "value")
+  yield_data_wide %>%
+    melt(id.var = "state") %>%
+    .[, c("type", "year") := tstrsplit(variable, "_", fixed = TRUE)] %>%
+    .[, variable := NULL] %>%
+    dcast(state + year ~ type, value.var = "value")
 )
 ```
 
@@ -881,6 +1501,15 @@ yield_data_wide %>%
 ::: {.panel-tabset}
 
 ### How
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Data.table joins use x bracket i syntax. In dee-tee-one bracket dee-tee-two comma on equals keys, dee-tee-two is i and determines the rows the result must retain. Matching columns from dee-tee-one are attached to those rows. That is why the slide maps it to left-join of dee-tee-two comma dee-tee-one, not the other way around. The order can feel reversed if you learned dplyr first.
+
+On equals dot parentheses lists the key relationships. When the names match, you can list them directly; data.table also supports explicit name mappings and inequalities, which we use later. Read the final sentence literally: dee-tee-two is the base table whose rows you start with, and dee-tee-one is the lookup table being joined onto it. Predict the result's population from i before running any join.
+
+</details>
 
 You can use the following syntax:
 
@@ -905,10 +1534,19 @@ So, `dt2` is the base dataset and you are attaching `dt1` to `dt2`.
 
 ### Example
 
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first cell creates price-data with the same eight state-year keys as yield-data-long. Run-if draws eight made-up prices between three and six, so your exact price values can vary from one session to another. The structure, not those random numbers, is what matters.
+
+In price-data bracket yield-data-long comma on equals state comma year, yield-data-long is i and therefore supplies the eight retained rows. Data.table matches each state-year pair to price-data and attaches price alongside yield and rainfall. The output has eight rows because every key appears exactly once on both sides. The key columns are shown once, and the non-key columns from both tables appear together. This is a one-to-one join and is the data.table equivalent of left-joining price onto yield-data-long.
+
+</details>
+
 Let's first create a price data:
 
 ```{webr-r}
-price_data <- 
+price_data <-
   data.table(
     state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
     year = c(2019, 2020) %>% rep(4),
@@ -926,6 +1564,15 @@ price_data[yield_data_long, on = .(state, year)]
 
 
 ### `left_join()`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You are not locked into bracket joins just because your objects are data.tables. A data.table inherits from data.frame, so dplyr left-join accepts it. The displayed call keeps every row of yield-data-long and attaches matching price-data columns by state and year. With these one-to-one keys, it contains the same information as the preceding data.table join, although column order and some class details can differ.
+
+The autorun class call confirms the inheritance: class of yield-data-long prints both data.table and data.frame. That is why functions written for data.frames normally work. Still, remember the semantic differences when you mix systems. Dplyr verbs return a result to assign, while data.table colon-equals and set functions may mutate by reference. Choose syntax based on clarity and behavior rather than assuming the class forces you to use only one package.
+
+</details>
 
 There is nothing to prevent you from using `dplyr::left_join()`.
 
@@ -946,5 +1593,365 @@ class(yield_data_long)
 <!--end of panel-->
 
 
+## Join cardinality
+
+::: {.panel-tabset}
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These five tiny tables make join cardinality visible. Students has one row for Ana and one for Bo. Scores also has one row per student. Courses has three rows for student one and one for student two. Clubs has two rows for student one, and course-choices has three rows for that same student. Student-id is stored as an integer, indicated by the L suffix on its values.
+
+Run the autorun setup and inspect how many times each student-id appears in each table. Cardinality is about those repetitions, not about the number of columns. Students and scores will demonstrate one-to-one. Students and courses will demonstrate one-to-many. Clubs and course-choices will demonstrate many-to-many. Because the tables are small, predict the result row count before moving through the next tabs.
+
+</details>
+
+These small tables let us see exactly how rows multiply when keys repeat.
+
+```{webr-r}
+#| autorun: true
+students <- data.table(
+  student_id = c(1L, 2L),
+  student = c("Ana", "Bo")
+)
+
+scores <- data.table(
+  student_id = c(1L, 2L),
+  score = c(88, 91)
+)
+
+courses <- data.table(
+  student_id = c(1L, 1L, 1L, 2L),
+  course = c("R", "Stats", "GIS", "R")
+)
+
+clubs <- data.table(
+  student_id = c(1L, 1L),
+  club = c("Data", "Maps")
+)
+
+course_choices <- data.table(
+  student_id = c(1L, 1L, 1L),
+  course = c("R", "Stats", "GIS")
+)
+```
+
+### One-to-one
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Students bracket scores comma on student-id keeps the two score rows because scores is i, then finds exactly one students match for each. The result has two rows and columns student-id, student, and score: Ana with 88 and Bo with 91. Student-id occurs once on each side, so this is one-to-one.
+
+In this perfectly matched case, reversing the tables would not change which keys survive, though it could change column order. Real joins are often less symmetric, so keep reading x bracket i as attaching x to the rows of i. The two-row result is your baseline before repeated keys start multiplying rows.
+
+</details>
+
+Each `student_id` appears once in `students` and once in `scores`.
+
+```{webr-r}
+students[scores, on = "student_id"]
+```
+
+Two rows come back. Each of the 2 score rows has exactly one matching student row.
+
+### One-to-many
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Students bracket courses keeps all four course rows from i. Student one matches Ana once in students but appears in three course rows, so Ana's name is repeated beside R, Stats, and G-I-S. Student two matches Bo and his single R course. Four rows go in from courses and four rows come back.
+
+This is one-to-many when described from students to courses. Repetition in the result is expected because one student-level record is being attached to many course-level records. It becomes a problem only if you later forget that the observational unit is now a course enrollment rather than a unique student. Next, both sides repeat the key and the multiplication becomes a Cartesian combination.
+
+</details>
+
+Each `student_id` appears once in `students`, but student 1 appears three times in `courses`.
+
+```{webr-r}
+students[courses, on = "student_id"]
+```
+
+Four rows come back, one for each course row. Ana's student information is repeated for her 3 courses, and Bo's information appears once for his 1 course.
+
+### Many-to-many
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Student one appears twice in clubs and three times in course-choices. Since student-id is the only join key, each of the three course rows matches both club rows. The result has six rows: R with Data and Maps, Stats with Data and Maps, and G-I-S with Data and Maps. That is three times two.
+
+Allow dot cartesian equals true does not create the relationship. It tells data.table that this potentially large row multiplication is intentional and allows the join to proceed. The important callout gives you the habit to keep: before every join, count how often the key can occur on each side. An unintended many-to-many relationship can multiply a large dataset dramatically while all the code around it continues to run. If six rows were not your prediction here, revisit which variables should be keys.
+
+</details>
+
+Student 1 has 2 club rows and 3 course rows. Both sides repeat the key.
+
+```{webr-r}
+clubs[
+  course_choices,
+  on = "student_id",
+  allow.cartesian = TRUE
+]
+```
+
+Six rows come back because every course is paired with every club: $3 \times 2 = 6$. `allow.cartesian = TRUE` confirms that this row multiplication is intentional.
+
+:::{.callout-important}
+Before every join, ask how many times each key can appear on both sides. An unexpected many-to-many join can make a dataset much larger without changing any code outside the join.
+:::
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You need to attach each student's score to every course row. Courses must therefore be i, because its four rows are the population to retain. Scores goes before the bracket, giving scores bracket courses comma on student-id. Each student has one score but may have several courses, so this is one-to-many from scores to courses. Predict four result rows: Ana's 88 repeats three times and Bo's 91 appears once. Try the empty Work here tab before opening the folded Answer. The row-count prediction matters as much as the syntax, because checking cardinality before a join is what prevents accidental multiplication in less obvious data.
+
+</details>
+
+##### Exercise 4
+
+Attach each student's score to every row in `courses`. Before running the join, predict how many rows will come back and identify the cardinality.
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+scores[courses, on = "student_id"]
+# 4 rows: one score row can match many course rows
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
 
 
+## Rolling and nearest joins
+
+::: {.panel-tabset}
+
+### Preparation
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This section joins events whose dates do not necessarily match exactly. Readings contains soil-moisture observations for fields A and B on irregular dates. Irrigation contains four events on its own dates, with inches applied. As-Date converts the displayed character strings into real Date values so data.table can compare and order them.
+
+Inspect the calendars before joining. For field A, May eighth falls between readings on May first and May tenth, while May twenty-second follows the May twentieth reading. For field B, May fourteenth lies between May fifth and May fifteenth, while May second occurs before the first reading. Those positions let you predict every result in the following tabs. The question is not merely whether dates are close. It is whether you want all earlier readings, the latest earlier reading, or the nearest reading in either direction.
+
+</details>
+
+Soil moisture is measured on irregular dates, and irrigation happens on its own dates.
+
+```{webr-r}
+#| autorun: true
+readings <- data.table(
+  field = c("A", "A", "A", "B", "B"),
+  read_date = as.Date(c(
+    "2024-05-01", "2024-05-10", "2024-05-20",
+    "2024-05-05", "2024-05-15"
+  )),
+  moisture = c(30, 22, 35, 28, 19)
+)
+
+irrigation <- data.table(
+  field = c("A", "A", "B", "B"),
+  irrig_date = as.Date(c(
+    "2024-05-08", "2024-05-22", "2024-05-14", "2024-05-02"
+  )),
+  inches = c(1.0, 0.8, 1.2, 0.5)
+)
+```
+
+### A non-equi join
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+An equality join cannot pair these different dates, so on includes read-date less than or equal to irrig-date. Field must still match exactly. Read the condition from the retained irrigation row's perspective: find readings in the same field that occurred on or before that irrigation.
+
+The j list controls the displayed columns and makes table sources explicit. I dot field and i dot irrig-date come from irrigation, the i table. X dot read-date and x dot moisture come from readings, the x table. I dot inches also comes from irrigation. All qualifying readings return, so field A on May twenty-second produces three rows, one for May first, tenth, and twentieth. Field A on May eighth produces one, and field B on May fourteenth produces one. Field B on May second remains because irrigation is i, but its reading columns are N-A. Allow dot cartesian permits the one-event-to-many-readings expansion. The next tab asks for only the latest qualifying reading.
+
+</details>
+
+An equality join cannot match these dates. A non-equi join puts an inequality directly in `on=`:
+
+```{webr-r}
+readings[
+  irrigation,
+  on = .(field, read_date <= irrig_date),
+  .(
+    field = i.field,
+    irrig_date = i.irrig_date,
+    read_date = x.read_date,
+    moisture = x.moisture,
+    inches = i.inches
+  ),
+  allow.cartesian = TRUE
+]
+```
+
+Read the condition as: match rows in the same field where the reading occurred on or before irrigation. All qualifying readings return. Field A on 05-22 therefore returns 3 rows, one for each earlier reading. Field B on 05-02 stays in the result but gets `NA`, because it has no reading on or before that date.
+
+### `roll = TRUE`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For a last-observation-carried-forward join, write the date relationship as an equality mapping in on, read-date equals irrig-date, and add roll equals true. Data.table searches the ordered lookup values and, when no exact date exists, rolls the most recent earlier reading forward to the irrigation date. Field remains an exact grouping key.
+
+The explicit j columns again distinguish i from x. The verified output has exactly four rows, one per irrigation. Field A on May eighth receives May first with moisture 30; A on May twenty-second receives May twentieth with 35; B on May fourteenth receives May fifth with 28. B on May second has N-A because no earlier B reading exists. This differs from the non-equi join because it selects one qualifying lookup row instead of all of them. It corresponds to dplyr closest with an at-or-before inequality and is appropriate when future information must not be used.
+
+</details>
+
+Usually we want only the latest qualifying reading. Join on the date columns as if they were equal, then use `roll = TRUE` to carry the last observation forward.
+
+```{webr-r}
+readings[
+  irrigation,
+  on = .(field, read_date = irrig_date),
+  .(
+    field = i.field,
+    irrig_date = i.irrig_date,
+    read_date = x.read_date,
+    moisture = x.moisture,
+    inches = i.inches
+  ),
+  roll = TRUE
+]
+```
+
++ Field A on 05-08 gets the 05-01 reading, and field A on 05-22 gets the 05-20 reading.
++ Field B on 05-14 gets the 05-05 reading.
++ Field B on 05-02 gets `NA` because there is no earlier field B reading to carry forward.
+
+Four irrigation rows go in and four rows come back.
+
+### `roll = "nearest"`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Roll equals quote nearest removes the one-direction restriction and selects the closest reading date on either side within each field. The equality mapping in on still aligns read-date with irrig-date, and j still keeps one row for each irrigation.
+
+The output is different in two important places. Field A on May eighth chooses May tenth, two days later, with moisture 22, instead of May first, seven days earlier. Field B on May fourteenth chooses May fifteenth, one day later, with moisture 19, instead of May fifth. A on May twenty-second still gets May twentieth, and B on May second gets May fifth. No row is N-A because every irrigation has a nearest reading in its field. The final paragraph is the substantive decision: use roll true when only information available by the event date is valid. Use nearest only when direction genuinely does not matter, because it may attach future measurements.
+
+</details>
+
+Use `roll = "nearest"` when direction does not matter and you want the closest date on either side.
+
+```{webr-r}
+readings[
+  irrigation,
+  on = .(field, read_date = irrig_date),
+  .(
+    field = i.field,
+    irrig_date = i.irrig_date,
+    read_date = x.read_date,
+    moisture = x.moisture,
+    inches = i.inches
+  ),
+  roll = "nearest"
+]
+```
+
++ Field A on 05-08 now gets the 05-10 reading, which is 2 days away rather than the 05-01 reading, which is 7 days away.
++ Field A on 05-22 gets 05-20, field B on 05-14 gets 05-15, and field B on 05-02 gets 05-05.
++ No row gets `NA` here because every irrigation has a nearest reading in its field.
+
+`roll = TRUE` and `roll = "nearest"` answer different questions. Use `roll = TRUE` when only information available at or before the event is valid.
+
+### `rollends`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Roll-ends controls whether rolling may cross the lower and upper boundaries of each field's lookup dates. With roll true, the default c of false comma true refuses to reach before the first reading but allows the last reading to carry beyond the upper end. With roll nearest, both ends are used by default because the nearest boundary value is still a candidate.
+
+The displayed call explicitly reverses those choices with c of true comma false. Lower-end rolling is allowed, so field B on May second reaches forward to its first reading on May fifth and gets moisture 28. Upper-end rolling is forbidden, so field A on May twenty-second cannot carry May twentieth past the end and gets N-A. The two middle-of-range events still roll to their preceding readings. End behavior is part of the question, not a cosmetic option. Decide whether extrapolating beyond observed dates is defensible before setting it.
+
+</details>
+
+`rollends` controls what happens before the first and after the last lookup value in each group.
+
++ With `roll = TRUE`, the default is `rollends = c(FALSE, TRUE)`: do not roll before the first reading, but carry the last reading past the upper end.
++ With `roll = "nearest"`, both ends are used by default.
+
+You can reverse the two end choices explicitly:
+
+```{webr-r}
+readings[
+  irrigation,
+  on = .(field, read_date = irrig_date),
+  .(
+    field = i.field,
+    irrig_date = i.irrig_date,
+    read_date = x.read_date,
+    moisture = x.moisture
+  ),
+  roll = TRUE,
+  rollends = c(TRUE, FALSE)
+]
+```
+
+Now field B on 05-02 uses its first reading on 05-05, but field A on 05-22 gets `NA` because rolling past the last field A reading is forbidden.
+
+### Exercises
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Repeat the last-observation-carried-forward join, but set roll-ends false so neither boundary can be crossed. Keep readings before the bracket, irrigation in i, the field and date equality mapping in on, the selected i and x columns in j, and roll true. With both ends forbidden, predict two missing matches. Field B on May second is before B's first reading, and field A on May twenty-second is after A's last reading. Field A on May eighth and field B on May fourteenth lie within their observed ranges and still receive the latest earlier readings. Use the Work here tab to write the call, then compare it with the folded Answer and with your two-row N-A prediction.
+
+</details>
+
+##### Exercise 5
+
+Repeat the last-observation-carried-forward join, but set `rollends = FALSE` so that neither end is used. Which two irrigation rows receive `NA`, and why?
+
+<br>
+
+::: {.panel-tabset}
+### Work here
+
+```{webr-r}
+
+```
+
+### Answer
+```{r, eval = FALSE}
+#| code-fold: true
+readings[
+  irrigation,
+  on = .(field, read_date = irrig_date),
+  .(
+    field = i.field,
+    irrig_date = i.irrig_date,
+    read_date = x.read_date,
+    moisture = x.moisture
+  ),
+  roll = TRUE,
+  rollends = FALSE
+]
+# A on 05-22 is after its last reading.
+# B on 05-02 is before its first reading.
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
