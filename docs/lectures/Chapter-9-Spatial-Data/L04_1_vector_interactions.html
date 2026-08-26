@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-9f9fb851b2c68f17b9a22372e75d240b.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -809,9 +809,42 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "webr-output-toggle";
+      btn.title = "Hide output";
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "\u25BE";                // down caret: output is showing
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        btn.setAttribute("aria-expanded", hide ? "false" : "true");
+        btn.title = hide ? "Show output" : "Hide output";
+        btn.textContent = hide ? "\u25B8" : "\u25BE";
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -935,6 +968,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -2227,9 +2267,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2291,6 +2370,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2307,7 +2399,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -3068,7 +3160,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The first of the two distance-based relations. Rather than asking whether two things touch, it asks whether anything in the second object lies within a given distance of each feature in the first. Note that the distance argument is required and carries no default, and that it is expressed in the units of the CRS, so a bare number means degrees on unprojected data and metres on most projected data. That catches people constantly. Work through the tabs in order: the expected outcome tab draws buffers of the right radius around each red point, so you can read the answer off the picture before you run the function.</p>
+<p>The first of the two distance-based relations. Rather than asking whether two things touch, it asks whether anything in the second object lies within a given distance of each feature in the first. Note that the distance argument is required and carries no default. A numeric distance uses metres for geographic coordinates and coordinate units for projected or CRS-free data. That catches people constantly. Work through the tabs in order: the expected outcome tab draws buffers of the right radius around each red point, so you can read the answer off the picture before you run the function.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Syntax</a></li><li><a href="#tabset-2-2">Data Preparation</a></li><li><a href="#tabset-2-3">Expected Outcomes</a></li><li><a href="#tabset-2-4">Apply the function</a></li></ul>
@@ -3079,7 +3171,7 @@ Transcript
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">st_is_within_distance</span>(sf_1, sf_2, dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li><code>dist</code>: the distance threshold. It is <strong>required</strong> — there is no default — and it is in the units of the CRS, so degrees for unprojected lon/lat data and metres for most projected data.</li>
+<li><code>dist</code>: the distance threshold. It is <strong>required</strong>; there is no default. A numeric distance uses metres for geographic coordinates and coordinate units for projected or CRS-free data.</li>
 </ul>
 </div>
 <div id="tabset-2-2">
@@ -3288,13 +3380,13 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Exactly the same syntax, now with points. Wells inside the aquifer boundary, in one line of brackets. There is a parenthetical worth noticing: for points, intersects and within give the same answer, because a point either is in the polygon or is not, with none of the partial overlap a polygon can have. The flagging tab repeats the pattern from before, pulling out the well identifiers that survived and marking every well as in or out. That flagged version, rather than the subset, is what you would carry into an analysis where you want to compare the two groups.</p>
+<p>Exactly the same syntax, now with points. Wells inside the aquifer boundary, in one line of brackets. There is a parenthetical worth noticing: for points, intersects and within give the same answer only when none of the points lies on the polygon boundary. A point on the boundary intersects the polygon but is not within it. The flagging tab repeats the pattern from before, pulling out the well identifiers that survived and marking every well as in or out. That flagged version, rather than the subset, is what you would carry into an analysis where you want to compare the two groups.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Goal</a></li><li><a href="#tabset-7-2">Demonstration</a></li><li><a href="#tabset-7-3">Flagging</a></li></ul>
 <div class="tab-content">
 <div id="tabset-7-1">
-<p>Select only the wells that intersect with (or equivalently inside) the HPA boundary.</p>
+<p>Select only the wells that intersect with the HPA boundary. This is equivalent to selecting wells within it only when no wells lie on the polygon boundary.</p>
 <div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -3324,7 +3416,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The third combination, and by now it should feel routine: railroads intersecting Lancaster county, using the same brackets as before. What is worth pausing on is what intersects actually means for a line. A railroad that merely clips the corner of the county is kept in full, not trimmed at the boundary — the whole line survives, because subsetting selects features and never modifies their geometry. If what you want is the piece inside the county rather than the whole line, that is cropping, which is the next section and a genuinely different operation. The flagging tab closes the section by marking every railroad as in or out of Lancaster.</p>
+<p>The third combination, and by now it should feel routine: railroads intersecting Lancaster county, using the same brackets as before. What is worth pausing on is what intersects actually means for a line. A railroad that merely clips the corner of the county is kept in full, not trimmed at the boundary. The whole line survives because subsetting selects features and never modifies their geometry. If what you want is the piece inside the county rather than the whole line, use st_intersection to clip it to the county boundary. The st_crop function, covered in the next section, clips only to a rectangular bounding box. The flagging tab closes the section by marking every railroad as in or out of Lancaster.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Goal</a></li><li><a href="#tabset-8-2">Demonstration</a></li><li><a href="#tabset-8-3">Flagging</a></li></ul>

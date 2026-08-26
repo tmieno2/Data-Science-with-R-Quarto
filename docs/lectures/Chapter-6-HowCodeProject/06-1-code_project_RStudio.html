@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -415,14 +415,14 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The usual note about the code boxes. The faintly blue area is an editor, Run Code executes it, and you can run part of it by highlighting and pressing Command Enter, or Control Enter on Windows. The copy button in the top right corner puts the code on your clipboard for pasting into RStudio, and the reload button restores the original if you have edited yourself into a mess. This particular chapter has less runnable code than most, because much of what we cover happens in the RStudio interface rather than in the console. Where there is code, though, it behaves the same way.</p>
+<p>The code boxes in this chapter are static examples. You can use the copy button in the top right corner to put the code on your clipboard and paste it into RStudio, but you cannot edit or run code within these slides. In RStudio, you can run part of an example by highlighting it and pressing Command Enter, or Control Enter on Windows.</p>
 </details>
 <ul>
-<li>The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the “code area”).</li>
-<li>Hit the “Run Code” button to execute all the code inside the code area.</li>
-<li>You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).</li>
-<li>If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.</li>
-<li>You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.</li>
+<li>The boxes with a hint of blue contain static code examples.</li>
+<li>You cannot edit or execute these examples within the slides.</li>
+<li>To run only part of an example, first copy it into RStudio, highlight the part you want, and press Command + Enter for Mac (Ctrl + Enter for Windows).</li>
+<li>Click the icon with two sheets of paper stacked on top of each other at the top right corner of a code block to copy the example, then paste it into RStudio.</li>
+<li>Make any edits to the examples in RStudio, not in the slides.</li>
 </ul>
 </div>
 </div>
@@ -637,7 +637,7 @@ Transcript
 <ul>
 <li>type in a directory name</li>
 <li>select the directory in which the project folder (directory) is going to be created</li>
-<li>hit the <em>create folder</em> button</li>
+<li>hit the <em>Create Project</em> button</li>
 </ul>
 </div><!--end of the 1st column--><div class="column" style="width:70%;">
 <p><img data-src="New-Project.png"></p>
@@ -665,7 +665,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data is the thing you can never regenerate, so it lives somewhere you only ever read from. Everything else can be rebuilt by rerunning your scripts.</p>
+<p>A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data and other source materials must be preserved because rerunning your scripts cannot regenerate them. Processed data and generated results should be rebuildable by rerunning your scripts.</p>
 </details>
 <p>Here is a recommended folder organization. You should modify/add folders as you see fit.</p>
 <div class="columns">
@@ -722,7 +722,7 @@ Transcript
 <ul>
 <li><p>It is much easier to make comments in a qmd file than an R file</p></li>
 <li><p>You can better organize your codes with markdown section headers (e.g., #, ##)</p></li>
-<li><p>R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Use <code>Run All Chunks Above</code> button (click on the triangle right to the <code>Run</code> button and select the option, or hit <code>option</code> + <code>command</code> + <code>P</code>).</p></li>
+<li><p>R crashed at a certain chunk and had to restart R and then run all the R codes up to the problematic chunk? Select <code>Run All Chunks Above</code> by clicking the triangle to the right of the <code>Run</code> button, or hit <code>option</code> + <code>shift</code> + <code>command</code> + <code>P</code> to run the previous Rmd code.</p></li>
 <li><p>Easily move between sections and subsection using the navigator at the bottom lower corner of the source pane</p></li>
 </ul>
 <p><img data-src="MoveBetweenChunks.png" style="width:60.0%"></p>
@@ -990,13 +990,13 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Snippets are text expansion inside RStudio. You type a short trigger, hit tab, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. The line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.</p>
+<p>Snippets are text expansion inside RStudio. You type a short trigger and select the matching snippet from the completion list, or press shift tab to insert it immediately, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. Every line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.</p>
 </details>
 <p>Code snippets map a short sequence of letters and symbols to a longer, more complicated one.</p>
 <p><br></p>
 <p><strong>Syntax</strong></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>snippet (combination of letters to invoke)</span>
-<span id="cb1-2"><a></a>  (what you want to print) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a></a>    (what you want to print)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div title="Important">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -1004,7 +1004,7 @@ Transcript
 <p><strong>Important</strong></p>
 </div>
 <div class="callout-content">
-<p>You need a tab before <strong>(what you want to print)</strong></p>
+<p>You need a literal tab before <strong>(what you want to print)</strong></p>
 </div>
 </div>
 </div>
@@ -1015,7 +1015,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two examples in the nested tabs, and they are the two worth setting up first. Typing p i then tab gives you the pipe. Typing a s then tab gives you the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Note the parenthetical about hitting enter if there are competing completions. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so you may need one extra keystroke to disambiguate. That is worth knowing before you decide a snippet is broken.</p>
+<p>Two examples in the nested tabs, and they are the two worth setting up first. Type p i and select the snippet from the completion list, or press shift tab to get the pipe. Do the same with a s to get the assignment arrow. Both are things you type dozens of times an hour, and both currently cost you an awkward key combination. Short triggers like these often collide with object or function names that RStudio is also trying to suggest, so make sure you select the snippet when you use the completion list. That is worth knowing before you decide a snippet is broken.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">piping operator</a></li><li><a href="#tabset-7-2">assignment operator</a></li></ul>
@@ -1023,16 +1023,16 @@ Transcript
 <div id="tabset-7-1">
 <p><br></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a>snippet pi</span>
-<span id="cb2-2"><a></a>  %&gt;% </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a></a>    %&gt;%</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
-<p>Once you add this, you can type “pi” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>%&gt;%</code> printed.</p>
+<p>Once you add this, type “pi”, then select the snippet from the completion list or press <code>shift</code> + <code>tab</code> to have <code>%&gt;%</code> printed.</p>
 </div>
 <div id="tabset-7-2">
 <p><br></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a></a>snippet as</span>
-<span id="cb3-2"><a></a>  &lt;- </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a></a>    &lt;-</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
-<p>Once you add this, you can type “as” and hit <code>tab</code> (and hit <code>enter</code> if there are other competing shortcuts) to have <code>&lt;-</code> printed.</p>
+<p>Once you add this, type “as”, then select the snippet from the completion list or press <code>shift</code> + <code>tab</code> to have <code>&lt;-</code> printed.</p>
 </div>
 </div>
 </div>
@@ -1043,7 +1043,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, hit tab, and watch the arrow appear. And remember the tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.</p>
+<p>Here is where the snippets actually live. Tools, then Global Options, then Code, then Edit Snippets, and choose the R tab. That path is worth remembering, because you will want to add more as you go. Then do the exercise in the callout, right now if you have RStudio open, because snippets are one of those things that sound marginal until you have used them for a day. Add the assignment one, type a s, then select the snippet from completion or press shift tab, and watch the arrow appear. And remember the literal tab indentation rule from the previous tab, since that is why most first attempts do nothing at all.</p>
 </details>
 <p>Follow <span style="color: blue;"> Tools </span> <span class="math inline">\rightarrow</span> <span style="color: blue;">Global Options </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Code </span> <span class="math inline">\rightarrow</span> <span style="color: blue;"> Edit Snippets</span> , select R tab, and add snippets.</p>
 <p><br></p>
@@ -1058,9 +1058,9 @@ Transcript
 <li>Place the following</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a></a>snippet as</span>
-<span id="cb4-2"><a></a>  &lt;-</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a></a>    &lt;-</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li>type “as” and hit tab inside an R code chunk</li>
+<li>type “as” inside an R code chunk, then select the snippet from completion or hit <strong>shift</strong>+<strong>tab</strong></li>
 </ul>
 </div>
 </div>
@@ -1088,8 +1088,8 @@ Transcript
 <div id="tabset-8-2">
 <p>This snippet will let you create an R code chunk with typing “rmc”. Place it in the Markdown tab of the snippets list and hit <strong>shift</strong>+<strong>tab</strong> to invoke it.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a></a>snippet rmc</span>
-<span id="cb5-2"><a></a>  `r ''````{r }</span>
-<span id="cb5-3"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-2"><a></a>    `r ''````{r }</span>
+<span id="cb5-3"><a></a>    <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Confirm that this snippet does not work in the R environment.</p>
 </div>
 </div>
@@ -1104,9 +1104,9 @@ Transcript
 <p>This is what makes snippets genuinely powerful rather than just shorter to type. The dollar sign with a number and a label marks a placeholder. Expand this one and your cursor lands in the chunk title; press tab and it jumps to the chunk contents. So a snippet is not simply fixed text, it is a small fill-in-the-blanks form that walks you through the parts you have to supply, in order. Once you see that, the useful snippets to write become obvious. Any structure you type repeatedly where only two or three pieces change each time is a candidate.</p>
 </details>
 <div class="sourceCode" id="cb6"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a></a>snippet rmc</span>
-<span id="cb6-2"><a></a>  `r ''````{r ${1:chunk_title}}</span>
-<span id="cb6-3"><a></a>    ${2:chunk_content}</span>
-<span id="cb6-4"><a></a>  <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a></a>    `r ''````{r ${1:chunk_title}}</span>
+<span id="cb6-3"><a></a>      ${2:chunk_content}</span>
+<span id="cb6-4"><a></a>    <span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><code>$</code> is used as a special character to denote where the cursor should jump (by hitting <code>tab</code>) after completing each section of a snippet.</p>
 </div>
 <div id="tabset-9-6">
@@ -1114,17 +1114,17 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and tab and you get a line plot skeleton, with your cursor waiting on the dataset name, then the y variable, then x. Type g d and you get a density plot the same way. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.</p>
+<p>Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and select the snippet from completion, or press shift tab, and you get a line plot skeleton with your cursor waiting on the dataset name, then the y variable, then x. Do the same with g d and you get a density plot. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.</p>
 </details>
-<p><strong>ggplot (scatter plot)</strong></p>
+<p><strong>ggplot (line plot)</strong></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>snippet gl</span>
-<span id="cb7-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
-<span id="cb7-3"><a></a>  geom_line(aes(y = ${2:y}, x = ${3:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-2"><a></a>    ggplot(data = ${1:dataset}) +</span>
+<span id="cb7-3"><a></a>    geom_line(aes(y = ${2:y}, x = ${3:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
 <p><strong>ggplot (density plot)</strong></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>snippet gd</span>
-<span id="cb8-2"><a></a>  ggplot(data = ${1:dataset}) +</span>
-<span id="cb8-3"><a></a>  geom_density(aes(x = ${2:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a></a>    ggplot(data = ${1:dataset}) +</span>
+<span id="cb8-3"><a></a>    geom_density(aes(x = ${2:x}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>

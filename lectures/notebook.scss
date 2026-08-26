@@ -754,6 +754,62 @@ div.cell-output.cell-output-stderr > pre > code { background-color: $nb-out-bg; 
   }
 }
 
+// ---- Fold the output away ---------------------------------------------------
+//
+// Long output pushes everything below it down the slide, and once a result has
+// been read it is in the way. The button is injected by webr-layout.html — into
+// the Output banner on a side-by-side cell, into the editor toolbar on a stacked
+// one, the two places a cell already has a header strip — and all it does is set
+// this flag. The banner stays behind, so a folded cell still says "Output" and
+// still carries the control that brings it back.
+.reveal .qwebr-interactive-area[data-webr-output-hidden="true"] {
+  .qwebr-output-code-area,
+  .qwebr-output-graph-area { display: none; }
+}
+
+// The button wears the extension's own `.qwebr-button` class, so its size,
+// radius, background and hover highlight all come from qwebr-styling.css and it
+// cannot drift from the reset and copy buttons beside it. Only two things are
+// set here: the word is in the bar's font rather than the deck's, and it is the
+// same grey the extension gives those two icons (#696969, qwebr-styling.css
+// `.qwebr-button-reset`), so the label reads as secondary to the black "Output"
+// opposite it and darkens under the cursor.
+.reveal .webr-output-toggle {
+  display: inline-flex;
+  align-items: center;
+  color: #696969;
+  font-family: $nb-bar-font;
+  font-size: $nb-bar-size;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: #000; }
+}
+
+// Side by side it sits at the right end of the Output banner, in the SAME grid
+// area as the ::before that paints that banner. Two grid items in one area
+// overlap by design here: the pseudo-element paints the bar and its label, the
+// button paints over the empty right end of it. Matching $nb-bar-h makes the
+// whole right end of the bar the click target rather than one glyph.
+.reveal .side-out .qwebr-interactive-area > .webr-output-toggle {
+  grid-area: outbar;
+  justify-self: end;
+  z-index: 1;
+  // NOT `align-self: center`. The grid row is 34.78px while the banner PAINTS
+  // 37.6px (see the ::before note above), so centring in the row lands ~1.4px
+  // high. Standing the button on the row's top edge and giving it the banner's
+  // own height instead means its box and the painted bar are the same box, and
+  // the label centres inside that.
+  align-self: start;
+  min-height: $nb-bar-h;
+  // 0.75rem is the horizontal padding qwebr-styling.css gives `.qwebr-button`,
+  // so the eye has the same air around it as the copy icon opposite; the
+  // 0.5rem margin is the toolbar's own side padding, so it sits the same
+  // distance from the right edge as that icon does.
+  padding: 0 0.75rem;
+  margin-right: 0.5rem;
+}
+
 // Stack again when the slide is printed. NOT `(max-width: 800px)`, which is what
 // this used to say: reveal scales the whole 1050px slide to fit the window, so a
 // narrow window makes the slide SMALLER, never narrower in its own coordinates.
@@ -836,9 +892,15 @@ div.cell-output.cell-output-stderr > pre > code { background-color: $nb-out-bg; 
 // that back on a slide of this shape — heading, a couple of lines of text, a
 // figure — while still leaving the fullest slides inside 700px. The tab labels
 // shrinking (0.85em to 0.74em) paid for part of it.
+//
+// The number is a custom property so it can be overridden for one slide or one
+// cell without any of this cascade being repeated. `.figure-slide` below sets
+// it for a slide; `#| fig-max-height: 600` sets it on a single cell, which
+// webr-layout.html writes onto that cell's `.qwebr-interactive-area`. A value
+// set closer to the canvas wins, so cell beats slide beats this default.
 .reveal .cell-output-display img,
 .reveal .qwebr-output-graph-area canvas {
-  max-height: 420px;
+  max-height: var(--webr-fig-max-height, 420px);
   object-fit: contain;
 }
 
@@ -849,7 +911,4 @@ div.cell-output.cell-output-stderr > pre > code { background-color: $nb-out-bg; 
 // knitr 12x7.2in at out-width 95%, webr fig-width 10.2 / fig-height 6.55 at
 // out-width 80%. Both keep the ratio of display width to canvas width that the
 // defaults have, which is what holds the type size steady. See RULES.md.
-.reveal .figure-slide .cell-output-display img,
-.reveal .figure-slide .qwebr-output-graph-area canvas {
-  max-height: 540px;
-}
+.reveal .figure-slide { --webr-fig-max-height: 540px; }

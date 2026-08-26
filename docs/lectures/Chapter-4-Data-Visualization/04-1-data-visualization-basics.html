@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -823,9 +823,42 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "webr-output-toggle";
+      btn.title = "Hide output";
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "\u25BE";                // down caret: output is showing
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        btn.setAttribute("aria-expanded", hide ? "false" : "true");
+        btn.title = hide ? "Show output" : "Hide output";
+        btn.textContent = hide ? "\u25B8" : "\u25BE";
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -949,6 +982,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -2241,9 +2281,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2305,6 +2384,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2321,7 +2413,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -2375,6 +2467,10 @@
 
           // Design an output object for messages
           const pre = document.createElement("pre");
+          // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+          // or tinytable table). It keeps the output box, but not the whitespace
+          // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+          if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
           if (/\S/.test(out)) {
               // Display results as HTML elements to retain output styling
               const div = document.createElement("div");
@@ -2393,6 +2489,22 @@
           }
 
           elements.outputCodeDiv.appendChild(pre);
+
+          // PATCHED: HTML written by `output: asis` may carry its own <script>,
+          // which is how tinytable, modelsummary's default HTML output, fills its
+          // cells. innerHTML never runs a script, so the table arrived empty.
+          // Re-creating each script node runs it, and it must happen after the
+          // output is in the document or a detached node still does nothing.
+          if (!showMarkup) {
+              pre.querySelectorAll("script").forEach((original) => {
+                  const script = document.createElement("script");
+                  for (const attribute of original.attributes) {
+                      script.setAttribute(attribute.name, attribute.value);
+                  }
+                  script.textContent = original.textContent;
+                  original.replaceWith(script);
+              });
+          }
 
           // Determine if we have graphs to display
           if (result.images.length > 0) {
@@ -2897,7 +3009,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The package we are using is ggplot2, and you may well already have it. If you have installed tidyverse then ggplot2 came with it, and loading tidyverse loads it automatically. If you would rather load just the one package, library of ggplot2 does that. Either is fine. The gg in the name stands for grammar of graphics, which is not just branding: the package is built on the idea that plots have a grammar, with parts that combine according to rules, and once you see that structure the whole thing gets much easier to learn.</p>
+<p>The package we are using is ggplot2, and you may well already have it. If you have installed tidyverse then ggplot2 came with it, and loading tidyverse loads it automatically. If you would rather load just the one package, library of ggplot2 does that. Either is fine. The gg in the name stands for grammar of graphics, which is not just branding: the package is built on the idea that plots have a grammar, with parts that combine according to rules, and once you see that structure the whole thing gets much easier to learn. Look at the two code chunks to separate installation from loading. Install dot packages of ggplot2 downloads the package onto your computer, so you normally do that once. The label names that chunk ggplot2-install, and eval false keeps the lecture deck from installing a package every time it is rendered. In a new R session you still load installed code with library. The second chunk is labelled load-tidyverse, and message false keeps the package startup messages off the slide. Library of tidyverse loads ggplot2 along with the rest of the tidyverse, while library of ggplot2 loads only the package we need here. With the package ready, the next tab introduces the data that every example will use.</p>
 </details>
 <p>Install the package if you have not.</p>
 <div class="cell">
@@ -2922,7 +3034,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The data for this lecture is county_yield, which records corn and soybean yields by county across several years, together with drought measures. The three tabs inside cover the dataset itself, what the variables mean, and a derived version. Spend a moment on the variable definitions in particular, because the drought variables have opaque names: d3_5_9 means the fraction of weeks at drought severity three between May and September. Once you know that, the plots we build will actually mean something rather than being shapes on a screen.</p>
+<p>The data for this lecture is county_yield, which records corn and soybean yields by county across several years, together with drought measures. The three tabs inside cover the dataset itself, what the variables mean, and a derived version. Spend a moment on the variable definitions in particular, because the drought variables have opaque names: d3_5_9 means the fraction of weeks at drought severity three between May and September. Once you know that, the plots we build will actually mean something rather than being shapes on a screen. On the Data tab, county_yield by itself prints the dataset so you can inspect its rows and columns, and autorun true does that automatically when the cell becomes available. The Variable Definitions tab tells you that soy_yield and corn_yield are measured in bushels per acre. The drought names follow the same pattern from d-zero through d-four, with the first number giving severity and five-nine identifying May through September. The Derived data tab builds mean_yield because the later line and bar plots need one corn-yield value per year rather than hundreds of county values. Read the pipe from top to bottom. Group by year forms the annual groups. Summarize then replaces each group with its mean corn yield, and n-a dot r-m equals true tells mean to ignore missing yield values instead of allowing one missing value to make the whole annual mean missing. Filter not is dot n-a of year removes the group whose year itself is missing. The left arrow stores the result as mean_yield, the surrounding parentheses print it immediately, and autorun true prepares it without making you run the setup by hand. Keep both datasets in mind as we move to Step 1: county_yield holds the detailed observations, while mean_yield holds the annual summary.</p>
 </details>
 <div id="qwebr-insertion-location-1"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -2981,7 +3093,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Let us build a plot one piece at a time, because the structure is the thing worth learning. Step one is always the same: call ggplot and tell it which dataset you are working with. That is it. Now run g_fig and look at what you get: a completely blank panel. That is not a mistake, and it is worth sitting with for a second. You have told R what data to use, but nothing at all about what to do with it, so a blank canvas is the honest response. Every ggplot you ever write starts here.</p>
+<p>Let us build a plot one piece at a time, because the structure is the thing worth learning. Step one is always the same: call ggplot and tell it which dataset you are working with. That is it. Now run g_fig and look at what you get: a completely blank panel. That is not a mistake, and it is worth sitting with for a second. You have told R what data to use, but nothing at all about what to do with it, so a blank canvas is the honest response. Every ggplot you ever write starts here. In the first code area, data equals county_yield is the argument that connects the plot to those columns. The left arrow stores this unfinished plot as g_fig so we can reuse the same data foundation in later layers, and autorun true creates it automatically. The second code area contains only g_fig.&nbsp;Evaluating an object name prints it, which is why that cell reveals the blank plotting panel rather than creating a new object.</p>
 </details>
 <p>The very first job you need to do in creating a figure using the <code>ggplot2</code> package is to let R know the dataset you are trying to visualize, which can be done using <code>ggplot()</code> like below:</p>
 <p><br></p>
@@ -3003,7 +3115,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Step two is telling it what kind of figure you want, which you do with one of the geom functions. Here we use geom_point, which means a scatter plot. But a scatter plot needs to know what goes on each axis, and that is what the aes part supplies: x is the drought variable and y is corn yield. Notice the plus sign. You build a ggplot by adding layers together, and that plus is the grammar in action. Run it now and you have an actual figure, from two lines of code.</p>
+<p>Step two is telling it what kind of figure you want, which you do with one of the geom functions. Here we use geom_point, which means a scatter plot. But a scatter plot needs to know what goes on each axis, and that is what the aes part supplies: x is the drought variable and y is corn yield. Notice the plus sign. You build a ggplot by adding layers together, and that plus is the grammar in action. Run it now and you have an actual figure, from two lines of code. Because g_fig already carries county_yield from Step 1, geom_point inherits that dataset. The left arrow saves the completed object as g_fig_scatter so later tabs can add more layers to the same scatter plot, and autorun true builds it as soon as the tab loads. The side output cell then evaluates g_fig_scatter to display the points. On the resulting axes, d3_5_9 measures the drought exposure and corn_yield is the county yield being compared with it.</p>
 </details>
 <p>The next thing you need to do is tell <code>g_fig</code> what type of figure you want by <code>geom_*()</code> functions. For example, we use <code>geom_point()</code> to create a scatter plot. To create a scatter plot, R needs to know which variables should be on the y-axis and x-axis. This information can be passed to <code>g_fig</code> by the following code:</p>
 <p><br></p>
@@ -3026,7 +3138,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The aes function deserves its own tabs because it is the piece people misunderstand for longest. The short version is in the callout: aes is how you make some visual property of the plot a function of a variable in your data. The word is short for aesthetic. So writing x equals the drought variable inside aes does not mean use this value, it means look up this column in the dataset and map it onto the x axis. The second tab shows what happens when you get this wrong, and it is worth actually running so you recognize the error later.</p>
+<p>The aes function deserves its own tabs because it is the piece people misunderstand for longest. The short version is in the callout: aes is how you make some visual property of the plot a function of a variable in your data. The word is short for aesthetic. So writing x equals the drought variable inside aes does not mean use this value, it means look up this column in the dataset and map it onto the x axis. The second tab shows what happens when you get this wrong, and it is worth actually running so you recognize the error later. On the first inner tab, the left arrow stores the scatter plot and the surrounding parentheses also print it, so assignment and inspection happen in one expression. G_fig already knows that county_yield is its data, which is why aes can resolve d3_5_9 and corn_yield as column names. On the If not in aes tab, x and y are passed directly to geom_point instead of being declared as data mappings. R then looks for standalone objects with those names outside the dataset and reports that they are not found. That error is useful evidence that the columns were placed outside the data-masking job aes exists to perform.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">What does it do?</a></li><li><a href="#tabset-4-2">If not in aes()?</a></li></ul>
@@ -3119,7 +3231,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The histogram is our first example of a geom that needs only x, as the callout points out, and the reason is worth understanding rather than memorizing. You give it one variable, and it works out the y axis itself by counting how many observations fall into each bin. So there is no y to supply; it is computed. This is the first hint of something important, that some geoms transform your data before drawing it rather than plotting it directly.</p>
+<p>The histogram is our first example of a geom that needs only x, as the callout points out, and the reason is worth understanding rather than memorizing. You give it one variable, and it works out the y axis itself by counting how many observations fall into each bin. So there is no y to supply; it is computed. This is the first hint of something important, that some geoms transform your data before drawing it rather than plotting it directly. In the code, g_fig supplies county_yield and aes maps corn_yield to the horizontal axis. The output therefore shows corn yield along x and the number of county-year observations in each bin along y. The chunk options make the figure use the full output width and suppress routine messages and warnings on the slide. In particular, message false hides ggplot2’s note that it chose thirty bins by default. Those options are presentation housekeeping; they do not change the histogram itself.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-10"></div>
@@ -3141,7 +3253,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>A density plot answers the same question as a histogram, what does the distribution look like, but draws a smooth curve instead of bars. Like the histogram it needs only x, and for the same reason: the height is computed for you. Which should you use? A histogram is more honest, because you can see the actual binning, and a density plot is easier to read when you are overlaying several groups. Both are reasonable; be aware that the smoothness of a density plot is a choice made by an algorithm, not a property of your data.</p>
+<p>A density plot answers the same question as a histogram, what does the distribution look like, but draws a smooth curve instead of bars. Like the histogram it needs only x, and for the same reason: the height is computed for you. Which should you use? A histogram is more honest, because you can see the actual binning, and a density plot is easier to read when you are overlaying several groups. Both are reasonable; be aware that the smoothness of a density plot is a choice made by an algorithm, not a property of your data. Here again g_fig supplies county_yield, while aes identifies corn_yield as x. The vertical axis is computed density rather than a count, so you should not read its height as a number of observations. Out-width one hundred percent lets the figure fill the output area, and message false plus warning false keep routine console text from competing with it. The callout’s one-x rule is therefore visible both in the code and in the computed vertical scale.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-11"></div>
@@ -3163,7 +3275,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>A line plot needs both x and y, as the callout notes, and notice something else about this example: it uses a different dataset. We switch to mean_yield, the derived data with one row per year. That is not incidental. A line implies a connection from one point to the next, so it only makes sense when there is exactly one y for each x. Trying to draw a line through the full county-level data, where each year has hundreds of values, would produce a mess. Match the geom to the shape of your data.</p>
+<p>A line plot needs both x and y, as the callout notes, and notice something else about this example: it uses a different dataset. We switch to mean_yield, the derived data with one row per year. That is not incidental. A line implies a connection from one point to the next, so it only makes sense when there is exactly one y for each x. Trying to draw a line through the full county-level data, where each year has hundreds of values, would produce a mess. Match the geom to the shape of your data. The code starts a new ggplot with mean_yield, maps year to x and the annual mean corn_yield to y, and adds geom_line to connect those annual values. The figure is therefore a time path of average yield, not a display of individual counties. Out-width one hundred percent fills the available output area, while message false and warning false keep routine console text off the slide. Those chunk options affect only the presentation of the result.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-12"></div>
@@ -3185,7 +3297,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Boxplots need x and y, but look closely at the code because there is a wrinkle: the x variable is wrapped in factor. The callout asks why, so let me answer it. Year is stored as a number, and if you hand ggplot a number it treats the axis as continuous and tries to draw one enormous box across the whole range. Wrapping it in factor says treat these as distinct categories, and then you get one box per year, which is what you wanted. That trick of converting a number to a factor for grouping comes up constantly.</p>
+<p>This grouped boxplot uses x for year and y for yield, but an ungrouped boxplot needs only one positional aesthetic. Look closely at the code because there is a wrinkle: the x variable is wrapped in factor. The callout asks why, so let me answer it. Year is stored as a number, and if you hand ggplot a number it treats the axis as continuous and tries to draw one enormous box across the whole range. Wrapping it in factor says treat these as distinct categories, and then you get one box per year, which is what you wanted. That trick of converting a number to a factor for grouping comes up constantly. County_yield is the data, corn_yield is the numeric y variable whose distribution each box summarizes, and factor of year supplies the groups on x. The output lets you compare the center, spread, and unusual county yields from year to year rather than reducing each year to a single mean. As on the surrounding tabs, out-width one hundred percent uses the whole output area, and message false with warning false keeps routine console text out of the lecture display.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-13"></div>
@@ -3198,7 +3310,7 @@ Transcript
 </div>
 <div class="callout-content">
 <ul>
-<li><code>geom_boxplot()</code> needs <code>x</code> and <code>y</code>.</li>
+<li>This grouped <code>geom_boxplot()</code> uses <code>x</code> for year and <code>y</code> for yield, but an ungrouped boxplot needs only one positional aesthetic.</li>
 <li>Why <code>factor(year)</code>?</li>
 </ul>
 </div>
@@ -3210,7 +3322,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Bar plots need x and y, and here is another wrinkle worth pointing at: the stat equals identity argument sitting outside the aes. By default geom_bar wants one variable and counts how many times each value occurs, like a histogram for categories. But here we already have the numbers we want to display, the mean yields, so we do not want it counting anything. stat identity tells it to use the y values as they are. If you get a bar chart that stubbornly shows counts instead of your values, this is the argument you forgot.</p>
+<p>This stat equals identity example needs both x and y, while default geom_bar needs only one positional aesthetic. Here is another wrinkle worth pointing at: the stat equals identity argument sits outside the aes. By default geom_bar wants one variable and counts how many times each value occurs, like a histogram for categories. But here we already have the numbers we want to display, the mean yields, so we do not want it counting anything. stat identity tells it to use the y values as they are. If you get a bar chart that stubbornly shows counts instead of your values, this is the argument you forgot. Mean_yield supplies one row per year, aes maps year to the horizontal position and mean corn_yield to bar height, and the resulting figure gives one annual average per bar. Stat is outside aes because identity is a fixed instruction about how the geom should process every row, not a variable mapping. Out-width one hundred percent fills the result panel, while message false and warning false suppress routine console text. That completes the figure-type tour and sets up the next section, where we keep the geoms but change how they look.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-14"></div>
@@ -3222,7 +3334,7 @@ Transcript
 <p><strong>Note</strong></p>
 </div>
 <div class="callout-content">
-<p><code>geom_bar()</code> needs <code>x</code> and <code>y</code></p>
+<p>This <code>stat = "identity"</code> example needs both <code>x</code> and <code>y</code>, while default <code>geom_bar()</code> needs only one positional aesthetic.</p>
 </div>
 </div>
 </div>
@@ -3241,7 +3353,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Everything so far has been black and white. Now we make things look the way we want, by giving options inside the geom. The list on the slide is the vocabulary: fill and color, size for points and text, linewidth for lines and borders, shape, and linetype. Two warnings underneath which are worth taking seriously. Which options apply depends on the geom, so not everything works everywhere. And the same name can mean different things depending on the geom, which is why the next few tabs go through them one type at a time.</p>
+<p>Everything so far has been black and white. Now we make things look the way we want, by giving options inside the geom. The list on the slide is the vocabulary: fill and color, size for points and text, linewidth for lines and borders, shape, and linetype. Two warnings underneath which are worth taking seriously. Which options apply depends on the geom, so not everything works everywhere. And the same name can mean different things depending on the geom, which is why the next few tabs go through them one type at a time. Use fill for the interior of a shape and color for points, lines, or outlines. Size changes points and text, linewidth changes lines and borders, shape selects a point symbol, and linetype selects a solid, dashed, or dotted pattern. These are fixed settings when you place them outside aes, as the examples below do. The callout also shows the exact failure mode for an option a geom cannot use: ggplot2 still draws the figure but warns that it is ignoring the unknown parameter. Watch for shape on the histogram tab and fill on the line-plot tab. The warning tells you the option had no effect, which is different from a plotting error that stops the figure from being made.</p>
 </details>
 <p>All the elements in the figures we have created so far are in black and white.</p>
 <p>You can change how figure elements look by providing options inside <code>geom_*()</code>.</p>
@@ -3283,7 +3395,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>For a scatter plot, the three that matter are color, size, and shape. Notice where they sit: outside the aes, but inside geom_point. That placement is the whole lesson of this section, so let me be explicit. Inside aes means make this depend on a variable in the data. Outside aes means set it to this fixed value for everything. Here we want every point red, not red according to some column, so color goes outside. Getting this backwards is the single most common ggplot mistake, and we return to it properly in the next lecture.</p>
+<p>For a scatter plot, the three that matter are color, size, and shape. Notice where they sit: outside the aes, but inside geom_point. That placement is the whole lesson of this section, so let me be explicit. Inside aes means make this depend on a variable in the data. Outside aes means set it to this fixed value for everything. Here we want every point red, not red according to some column, so color goes outside. Getting this backwards is the single most common ggplot mistake, and we return to it properly in the next lecture. The code keeps the same d3_5_9 and corn_yield mapping from the earlier scatter plot. Size zero point seven makes every marker smaller, and shape zero changes every marker to an open square. Autorun true executes the cell automatically, which makes this tab useful as a live demonstration: change red, zero point seven, or zero, rerun, and compare the visible result. Fixed settings belong outside aes because they describe the layer as a whole and should not create a data-driven legend.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-15"></div>
@@ -3295,7 +3407,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>For a histogram, notice that there are two separate colour options and they do different things. fill is the inside of the bars, and color is their outline. That distinction runs through every geom that draws a shape with an interior: bars, boxes, ribbons, polygons. For points and lines, which have no interior, color is the only one that does anything. Also notice shape in this example, which does nothing at all here, because a bar has no shape to set. Run it and you will get the warning the introduction told you about, saying shape is being ignored. That is the point about options differing by geom, made concrete.</p>
+<p>For a histogram, notice that there are two separate colour options and they do different things. fill is the inside of the bars, and color is their outline. That distinction runs through every geom that draws a shape with an interior: bars, boxes, ribbons, polygons. For points and lines, which have no interior, color is the only one that does anything. Also notice shape in this example, which does nothing at all here, because a bar has no shape to set. Run it and you will get the warning the introduction told you about, saying shape is being ignored. That is the point about options differing by geom, made concrete. Corn_yield remains the x mapping, blue draws the bar outlines, green fills the interiors, and linewidth two makes those outlines deliberately thick. Shape two is the deliberately inapplicable option, so it changes nothing. Because warning output is left on in this interactive cell, you can see the ignored-parameter warning, and because autorun true runs the example automatically, the warning and the figure appear without an initial click. Change one option at a time so you can connect each argument with the part of the bars it controls.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-16"></div>
@@ -3307,7 +3419,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The boxplot example shows the same fill and color pair, with fill filling the boxes and color drawing their outlines and whiskers. linewidth controls the thickness of those lines. Try changing the numbers and rerunning; with a boxplot in particular, a thinner line and a pale fill usually reads better than the defaults, because the eye should be drawn to the position of the boxes rather than to their borders.</p>
+<p>The boxplot example shows the same fill and color pair, with fill filling the boxes and color drawing their outlines and whiskers. linewidth controls the thickness of those lines. Try changing the numbers and rerunning; with a boxplot in particular, a thinner line and a pale fill usually reads better than the defaults, because the eye should be drawn to the position of the boxes rather than to their borders. In this code, factor of year again creates one group per year and corn_yield supplies the values within each group. Color red and fill orange set the outline and interior, while linewidth zero point two makes the box, whisker, and median lines thin. Shape one has a narrower job here: it changes any outlier points to open circles. It is therefore a valid boxplot aesthetic even though shape was meaningless for the histogram. Autorun true draws the comparison automatically and leaves the cell ready for your own changes.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-17"></div>
@@ -3319,7 +3431,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>For a line plot, colour and linewidth do the obvious things, and linetype gives you dotted, dashed, and so on, which is genuinely useful when a figure has to survive being printed in black and white. Notice fill is set here too and has no effect, because a line has no interior to fill. Watch what happens when you run it: ggplot does not stop, but it does warn you, saying it is ignoring an unknown parameter. That is worth recognizing, because it is the message you get whenever you hand a geom an option it has no use for. If an option seems to do nothing, look for that warning.</p>
+<p>For a line plot, colour and linewidth do the obvious things, and linetype gives you dotted, dashed, and so on, which is genuinely useful when a figure has to survive being printed in black and white. Notice fill is set here too and has no effect, because a line has no interior to fill. Watch what happens when you run it: ggplot does not stop, but it does warn you, saying it is ignoring an unknown parameter. That is worth recognizing, because it is the message you get whenever you hand a geom an option it has no use for. If an option seems to do nothing, look for that warning. The data and mapping still say year on x and annual mean corn_yield on y. Color blue makes the line blue, linewidth one point five makes it thicker, and linetype dotted changes its pattern. Fill red is intentionally useless, and the warning is visible because this cell does not suppress warnings. Autorun true produces both the figure and that diagnostic automatically. Compare this with the histogram tab: ggplot2 ignores different options for different geoms because the visible objects have different parts.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-18"></div>
@@ -3340,7 +3452,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Time to write some of your own. These exercises use the diamonds dataset, which comes with ggplot2, and the setup code filters it down to premium-cut stones in three colours so the plots are not overwhelming. Run the setup first and look at what you have. Then the two exercises each show you a target figure, and your job is to reproduce it. Working backwards from a picture to the code is a genuinely good way to learn this package, because it forces you to notice details you would otherwise skim.</p>
+<p>Time to write some of your own. These exercises use the diamonds dataset, which comes with ggplot2, and the setup code filters it down to premium-cut stones in three colours so the plots are not overwhelming. Run the setup first and look at what you have. Then the two exercises each show you a target figure, and your job is to reproduce it. Working backwards from a picture to the code is a genuinely good way to learn this package, because it forces you to notice details you would otherwise skim. Data of diamonds makes the built-in dataset available. The left arrow names the filtered result premium. Dplyr colon-colon filter explicitly calls filter from dplyr, cut double-equals Premium keeps that cut, and the ampersand requires the color condition to be true as well. Color percent-in-percent c of E, I, and F tests whether each diamond has any one of those three color grades. The final bare premium prints the result so you can inspect the columns and confirm the filter before plotting, and autorun true performs this preparation automatically. Move to Exercise 1 only after you can see that smaller dataset.</p>
 </details>
 <p>This exercise uses the <code>diamonds</code> dataset from the <code>ggplot2</code> package. First, load the dataset and extract observations with <code>Premium</code> cut whose color is one of <code>E</code>, <code>I</code>, and <code>F</code>:</p>
 <div id="qwebr-insertion-location-19"></div>
@@ -3351,7 +3463,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The first exercise is a scatter plot of price against carat, with red points. Everything you need is on the earlier slides. Think through the four steps: ggplot with the data, add geom_point, put carat and price inside aes, and put the colour outside aes since every point should be red. That last decision is the one to be deliberate about. There is a folded answer, but try it before you open it.</p>
+<p>The first exercise is a scatter plot of price against carat, with red points. Everything you need is on the earlier slides. Think through the four steps: ggplot with the data, add geom_point, put carat and price inside aes, and put the colour outside aes since every point should be red. That last decision is the one to be deliberate about. There is a folded answer, but try it before you open it. The target cell is an output context, so it runs automatically to show the figure you are trying to match rather than giving you another editor. The Work here tab is the blank live code area for your attempt. On the Answer tab, code-fold true keeps the solution collapsed until you choose to reveal it, and eval false prevents that R chunk from running again while the deck is rendered. When you compare your work with the answer, also check the axes: carat is x, price is y, and premium is the dataset prepared on the Instruction tab.</p>
 </details>
 <p>Using <code>carat</code> and <code>price</code> variables from <code>premium</code>, generate the figure below:</p>
 <div class="side-out">
@@ -3382,7 +3494,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The second exercise is a histogram of price, and look carefully at the target figure: the bars are white inside with a blue outline. That means both fill and color, and it means getting them the right way round, which is exactly the distinction we drew a few tabs ago. If your bars come out solid blue, you have swapped them. Again, both go outside aes, because they are fixed values rather than functions of a variable.</p>
+<p>The second exercise is a histogram of price, and look carefully at the target figure: the bars are white inside with a blue outline. That means both fill and color, and it means getting them the right way round, which is exactly the distinction we drew a few tabs ago. If your bars come out solid blue, you have swapped them. Again, both go outside aes, because they are fixed values rather than functions of a variable. The target uses premium as the data and maps price to x, with no y because geom_histogram computes counts. Its output-context cell runs automatically to provide the picture to copy. Write your version in the blank Work here cell before opening Answer. There, code-fold true hides the solution initially and eval false keeps the deck render from executing the duplicate R code. The fixed white fill and blue outline do not create a legend, which is another check that they belong outside aes.</p>
 </details>
 <p>Using the <code>price</code> variable from <code>premium</code>, generate a histogram of <code>price</code> shown below:</p>
 <div id="qwebr-insertion-location-22"></div>
@@ -3437,7 +3549,7 @@ Transcript
 <li><code>geom_vline()</code>: draw a vertical line</li>
 <li><code>geom_hline()</code>: draw a horizontal line</li>
 <li><code>geom_abline()</code>: draw a line with the specified intercept and slope</li>
-<li><code>geom_smooth()</code>: draw an OLS-estimated regression line (other regression methods available)</li>
+<li><code>geom_smooth()</code>: draw an automatically selected smoother; use <code>method = "lm"</code> for an OLS line</li>
 <li><code>geom_ribbon()</code>: create a shaded area</li>
 <li><code>geom_text()</code> and <code>annotate()</code>: add texts in the figure</li>
 </ul>
@@ -3448,7 +3560,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Vertical and horizontal reference lines, and their arguments are refreshingly simple: xintercept says where to put a vertical line, yintercept where to put a horizontal one. Notice that neither needs an aes, because you are giving a fixed position rather than mapping a variable. These are more useful than they look. A horizontal line at a policy threshold, or at the historical average, gives your reader something to measure against, and that is often what makes a figure persuasive rather than merely informative.</p>
+<p>Vertical and horizontal reference lines, and their arguments are refreshingly simple: xintercept says where to put a vertical line, yintercept where to put a horizontal one. Notice that neither needs an aes, because you are giving a fixed position rather than mapping a variable. These are more useful than they look. A horizontal line at a policy threshold, or at the historical average, gives your reader something to measure against, and that is often what makes a figure persuasive rather than merely informative. On screen, g_fig_scatter supplies the original points. The first plus adds a blue vertical line at x equals ten, and the second adds a red horizontal line at y equals one hundred. Color is also fixed outside aes because neither line varies by an observation. The callout pairs each intercept argument with the direction it controls, which helps prevent the easy mistake of putting ten into yintercept. Out-width one hundred percent lets the completed layered figure occupy the full output panel.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-24"></div>
@@ -3473,7 +3585,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>geom_abline draws a line from an intercept and a slope, following the equation in the callout: y equals a plus b times x. So intercept is a and slope is b. The most common use is drawing a forty-five degree reference line, with intercept zero and slope one, when you are comparing predicted against actual values and want to show where perfect prediction would lie. Note again there is no aes here; you are specifying the line directly rather than deriving it from data.</p>
+<p>geom_abline draws a line from an intercept and a slope, following the equation in the callout: y equals a plus b times x. So intercept is a and slope is b. The most common use is drawing a forty-five degree reference line, with intercept zero and slope one, when you are comparing predicted against actual values and want to show where perfect prediction would lie. Note again there is no aes here; you are specifying the line directly rather than deriving it from data. The comments in the code label the two pieces of the equation. In this particular layer, a is fifty and b is four, so the blue reference line follows y equals fifty plus four times x on top of g_fig_scatter. Color blue is a fixed layer setting, and out-width one hundred percent gives the combined plot the full output area. The values here illustrate the mechanics; in your own figure the intercept and slope should come from the benchmark or relationship you need the reader to judge.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-25"></div>
@@ -3499,7 +3611,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>geom_smooth is different from the others in this section, because it does compute something from your data. It fits a smooth curve through the points and draws it, with a shaded confidence band around it. By default it chooses the smoothing method for you based on how many observations you have. The callout suggests trying method equals lm, and you should, because that gives you the ordinary least squares straight line instead of a wiggly curve. Which you want depends on whether you are claiming a linear relationship or just showing the shape of the data.</p>
+<p>geom_smooth is different from the others in this section, because it does compute something from your data. It fits a smooth curve through the points and draws it, with a shaded confidence band around it. By default it chooses the smoothing method for you based on how many observations you have. The callout suggests trying method equals lm, and you should, because that gives you the ordinary least squares straight line instead of a wiggly curve. Which you want depends on whether you are claiming a linear relationship or just showing the shape of the data. The layer is added to g_fig_scatter, so the original points remain visible underneath it. Aes maps d3_5_9 to x and corn_yield to y because the smoother must know which relationship to estimate; those mappings are repeated here because g_fig_scatter did not store them as a plot-wide aes. Method equals l-m would sit outside aes because it is one fixed modelling choice for the layer. Out-width one hundred percent lets you compare the fitted line, its band, and the points across the full output panel.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-26"></div>
@@ -3521,7 +3633,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>geom_ribbon shades the area between an upper and a lower bound, so it needs ymin and ymax rather than a single y. Here we use fixed numbers to keep it simple, and alpha set to zero point three makes it partly transparent so the points still show through. The callout points at the real use: confidence intervals. When you have a fitted line and a band of uncertainty around it, a ribbon is how you draw the band, and drawing that uncertainty rather than hiding it is good practice.</p>
+<p>geom_ribbon shades the area between an upper and a lower bound, so it needs ymin and ymax rather than a single y. Here we use fixed numbers to keep it simple, and alpha set to zero point three makes it partly transparent so the points still show through. The callout points at the real use: confidence intervals. When you have a fitted line and a band of uncertainty around it, a ribbon is how you draw the band, and drawing that uncertainty rather than hiding it is good practice. In the code, x equals d3_5_9 tells the ribbon where to extend along the horizontal scale, ymin one hundred supplies its lower edge, and ymax two hundred supplies its upper edge. Fill green controls the shaded interior. Adding the layer to g_fig_scatter keeps the points as context, while the transparency prevents the ribbon from covering them completely. Out-width one hundred percent uses the full output panel. In a real confidence band, ymin and ymax would usually be columns containing observation-specific bounds rather than the same two constants at every x.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-27"></div>
@@ -3547,7 +3659,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>geom_text puts text on the plot at positions taken from your data. It needs x and y for the position, exactly like a point, plus label saying which column supplies the text. So here every point becomes its state name. Notice that all three are inside aes, because all three come from the data. This is excellent for labelling a handful of notable observations and terrible for labelling hundreds, as this example rather demonstrates: with this many points the labels collide into an unreadable smear.</p>
+<p>geom_text puts text on the plot at positions taken from your data. It needs x and y for the position, exactly like a point, plus label saying which column supplies the text. So here every point becomes its state name. Notice that all three are inside aes, because all three come from the data. This is excellent for labelling a handful of notable observations and terrible for labelling hundreds, as this example rather demonstrates: with this many points the labels collide into an unreadable smear. The new text layer is added to g_fig_scatter, so the original points stay on screen and each label is drawn at the drought and corn-yield coordinates of its row. The callout summarizes those three jobs: x and y position the text, while label supplies what is printed. Out-width one hundred percent gives the crowded result as much horizontal room as the panel allows, but it cannot solve overplotting. The handoff to annotate is the distinction to remember: geom_text repeats data-driven labels, while annotate adds one fixed message.</p>
 </details>
 <div class="side-out">
 <div id="qwebr-insertion-location-28"></div>
@@ -3572,7 +3684,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>annotate is the counterpart to geom_text for when the text does not come from your data. You give it the type of annotation, a fixed x and y position, and the literal text you want, and it draws that one thing. This is what you use for a caption inside the plot area, or to point out the one feature you want your reader to notice. Note the backslash n inside the label, which breaks the text onto a second line. Use annotate rather than geom_text whenever you are adding a single fixed piece of text, because geom_text would draw it once for every row in your data.</p>
+<p>annotate is the counterpart to geom_text for when the text does not come from your data. You give it the type of annotation, a fixed x and y position, and the literal text you want, and it draws that one thing. This is what you use for a caption inside the plot area, or to point out the one feature you want your reader to notice. Note the backslash n inside the label, which breaks the text onto a second line. Use annotate rather than geom_text whenever you are adding a single fixed piece of text, because geom_text would draw it once for every row in your data. The first argument, text, chooses a text annotation. X equals ten and y equals fifty place it in the coordinate system of g_fig_scatter, label supplies the two spoken lines, size three controls the font size, and color red makes the note stand out from the black points. All of these are fixed annotation arguments, so none belongs inside aes. The callout repeats the position, label, line-break, and size roles, while the code also shows the color setting. Out-width one hundred percent gives the final annotated plot the full available output area.</p>
 </details>
 <div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>

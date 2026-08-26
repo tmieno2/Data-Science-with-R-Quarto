@@ -278,7 +278,14 @@ iframe.app-frame {
 .reveal div.qwebr-interactive-area:has(.qwebr-output-graph-area canvas):not(.column *):not(.side-out *):not([data-webr-layout="stacked"]),
 .reveal div.qwebr-interactive-area.qwebr-side-by-side:not(.side-out *):not([data-webr-layout="stacked"]) {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr), NOT 1fr. A `1fr` track may not shrink below its item's
+     min-content width, and the item here is Monaco, whose min-content is the
+     full slide: the tracks resolved to `1021px 9px` and the figure was drawn
+     into the 9px one, 0x0 and off the right edge of the slide. Measured on
+     L05_vector_raster_interaction.html. The editor needs `min-width: 0` below
+     for the same reason — the track may shrink, but the item in it must be
+     allowed to as well. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   /* Vertically centre the code against the figure.
 
      The toolbar and the editor are separate grid items, so centring the
@@ -305,8 +312,8 @@ iframe.app-frame {
   > .qwebr-console-area {
     display: contents;
 
-    > .qwebr-editor { grid-area: editor; }
-    > .qwebr-output-code-area { grid-area: output; }
+    > .qwebr-editor { grid-area: editor; min-width: 0; }
+    > .qwebr-output-code-area { grid-area: output; min-width: 0; }
   }
 
   > .qwebr-output-graph-area {
@@ -331,7 +338,7 @@ iframe.app-frame {
 @media (max-width: 800px) {
   .reveal div.qwebr-interactive-area:has(.qwebr-output-graph-area canvas):not(.column *):not(.side-out *):not([data-webr-layout="stacked"]),
   .reveal div.qwebr-interactive-area.qwebr-side-by-side:not(.side-out *):not([data-webr-layout="stacked"]) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "toolbar" "editor" "output" "graph";
     grid-template-rows: auto auto auto auto;
   }

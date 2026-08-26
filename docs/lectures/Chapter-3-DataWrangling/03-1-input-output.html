@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -447,7 +447,7 @@ Transcript
 <p>Before you can wrangle any data you have to get it into R, and getting it out again matters just as much. Three objectives today. First, reading datasets in the four formats you will actually meet: csv, Excel, STATA, and R’s own rds. Second, writing R objects back out to files. And third, which is the one people underestimate, understanding where R looks for a file. That third objective is the middle third of this lecture and it is the part that goes wrong in assignments, because code that works on your machine and nowhere else is not much use to anybody.</p>
 </details>
 <ul>
-<li><p>Read datasets in various formats (<strong>csv</strong>, <strong>xlsx</strong>, <strong>dta</strong>, and <strong>rds</strong>) containing corn yields in Nebraska counties</p></li>
+<li><p>Read datasets in various formats (<strong>csv</strong>, <strong>xls</strong>, <strong>dta</strong>, and <strong>rds</strong>) containing corn yields in Nebraska counties</p></li>
 <li><p>Write R objects as files in various formats</p></li>
 <li><p>Understand where R looks for a file, so that your code runs on someone else’s computer too <!-- ADDED: the third objective. It is what the middle third of this lecture is
      really about, and it is the part students get wrong in assignments. --></p></li>
@@ -458,7 +458,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two things to do before we go further. Clone the repository linked here, which holds the datasets this lecture uses, so you can follow along rather than watch. And install two packages: tidyverse, which is a whole collection we will lean on for the rest of the course, and haven, which is what reads STATA files. Install them once now. The callout makes the point that tidyverse does a great deal more than reading and writing files; today we are using one small corner of it.</p>
+<p>Two things to do before we go further. Clone the repository linked here, which holds the datasets this lecture uses, so you can follow along rather than watch. And install two packages: tidyverse, which is a whole collection we will lean on for the rest of the course, and haven, which is what reads STATA files. Install them once now. In the code on screen, c combines the two package names into the character vector that install dot packages expects. Eval false is important here because installing is a one-time setup task, so the command is shown without being rerun every time the slides render. The callout makes the point that tidyverse does a great deal more than reading and writing files; today we are using one small corner of it.</p>
 </details>
 <ul>
 <li>Go <a href="https://github.com/tmieno2/data-science-course-supplementary-datasets">here</a> and clone the repository that hosts datasets used in this lecture</li>
@@ -508,9 +508,9 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Start with csv, and with the function that comes built into R: read.csv, with a dot. You give it a path to a file and it hands you back a data.frame. The syntax block shows the shape, and the example actually runs, reading the corn yields file. Note in passing how the example builds its path rather than typing one out; we come back to why that matters shortly. This function works, it needs no packages, and for a small clean file it is perfectly adequate. But it is not what I am going to recommend.</p>
+<p>Start with csv, and with the function that comes built into R: read.csv, with a dot. You give it a path to a file and it hands you back a data.frame. The syntax block shows the shape, and the example actually runs, reading the corn yields file. In that syntax block, the quoted text is where the file path goes, and the left arrow stores the returned data under the name on the left. Eval false keeps that placeholder example from running because path to the file to import is not a real file. The second chunk reads corn-yields-dot-c-s-v and assigns the result to corn-yields-d-f.&nbsp;Notice that this example uses only the file name. That works when the file is in R’s working directory, and we will soon look closely at how R decides what that directory is. This function works, it needs no extra packages, and for a small clean file it is perfectly adequate. But it is not what I am going to recommend.</p>
 </details>
-<p>You can use <code>read.csv()</code> from the <code>base</code> package.</p>
+<p>You can use <code>read.csv()</code> from the <code>utils</code> package, which comes with R.</p>
 <p><br></p>
 <p><strong>Syntax</strong></p>
 <div class="cell">
@@ -531,7 +531,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is the alternative: read_csv, with an underscore, from the readr package, which comes with tidyverse. Notice the naming convention, because it runs through the whole tidyverse: underscores rather than dots. The call looks almost identical, you hand it a path and get your data back. The difference is in what you get back and how it behaves, and that is what the next tab is about. When you see both of these in code on the internet, and you will, the underscore version is the modern one.</p>
+<p>Here is the alternative: read_csv, with an underscore, from the readr package, which comes with tidyverse. Notice the naming convention, because it runs through the whole tidyverse: underscores rather than dots. The call looks almost identical, you hand it a path and get your data back. The double colon in readr double-colon read-c-s-v asks for that function directly from readr, so this line does not depend on a separate library readr call. The first chunk is a non-running syntax template. In the example, the file name is the input, the left arrow saves the imported data as corn-yields-t-b-l, and message false suppresses readr’s column-specification message so the slide stays focused on the object itself. The difference is in what you get back and how it behaves, and that is what the next tab is about. When you see both of these in code on the internet, and you will, the underscore version is the modern one.</p>
 </details>
 <p>You can use <code>read_csv()</code> from the <code>readr</code> package.</p>
 <p><br></p>
@@ -550,7 +550,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>So what actually differs, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.</p>
+<p>So what actually differs, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. The two class calls produce those labels. A tibble’s class output can contain several inherited class names, including t-b-l-d-f, t-b-l, and data-dot-frame, and this readr result may also begin with spec-t-b-l-d-f.&nbsp;Those names describe one tibble with layers of behavior, not several separate objects. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. Because spaces cannot be used as ordinary bare names in R code, you refer to that preserved name by surrounding it with backticks. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.</p>
 </details>
 <!-- CHANGED (C1): the original Compare tab printed class() for each and stopped
      there. That tells a student the two objects differ without telling them
@@ -595,7 +595,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now a real-world problem the clean examples hide. read_csv guesses each column’s type by sampling up to guess_max rows spread throughout the file, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all.</p>
+<p>Now a real-world problem the clean examples hide. read_csv guesses each column’s type by sampling up to guess_max rows spread throughout the file, and sometimes it guesses wrong. The classic case is a zip code or a county code that looks like a number, so it is read as one, and the leading zero disappears. Once that has happened you cannot get it back. The fix is to stop it guessing and tell it directly, using col_types. In the code, cols defines the column specification, county-code names the column we are overriding, and col-character tells readr to preserve its values as text, including any leading zero. Columns you do not name there are still guessed. Eval false makes this a demonstration rather than trying to reread the lecture file with a column it does not actually contain. Three other arguments worth remembering: skip, for files with a title sitting above the header row, na, for telling it which strings mean missing, and col_names FALSE when there is no header at all. Here, skip equals two ignores exactly the first two lines; na uses c to collect the empty string, uppercase N-A, and a dot as three different missing-value markers; and col-names FALSE says the first row is data rather than names.</p>
 </details>
 <!-- ADDED (B6): entire tab. read_csv guessing a column type wrongly is the most
      common real-world import problem and the original never mentioned it. -->
@@ -618,7 +618,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>A small convenience with a warning attached. Anywhere read_csv accepts a file path, it also accepts a web address, so you can read a dataset straight off the internet without downloading it first. That is genuinely useful when you are exploring. But read the callout before you build anything on it: this re-downloads the file every single time you render, which is slow, and more importantly a URL can change or vanish without warning, taking your analysis with it. For anything you actually rely on, download it once, keep it in your project, and read the local copy.</p>
+<p>A small convenience with a warning attached. Anywhere read_csv accepts a file path, it also accepts a web address, so you can read a dataset straight off the internet without downloading it first. In the example, read-c-s-v receives the complete raw-file U-R-L as its one argument, and the left arrow would store the downloaded data as corn. Eval false keeps this illustrative address from being contacted when the deck renders. That is genuinely useful when you are exploring. But read the callout before you build anything on it: this re-downloads the file every single time you render, which is slow, and more importantly a URL can change or vanish without warning, taking your analysis with it. For anything you actually rely on, download it once, keep it in your project, and read the local copy.</p>
 </details>
 <!-- ADDED (B7): entire tab. Students find data online constantly and do not
      realise they can skip the download entirely. -->
@@ -658,7 +658,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. Once you know that, the simple case makes sense: if the working directory is your project folder and the file is sitting in it, then the bare file name is enough. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
+<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. It takes no arguments and prints the full path R is currently using, so compare that output with the folder you expect. Once you know that, the simple case makes sense: if the working directory is your project folder and the file is sitting in it, then the bare file name is enough. The example’s bare name is corn-yields-dot-c-s-v, the left arrow would store the imported data as corn-yield, and eval false leaves that line as an example rather than importing the file again on this tab. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
 </details>
 <p>R always has one folder it treats as “here”, called the <strong>working directory</strong>. A path that does not start from the root of your disk is interpreted relative to it.</p>
 <div class="cell">
@@ -730,7 +730,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root.</p>
+<p>And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. The double colon calls here directly from the here package. In the first chunk, the three quoted arguments are successive path pieces: the lectures folder, the Chapter-3-DataWrangling folder, and corn-yields-dot-c-s-v. The printed output is the complete operating-system path that here assembled. In the second chunk, here builds data slash corn-yields-dot-c-s-v and passes that path straight into read-c-s-v, whose result would be stored as corn. Eval false displays the portable pattern without reading the existing project copy. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root. As the callout notes, it finds that root by looking for the R Project file.</p>
 </details>
 <!-- ADDED (B1): entire tab. -->
 <p>Inside an R Project, the <code>here</code> package builds paths from the project root:</p>
@@ -766,7 +766,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
+<p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. More precisely, a backslash starts an escape sequence, and in the first example the one before Users is treated as an escape instead of as a folder separator. Eval false is necessary because this line is deliberately showing the broken form. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. The two non-running lines show those fixes and both describe the same file. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
 </details>
 <!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
      first week. -->
@@ -795,7 +795,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files.</p>
+<p>This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files. The specific error on screen names corn-yields-dot-c-s-v. Both get-w-d and list-dot-files take no arguments here; the first prints the full folder path and the second prints the names inside it, so compare those outputs character for character against what you typed. Eval false means the calls are displayed for you to run when you need them, without adding machine-specific folder listings to the rendered slide.</p>
 </details>
 <!-- ADDED (B9): entire tab. "cannot open file" is the single most common error
      in this chapter and the original offered no way to diagnose it. -->
@@ -863,7 +863,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is that weakness. Sheet numbers are positional, so the moment somebody inserts a sheet at the front of the workbook, every number shifts by one and your code silently reads the wrong data. Silently is the problem; nothing errors. So use names instead. The function excel_sheets lists every sheet name in a workbook without you having to open Excel at all, which is useful in its own right. Then pass that name to the sheet argument instead of a number. It reads better and it survives somebody reorganizing the file.</p>
+<p>Here is that weakness. Sheet numbers are positional, so the moment somebody inserts a sheet at the front of the workbook, every number shifts by one and your code silently reads the wrong data. Silently is the problem; nothing errors. So use names instead. The function excel_sheets lists every sheet name in a workbook without you having to open Excel at all, which is useful in its own right. Its file argument is corn-yields-dot-x-l-s, and the output here shows corn-yields-zero-eight and corn-yields-zero-nine. Then pass that name to the sheet argument instead of a number. The second chunk passes corn-yields-zero-eight, reads that named sheet from the same workbook, and stores it as corn-zero-eight. It reads better and it survives somebody reorganizing the file.</p>
 </details>
 <!-- ADDED (B3): entire tab. Sheet numbers break the moment someone reorders the
      workbook; names do not. And students need a way to see what the sheets are
@@ -891,7 +891,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.</p>
+<p>One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. The class call asks R what kind of object corn-zero-eight is, and its output lists t-b-l-d-f, t-b-l, and data-dot-frame. The first two labels identify a tibble, while data-dot-frame appears because a tibble is built on top of a data.frame. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.</p>
 </details>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -915,7 +915,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. There is nothing more to the basic case than that. The two tabs after this one cover the two things about STATA files that do occasionally surprise people.</p>
+<p>STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. The library call attaches haven so its functions are available by name. The syntax template is marked eval false because its quoted path is only a placeholder. The double colon in haven double-colon read-d-t-a is the other way to reach the function: it asks for read-d-t-a directly from haven, even without relying on the earlier library call. In the running example, corn-yields-dot-d-t-a is the input path and the left arrow stores the imported object as corn-yields. There is nothing more to the basic case than that. The two tabs after this one cover the two things about STATA files that do occasionally surprise people.</p>
 </details>
 <p>Use the <code>read_dta()</code> function from the <code>haven</code> package.</p>
 <div class="cell">
@@ -973,7 +973,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>One genuine oddity of STATA files. STATA lets you attach labels to variables, and haven preserves them, which means a column can come back as a special labelled type rather than a plain number. Most of the time this is invisible and harmless. But occasionally a column will refuse to behave in arithmetic or will plot strangely, and the labels are why. The fix is one function, zap_labels, which strips them off and leaves you with ordinary columns. Worth filing away, because when it happens the symptoms are baffling if you have never heard of it.</p>
+<p>One genuine oddity of STATA files. STATA lets you attach labels to variables, and haven preserves them, which means a column can come back as a special labelled type rather than a plain number. Most of the time this is invisible and harmless. But occasionally a column will refuse to behave in arithmetic or will plot strangely, and the labels are why. The fix is one function, zap_labels, which strips them off and leaves you with ordinary columns. The code calls it directly from haven, passes in the whole corn-yields object, and assigns the cleaned result back to that same name. Eval false keeps this as a remedy to use when you actually encounter labelled columns, rather than stripping information from the lecture object automatically. Worth filing away, because when it happens the symptoms are baffling if you have never heard of it.</p>
 </details>
 <!-- ADDED: STATA files carry variable labels, which surprise people the first
      time a column refuses to behave like a plain number. -->
@@ -1011,7 +1011,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The syntax is the simplest of the lot: readRDS, and a path. No sheet to specify, no package to load, no column types to worry about. That is because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. Which is exactly the point of the format, and it leads directly into the note on the next tab.</p>
+<p>The syntax is the simplest of the lot: readRDS, and a path. The first chunk is marked eval false because path to the file is only a placeholder. In the running example, read-R-D-S opens corn-yields-dot-r-d-s and the left arrow stores the returned object as corn-yields. No sheet to specify, no package to load, no column types to worry about. That is because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. Which is exactly the point of the format, and it leads directly into the note on the next tab.</p>
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
@@ -1028,7 +1028,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Check the class here and you get a tibble again, but for a completely different reason than before. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
+<p>Check the class here and you get a tibble again, but for a completely different reason than before. The output lists t-b-l-d-f, t-b-l, and data-dot-frame, which identifies corn-yields as that tibble. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
 </details>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1053,7 +1053,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Exporting is the mirror image of importing, and pleasantly the naming follows the same pattern, so you already half know it. write_csv for csv, write_dta for STATA, and saveRDS for rds. That last one also has a tidyverse-style alternative, write_rds, which does exactly the same thing with the arguments in tidyverse order. Pick whichever reads better to you. The general shape is the same across all of them, which is the next tab.</p>
+<p>Exporting is the mirror image of importing, and pleasantly the naming follows the same pattern, so you already half know it. Write-c-s-v writes a data.frame or tibble as csv, write-d-t-a writes one in STATA’s dta format, and save-R-D-S saves an R object as rds. That last one also has a readr alternative, write-r-d-s, which serves the same basic purpose with tidyverse-style naming and its own defaults. Pick whichever reads better to you. The general shape is the same across all of them, which is the next tab.</p>
 </details>
 <ul>
 <li><p>Exporting datasets works much the same way as importing them.</p></li>
@@ -1070,7 +1070,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The syntax for every export function is the same: the object you want to save, then the file name to save it as. Object first, destination second. The examples show all three formats writing the same data. Now read the callout about Excel, because it is a genuine recommendation rather than a preference. A spreadsheet is a thing for people to look at, not a thing for code to read; saving results into one puts them somewhere that is harder to verify and trivially easy for somebody to edit by hand without leaving a trace. If a supervisor genuinely requires one, write_xlsx exists.</p>
+<p>The syntax for every export function is the same: the object you want to save, then the file name to save it as. Object first, destination second. The examples show all three formats writing the same data. In each example, corn-yields is the object. Readr double-colon write-c-s-v creates corn-yields-exp-dot-c-s-v, haven double-colon write-d-t-a creates corn-yields-exp-dot-d-t-a, and save-R-D-S creates corn-yields-exp-dot-r-d-s. The double colons select functions from packages without attaching those packages. Eval false matters especially on an export slide because it shows the commands without creating or overwriting those three files whenever the deck renders. The comments separate the examples by format and are not commands. Now read the callout about Excel, because it is a genuine recommendation rather than a preference. A spreadsheet is a thing for people to look at, not a thing for code to read; saving results into one puts them somewhere that is harder to verify and trivially easy for somebody to edit by hand without leaving a trace. If a supervisor genuinely requires one, write_xlsx exists. The callout’s writexl double-colon write-x-l-s-x form reaches that function directly from the writexl package.</p>
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
@@ -1115,6 +1115,8 @@ Transcript
 Transcript
 </summary>
 <p>Two things worth knowing about rds specifically, in the tabs here. The first is that it preserves any R object, not just datasets. The example saves a list containing both a character vector and a whole dataset, and gets the identical list back. Try to do that with a csv and you cannot even begin. The second tab answers the practical question of which format to choose. rds is smallest, but size is the least interesting consideration. The real trade-off is that csv can be opened by anything in twenty years but forgets every type, while rds preserves everything perfectly but only R can read it. The callout gives a sensible default: keep raw data as csv, save intermediate results as rds.</p>
+<p>Look first at Object type preservation. The list call creates a-list with two named elements: a is the character vector R and rocks, made with c, and b is the entire corn-yields object. The next line asks temp-dir for R’s temporary folder, then file-dot-path safely joins that folder to a-list-dot-r-d-s and stores the resulting path as r-d-s-path. That path exists so the demonstration does not leave an output file in the course folder. Save-R-D-S writes the whole list to that path, and read-R-D-S reads it back and prints it. The output shows that a is still a character vector and b is still the dataset with its column types. A csv cannot do that because it can only represent a rectangular table of text values.</p>
+<p>Now move to Which format should you use. The data-dot-frame call builds the comparison table on screen. The file column is a character vector of the three file names. File-dot-size returns each size in bytes, division by one thousand twenty-four converts those values to kibibytes, and round with one as its second argument keeps one decimal place before the values become the K-i-B column. For these files, the output is fourteen-point-seven kibibytes for csv, eight-point-eight for dta, and one-point-five for rds, so rds is the smallest. The size comparison is not the only decision. Csv stays broadly readable but loses stored types, rds preserves the exact R object but only R can read it, and dta is the choice when the recipient works in STATA. That is why the callout recommends csv for raw data and rds for intermediate results whose types need to survive between scripts.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Object type preservation</a></li><li><a href="#tabset-7-2">Which format should you use?</a></li></ul>
@@ -1164,11 +1166,11 @@ $b
 <div class="cell">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">data.frame</span>(</span>
 <span id="cb44-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
-<span id="cb44-3"><a></a>  <span class="at">KB   =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
+<span id="cb44-3"><a></a>  <span class="at">KiB  =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
 <span id="cb44-4"><a></a>           <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
 <span id="cb44-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             file   KB
+<pre><code>             file  KiB
 1 corn_yields.csv 14.7
 2 corn_yields.dta  8.8
 3 corn_yields.rds  1.5</code></pre>

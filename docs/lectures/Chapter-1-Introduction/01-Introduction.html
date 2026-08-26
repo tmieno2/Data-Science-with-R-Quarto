@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-2863f5211c65b05d312ef8bbce9d2a59.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -581,7 +581,7 @@
       var available = Math.max(1, (area.clientWidth || 1005) - 16);
       var share = parseFloat(host.style.getPropertyValue("--webr-code-share")) / 100;
       if (!share) return;
-      if (available * (1 - share) < MIN_PLOT_PX) stack(host, false);
+      if (available * (1 - share) < MIN_PLOT_PX) stack(area, host, false);
     }
 
     function measureRenderedCode(area, host, code, attempt) {
@@ -669,7 +669,7 @@
       if (share >= MAX_CODE_SHARE || attempt > 40) {
         // Even at the widest permitted code column the line will not fit, so the
         // cell has no business being side by side at all.
-        stack(host, true);
+        stack(area, host, true);
         return;
       }
       setTracks(host, area, share + 0.02);
@@ -782,13 +782,12 @@
     // The one remaining way out of the side-by-side layout, and it can only fire
     // during load: the code will not fit on one line even in the widest column
     // allowed. Nothing a cell does at RUN time reaches here.
-    function stack(host, force) {
+    function stack(area, host, force) {
       // `::: {.side-out}` is a REQUEST, not an override: it cannot make code fit
       // that does not fit. What the exemption buys is that ordinary measurement
       // noise will not tear a deliberate wrapper down.
       if (host.dataset.webrLayoutManual === "true" && !force) return;
-      host.classList.remove("side-out");
-      host.dataset.webrLayout = "stacked";
+      markStacked(area, host);
     }
 
     // Called whenever the cell's DOM changes, which in practice means "the cell
@@ -806,16 +805,25 @@
       requestAnimationFrame(function () { markGutter(area, host); });
     }
 
-    // `::: {.stacked}` and `#| layout: stacked` both land here. Undoing the
-    // side-out wrapper is not enough on its own: custom.scss puts ANY cell that
-    // has drawn a figure side by side, keyed off `:has(... canvas)`, and that
-    // rule knows nothing about what this script decided. So a stacked plot cell
-    // obeyed the option until the moment the plot appeared and then reflowed into
-    // two columns anyway. The marker goes on the interactive area itself, which
-    // is the element that selector matches, so the stylesheet can stand aside.
-    function markStacked(area) {
+    // EVERY path that decides a cell stays stacked must come through here, and
+    // the reason is the attribute on the AREA. custom.scss puts any cell that has
+    // drawn a figure side by side, keyed off
+    // `:has(.qwebr-output-graph-area canvas):not([data-webr-layout="stacked"])`,
+    // and that `:not()` matches the interactive area — not the wrapper this
+    // script mostly works with. Stamping only the wrapper leaves that rule free
+    // to fire, and it fires at the moment the plot appears.
+    //
+    // What that looked like, measured on `L05_vector_raster_interaction.html`:
+    // the cell sat stacked until its plot was drawn, then flipped to
+    // `display: grid` with columns `1021px 9px` — custom.scss asks for `1fr 1fr`,
+    // but a `1fr` track may not shrink below its item's min-content width and
+    // Monaco's is the full slide — and the figure landed in the 9px track, 0x0,
+    // off the right edge of the slide. "The plot never appears." Adding
+    // `#| layout: stacked` by hand fixed it only because that option came through
+    // this function and stamped the area.
+    function markStacked(area, host) {
       area.dataset.webrLayout = "stacked";
-      var host = area.closest(".side-out") || area.closest(".cell") ||
+      host = host || area.closest(".side-out") || area.closest(".cell") ||
         area.parentElement;
       if (host) {
         host.classList.remove("side-out");
@@ -823,9 +831,58 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      // The extension's own reset and copy buttons carry exactly these classes.
+      // Wearing them too is what makes this look like part of the toolbar rather
+      // than something bolted on, and it inherits their hover state for free.
+      btn.className = "btn btn-light btn-xs qwebr-button webr-output-toggle";
+      // An eye, matching the reset and copy buttons beside it in being icon-only.
+      // Font Awesome needs no loading of its own: those two are already
+      // `fa-solid fa-arrows-rotate` and `fa-regular fa-copy`. The icon names the
+      // ACTION, not the current state — a folded cell shows a plain eye, "click
+      // to show".
+      //
+      // An icon carries no accessible name, so title and aria-label carry the
+      // words the button no longer prints. Both, not either: the title is the
+      // hover tooltip, the aria-label is what a screen reader announces.
+      var setState = function (hidden) {
+        var words = hidden ? "Show this cell's output" : "Hide this cell's output";
+        btn.innerHTML = '<i class="fa-solid fa-eye' + (hidden ? "" : "-slash") +
+          '" aria-hidden="true"></i>';
+        btn.title = words;
+        btn.setAttribute("aria-label", words);
+        btn.setAttribute("aria-expanded", hidden ? "false" : "true");
+      };
+      setState(false);
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        setState(hide);
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -873,10 +930,7 @@
       // two columns regardless of what this script decides, and the halved width
       // is not something the author who typed `::: {.side-out}` accounted for.
       if (area.closest(".column") && !fixedSplit) {
-        if (existingWrapper) {
-          existingWrapper.classList.remove("side-out");
-          existingWrapper.dataset.webrLayout = "stacked";
-        }
+        if (existingWrapper) markStacked(area, existingWrapper);
         return;
       }
 
@@ -930,6 +984,11 @@
         // A measured cell is judged on what R really printed.
         if (!entry && printsNothing(details.code) &&
           host.dataset.webrCodeFixed !== "true") {
+          // Not markStacked(): that also strips a `::: {.side-out}` wrapper, and
+          // this branch is a guess from the source rather than a measurement, so
+          // it must not tear an author's wrapper down. Only the two attributes,
+          // which is what keeps custom.scss's figure rule off the cell.
+          area.dataset.webrLayout = "stacked";
           host.dataset.webrLayout = "stacked";
           return;
         }
@@ -937,7 +996,7 @@
           // force: a `::: {.side-out}` wrapper is a request, and the class is in
           // the markup, so it must be REMOVED here or the stylesheet lays the cell
           // out in two columns whatever this script decided.
-          stack(host, true);
+          stack(area, host, true);
           return;
         }
         if (entry && entry.plot) host.dataset.webrPlot = "true";
@@ -949,6 +1008,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -2241,9 +2307,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2305,6 +2410,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2321,7 +2439,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -2375,6 +2493,10 @@
 
           // Design an output object for messages
           const pre = document.createElement("pre");
+          // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+          // or tinytable table). It keeps the output box, but not the whitespace
+          // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+          if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
           if (/\S/.test(out)) {
               // Display results as HTML elements to retain output styling
               const div = document.createElement("div");
@@ -2393,6 +2515,22 @@
           }
 
           elements.outputCodeDiv.appendChild(pre);
+
+          // PATCHED: HTML written by `output: asis` may carry its own <script>,
+          // which is how tinytable, modelsummary's default HTML output, fills its
+          // cells. innerHTML never runs a script, so the table arrived empty.
+          // Re-creating each script node runs it, and it must happen after the
+          // output is in the document or a detached node still does nothing.
+          if (!showMarkup) {
+              pre.querySelectorAll("script").forEach((original) => {
+                  const script = document.createElement("script");
+                  for (const attribute of original.attributes) {
+                      script.setAttribute(attribute.name, attribute.value);
+                  }
+                  script.textContent = original.textContent;
+                  original.replaceWith(script);
+              });
+          }
 
           // Determine if we have graphs to display
           if (result.images.length > 0) {
@@ -2921,7 +3059,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is something worth being blunt about: R’s own interface is poor. If you install R and open it directly you get a fairly bare window, and it does not make a good first impression. RStudio is a separate program that sits on top of R and gives you a proper working environment, and it is by far the most popular way people actually use the language. So you will install two things, and you will then spend essentially all of your time in the second one. The screenshot shows what you will be looking at for the rest of the semester.</p>
+<p>Here is something worth being blunt about: R’s own interface is poor. If you install R and open it directly you get a fairly bare window, and it does not make a good first impression. RStudio is a separate program that sits on top of R and gives you a proper working environment, and it is by far the most popular way people actually use the language. So you will install two things, and you will then spend essentially all of your time in the second one. The screenshot shows that bare R console, not RStudio. It is on screen so you can recognize the interface we are choosing not to use and understand why we add RStudio on top of R.</p>
 </details>
 <ul>
 <li>R’s own graphical user interface is very poor</li>
@@ -2995,11 +3133,11 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Before we get to objects, the raw materials they are made of. There are five basic types. Integer is whole numbers. Numeric, also called double, is numbers with a decimal part, and this is the one you will meet most often. Complex has an imaginary part and you will almost certainly never need it in this course. Logical is just TRUE or FALSE, and it becomes enormously important once you start filtering data. And character is text, written inside quotation marks. Note the remark on that last one: you cannot do arithmetic on characters. That sounds obvious right now and it will still catch you out later.</p>
+<p>Before we get to objects, the raw materials they are made of. There are five basic types. Integer literals require an L suffix. Numeric, also called double, is R’s default numeric type and can represent whole or fractional values, and this is the one you will meet most often. Complex has an imaginary part and you will almost certainly never need it in this course. Logical is just TRUE or FALSE, and it becomes enormously important once you start filtering data. And character is text, written inside quotation marks. Note the remark on that last one: you cannot do arithmetic on characters. That sounds obvious right now and it will still catch you out later.</p>
 </details>
 <ul>
-<li><strong>integer</strong>: whole numbers, e.g.&nbsp;<code>1</code>, <code>3</code></li>
-<li><strong>numeric (double)</strong>: numbers with a decimal part, e.g.&nbsp;<code>1</code>, <code>1.3</code></li>
+<li><strong>integer</strong>: integer literals require an <code>L</code> suffix, e.g.&nbsp;<code>1L</code>, <code>3L</code></li>
+<li><strong>numeric (double)</strong>: R’s default numeric type; can represent whole or fractional values, e.g.&nbsp;<code>1</code>, <code>1.3</code></li>
 <li><strong>complex</strong>: numbers with an imaginary part, e.g.&nbsp;<code>1+2i</code> (rarely needed in this course)</li>
 <li><strong>logical (boolean)</strong>: <code>TRUE</code> or <code>FALSE</code></li>
 <li><strong>character</strong>: text, e.g.&nbsp;<code>"Nebraska"</code> (arithmetic is not allowed)</li>
@@ -3092,7 +3230,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Real data has holes in it, and R has a specific value for that: NA. Be clear about what it is not. It is not zero, and it is not the two-letter text NA in quotes; it is a distinct thing meaning this value is unknown. You test for it with is.na, which checks every element and returns TRUE wherever the value is missing. Now the important behaviour: most calculations involving NA return NA, and that is correct rather than annoying, because the honest answer to what is the mean of these numbers, one of which I do not know, is that you cannot say. You can ask for the mean of what remains with na.rm equals TRUE. But read the callout, because it matters: do not reach for that out of habit. It drops observations silently, which is how you end up reporting a result computed on a different sample than the one you think you have.</p>
+<p>Real data has holes in it, and R has a specific value for that: NA. Be clear about what it is not. It is not zero, and it is not the two-letter text NA in quotes; it is a distinct thing meaning this value is unknown. You test for it with is.na, which checks every element and returns TRUE wherever the value is missing. The first line uses c to combine four, three, NA, and nine into a vector and assigns that vector to x. Printing x lets you confirm that the missing value is stored alongside the numbers. Is dot n-a of x then returns FALSE, FALSE, TRUE, FALSE, so you can see that the third element is the missing one. Now the important behaviour: most calculations involving NA return NA, and that is correct rather than annoying, because the honest answer to what is the mean of these numbers, one of which I do not know, is that you cannot say. You can ask for the mean of what remains with na.rm equals TRUE. Here that removes the missing entry before calculating and gives sixteen divided by three, about five point three three. But read the callout, because it matters: do not reach for that out of habit. It drops observations silently, which is how you end up reporting a result computed on a different sample than the one you think you have.</p>
 </details>
 <p>R uses <code>NA</code> to mean “this value is missing”. It is not zero, and it is not the text <code>"NA"</code>.</p>
 <div id="qwebr-insertion-location-6"></div>
@@ -3184,7 +3322,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Once an object exists you can see what is inside it by typing its name and running it. That is all that evaluation means. I use the word constantly, so I want to define it once here: when I ask you to evaluate an object, I am asking you to print it so you can look at the contents. It is the simplest and most frequent thing you will do while working, and it is how you check that what you think happened has actually happened.</p>
+<p>Once an object exists you can see what is inside it by typing its name and running it. That is all that evaluation means. I use the word constantly, so I want to define it once here: when I ask you to evaluate an object, I am asking you to print it so you can look at the contents. It is the simplest and most frequent thing you will do while working, and it is how you check that what you think happened has actually happened. Since a currently holds one, evaluating a prints one. If the console prefixes that output with bracket one, the bracket is an index label telling you that the displayed line begins with the first element. It is not another value stored in a.</p>
 </details>
 <p>Once objects are created, you can evaluate them on the console to see what is inside:</p>
 <div id="qwebr-insertion-location-10"></div>
@@ -3206,7 +3344,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two more assignments, to show this works for any type. The first stores a character string in b, and notice that b was previously holding the number two, so we have just replaced it. The second stores the result of a comparison in d, and this one is worth pausing on: the right-hand side is one equals two, which evaluates to FALSE, and it is that FALSE which gets stored, not the comparison itself. R evaluates the right-hand side first and then assigns the result. That order matters, and it is easy to skate past.</p>
+<p>Two more assignments, to show this works for any type. The first stores a character string in b, and notice that b was previously holding the number two, so we have just replaced it. The second stores the result of a comparison in d, and this one is worth pausing on: the right-hand side is one double-equals two, which evaluates to FALSE, and it is that FALSE which gets stored, not the comparison itself. R evaluates the right-hand side first and then assigns the result. That order matters, and it is easy to skate past.</p>
 </details>
 <div id="qwebr-insertion-location-11"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3216,7 +3354,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Three things to remember about assignment, and the last two are deliberately shown as errors so that you meet them here rather than in the middle of an assignment. First, assigning to a name that already exists silently overwrites what was there. No warning; it is simply gone. Second, a name cannot begin with a digit, so 1a is not legal. Third, you cannot use a reserved word, meaning a word the language itself needs, such as if. Run those last two and read the errors carefully, because recognizing an error message you have seen before is a genuine and underrated skill.</p>
+<p>Three things to remember about assignment, and the last two are deliberately shown as errors so that you meet them here rather than in the middle of an assignment. First, assigning to a name that already exists silently overwrites what was there. No warning; it is simply gone. Second, a name cannot begin with a digit, so 1a is not legal. Third, you cannot use a reserved word, meaning a word the language itself needs, such as if, as an unquoted syntactic name, although backticks allow it as a non-syntactic name. Run those last two and read the errors carefully, because recognizing an error message you have seen before is a genuine and underrated skill.</p>
 </details>
 <p>Several things to remember about assignment:</p>
 <ul>
@@ -3232,7 +3370,7 @@ Transcript
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
-<li>You cannot use a reserved word as the name of an object (complete list found <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html">here</a>)</li>
+<li>Reserved words cannot be used as unquoted syntactic object names, although backticks allow them as non-syntactic names (complete list found <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Reserved.html">here</a>)</li>
 </ul>
 <div id="qwebr-insertion-location-14"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3372,7 +3510,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now the one you will use constantly. A data.frame looks like a matrix, but it is better thought of as a list of columns, and the crucial difference from a matrix is that different columns may be different types. Look at the example: nitrogen and yield are numbers, state is text, and they sit together quite happily. That is exactly what real data looks like, which is why this is the workhorse object of the entire course. The last bullet mentions tibble and data.table, which are variations on the same idea with some conveniences added, and we meet them later on.</p>
+<p>Now the one you will use constantly. A data.frame looks like a matrix, but it is better thought of as a list of columns, and the crucial difference from a matrix is that different columns may be different types. Inside data dot frame, each name-equals-value argument creates a named column. The c calls supply three values to each column, and values in the same position line up to make a row. That equal column length is what gives you a rectangle. Look at the example: nitrogen and yield are numbers, state is text, and they sit together quite happily. The first printed row, for example, joins nitrogen two hundred, yield two hundred forty, and the state Kansas. That is exactly what real data looks like, which is why this is the workhorse object of the entire course. The last bullet mentions tibble and data.table, which are variations on the same idea with some conveniences added, and we meet them later on.</p>
 </details>
 <p><code>data.frame</code> is like a matrix (or a list of columns)</p>
 <p><br></p>
@@ -3391,7 +3529,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>This tab is about a habit rather than a fact, and the tabs inside it cover why it matters, how to check, and how to inspect an object visually. The short version is this: knowing what class an object is is not an academic exercise. The same function behaves differently depending on the class it is handed, and some functions simply refuse to work on some classes at all. A large share of the errors you will hit this semester come from giving a function an object it was never designed for. So when something behaves strangely, checking the class is a very good first move.</p>
+<p>This tab is about a habit rather than a fact, and the tabs inside it cover why it matters, how to check, and how to inspect an object visually. The short version is this: knowing what class an object is is not an academic exercise. The same function behaves differently depending on the class it is handed, and some functions simply refuse to work on some classes at all. A large share of the errors you will hit this semester come from giving a function an object it was never designed for. So when something behaves strangely, checking the class is a very good first move. On the How tab, class of yield data reports data dot frame, which is the high-level class that determines how many functions treat it. Type-of of yield data reports list, which tells you about its underlying storage and connects back to the idea that a data frame is a list of columns. Structure, written s-t-r, gives the most useful quick inspection: it reports three observations of three variables, then shows each column’s name, type, and first values. Those three functions answer related but different questions, so do not treat them as interchangeable. On the Visual inspection tab, View with a capital V opens the object in RStudio’s spreadsheet-style viewer. That is convenient for looking, but structure is faster when you need the class, dimensions, and column types together. Flip through all three inner tabs and connect the reason for checking with the diagnostic each tool provides.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Why?</a></li><li><a href="#tabset-2-2">How</a></li><li><a href="#tabset-2-3">Visual inspection</a></li></ul>
@@ -3471,7 +3609,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Four functions you will use constantly, so they are worth meeting properly. seq builds a sequence, and notice it can be told either how big each step should be, using by, or how many values you want in total, using length. rep repeats a value a given number of times. sum adds up everything in a vector. And length tells you how many elements a vector has, which sounds trivial and turns out to be one of the things you reach for most often. Run all four and look at the results before you move on, because the exercise on the next tab uses them.</p>
+<p>Four functions you will use constantly, so they are worth meeting properly. seq builds a sequence, and notice it can be told either how big each step should be, using by, or how many values you want in total, using length. Both seq lines start at zero, end at one hundred, and produce the same twenty-one values. By equals five specifies the gap directly. Length equals twenty-one asks R to choose evenly spaced values, and here R partially matches the name length to the full argument name length dot out. Rep repeats a value a given number of times. Rep of ten comma five means repeat the value ten five times, so the output contains five tens. Sum adds up everything in a vector. And length tells you how many elements a vector has, which sounds trivial and turns out to be one of the things you reach for most often. There is one problem on screen that you should recognize rather than blame on either function: v-one has not been defined in this deck. If you run sum of v-one or length of v-one exactly as shown, R reports that the object is not found. Once v-one is an existing vector, sum returns the total of its elements and length returns their count. Run the working examples and keep those roles separate before you move on, because the exercise on the next tab uses them.</p>
 </details>
 <ul>
 <li>create a sequence of values</li>
@@ -3502,7 +3640,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now you use them. Three exercises, and I want you to actually type these rather than read them. First, build a vector starting at one and increasing by two up to ninety-nine, which is a direct application of seq. Second, compute the sample mean of that vector; the formula is on the slide. Third, compute the sample variance. Read the callout carefully on that last one, because it is a trap: the formula shown divides by n, whereas R’s built-in var function divides by n minus one, so the two will not agree. Compute it directly from the formula rather than reaching for var, or you will get a number that is close and wrong.</p>
+<p>Now you use them. Three exercises, and I want you to actually type these rather than read them. First, build a vector starting at one and increasing by two up to ninety-nine, which is a direct application of seq. In spoken code, x gets seq from one to ninety-nine, with by equal to two. That gives you the fifty odd numbers in that range. Second, compute the sample mean of that vector; the formula is on the slide. Let n be length of x, then sum of x divided by n gives fifty. Third, compute the sample variance. Subtract the mean from x, which works element by element, square those deviations with caret two, add them with sum, and divide by n.&nbsp;The displayed formula gives eight hundred thirty-three. Read the callout carefully on that last one, because it is a trap: the formula shown divides by n, whereas R’s built-in var function divides by n minus one, so the two will not agree. Compute it directly from the formula rather than reaching for var, or you will get a number that is close and wrong. The reason for doing the arithmetic directly is to combine assignment, vectorized arithmetic, seq, sum, and length in one small problem. If you get stuck on a function name or argument, the next slide shows you how to ask R for help.</p>
 </details>
 <ol type="1">
 <li>Generate a vector (call it <span class="math inline">x</span>) that starts at 1 and increases by 2 up to 99</li>
@@ -3554,14 +3692,14 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it, but they all share the same structure and two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.</p>
+<p>You are going to need help constantly, and there is no shame in that; it is how everybody works. The fastest route is a question mark in front of a function name, which opens its help page in the Help pane. Help pages have a reputation for being dense, and some of them earn it. R help pages follow common conventions, but their sections vary by topic. When present, two sections repay reading immediately. Usage tells you the arguments and their defaults. Examples, right at the bottom, gives you code you can run. We spend a whole slide on reading these properly in a moment.</p>
 </details>
 <p>Put a <code>?</code> in front of any function name to open its help page in the <strong>Help</strong> pane:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>?seq</span>
 <span id="cb3-2"><a></a>?mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Every help page has the same sections. The two worth reading first are <strong>Usage</strong>, which lists the arguments and their defaults, and <strong>Examples</strong> at the very bottom, which you can copy and run.</p>
+<p>R help pages follow common conventions, but their sections vary by topic. When present, two worth reading first are <strong>Usage</strong>, which lists the arguments and their defaults, and <strong>Examples</strong> at the very bottom, which you can copy and run.</p>
 </div>
 <div id="tabset-5-2">
 <details class="transcript">
@@ -3581,7 +3719,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks R to sum a character string, and look at what comes back. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.</p>
+<p>When something goes wrong, R prints an error, and the single most useful habit you can build this semester is reading it before you do anything else. It usually names the function that failed and says what it objected to. Run the example here, which asks R to sum a character string, and look at what comes back. The message says the argument has the invalid type character. That is useful evidence: sum exists and was called, but the object you supplied is not a numeric or otherwise summable input. Then read the callout and take it seriously: pasting an error message into a search engine is not cheating and it is not a sign that you are struggling. It is what practising researchers do every day of the week.</p>
 </details>
 <p>When something goes wrong, R prints an error. Read it before doing anything else: it usually names the function that failed and what it objected to.</p>
 <div id="qwebr-insertion-location-31"></div>
@@ -3610,9 +3748,9 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: every help page, for every function, has the same sections in the same order. So once you can read one, you can read all of them. Three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.</p>
+<p>We are going to spend a whole slide on how to read a help page, because it is a skill that pays off for the rest of your career and almost nobody is ever taught it. The important structural fact is on this tab: R help pages follow common conventions, but their sections vary by topic. Once you understand those conventions, you can navigate the pages more easily. On the seq page, three sections do the real work, Usage and Arguments and Examples, and we take them one at a time using seq, which you have already met.</p>
 </details>
-<p>Running <code>?seq</code> opens the page shown in the next tabs. Every help page—no matter the function—is laid out with the <strong>same sections in the same order</strong>, so once you can read one, you can read them all.</p>
+<p>Running <code>?seq</code> opens the page shown in the next tabs. R help pages follow common conventions, but their sections vary by topic, so learning those conventions makes the pages easier to navigate.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>?seq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -3643,7 +3781,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change.</p>
+<p>Usage is the most useful section on the page and the one worth learning to read properly. It shows how the function is called, with every argument and its default value. Read it like this. Each name-equals-value pair is an argument together with the value you get if you do not supply it, so if you say nothing about from, it is one. To is the endpoint and also defaults to one. By is the increment, and the expression shown as its default connects the endpoints to length dot out when you request a particular number of values. Null for length dot out means that no output length has been requested. Along dot with gives another route: supply an existing object there and seq makes a sequence with one position for each of its elements. Arguments are matched by position when you do not name them and by name when you do, which is why seq of zero comma ten means from zero to ten. And the three dots mean the function accepts further arguments, which you can happily ignore at first. The callout explains why a function listing five arguments works fine when you supply two: you only ever need to override the defaults you want to change. The dense-looking Usage line is not code you are expected to memorize. It is a compact map that tells you what can be supplied and what R will assume.</p>
 </details>
 <p><strong>Usage</strong> is the single most useful section. It shows how the function is called and, crucially, its <strong>arguments and their default values</strong>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, <span class="at">to =</span> <span class="dv">1</span>, <span class="at">by =</span> ((to <span class="sc">-</span> from)<span class="sc">/</span>(length.out <span class="sc">-</span> <span class="dv">1</span>)),</span>
@@ -3716,7 +3854,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time.</p>
+<p>Now practise that on a function whose documentation you have not seen. Open the help page for rep and answer the three questions by reading rather than guessing. What does times do, what does each do, and then predict the output of the two lines before you run them. That prediction step is the entire point of the exercise. If your prediction is right, you have read the page correctly. If it is wrong, you have found exactly the gap between what you assumed and what the documentation actually said, and that is worth more than getting it right first time. Here is the distinction you should recover from the page. Times equals three repeats the whole vector three times, so the first line returns one, two, one, two, one, two. Each equals three repeats every individual element three times before moving on, so the second returns one, one, one, two, two, two. The same six values appear, but their order records which argument did the repeating.</p>
 </details>
 <p>Open the help page for <code>rep()</code> and use <strong>Usage</strong> and <strong>Arguments</strong> to answer these—read, do not guess.</p>
 <div class="cell">
@@ -3763,7 +3901,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two steps, and keeping them separate in your head prevents a lot of confusion. First you install the package, using install.packages with the name in quotes, which downloads it onto your computer. Then, to actually use it, you load it with library, which brings that drawer into your current workspace. Now read the callout, because this is a genuine stumbling block: you install once per computer, but you load in every new session. And crucially that includes every time you render a Quarto document, because rendering starts a fresh session. That single fact is the source of a great many could not find function errors.</p>
+<p>Two steps, and keeping them separate in your head prevents a lot of confusion. First you install the package, using install.packages with the name in quotes, which downloads it onto your computer. The first box is a template, and the second replaces package name with ggplot2 to show a real installation call. The quotation marks matter because install dot packages expects the package name as character text. Then, to actually use it, you load it with library, which brings that drawer into your current workspace. In the library call shown, ggplot2 is written as the package name without quotation marks. Loading does not download the package, so it works only after installation has succeeded. Now read the callout, because this is a genuine stumbling block: you install once per computer, but you load in every new session. And crucially that includes every time you render a Quarto document, because rendering starts a fresh session. That single fact is the source of a great many could not find function errors.</p>
 </details>
 <ul>
 <li>Before you can use the tools (functions) in a drawer (package), you have to obtain the drawer (install the package). Install one like this:</li>
@@ -3852,7 +3990,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now add, subtract, multiply, and divide the two vectors, and look carefully at what comes back each time. Every result is itself a vector of five numbers. That is the point, and it is what the callout is telling you: arithmetic on vectors happens element by element. The first element of a is combined with the first element of b, the second with the second, and so on down the line. This is called vectorization, and it is one of the things that makes R pleasant to use, because in many other languages you would have to write a loop to achieve the same thing.</p>
+<p>Now add, subtract, multiply, and divide the two vectors, and look carefully at what comes back each time. Every result is itself a vector of five numbers. That is the point, and it is what the callout is telling you: arithmetic on vectors happens element by element. The first element of a is combined with the first element of b, the second with the second, and so on down the line. Because a and b contain the same values, addition doubles each position, subtraction produces five zeros, multiplication produces the squares one, four, nine, sixteen, twenty-five, and division produces five ones. Those outputs are a quick check that you are pairing corresponding positions. This is called vectorization, and it is one of the things that makes R pleasant to use, because in many other languages you would have to write a loop to achieve the same thing.</p>
 </details>
 <div id="qwebr-insertion-location-35"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3875,7 +4013,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>To get at part of a vector you use square brackets with a position inside them. a bracket two gives you the second element. And you are not limited to one at a time: put a vector of positions inside the brackets and you get several elements back, so a bracket c of one comma two gives you the first and second. Notice the pattern here, because it generalizes: whatever goes inside the brackets describes which elements you want. That idea carries straight over to matrices and data frames, where the brackets simply gain more positions.</p>
+<p>To get at part of a vector you use square brackets with a position inside them. a bracket two gives you the second element. The next line applies the same rule to b, so b bracket three gives you its third element. And you are not limited to one at a time: put a vector of positions inside the brackets and you get several elements back, so a bracket c of one comma two gives you the first and second. The final example asks b for positions one and five and returns those two values. Notice the pattern here, because it generalizes: whatever goes inside the brackets describes which elements you want. R counts positions from one, not zero, which is why bracket one means the first element. That idea carries straight over to matrices and data frames, where the brackets simply gain more positions.</p>
 </details>
 <p>To access element(s) of a vector, you use <code>[]</code> like below:</p>
 <div id="qwebr-insertion-location-36"></div>
@@ -3929,7 +4067,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Accessing a matrix uses the same square brackets as a vector, but now there are two positions inside, separated by a comma: rows first, then columns. So A bracket one comma two is the first row, second column. As with vectors you can ask for several at once by putting a vector into either position. And the third example is the one to remember: leaving a position empty means give me all of them, so A bracket one comma nothing hands you the entire first row. That empty-means-everything convention comes up constantly once we get to data frames.</p>
+<p>Accessing a matrix uses the same square brackets as a vector, but now there are two positions inside, separated by a comma: rows first, then columns. So A bracket one comma two is the first row, second column. As with vectors you can ask for several at once by putting a vector into either position. In the second example, c of one comma three in the row position selects rows one and three, while the two after the comma keeps only column two. And the third example is the one to remember: leaving a position empty means give me all of them, so A bracket one comma nothing hands you the entire first row. That empty-means-everything convention comes up constantly once we get to data frames.</p>
 </details>
 <p>To access elements of a matrix you use <code>[]</code>, just as for a vector, but now there are two positions inside the brackets:</p>
 <div class="cell">
@@ -4002,7 +4140,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now the object you will spend the rest of the course inside. Three things to hold onto. It is the most common type we use, by a wide margin. Technically it is a special kind of list whose elements are vectors that all happen to have the same length, and that equal length is what gives it its rectangular, matrix-like shape. And because of that dual nature it inherits properties of both a list and a matrix, which is exactly why the next tab shows two different ways of getting at its contents. Run mtcars to see a real one.</p>
+<p>Now the object you will spend the rest of the course inside. Three things to hold onto. It is the most common type we use, by a wide margin. Technically it is a special kind of list whose elements are vectors that all happen to have the same length, and that equal length is what gives it its rectangular, matrix-like shape. And because of that dual nature it inherits properties of both a list and a matrix, which is exactly why the next tab shows two different ways of getting at its contents. Run mtcars to see a real one. In the printed output, each row is a car model and each named column is a measured variable such as miles per gallon, cylinders, or gears. The aligned rows show what equal-length column vectors look like when R presents them as one rectangular data frame. All the displayed mtcars columns are numeric, but that is a feature of this dataset, not a requirement of data frames.</p>
 </details>
 <p><code>data.frame</code> (and its relatives)</p>
 <ul>
@@ -4018,7 +4156,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>And here is that dual nature in action. The list-like way uses the dollar sign with a column name, so mtcars dollar gear hands you that entire column as a vector. The matrix-like way uses square brackets with a row position and a column position. Both are correct, and which one you reach for depends on whether you are thinking of the object as a collection of named columns or as a rectangle of values. The line in red is a promise: we are going to spend a great deal of time doing exactly this kind of work with the tidyverse, and it will be considerably more pleasant than square brackets.</p>
+<p>And here is that dual nature in action. The list-like way uses the dollar sign with a column name, so mtcars dollar gear hands you that entire column as a vector, one gear count for every car. The matrix-like way uses square brackets with a row position and a column position. Mtcars bracket one comma two selects the first row and second column, which the label identifies as cylinders, and the value returned is six. Both are correct, and which one you reach for depends on whether you are thinking of the object as a collection of named columns or as a rectangle of values. The line in red is a promise: we are going to spend a great deal of time doing exactly this kind of work with the tidyverse, and it will be considerably more pleasant than square brackets.</p>
 </details>
 <p>Accessing parts of a <code>data.frame</code> works like accessing elements of a matrix or a list.</p>
 <p><strong>Examples</strong></p>

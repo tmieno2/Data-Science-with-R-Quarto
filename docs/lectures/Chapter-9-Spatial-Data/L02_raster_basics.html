@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-9f9fb851b2c68f17b9a22372e75d240b.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -825,9 +825,42 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "webr-output-toggle";
+      btn.title = "Hide output";
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "\u25BE";                // down caret: output is showing
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        btn.setAttribute("aria-expanded", hide ? "false" : "true");
+        btn.title = hide ? "Show output" : "Hide output";
+        btn.textContent = hide ? "\u25B8" : "\u25BE";
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -951,6 +984,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -2243,9 +2283,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2307,6 +2386,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2323,7 +2415,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -2879,7 +2971,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <summary>
 Transcript
 </summary>
-<p>Raster data is the other half of GIS, and it is a completely different animal from what we did last time. A raster is a grid: fixed rows and columns of equally sized cells, each holding a number. No geometry column, no attribute table, just a rectangle of values plus enough metadata to say where on Earth that rectangle sits. That difference drives everything in this deck. We will cover what the object looks like, how to read and write the various file formats weather and satellite data arrive in, and then three operations you will actually reach for: arithmetic across layers, aggregating to a coarser resolution, and resampling one grid onto another.</p>
+<p>Raster data is the other half of GIS, and it is a completely different animal from what we did last time. A raster is a grid: fixed rows and columns of equally sized cells, each holding a number. A raster has no vector-style geometry column or row-per-feature attribute table, though categorical layers can have associated category tables. Otherwise, it is a rectangle of values plus enough metadata to say where on Earth that rectangle sits. That difference drives everything in this deck. We will cover what the object looks like, how to read and write the various file formats weather and satellite data arrive in, and then three operations you will actually reach for: arithmetic across layers, aggregating to a coarser resolution, and resampling one grid onto another.</p>
 </details>
 <p><br></p>
 <h3 id="learning-objectives">Learning objectives</h3>
@@ -3211,7 +3303,7 @@ Transcript
 <li><code>reflec_blue[]</code> (no index) returns a <strong>matrix</strong>, one column per layer.</li>
 <li><code>reflec_blue[10100:10120]</code> returns a <strong>data.frame</strong>, again one column per layer.</li>
 </ul>
-<p>So <code>reflec_blue[10100]</code> is a one-row data.frame, not a number. If you need a plain numeric vector, ask for the column — <code>reflec_blue[10100:10120]$blue</code> — or use <code>terra::values(reflec_blue)</code>.</p>
+<p>So <code>reflec_blue[10100]</code> is a one-row data.frame, not a number. If you need a plain numeric vector, ask for the column — <code>reflec_blue[10100:10120]$blue</code> — or use <code>terra::values(reflec_blue, mat = FALSE)</code>.</p>
 </div>
 </div>
 </div>
@@ -3593,7 +3685,7 @@ Transcript
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">aggregate</span>(SpatRaster, fact, fun)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li><code>fact</code>: aggregation factor — how many cells in each direction get combined into one. <code>fact = 5</code> turns each 5-by-5 block of cells into a single cell, so the result has 25 times fewer cells. Give one number to use it both horizontally and vertically, or <code>c(x, y)</code> to differ.</li>
+<li><code>fact</code>: aggregation factor — how many cells in each direction get combined into one. <code>fact = 5</code> turns each 5-by-5 block of cells into a single cell, so the result has 25 times fewer cells. Give one number to use it both horizontally and vertically, or <code>c(row_factor, column_factor)</code>, equivalently <code>c(y_factor, x_factor)</code>, to differ.</li>
 <li><code>fun</code>: how the values in each block are combined. <strong>Defaults to <code>"mean"</code>.</strong> Others include <code>"sum"</code>, <code>"min"</code>, <code>"max"</code>, <code>"median"</code> and <code>"modal"</code>.</li>
 </ul>
 <div title="The default averages">
@@ -3646,7 +3738,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Resampling is the fix for two rasters that do not line up, and you will need it more often than you would like, since weather data, soil data and satellite data all come on their own grids. It transfers the values of one raster onto the cell geometry of another so the two become comparable. Look at the picture in the second tab, with red and blue grids overlapping, to see the problem before the syntax. Then read the important note: the default method is bilinear, not nearest neighbour, so leaving method out interpolates your values. On categorical data that produces numbers that are not any category.</p>
+<p>Resampling is the fix for two rasters that do not line up, and you will need it more often than you would like, since weather data, soil data and satellite data all come on their own grids. It transfers the values of one raster onto the cell geometry of another so the two become comparable. Look at the picture in the second tab, with red and blue grids overlapping, to see the problem before the syntax. Then read the important note: the default is bilinear for noncategorical data and nearest neighbour when the first layer is categorical. Specifying <code>method</code> explicitly is still clearer.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">Motivation</a></li><li><a href="#tabset-12-2">What does it do really?</a></li><li><a href="#tabset-12-3">How</a></li><li><a href="#tabset-12-4">Example</a></li></ul>

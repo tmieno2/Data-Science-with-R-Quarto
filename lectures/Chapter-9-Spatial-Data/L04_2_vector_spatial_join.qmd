@@ -118,7 +118,7 @@ wells_ne <-
     crs = 4269
   )
 
-#--- Nebraska county boundary ---# 
+#--- Nebraska county boundary ---#
 data(ne_counties, package = "r.spatial.workshop.datasets")
 
 #--- Iowa corn acres ---#
@@ -347,8 +347,11 @@ Print the result and you will see statefp, countyfp and name appended to each we
 </details>
 
 ```{webr-r}
+#| code-track: 0.3
 wells_joined_with_county
 ```
+
+<br>
 
 Evaluate `wells_joined_with_county` and you will see that `statefp`, `countyfp`, and `name` variables are appended.
 
@@ -360,8 +363,14 @@ wells_in_Adams <- dplyr::filter(wells_joined_with_county, name == "Adams")
 
 #--- get Adams county boundary ---#
 adams_county <- dplyr::filter(ne_counties, name == "Adams")
+```
 
-#--- visualize ---#
+<br>
+
+Visualize:
+
+```{webr-r}
+#| code-track: 0.3
 ggplot() +
   geom_sf(data = adams_county) +
   geom_sf(data = wells_in_Adams) +
@@ -429,9 +438,11 @@ We create a fake variable that represents groundwater extraction (acre-feet) fro
 
 ```{webr-r}
 #| autorun: true
-wells_ne <- 
-  wells_ne %>%
-  dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))
+(
+  wells_ne <-
+    wells_ne %>%
+    dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))
+)
 ```
 
 <br>
@@ -450,7 +461,9 @@ Identical syntax to before, arguments swapped. That is the whole change. It is w
 For each of the polygons (counties) in `ne_counties`, the code below will find all the points (wells) that are located inside the county, and attach the value of the variables of the points (wells) to the polygon (county).
 
 ```{webr-r}
-county_joined_with_wells <- st_join(ne_counties, wells_ne)
+(
+  county_joined_with_wells <- st_join(ne_counties, wells_ne)
+)
 ```
 
 ### Inspect the results
@@ -465,6 +478,7 @@ Here is the one-to-many consequence, and it is the most important slide in the s
 Evaluate `county_joined_with_wells` and you will see that `wellid` and `gw_extraction` variables are appended.
 
 ```{webr-r}
+#| code-track: 0.3
 county_joined_with_wells
 ```
 
@@ -479,10 +493,8 @@ One thing that is different from the previous case is that
 For example, the first row is `countyfp` 115 (Loup county), which has no wells inside it. So we get a single row with `wellid` and `gw_extraction` missing. But `countyfp` 001 (Adams county) has 53 wells inside it, and so appears 53 times.
 
 ```{webr-r}
-#--- CHANGED: was countyfp == "129", which is Nuckolls county, not Adams. The ---#
-#--- surrounding text called it Adams throughout. Adams is 001.               ---#
 (
-adams_county <- dplyr::filter(county_joined_with_wells, countyfp == "001") 
+  adams_county <- dplyr::filter(county_joined_with_wells, countyfp == "001")
 )
 ```
 
@@ -550,25 +562,50 @@ Two Iowa datasets that share no key at all. Nitrogen use is recorded by county; 
 
 </details>
 
+
+
+::: {.panel-tabset}
+
+#### Nitrogen use
+
 Nitrogen use (lb/acre) by county in Iowa (Note: this is a fake dataset that is generated using R):
 
 ```{webr-r}
+#| code-track: 0.3
 ia_nitrogen
-
-ggplot() +
-  geom_sf(data = ia_nitrogen, aes(fill = nitrogen_rate))
 ```
 
 <br>
 
+```{webr-r}
+#| code-track: 0.3
+ggplot() +
+  geom_sf(
+    data = ia_nitrogen,
+    aes(fill = nitrogen_rate)
+  )
+```
+
+#### Hydrologic units
+
 Hydrologic units that cover Iowa:
 
 ```{webr-r}
+#| code-track: 0.3
 huc_ia
+```
 
+<br>
+
+```{webr-r}
+#| code-track: 0.3
 ggplot() +
   geom_sf(data = huc_ia)
 ```
+
+:::
+
+
 
 ### Story
 
@@ -587,7 +624,7 @@ You are interested in understanding the impact of nitrogen use for agricultural 
 You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of corn production on water quality.
 
 ```{webr-r}
-ggplot() + 
+ggplot() +
   geom_sf(
     data = ia_nitrogen,
     alpha = 0.6,
@@ -598,7 +635,7 @@ ggplot() +
     alpha = 0
   ) +
   theme_void() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom")
 ```
 
 ### Demonstration
@@ -635,9 +672,7 @@ All eight rows carry exactly the same geometry, the one representing the HUC uni
 We can now find the average nitrogen use (lb/acre) by HUC unit:
 
 ```{webr-r}
-#--- CHANGED: two faults here. The pipe after as.data.frame() was missing, so ---#
-#--- the cell errored with "object 'HUC_CODE' not found". And ia_nitrogen has ---#
-#--- no `acres` column at all — its variable is nitrogen_rate.                ---#
+#| code-track: 0.5
 huc_joined_with_acres %>%
   sf::st_drop_geometry() %>%
   dplyr::group_by(HUC_CODE) %>%
@@ -660,8 +695,13 @@ Note that the resulting dataset does not tell you the nature of intersections. T
 <br>
 
 ```{webr-r}
+#| layout: stacked
 ggplot() +
-  geom_sf(data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp)) +
+  geom_sf(
+    data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp),
+    fill = "red",
+    alpha = 0.5
+  ) +
   geom_sf(data = huc_07060004)
 ```
 
@@ -762,10 +802,10 @@ The join with a distance relation, written as a small anonymous function with th
 Let's join using `st_join()`:
 
 ```{webr-r}
-soy_seed <- 
+soy_seed <-
   st_join(
     soy_yield,
-    as_applied_s_rate, 
+    as_applied_s_rate,
     join = \(x, y) st_is_within_distance(x, y, dist = 10)
   )
 ```
@@ -809,9 +849,9 @@ seed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20),
 #--- visualize ---#
 ggplot() +
   #--- second yield point ---#
-  geom_sf(data = soy_yield[2, ], color = "red") + 
+  geom_sf(data = soy_yield[2, ], color = "red") +
   #--- 10 meter buffer around the second yield point ---#
-  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = "blue", fill = NA) + 
+  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = "blue", fill = NA) +
   #--- seed_id printed where each seed rate point sits ---#
   geom_sf_text(data = seed_rates_around_2nd, aes(label = seed_id), size = 6) +
   theme_void()
@@ -886,13 +926,15 @@ The same shortcut applied to the soybean example, which shows that aggregate is 
 Here is the code:
 
 ```{webr-r}
-soy_seed <-
-  aggregate(
-    as_applied_s_rate, # what you are aggregating
-    soy_yield, # based on 
-    FUN = mean,
-    join = \(x, y) st_is_within_distance(x, y, dist = 10)
-  )
+(
+  soy_seed <-
+    aggregate(
+      as_applied_s_rate, # what you are aggregating
+      soy_yield, # based on
+      FUN = mean,
+      join = \(x, y) st_is_within_distance(x, y, dist = 10)
+    )
+)
 ```
 
 <br>
@@ -954,9 +996,9 @@ point_2 <- st_point(c(1, 1))
 point_3 <- st_point(c(1, 3))
 
 #--- combine the points to make a single  sf of points ---#
-points <- list(point_1, point_2, point_3) %>% 
-  st_sfc() %>% 
-  st_as_sf() %>% 
+points <- list(point_1, point_2, point_3) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
   mutate(point_name = c("point 1", "point 2", "point 3"))
 
 #--- create lines ---#
@@ -964,28 +1006,28 @@ line_1 <- st_linestring(rbind(c(0, 0), c(2.5, 0.5)))
 line_2 <- st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))
 
 #--- combine the points to make a single  sf of points ---#
-lines <- list(line_1, line_2) %>% 
-  st_sfc() %>% 
-  st_as_sf() %>% 
+lines <- list(line_1, line_2) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
   mutate(line_name = c("line 1", "line 2"))
 
 #--- create polygons ---#
 polygon_1 <- st_polygon(list(
-  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)) 
+  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0))
 ))
 
 polygon_2 <- st_polygon(list(
-  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5)) 
+  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5))
 ))
 
 polygon_3 <- st_polygon(list(
-  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5)) 
+  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5))
 ))
 
 #--- combine the polygons to make an sf of polygons ---#
-polygons <- list(polygon_1, polygon_2, polygon_3) %>% 
-  st_sfc() %>% 
-  st_as_sf() %>% 
+polygons <- list(polygon_1, polygon_2, polygon_3) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
   mutate(polygon_name = c("polygon 1", "polygon 2", "polygon 3"))
 ```
 
@@ -994,8 +1036,8 @@ The following code gets the intersection of the lines and the polygons.
 ```{webr-r}
 #| autorun: true
 (
-intersections_lp <- st_intersection(lines, polygons) %>% 
-  mutate(int_name = paste0(line_name, "-", polygon_name))
+  intersections_lp <- st_intersection(lines, polygons) %>%
+    mutate(int_name = paste0(line_name, "-", polygon_name))
 )
 ```
 
@@ -1060,8 +1102,8 @@ The following code gets the intersection of polygon 1 and polygon 3 with polygon
 
 ```{webr-r}
 (
-intersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>% 
-  mutate(int_name = paste0(polygon_name, "-", polygon_name.1))
+  intersections_pp <- st_intersection(polygons[c(1, 3), ], polygons[2, ]) %>%
+    mutate(int_name = paste0(polygon_name, "-", polygon_name.1))
 )
 ```
 
@@ -1070,19 +1112,20 @@ intersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>%
 Just like the lines-polygons case, the non-intersecting part of polygons 1 and 3 are cut out and do not remain in the returned `sf`. 
 
 ```{webr-r}
+#| code-track: 0.4
 ggplot() +
-  #--- here are all the original polygons  ---#
+  #--- original polygons  ---#
   geom_sf(
-  	data = polygons, 
-  	aes(fill = polygon_name), 
-  	alpha = 0.3
+    data = polygons,
+    aes(fill = polygon_name),
+    alpha = 0.3
   ) +
-  #--- here is what is returned after st_intersection ---#
+  #--- returned after st_intersection ---#
   geom_sf(
-  	data = intersections_pp, 
-  	aes(color = int_name),
-  	linewidth = 1.5,
-  	alpha = 0
+    data = intersections_pp,
+    aes(color = int_name),
+    linewidth = 1.5,
+    alpha = 0
   ) +
   theme_void()
 ```
@@ -1102,8 +1145,8 @@ Using `st_intersection()`, for each of the HUC polygons, we can find the interse
 
 ```{webr-r}
 (
-HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>% 
-  mutate(huc_county = paste0(HUC_CODE, "-", countyfp))
+  HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>%
+    mutate(huc_county = paste0(HUC_CODE, "-", countyfp))
 )
 ```
 
@@ -1136,7 +1179,7 @@ Your turn, on a deliberately simple layout: four unit squares in a grid with val
 
 ```{webr-r}
 #| context: setup
-polygon_1 <- 
+polygon_1 <-
   st_sfc(
     st_polygon(list(rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)))),
     st_polygon(list(rbind(c(0, 2), c(2, 2), c(2, 4), c(0, 4), c(0, 2)))),
@@ -1146,7 +1189,7 @@ polygon_1 <-
   st_sf(geometry = .) %>%
   dplyr::mutate(value = 1:4)
 
-polygon_2 <- 
+polygon_2 <-
   st_sfc(
     st_polygon(list(rbind(c(1, 1), c(3, 1), c(3, 3), c(1, 3), c(1, 1))))
   ) %>%
@@ -1178,6 +1221,7 @@ ggplot() +
 Find the intersection of the two polygons using `st_intersection()`.
 
 ```{webr-r}
+#| layout: stacked
 st_intersection()
 ```
 
@@ -1194,7 +1238,7 @@ intersection <- st_intersection(polygon_2, polygon_1)
 Find the area-weighted average of `value` for `polygon_2`, based on the area it overlaps with each polygon in `polygon_1`.
 
 ```{webr-r}
-
+#| layout: stacked
 ```
 
 <br>

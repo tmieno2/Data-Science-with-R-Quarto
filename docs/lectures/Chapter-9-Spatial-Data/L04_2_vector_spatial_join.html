@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-9f9fb851b2c68f17b9a22372e75d240b.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-edea051d6e4e30bb96c61747156a7319.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -807,9 +807,58 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      // The extension's own reset and copy buttons carry exactly these classes.
+      // Wearing them too is what makes this look like part of the toolbar rather
+      // than something bolted on, and it inherits their hover state for free.
+      btn.className = "btn btn-light btn-xs qwebr-button webr-output-toggle";
+      // An eye, matching the reset and copy buttons beside it in being icon-only.
+      // Font Awesome needs no loading of its own: those two are already
+      // `fa-solid fa-arrows-rotate` and `fa-regular fa-copy`. The icon names the
+      // ACTION, not the current state — a folded cell shows a plain eye, "click
+      // to show".
+      //
+      // An icon carries no accessible name, so title and aria-label carry the
+      // words the button no longer prints. Both, not either: the title is the
+      // hover tooltip, the aria-label is what a screen reader announces.
+      var setState = function (hidden) {
+        var words = hidden ? "Show this cell's output" : "Hide this cell's output";
+        btn.innerHTML = '<i class="fa-solid fa-eye' + (hidden ? "" : "-slash") +
+          '" aria-hidden="true"></i>';
+        btn.title = words;
+        btn.setAttribute("aria-label", words);
+        btn.setAttribute("aria-expanded", hidden ? "false" : "true");
+      };
+      setState(false);
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        setState(hide);
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -933,6 +982,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -1282,7 +1338,7 @@
   };
 
   // Store cell data
-  globalThis.qwebrCellDetails = [{"code":"#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\n\n#--- Irrigation wells in Nebraska as sf ---#\ndata(wells_ne)\nwells_ne <-\n  sf::st_as_sf(\n    wells_ne,\n    coords = c(\n      \"longdd\",\n      \"latdd\"\n    ),\n    crs = 4269\n  )\n\n#--- Nebraska county boundary ---# \ndata(ne_counties, package = \"r.spatial.workshop.datasets\")\n\n#--- Iowa corn acres ---#\ndata(ia_nitrogen)\n\n#--- HUC units ---#\ndata(huc_ia)\n\n# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the\n# browser against a virtual filesystem that does not hold the repo, so it\n# cannot source that file and has to carry a copy. Edit the shared file first,\n# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy\n# has drifted and prints the block to paste.\nlecture_theme <- function(base_size = 16) {\n  ggplot2::theme_bw(base_size = base_size) +\n    ggplot2::theme(\n      axis.text = ggplot2::element_text(size = base_size * 0.9),\n      axis.title = ggplot2::element_text(size = base_size),\n      legend.text = ggplot2::element_text(size = base_size * 0.9),\n      legend.title = ggplot2::element_text(size = base_size * 0.9),\n      plot.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      panel.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.key = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      # theme_bw's grey92 grid was chosen against a white panel and all but\n      # disappears on the warm paper once the panel stops being opaque.\n      panel.grid = ggplot2::element_line(colour = \"grey87\")\n    )\n}\n\n# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas\n# every size ggplot measures in points or millimetres comes out a third of what\n# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by\n# the same factor puts WebR figures at the same type size as the knitr ones.\n# Keep this in step with `dpi` in the header: change one, change the other.\nwebr_scale <- 216 / 72\nassignInNamespace(\".pt\", ggplot2::.pt * webr_scale, \"ggplot2\")\nassignInNamespace(\".stroke\", ggplot2::.stroke * webr_scale, \"ggplot2\")\ntheme_lecture <- lecture_theme(18 * webr_scale) +\n  # base_size also sets the theme's line widths, which are in millimetres and\n  # already pass through the scaled .pt; pin them to what 18pt gives, or they\n  # come out nine times too thick.\n  ggplot2::theme(\n    line = ggplot2::element_line(linewidth = 18 / 22),\n    rect = ggplot2::element_rect(linewidth = 18 / 22)\n  )\nggplot2::theme_set(theme_lecture)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = ne_counties) +\n  geom_sf(data = wells_ne) +\n  theme_void()","id":2,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_joined_with_county <- st_join(wells_ne, ne_counties)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_joined_with_county","id":4,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- get wells in Adams county according to st_join() ---#\nwells_in_Adams <- dplyr::filter(wells_joined_with_county, name == \"Adams\")\n\n#--- get Adams county boundary ---#\nadams_county <- dplyr::filter(ne_counties, name == \"Adams\")\n\n#--- visualize ---#\nggplot() +\n  geom_sf(data = adams_county) +\n  geom_sf(data = wells_in_Adams) +\n  theme_void()","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = ne_counties) +\n  geom_sf(data = wells_ne) +\n  theme_void()","id":6,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_ne <- \n  wells_ne %>%\n  dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))","id":7,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_joined_with_wells <- st_join(ne_counties, wells_ne)","id":8,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_joined_with_wells","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- CHANGED: was countyfp == \"129\", which is Nuckolls county, not Adams. The ---#\n#--- surrounding text called it Adams throughout. Adams is 001.               ---#\n(\nadams_county <- dplyr::filter(county_joined_with_wells, countyfp == \"001\") \n)","id":10,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"identical(adams_county[1, \"geometry\"], adams_county[2, \"geometry\"])","id":11,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_joined_with_wells %>%\n  # sf::st_drop_geometry() %>%\n  dplyr::group_by(countyfp) %>%\n  #--- CHANGED: was sum(gw_extraction); the text promises an average ---#\n  dplyr::summarize(mean_gw_extraction = mean(gw_extraction))","id":12,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ia_nitrogen\n\nggplot() +\n  geom_sf(data = ia_nitrogen, aes(fill = nitrogen_rate))","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"huc_ia\n\nggplot() +\n  geom_sf(data = huc_ia)","id":14,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() + \n  geom_sf(\n    data = ia_nitrogen,\n    alpha = 0.6,\n    aes(fill = nitrogen_rate)\n  ) +\n  geom_sf(\n    data = huc_ia,\n    alpha = 0\n  ) +\n  theme_void() +\n  theme(legend.position = \"bottom\") ","id":15,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"huc_joined_with_acres <- st_join(huc_ia, ia_nitrogen)","id":16,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  huc_07060004 <- dplyr::filter(huc_joined_with_acres, HUC_CODE == \"07060004\")\n)","id":17,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- CHANGED: two faults here. The pipe after as.data.frame() was missing, so ---#\n#--- the cell errored with \"object 'HUC_CODE' not found\". And ia_nitrogen has ---#\n#--- no `acres` column at all — its variable is nitrogen_rate.                ---#\nhuc_joined_with_acres %>%\n  sf::st_drop_geometry() %>%\n  dplyr::group_by(HUC_CODE) %>%\n  dplyr::summarize(avg_nitrogen_rate = mean(nitrogen_rate))","id":18,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp)) +\n  geom_sf(data = huc_07060004)","id":19,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- soybean yield ---#\ndata(soy_yield)\n\n#--- seed rate ---#\ndata(as_applied_s_rate)","id":20,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = soy_yield,\n    size = 0.4,\n    color = \"red\"\n  ) +\n  geom_sf(\n    data = as_applied_s_rate,\n    size = 0.4,\n    color = \"blue\"\n  ) +\n  theme_void()","id":21,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed <- \n  st_join(\n    soy_yield,\n    as_applied_s_rate, \n    join = \\(x, y) st_is_within_distance(x, y, dist = 10)\n  )","id":22,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-22","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed %>%\n  # st_drop_geometry() %>%\n  group_by(yield_id) %>%\n  summarize(avg_seed_rate = mean(seed_rate))","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed","id":24,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- get all the points within 20 meter of the second yield point ---#\nseed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20), ]\n\n#--- visualize ---#\nggplot() +\n  #--- second yield point ---#\n  geom_sf(data = soy_yield[2, ], color = \"red\") + \n  #--- 10 meter buffer around the second yield point ---#\n  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = \"blue\", fill = NA) + \n  #--- seed_id printed where each seed rate point sits ---#\n  geom_sf_text(data = seed_rates_around_2nd, aes(label = seed_id), size = 6) +\n  theme_void()","id":25,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"aggregate(wells_ne, ne_counties, FUN = mean)","id":26,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"aggregate(dplyr::select(wells_ne, gw_extraction), ne_counties, FUN = mean)","id":27,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed <-\n  aggregate(\n    as_applied_s_rate, # what you are aggregating\n    soy_yield, # based on \n    FUN = mean,\n    join = \\(x, y) st_is_within_distance(x, y, dist = 10)\n  )","id":28,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create points ---#\npoint_1 <- st_point(c(2, 2))\npoint_2 <- st_point(c(1, 1))\npoint_3 <- st_point(c(1, 3))\n\n#--- combine the points to make a single  sf of points ---#\npoints <- list(point_1, point_2, point_3) %>% \n  st_sfc() %>% \n  st_as_sf() %>% \n  mutate(point_name = c(\"point 1\", \"point 2\", \"point 3\"))\n\n#--- create lines ---#\nline_1 <- st_linestring(rbind(c(0, 0), c(2.5, 0.5)))\nline_2 <- st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))\n\n#--- combine the points to make a single  sf of points ---#\nlines <- list(line_1, line_2) %>% \n  st_sfc() %>% \n  st_as_sf() %>% \n  mutate(line_name = c(\"line 1\", \"line 2\"))\n\n#--- create polygons ---#\npolygon_1 <- st_polygon(list(\n  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)) \n))\n\npolygon_2 <- st_polygon(list(\n  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5)) \n))\n\npolygon_3 <- st_polygon(list(\n  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5)) \n))\n\n#--- combine the polygons to make an sf of polygons ---#\npolygons <- list(polygon_1, polygon_2, polygon_3) %>% \n  st_sfc() %>% \n  st_as_sf() %>% \n  mutate(polygon_name = c(\"polygon 1\", \"polygon 2\", \"polygon 3\"))","id":29,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nintersections_lp <- st_intersection(lines, polygons) %>% \n  mutate(int_name = paste0(line_name, \"-\", polygon_name))\n)","id":30,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = polygons,\n    aes(fill = polygon_name),\n    alpha = 0.3\n  ) +\n  scale_fill_discrete(name = \"Polygons\") +\n  geom_sf(\n    data = lines,\n    aes(color = line_name)\n  ) +\n  scale_color_discrete(name = \"Lines\") +\n  theme_void()","id":31,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"120%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = intersections_lp,\n    aes(color = int_name),\n  ) +\n  geom_sf(\n    data = polygons,\n    aes(fill = polygon_name),\n    alpha = 0.3\n  ) +\n  theme_void()","id":32,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"120%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nintersections_pp <- st_intersection(polygons[c(1,3), ], polygons[2, ]) %>% \n  mutate(int_name = paste0(polygon_name, \"-\", polygon_name.1))\n)","id":33,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  #--- here are all the original polygons  ---#\n  geom_sf(\n    data = polygons, \n    aes(fill = polygon_name), \n    alpha = 0.3\n  ) +\n  #--- here is what is returned after st_intersection ---#\n  geom_sf(\n    data = intersections_pp, \n    aes(color = int_name),\n    linewidth = 1.5,\n    alpha = 0\n  ) +\n  theme_void()","id":34,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\nHUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>% \n  mutate(huc_county = paste0(HUC_CODE, \"-\", countyfp))\n)","id":35,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"HUC_intersections %>%\n  filter(HUC_CODE == \"07060004\") %>%\n  ggplot(data = .) +\n  geom_sf(aes(fill = huc_county)) +\n  theme_void()","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"polygon_1 <- \n  st_sfc(\n    st_polygon(list(rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)))),\n    st_polygon(list(rbind(c(0, 2), c(2, 2), c(2, 4), c(0, 4), c(0, 2)))),\n    st_polygon(list(rbind(c(2, 2), c(4, 2), c(4, 4), c(2, 4), c(2, 2)))),\n    st_polygon(list(rbind(c(2, 0), c(4, 0), c(4, 2), c(2, 2), c(2, 0))))\n  ) %>%\n  st_sf(geometry = .) %>%\n  dplyr::mutate(value = 1:4)\n\npolygon_2 <- \n  st_sfc(\n    st_polygon(list(rbind(c(1, 1), c(3, 1), c(3, 3), c(1, 3), c(1, 1))))\n  ) %>%\n  st_sf(geometry = .)","id":37,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"polygon_1\npolygon_2","id":38,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = polygon_1, aes(fill = factor(value)), alpha = 0.5) +\n  geom_sf(data = polygon_2, fill = \"red\", alpha = 0.5) +\n  theme_void()","id":39,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection()","id":40,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
+  globalThis.qwebrCellDetails = [{"code":"#--- install and library the data package ---#\n#--- Both repos are required. r.spatial.workshop.datasets declares         ---#\n#--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#\n#--- repos named here. With the custom repo alone, sf cannot be found and   ---#\n#--- the install never completes, so nothing downstream ever runs.          ---#\nwebr::install(\n  \"r.spatial.workshop.datasets\",\n  repos = c(\n    \"https://tmieno2.github.io/rwasm-package/repo\",\n    \"https://repo.r-wasm.org\"\n  )\n)\n\nlibrary(r.spatial.workshop.datasets)\n\n#--- Irrigation wells in Nebraska as sf ---#\ndata(wells_ne)\nwells_ne <-\n  sf::st_as_sf(\n    wells_ne,\n    coords = c(\n      \"longdd\",\n      \"latdd\"\n    ),\n    crs = 4269\n  )\n\n#--- Nebraska county boundary ---#\ndata(ne_counties, package = \"r.spatial.workshop.datasets\")\n\n#--- Iowa corn acres ---#\ndata(ia_nitrogen)\n\n#--- HUC units ---#\ndata(huc_ia)\n\n# Mirror of lecture_theme() in lectures/_lecture-theme.R. WebR runs in the\n# browser against a virtual filesystem that does not hold the repo, so it\n# cannot source that file and has to carry a copy. Edit the shared file first,\n# then run `Rscript lectures/check-lecture-theme.R`, which fails if this copy\n# has drifted and prints the block to paste.\nlecture_theme <- function(base_size = 16) {\n  ggplot2::theme_bw(base_size = base_size) +\n    ggplot2::theme(\n      axis.text = ggplot2::element_text(size = base_size * 0.9),\n      axis.title = ggplot2::element_text(size = base_size),\n      legend.text = ggplot2::element_text(size = base_size * 0.9),\n      legend.title = ggplot2::element_text(size = base_size * 0.9),\n      plot.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      panel.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.background = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      legend.key = ggplot2::element_rect(fill = \"transparent\", colour = NA),\n      # theme_bw's grey92 grid was chosen against a white panel and all but\n      # disappears on the warm paper once the panel stops being opaque.\n      panel.grid = ggplot2::element_line(colour = \"grey87\")\n    )\n}\n\n# WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas\n# every size ggplot measures in points or millimetres comes out a third of what\n# was asked for. Scaling ggplot2's own mm-to-point constants and the theme by\n# the same factor puts WebR figures at the same type size as the knitr ones.\n# Keep this in step with `dpi` in the header: change one, change the other.\nwebr_scale <- 216 / 72\nassignInNamespace(\".pt\", ggplot2::.pt * webr_scale, \"ggplot2\")\nassignInNamespace(\".stroke\", ggplot2::.stroke * webr_scale, \"ggplot2\")\ntheme_lecture <- lecture_theme(18 * webr_scale) +\n  # base_size also sets the theme's line widths, which are in millimetres and\n  # already pass through the scaled .pt; pin them to what 18pt gives, or they\n  # come out nine times too thick.\n  ggplot2::theme(\n    line = ggplot2::element_line(linewidth = 18 / 22),\n    rect = ggplot2::element_rect(linewidth = 18 / 22)\n  )\nggplot2::theme_set(theme_lecture)","id":1,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-1","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = ne_counties) +\n  geom_sf(data = wells_ne) +\n  theme_void()","id":2,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-2","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_joined_with_county <- st_join(wells_ne, ne_counties)","id":3,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-3","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"wells_joined_with_county","id":4,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-4","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- get wells in Adams county according to st_join() ---#\nwells_in_Adams <- dplyr::filter(wells_joined_with_county, name == \"Adams\")\n\n#--- get Adams county boundary ---#\nadams_county <- dplyr::filter(ne_counties, name == \"Adams\")","id":5,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-5","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = adams_county) +\n  geom_sf(data = wells_in_Adams) +\n  theme_void()","id":6,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-6","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = ne_counties) +\n  geom_sf(data = wells_ne) +\n  theme_void()","id":7,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-7","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  wells_ne <-\n    wells_ne %>%\n    dplyr::mutate(gw_extraction = runif(nrow(.), min = 50, max = 400))\n)","id":8,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-8","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  county_joined_with_wells <- st_join(ne_counties, wells_ne)\n)","id":9,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-9","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_joined_with_wells","id":10,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-10","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  adams_county <- dplyr::filter(county_joined_with_wells, countyfp == \"001\")\n)","id":11,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-11","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"identical(adams_county[1, \"geometry\"], adams_county[2, \"geometry\"])","id":12,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-12","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"county_joined_with_wells %>%\n  # sf::st_drop_geometry() %>%\n  dplyr::group_by(countyfp) %>%\n  #--- CHANGED: was sum(gw_extraction); the text promises an average ---#\n  dplyr::summarize(mean_gw_extraction = mean(gw_extraction))","id":13,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-13","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ia_nitrogen","id":14,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-14","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = ia_nitrogen,\n    aes(fill = nitrogen_rate)\n  )","id":15,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-15","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"huc_ia","id":16,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-16","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = huc_ia)","id":17,"options":{"autorun":"false","classes":"","code-track":"0.3","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-17","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = ia_nitrogen,\n    alpha = 0.6,\n    aes(fill = nitrogen_rate)\n  ) +\n  geom_sf(\n    data = huc_ia,\n    alpha = 0\n  ) +\n  theme_void() +\n  theme(legend.position = \"bottom\")","id":18,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-18","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"huc_joined_with_acres <- st_join(huc_ia, ia_nitrogen)","id":19,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-19","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  huc_07060004 <- dplyr::filter(huc_joined_with_acres, HUC_CODE == \"07060004\")\n)","id":20,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-20","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"huc_joined_with_acres %>%\n  sf::st_drop_geometry() %>%\n  dplyr::group_by(HUC_CODE) %>%\n  dplyr::summarize(avg_nitrogen_rate = mean(nitrogen_rate))","id":21,"options":{"autorun":"false","classes":"","code-track":"0.5","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-21","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = dplyr::filter(ia_nitrogen, countyfp %in% huc_07060004$countyfp),\n    fill = \"red\",\n    alpha = 0.5\n  ) +\n  geom_sf(data = huc_07060004)","id":22,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-22","layout":"stacked","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- soybean yield ---#\ndata(soy_yield)\n\n#--- seed rate ---#\ndata(as_applied_s_rate)","id":23,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-23","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = soy_yield,\n    size = 0.4,\n    color = \"red\"\n  ) +\n  geom_sf(\n    data = as_applied_s_rate,\n    size = 0.4,\n    color = \"blue\"\n  ) +\n  theme_void()","id":24,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-24","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed <-\n  st_join(\n    soy_yield,\n    as_applied_s_rate,\n    join = \\(x, y) st_is_within_distance(x, y, dist = 10)\n  )","id":25,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-25","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed %>%\n  # st_drop_geometry() %>%\n  group_by(yield_id) %>%\n  summarize(avg_seed_rate = mean(seed_rate))","id":26,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-26","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"soy_seed","id":27,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-27","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- get all the points within 20 meter of the second yield point ---#\nseed_rates_around_2nd <- as_applied_s_rate[st_buffer(soy_yield[2, ], dist = 20), ]\n\n#--- visualize ---#\nggplot() +\n  #--- second yield point ---#\n  geom_sf(data = soy_yield[2, ], color = \"red\") +\n  #--- 10 meter buffer around the second yield point ---#\n  geom_sf(data = st_buffer(soy_yield[2, ], dist = 10), color = \"blue\", fill = NA) +\n  #--- seed_id printed where each seed rate point sits ---#\n  geom_sf_text(data = seed_rates_around_2nd, aes(label = seed_id), size = 6) +\n  theme_void()","id":28,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-28","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"aggregate(wells_ne, ne_counties, FUN = mean)","id":29,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-29","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"aggregate(dplyr::select(wells_ne, gw_extraction), ne_counties, FUN = mean)","id":30,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-30","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  soy_seed <-\n    aggregate(\n      as_applied_s_rate, # what you are aggregating\n      soy_yield, # based on\n      FUN = mean,\n      join = \\(x, y) st_is_within_distance(x, y, dist = 10)\n    )\n)","id":31,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-31","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"#--- create points ---#\npoint_1 <- st_point(c(2, 2))\npoint_2 <- st_point(c(1, 1))\npoint_3 <- st_point(c(1, 3))\n\n#--- combine the points to make a single  sf of points ---#\npoints <- list(point_1, point_2, point_3) %>%\n  st_sfc() %>%\n  st_as_sf() %>%\n  mutate(point_name = c(\"point 1\", \"point 2\", \"point 3\"))\n\n#--- create lines ---#\nline_1 <- st_linestring(rbind(c(0, 0), c(2.5, 0.5)))\nline_2 <- st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))\n\n#--- combine the points to make a single  sf of points ---#\nlines <- list(line_1, line_2) %>%\n  st_sfc() %>%\n  st_as_sf() %>%\n  mutate(line_name = c(\"line 1\", \"line 2\"))\n\n#--- create polygons ---#\npolygon_1 <- st_polygon(list(\n  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0))\n))\n\npolygon_2 <- st_polygon(list(\n  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5))\n))\n\npolygon_3 <- st_polygon(list(\n  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5))\n))\n\n#--- combine the polygons to make an sf of polygons ---#\npolygons <- list(polygon_1, polygon_2, polygon_3) %>%\n  st_sfc() %>%\n  st_as_sf() %>%\n  mutate(polygon_name = c(\"polygon 1\", \"polygon 2\", \"polygon 3\"))","id":32,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-32","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  intersections_lp <- st_intersection(lines, polygons) %>%\n    mutate(int_name = paste0(line_name, \"-\", polygon_name))\n)","id":33,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-33","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = polygons,\n    aes(fill = polygon_name),\n    alpha = 0.3\n  ) +\n  scale_fill_discrete(name = \"Polygons\") +\n  geom_sf(\n    data = lines,\n    aes(color = line_name)\n  ) +\n  scale_color_discrete(name = \"Lines\") +\n  theme_void()","id":34,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-34","message":"true","out-height":"","out-width":"120%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(\n    data = intersections_lp,\n    aes(color = int_name),\n  ) +\n  geom_sf(\n    data = polygons,\n    aes(fill = polygon_name),\n    alpha = 0.3\n  ) +\n  theme_void()","id":35,"options":{"autorun":"true","classes":"","comment":"","context":"output","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-35","message":"true","out-height":"","out-width":"120%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  intersections_pp <- st_intersection(polygons[c(1, 3), ], polygons[2, ]) %>%\n    mutate(int_name = paste0(polygon_name, \"-\", polygon_name.1))\n)","id":36,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-36","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  #--- original polygons  ---#\n  geom_sf(\n    data = polygons,\n    aes(fill = polygon_name),\n    alpha = 0.3\n  ) +\n  #--- returned after st_intersection ---#\n  geom_sf(\n    data = intersections_pp,\n    aes(color = int_name),\n    linewidth = 1.5,\n    alpha = 0\n  ) +\n  theme_void()","id":37,"options":{"autorun":"false","classes":"","code-track":"0.4","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-37","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"(\n  HUC_intersections <- st_intersection(huc_ia, ia_nitrogen) %>%\n    mutate(huc_county = paste0(HUC_CODE, \"-\", countyfp))\n)","id":38,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-38","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"HUC_intersections %>%\n  filter(HUC_CODE == \"07060004\") %>%\n  ggplot(data = .) +\n  geom_sf(aes(fill = huc_county)) +\n  theme_void()","id":39,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-39","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"polygon_1 <-\n  st_sfc(\n    st_polygon(list(rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)))),\n    st_polygon(list(rbind(c(0, 2), c(2, 2), c(2, 4), c(0, 4), c(0, 2)))),\n    st_polygon(list(rbind(c(2, 2), c(4, 2), c(4, 4), c(2, 4), c(2, 2)))),\n    st_polygon(list(rbind(c(2, 0), c(4, 0), c(4, 2), c(2, 2), c(2, 0))))\n  ) %>%\n  st_sf(geometry = .) %>%\n  dplyr::mutate(value = 1:4)\n\npolygon_2 <-\n  st_sfc(\n    st_polygon(list(rbind(c(1, 1), c(3, 1), c(3, 3), c(1, 3), c(1, 1))))\n  ) %>%\n  st_sf(geometry = .)","id":40,"options":{"autorun":"true","classes":"","comment":"","context":"setup","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-40","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"polygon_1\npolygon_2","id":41,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-41","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"ggplot() +\n  geom_sf(data = polygon_1, aes(fill = factor(value)), alpha = 0.5) +\n  geom_sf(data = polygon_2, fill = \"red\", alpha = 0.5) +\n  theme_void()","id":42,"options":{"autorun":"true","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-42","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"st_intersection()","id":43,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-43","layout":"stacked","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}},{"code":"","id":44,"options":{"autorun":"false","classes":"","comment":"","context":"interactive","dpi":"216","editor-font-scale":"0.7","editor-max-height":"","editor-quick-suggestions":"false","editor-word-wrap":"true","fig-cap":"","fig-height":"4.5","fig-width":"7","label":"unnamed-chunk-44","layout":"stacked","message":"true","out-height":"","out-width":"100%","output":"true","read-only":"false","results":"markup","warning":"true"}}];
 
   </script>
   <script type="module">
@@ -2225,9 +2281,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2289,6 +2384,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2305,7 +2413,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -3063,9 +3171,14 @@ Transcript
 </details>
 <div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
 <p>Evaluate <code>wells_joined_with_county</code> and you will see that <code>statefp</code>, <code>countyfp</code>, and <code>name</code> variables are appended.</p>
 <p>Let’s check if the two datasets are indeed joined based on their spatial locations.</p>
 <div id="qwebr-insertion-location-5"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<p>Visualize:</p>
+<div id="qwebr-insertion-location-6"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -3106,11 +3219,11 @@ Transcript
 <p>The same two layers, swapped round. The extraction figures are invented, generated with runif, since the real ones are not public, but they behave like the real thing for our purposes. What matters is the goal: an average per county. Right now that number does not exist anywhere. Extraction is recorded per well, counties have no extraction figure at all, and the only thing linking them is position. Two steps get you there. The join is the first, attaching every well’s extraction figure to the county it sits in, and the summarise is the second. Neither step is spatial on its own.</p>
 </details>
 <p>We use <code>ne_counties</code> (polygons) and <code>wells_ne</code> (points) data for illustration. Here is the map:</p>
-<div id="qwebr-insertion-location-6"></div>
+<div id="qwebr-insertion-location-7"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>We create a fake variable that represents groundwater extraction (acre-feet) from the aquifer.</p>
-<div id="qwebr-insertion-location-7"></div>
+<div id="qwebr-insertion-location-8"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Our goal is to find average groundwater extraction by county.</p>
@@ -3123,7 +3236,7 @@ Transcript
 <p>Identical syntax to before, arguments swapped. That is the whole change. It is worth appreciating how little the interface asks of you: the same function handles both directions and works out what to do from the geometries themselves. But do not let the sameness of the code fool you into expecting the same kind of result. Print what comes back before reading on, and look at how many rows it has compared with the ninety-three counties you started with. If that number surprises you, the next tab explains exactly why, and it is the thing most worth understanding in this deck.</p>
 </details>
 <p>For each of the polygons (counties) in <code>ne_counties</code>, the code below will find all the points (wells) that are located inside the county, and attach the value of the variables of the points (wells) to the polygon (county).</p>
-<div id="qwebr-insertion-location-8"></div>
+<div id="qwebr-insertion-location-9"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-4">
@@ -3134,7 +3247,7 @@ Transcript
 <p>Here is the one-to-many consequence, and it is the most important slide in the section. Each county now appears once per well inside it. Loup county, the first row, has no wells, so it appears once with missing values. Adams county has fifty-three wells, so it appears fifty-three times, with the identical county geometry repeated in every one of those rows. The identical check at the bottom proves that. This is normal and expected for a one-to-many join, but if you did not know to look, you would think your data had been corrupted.</p>
 </details>
 <p>Evaluate <code>county_joined_with_wells</code> and you will see that <code>wellid</code> and <code>gw_extraction</code> variables are appended.</p>
-<div id="qwebr-insertion-location-9"></div>
+<div id="qwebr-insertion-location-10"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>One thing that is different from the previous case is that</p>
@@ -3143,11 +3256,11 @@ Transcript
 <li><p>If a polygon has no wells inside, then you will simply have a single row of data for that polygon.</p></li>
 </ul>
 <p>For example, the first row is <code>countyfp</code> 115 (Loup county), which has no wells inside it. So we get a single row with <code>wellid</code> and <code>gw_extraction</code> missing. But <code>countyfp</code> 001 (Adams county) has 53 wells inside it, and so appears 53 times.</p>
-<div id="qwebr-insertion-location-10"></div>
+<div id="qwebr-insertion-location-11"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>All the rows there have exactly the same geometry, which is the <code>MULTIPOLYGON</code> that represents the boundary of Adams county.</p>
-<div id="qwebr-insertion-location-11"></div>
+<div id="qwebr-insertion-location-12"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 <div id="tabset-3-5">
@@ -3158,7 +3271,7 @@ Transcript
 <p>The second step: group by county and summarise, which is ordinary dplyr with nothing spatial about it. Now read the two bullets, because they explain something you will hit constantly. Summarising an sf object is slow, and the reason is that geometry travels with the data, so summarise unions the geometries of each group as well as averaging the numbers. That is real work you did not ask for. Uncomment the line that drops the geometry and it becomes a plain data frame operation. Drop the geometry whenever you do not need it back.</p>
 </details>
 <p>Since we joined the two layers, we can now do calculations that were not possible before. Here, we will calculate the average groundwater extraction by county.</p>
-<div id="qwebr-insertion-location-12"></div>
+<div id="qwebr-insertion-location-13"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
@@ -3173,9 +3286,9 @@ Transcript
 <section id="sec-polygon-polygon" class="slide level2">
 <h2>Spatial join: polygons (target) vs polygons (source)</h2>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Introduction</a></li><li><a href="#tabset-4-2">Data</a></li><li><a href="#tabset-4-3">Story</a></li><li><a href="#tabset-4-4">Demonstration</a></li><li><a href="#tabset-4-5">But,</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Introduction</a></li><li><a href="#tabset-5-2">Data</a></li><li><a href="#tabset-5-3">Story</a></li><li><a href="#tabset-5-4">Demonstration</a></li><li><a href="#tabset-5-5">But,</a></li></ul>
 <div class="tab-content">
-<div id="tabset-4-1">
+<div id="tabset-5-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -3188,22 +3301,36 @@ Transcript
 <li>then, assign the values associated with the intersecting polygons from the source data to the polygon</li>
 </ul>
 </div>
-<div id="tabset-4-2">
+<div id="tabset-5-2">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
 <p>Two Iowa datasets that share no key at all. Nitrogen use is recorded by county; the hydrologic units, the watersheds, follow rivers and ignore county lines entirely. There is no column you could join these on. Plot them and you can see the problem: the two sets of boundaries cut across each other with no relationship whatsoever. The nitrogen figures are simulated, but the geography is real, and that mismatch between administrative boundaries and natural ones is among the most common reasons anyone needs a spatial join at all. Data is collected on the units that are convenient to collect on, not the units you want to analyse.</p>
 </details>
+<div class="panel-tabset">
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Nitrogen use</a></li><li><a href="#tabset-4-2">Hydrologic units</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1">
 <p>Nitrogen use (lb/acre) by county in Iowa (Note: this is a fake dataset that is generated using R):</p>
-<div id="qwebr-insertion-location-13"></div>
-<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
-<p><br></p>
-<p>Hydrologic units that cover Iowa:</p>
 <div id="qwebr-insertion-location-14"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<div id="qwebr-insertion-location-15"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-4-3">
+<div id="tabset-4-2">
+<p>Hydrologic units that cover Iowa:</p>
+<div id="qwebr-insertion-location-16"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+<p><br></p>
+<div id="qwebr-insertion-location-17"></div>
+<noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-5-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -3216,10 +3343,10 @@ Transcript
 <li>You observe nitrogen use (lb/acre) at the county level (<code>ia_nitrogen</code>)</li>
 </ul>
 <p>You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of corn production on water quality.</p>
-<div id="qwebr-insertion-location-15"></div>
+<div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-4-4">
+<div id="tabset-5-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -3227,20 +3354,20 @@ Transcript
 <p>The join itself, one line as always, and then the row counts tell the story. The watershed with code 07060004 intersects eight counties, so it comes back as eight rows, each carrying the identical watershed geometry and one county’s nitrogen figure. Then the summarise gives you a mean per watershed. Notice that this treats all eight counties as equal, which is the assumption the next tab attacks. For now the mechanics are what matter: join, then group, then summarise, exactly the same three steps as the previous section. The assumption buried in that mean is what the next tab is about.</p>
 </details>
 <p>Let’s join the two:</p>
-<div id="qwebr-insertion-location-16"></div>
+<div id="qwebr-insertion-location-19"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Here, for each of the HUC units from <code>huc_ia</code>, all the intersecting counties from <code>ia_nitrogen</code> are matched.</p>
 <p>For example, <code>HUC_CODE == "07060004"</code> intersects eight counties.</p>
-<div id="qwebr-insertion-location-17"></div>
+<div id="qwebr-insertion-location-20"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>All eight rows carry exactly the same geometry, the one representing the HUC unit with <code>HUC_CODE == 07060004</code>.</p>
 <p>We can now find the average nitrogen use (lb/acre) by HUC unit:</p>
-<div id="qwebr-insertion-location-18"></div>
+<div id="qwebr-insertion-location-21"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-4-5">
+<div id="tabset-5-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -3258,7 +3385,7 @@ Transcript
 </div>
 </div>
 <p><br></p>
-<div id="qwebr-insertion-location-19"></div>
+<div id="qwebr-insertion-location-22"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>We simply take the average of the value of <code>nitrogen_rate</code> of the intersecting counties. But, this does not take into account the degree of the overlaps between the intersecting counties and the HUC unit. Later, we will talk about how to find area-weighted average of <code>nitrogen_rate</code> <a href="#/sec-cropping-join">this section</a>.</p>
@@ -3269,9 +3396,9 @@ Transcript
 <section id="sec-point-point-distance" class="slide level2">
 <h2>Spatial Join: other topological relations</h2>
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Introduction</a></li><li><a href="#tabset-5-2">Data</a></li><li><a href="#tabset-5-3">Story and Objective</a></li><li><a href="#tabset-5-4">Demonstration</a></li><li><a href="#tabset-5-5">Inspect and verify</a></li></ul>
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Introduction</a></li><li><a href="#tabset-6-2">Data</a></li><li><a href="#tabset-6-3">Story and Objective</a></li><li><a href="#tabset-6-4">Demonstration</a></li><li><a href="#tabset-6-5">Inspect and verify</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1">
+<div id="tabset-6-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -3297,7 +3424,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-5-2">
+<div id="tabset-6-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -3305,10 +3432,10 @@ Transcript
 <p>Two point layers from an on-farm experiment: soybean yield measured by the combine, and seed rate recorded by the planter. Both are dense clouds of GPS readings over the same field. The reason this needs a distance relation rather than intersects is worth pausing on. These are two machines making separate passes over the same ground, so no yield point ever sits exactly on a seed rate point. Intersects would match nothing whatsoever, and you would get a dataset of missing values with no error to tell you why. Proximity is the only relation that can work here.</p>
 </details>
 <p>We use soy bean yield (points) data and as-applied seed rate (points) data.</p>
-<div id="qwebr-insertion-location-20"></div>
+<div id="qwebr-insertion-location-23"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-5-3">
+<div id="tabset-6-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -3316,12 +3443,12 @@ Transcript
 <p>The economic question is whether planting more seed raises yield, and answering it means having both numbers on the same row. Look at the plot of red and blue points and you can see they interleave without ever coinciding. So the rule becomes: for each yield point, take the seed rate points within ten metres. That threshold is a judgement call about how far apart two readings can be and still describe the same patch of ground, and it is the sort of choice you should be prepared to defend.</p>
 </details>
 <p>You have run an on-farm field experiment to understand the impact of seed rate on soybean yield. Both are available as points data.</p>
-<div id="qwebr-insertion-location-21"></div>
+<div id="qwebr-insertion-location-24"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>You want to merge them together based on their proximity so that you can run statistical analysis. Specifically, for each of the yield points, we would like to link the seed rate points that are within 10-meter from the yield point.</p>
 </div>
-<div id="tabset-5-4">
+<div id="tabset-6-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -3329,21 +3456,21 @@ Transcript
 <p>The join with a distance relation, written as a small anonymous function with the ten metre threshold inside it. Then the summarise, because this is one-to-many again and a yield point may match several seed rate points. Note the commented-out line dropping the geometry, which is the same performance point from earlier and applies just as much here. The result is one average seed rate per yield point, which is the dataset you would actually run a regression on. Everything before this was getting the two machines’ readings onto the same rows.</p>
 </details>
 <p>Let’s join using <code>st_join()</code>:</p>
-<div id="qwebr-insertion-location-22"></div>
+<div id="qwebr-insertion-location-25"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>We can now summarize the joined data like below:</p>
-<div id="qwebr-insertion-location-23"></div>
+<div id="qwebr-insertion-location-26"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-5-5">
+<div id="tabset-6-5">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
 <p>The verification, and this is the tab worth spending time on. The first yield point matched nothing, so its seed rate is missing, which happens whenever nothing lies within the threshold. The second matched two points. Rather than take that on trust, the code draws it: the yield point in red, a ten metre circle around it, and the nearby seed rate points labelled with their identifiers. Count what falls inside the circle. This is the same verify-by-picture habit from the first join, and it is how you catch a wrong threshold or a wrong CRS.</p>
 </details>
-<div id="qwebr-insertion-location-24"></div>
+<div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
@@ -3351,7 +3478,7 @@ Transcript
 <li><p>The second yield point from <code>soy_yield</code> is matched with two seed rate points from <code>as_applied_s_rate</code>: <code>seed_id</code> = 1 and <code>seed_id</code> = 558. Are they indeed less than 10 metres from the second yield point?</p></li>
 </ul>
 <p><br></p>
-<div id="qwebr-insertion-location-25"></div>
+<div id="qwebr-insertion-location-28"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
 </div>
@@ -3360,9 +3487,9 @@ Transcript
 <section id="sec-aggregate" class="slide level2">
 <h2>Spatial join and summary in one step with <code>aggregate()</code></h2>
 <div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">What is it?</a></li><li><a href="#tabset-6-2">Demonstration</a></li><li><a href="#tabset-6-3">Another demonstration</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">What is it?</a></li><li><a href="#tabset-7-2">Demonstration</a></li><li><a href="#tabset-7-3">Another demonstration</a></li></ul>
 <div class="tab-content">
-<div id="tabset-6-1">
+<div id="tabset-7-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -3383,21 +3510,21 @@ Transcript
 <p><br></p>
 <p>Here, for each of the rows of the second <code>sf</code> (here, <code>polygons_sf</code>), all the intersecting points in <code>points_sf</code> are found and then the average of <span style="color: blue;"> all </span> the columns of <code>points_sf</code> are calculated. Yes, <code>st_intersects()</code> is the default topological relationship just like spatial sub-setting with <code>sf1[sf2, ]</code> and <code>st_join()</code>.</p>
 </div>
-<div id="tabset-6-2">
+<div id="tabset-7-2">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
 <p>The one-liner, and then the reason to be careful with it. Look at the output: the well identifier has been averaged along with the extraction figures, giving a meaningless number in a column that looks perfectly respectable. That is what applying one function to every column gets you. The fix is on the same slide, selecting the column you actually want before aggregating. The general lesson is worth keeping: an operation that quietly does something to every column will do it to the columns you were not thinking about.</p>
 </details>
-<div id="qwebr-insertion-location-26"></div>
+<div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Note that <code>wellid</code> was also averaged by county. We could just do this:</p>
-<div id="qwebr-insertion-location-27"></div>
+<div id="qwebr-insertion-location-30"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-6-3">
+<div id="tabset-7-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -3406,7 +3533,7 @@ Transcript
 </details>
 <p><code>aggregate()</code> is a fairly general procedure of spatial joining and summarization, and you can use it for many other cases including our example of soybean yield and seed rate (go <a href="#/sec-point-point-distance">here</a> for the example).</p>
 <p>Here is the code:</p>
-<div id="qwebr-insertion-location-28"></div>
+<div id="qwebr-insertion-location-31"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <ul>
@@ -3420,9 +3547,9 @@ Transcript
 <section id="sec-cropping-join" class="slide level2">
 <h2>Cropping Join</h2>
 <div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Motivation</a></li><li><a href="#tabset-8-2">How</a></li><li><a href="#tabset-8-3">lines vs polygons</a></li><li><a href="#tabset-8-4">polygons vs polygons</a></li><li><a href="#tabset-8-5">area-weighted average</a></li><li><a href="#tabset-8-6">Exercise</a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">Motivation</a></li><li><a href="#tabset-9-2">How</a></li><li><a href="#tabset-9-3">lines vs polygons</a></li><li><a href="#tabset-9-4">polygons vs polygons</a></li><li><a href="#tabset-9-5">area-weighted average</a></li><li><a href="#tabset-9-6">Exercise</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1">
+<div id="tabset-9-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -3434,7 +3561,7 @@ Transcript
 <li><p>If we can get the geometry of the intersecting part of the HUC unit and the county, then we can calculate its area, which in turn allows us to find area-weighted averages of joined attributes.</p></li>
 </ul>
 </div>
-<div id="tabset-8-2">
+<div id="tabset-9-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -3447,31 +3574,31 @@ Transcript
 <li><p>Moreover, attribute values of the source <code>sf</code> will be merged to its intersecting <code>sfg</code> in the target <code>sf</code>.</p></li>
 </ul>
 </div>
-<div id="tabset-8-3">
+<div id="tabset-9-3">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
 <p>Back to the small made-up data from last deck, because with three polygons and two lines you can check the answer by eye. Intersecting the lines with the polygons gives you the line segments that fall inside each polygon, and every segment is one row labelled with which line and which polygon produced it. Compare the two figures side by side: on the left the full lines running out past the polygon edges, on the right only the parts inside, cut cleanly at the boundary. That cutting is the whole difference from subsetting.</p>
 </details>
-<div id="qwebr-insertion-location-29"></div>
+<div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>The following code gets the intersection of the lines and the polygons.</p>
-<div id="qwebr-insertion-location-30"></div>
+<div id="qwebr-insertion-location-33"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>Here is how the lines and polygons look like:</p>
-<div id="qwebr-insertion-location-31"></div>
+<div id="qwebr-insertion-location-34"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div><div class="column" style="width:50%;">
 <p>Here is how the intersections and polygons look like.</p>
-<div id="qwebr-insertion-location-32"></div>
+<div id="qwebr-insertion-location-35"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div></div>
 </div>
-<div id="tabset-8-4">
+<div id="tabset-9-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -3479,14 +3606,14 @@ Transcript
 <p>The same operation with polygons, which is the case we actually need. Intersecting polygons one and three with polygon two returns the overlapping regions as new polygons, one row each, with attributes from both parents. Look at the figure: the original polygons are filled and faint, and the intersections are outlined in heavy colour, sitting exactly where the shapes overlap. Those outlined pieces are new geometries that existed in neither input. Those outlined pieces are new geometries that existed in neither input, and crucially they have areas you can measure. That is what we came for, and the next tab applies it to the watersheds.</p>
 </details>
 <p>The following code gets the intersection of polygon 1 and polygon 3 with polygon 2. Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (<code>polygon 1-polygon 2</code> and <code>polygon 3-polygon 2</code>).</p>
-<div id="qwebr-insertion-location-33"></div>
+<div id="qwebr-insertion-location-36"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Just like the lines-polygons case, the non-intersecting part of polygons 1 and 3 are cut out and do not remain in the returned <code>sf</code>.</p>
-<div id="qwebr-insertion-location-34"></div>
+<div id="qwebr-insertion-location-37"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-5">
+<div id="tabset-9-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -3495,15 +3622,15 @@ Transcript
 </details>
 <p>Let’s now get back to the example of HUC units and county-level nitrogen use data. We would like to find <span style="color: blue;"> area-weighted </span> average of nitrogen use instead of the simple average.</p>
 <p>Using <code>st_intersection()</code>, for each of the HUC polygons, we can find the intersecting counties, and then divide it into parts based on the boundary of the intersecting polygons.</p>
-<div id="qwebr-insertion-location-35"></div>
+<div id="qwebr-insertion-location-38"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>The key difference from the <code>st_join()</code> example is that each observation of the returned data is a unique HUC-county intersection.</p>
 <p>The figure below maps every intersection of the HUC unit <code>HUC_CODE == 07060004</code> with the eight counties it overlaps.</p>
-<div id="qwebr-insertion-location-36"></div>
+<div id="qwebr-insertion-location-39"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-8-6">
+<div id="tabset-9-6">
 <details class="transcript">
 <summary>
 Transcript
@@ -3511,22 +3638,22 @@ Transcript
 <p>Your turn, on a deliberately simple layout: four unit squares in a grid with values one to four, and one square sitting over the middle of all four. Because it is centred, each quadrant contributes the same area, so you can work out the weighted answer in your head before writing any code. That is the point of the setup. Do problem one to get the intersection, then problem two to weight by area, and check your result against the number you predicted. If they disagree, the code is wrong, not your arithmetic.</p>
 </details>
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Data Preparation</a></li><li><a href="#tabset-7-2">Problem 1</a></li><li><a href="#tabset-7-3">Problem 2</a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Data Preparation</a></li><li><a href="#tabset-8-2">Problem 1</a></li><li><a href="#tabset-8-3">Problem 2</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
-<div id="qwebr-insertion-location-37"></div>
+<div id="tabset-8-1">
+<div id="qwebr-insertion-location-40"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p>We use <code>polygon_1</code> and <code>polygon_2</code> in this exercise. Inspect them to familiarize yourself with them:</p>
-<div id="qwebr-insertion-location-38"></div>
+<div id="qwebr-insertion-location-41"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p>Here is what they look like:</p>
-<div id="qwebr-insertion-location-39"></div>
+<div id="qwebr-insertion-location-42"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
-<div id="tabset-7-2">
+<div id="tabset-8-2">
 <p>Find the intersection of the two polygons using <code>st_intersection()</code>.</p>
-<div id="qwebr-insertion-location-40"></div>
+<div id="qwebr-insertion-location-43"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>
@@ -3537,9 +3664,9 @@ Transcript
 </details>
 </div>
 </div>
-<div id="tabset-7-3">
+<div id="tabset-8-3">
 <p>Find the area-weighted average of <code>value</code> for <code>polygon_2</code>, based on the area it overlaps with each polygon in <code>polygon_1</code>.</p>
-<div id="qwebr-insertion-location-41"></div>
+<div id="qwebr-insertion-location-44"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 <p><br></p>
 <p><strong>Answer</strong></p>

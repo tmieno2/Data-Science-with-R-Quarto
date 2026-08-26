@@ -213,13 +213,31 @@ NDRE
 Here is what they look like on a map:
 
 ```{webr-r}
+#| fig-width: 3
+#| code-track: 0.3
+#| fig-max-height: 800 
 ggplot() +
-  geom_spatraster(data = NDRE, alpha = 0.4) +
-  geom_sf(data = corn_yield, aes(color = yield), size = 0.05) +
-  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
-  scale_fill_viridis_c(name = "NDRE") +
-  scale_color_continuous(name = "Corn Yield (bu/acre)") +
-  theme_void() 
+  geom_spatraster(
+    data = NDRE,
+    alpha = 0.4
+  ) +
+  geom_sf(
+    data = corn_yield,
+    aes(color = yield),
+    size = 0.05
+  ) +
+  geom_sf(
+    data = treatment_blocks,
+    color = "red",
+    fill = NA
+  ) +
+  scale_fill_viridis_c(
+    name = "NDRE"
+  ) +
+  scale_color_continuous(
+    name = "Corn Yield (bu/acre)"
+  ) +
+  theme_void()
 ```
 
 ### Objectives
@@ -313,13 +331,32 @@ NDRE_sub <- terra::crop(NDRE, st_transform(corn_yield, crs(NDRE)))
 Let's check visually.
 
 ```{webr-r}
+#| code-track: 0.3
+#| fig-width: 3
+#| fig-max-height: 800
+
 ggplot() +
-  geom_spatraster(data = NDRE_sub, alpha = 0.4) +
-  geom_sf(data = corn_yield, aes(color = yield), size = 0.05) +
-  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
-  scale_fill_viridis_c(name = "NDRE") +
-  scale_color_continuous(name = "Corn Yield (bu/acre)") +
-  theme_void() 
+  geom_spatraster(
+    data = NDRE_sub,
+    alpha = 0.4
+  ) +
+  geom_sf(
+    data = corn_yield,
+    aes(color = yield),
+    size = 0.05
+  ) +
+  geom_sf(
+    data = treatment_blocks,
+    color = "red",
+    fill = NA
+  ) +
+  scale_fill_viridis_c(
+    name = "NDRE"
+  ) +
+  scale_color_continuous(
+    name = "Corn Yield (bu/acre)"
+  ) +
+  theme_void()
 ```
 :::
 <!--end of panel-->
@@ -358,11 +395,24 @@ NDRE_sub_masked <- terra::mask(NDRE_sub, st_transform(treatment_blocks, terra::c
 Let's check visually.
 
 ```{webr-r}
+#| code-track: 0.3
+#| fig-width: 3
+#| fig-max-height: 700
 ggplot() +
-  geom_spatraster(data = NDRE_sub_masked, alpha = 0.4) +
-  geom_sf(data = treatment_blocks, color = "red", fill = NA) +
-  scale_fill_viridis_c(name = "NDRE", na.value = "transparent") +
-  theme_void() 
+  geom_spatraster(
+    data = NDRE_sub_masked, 
+    alpha = 0.4
+  ) +
+  geom_sf(
+    data = treatment_blocks, 
+    color = "red", 
+    fill = NA
+  ) +
+  scale_fill_viridis_c(
+    name = "NDRE", 
+    na.value = "transparent"
+  ) +
+  theme_void()
 ```
 
 <br>
@@ -409,6 +459,7 @@ ggplot() +
 Create the map you saw in the previous tab.
 
 ```{webr-r}
+#| layout: stacked
 ggplot() +
   geom_spatraster() +
   geom_sf() +
@@ -431,6 +482,7 @@ ggplot() +
 Crop and then mask `prism_us` using `ne_counties`. 
 
 ```{webr-r}
+#| layout: stacked
 
 ```
 
@@ -439,7 +491,8 @@ Crop and then mask `prism_us` using `ne_counties`.
 Create a map using the cropped- and masked-`prism_us` and `ne_counties`.
 
 ```{webr-r}
-
+#| layout: stacked
+ 
 ```
 
 <br>
@@ -448,11 +501,11 @@ Create a map using the cropped- and masked-`prism_us` and `ne_counties`.
 ```{r, eval = FALSE}
 #| code-fold: true
 
-prism_us_cropped_masked <- 
+prism_us_cropped_masked <-
   prism_us %>%
   terra::crop(ne_counties) %>%
   terra::mask(ne_counties)
- 
+
 ggplot() +
   geom_spatraster(data = prism_us_cropped_masked) +
   geom_sf(data = ne_counties, color = "orange") +
@@ -502,14 +555,14 @@ polygon <- st_polygon(list(
   rbind(c(0, 0), c(8, 0), c(8, 8), c(0, 8), c(0, 0))
 ))
 
-raster_like_cells <- 
+raster_like_cells <-
   st_make_grid(polygon, n = c(8, 8)) %>%
   st_as_sf() %>%
   mutate(value = sample(1:64, 64))
 
 stars_cells <- st_rasterize(raster_like_cells, nx = 8, ny = 8)
 
-cell_centroids <- 
+cell_centroids <-
   st_centroid(raster_like_cells) %>%
   st_as_sf()
 ```
@@ -528,7 +581,7 @@ point_2 <- st_point(c(6.7, 1.8))
 point_3 <- st_point(c(4.2, 7.1))
 
 #--- combine the points to make a single  sf of points ---#
-points <- 
+points <-
   list(point_1, point_2, point_3) %>%
   st_sfc() %>%
   st_as_sf() %>%
@@ -675,7 +728,7 @@ the raster's CRS yourself, as below, and the intent of your code is explicit.
 
 ```{webr-r}
 (
-NDRE_extracted <- terra::extract(NDRE, st_transform(corn_yield, crs(NDRE)))
+  NDRE_extracted <- terra::extract(NDRE, st_transform(corn_yield, crs(NDRE)))
 )
 ```
 
@@ -718,11 +771,11 @@ For demonstration, let's create a multi-layer raster data:
 #| autorun: true
 #--- Create another layer ---#
 NDRE_100 <- NDRE * 100
-names(NDRE_100) <- "NDRE_100" # change the attribute name 
+names(NDRE_100) <- "NDRE_100" # change the attribute name
 
 #--- combine to form a two-layer SpatRaster ---#
 (
-NDRE_two_layers <- c(NDRE, NDRE_100) 
+  NDRE_two_layers <- c(NDRE, NDRE_100)
 )
 ```
 
@@ -730,7 +783,7 @@ NDRE_two_layers <- c(NDRE, NDRE_100)
 
 ```{webr-r}
 (
-NDRE_two_layers_extracted <- terra::extract(NDRE_two_layers, st_transform(corn_yield, crs(NDRE)))
+  NDRE_two_layers_extracted <- terra::extract(NDRE_two_layers, st_transform(corn_yield, crs(NDRE)))
 )
 ```
 
@@ -740,7 +793,7 @@ The resulting object is a `data.frame`, and the values from the first (second) l
 
 ```{webr-r}
 (
-corn_yield <- cbind(corn_yield, NDRE_two_layers_extracted[, -1])
+  corn_yield <- cbind(corn_yield, NDRE_two_layers_extracted[, -1])
 )
 ```
 
@@ -817,7 +870,7 @@ class(NDRE_extracted_tb)
 We just want one NDRE value for each of the treatment blocks. So, let's summarize them. In doing so, we summarize by `ID` as it indicates the row number of `treatment_blocks`. Here, we are getting the average.
 
 ```{webr-r}
-avg_NDRE <- 
+avg_NDRE <-
   NDRE_extracted_tb %>%
   dplyr::group_by(ID) %>%
   dplyr::summarize(avg_NDRE = mean(NDRE))
@@ -828,11 +881,6 @@ avg_NDRE <-
 Now, we can assign the average NDRE values to `treatment_blocks` like below because `ID == n` is for **n**th row of `treatment_blocks`.
 
 ```{webr-r}
-#--- CHANGED: was NDRE = avg_NDRE. avg_NDRE is the whole two-column summary  ---#
-#--- table, not a vector, so that packed a data.frame INTO the column. No    ---#
-#--- error at the time; it surfaces later as                                 ---#
-#---   "corrupt data frame: columns will be truncated or padded with NAs".   ---#
-#--- Take the column you want.                                               ---#
 treatment_blocks <- mutate(treatment_blocks, NDRE = avg_NDRE$avg_NDRE)
 
 #--- or ---#
@@ -910,6 +958,7 @@ head(NDRE_extracted_tb_twolayers)
 Let's get the weighted average for both variables:
 
 ```{webr-r}
+#| code-track: 0.5
 NDRE_extracted_tb_twolayers %>%
   dplyr::group_by(ID) %>%
   dplyr::summarize(
@@ -993,9 +1042,15 @@ rate_raster
 <br>
 
 ```{webr-r}
+#| code-track: 0.4
+#| fig-width: 1.8
+#| fig-max-height: 600
 ggplot() +
-  geom_spatraster(data = rate_raster) +
-  scale_fill_viridis_c(name = "N rate", na.value = "transparent") +
+  geom_spatraster(data = terra::trim(rate_raster)) +
+  scale_fill_viridis_c(
+    name = "N rate",
+    na.value = "transparent"
+  ) +
   theme_void()
 ```
 

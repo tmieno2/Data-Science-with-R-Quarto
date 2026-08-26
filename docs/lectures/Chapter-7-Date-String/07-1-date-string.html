@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-144bba8ee9928de8be0eb082e6af7bf5.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
   <script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
  var mathElements = document.getElementsByClassName("math");
@@ -823,9 +823,42 @@
       }
     }
 
+    // A control that folds a cell's output away, because long output pushes
+    // everything below it down the slide and a result that has been read is then
+    // just in the way. It goes where the cell already has a header strip: the
+    // Output banner on a side-by-side cell (layOut() moves it there), the
+    // editor toolbar on a stacked one. All it does is set a flag on the
+    // interactive area; notebook.scss does the hiding.
+    function addOutputToggle(area) {
+      var bar = area.querySelector(".qwebr-editor-toolbar-right-buttons");
+      if (!bar || area.querySelector(".webr-output-toggle")) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "webr-output-toggle";
+      btn.title = "Hide output";
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "\u25BE";                // down caret: output is showing
+      btn.addEventListener("click", function () {
+        var hide = area.dataset.webrOutputHidden !== "true";
+        area.dataset.webrOutputHidden = hide ? "true" : "false";
+        btn.setAttribute("aria-expanded", hide ? "false" : "true");
+        btn.title = hide ? "Show output" : "Hide output";
+        btn.textContent = hide ? "\u25B8" : "\u25BE";
+      });
+      // reveal reads keys off the document and stands aside only for inputs and
+      // contenteditable, not for a <button>. Without this, Space on a focused
+      // toggle both presses it and advances the slide.
+      btn.addEventListener("keydown", function (e) {
+        if (e.key === " " || e.key === "Enter") e.stopPropagation();
+      });
+      bar.appendChild(btn);
+    }
+
     function configure(area) {
       if (area.dataset.webrLayoutChecked === "true") return;
       area.dataset.webrLayoutChecked = "true";
+
+      addOutputToggle(area);
 
       // `::: {.stacked}` is the manual OPT-OUT, and the mirror of `.side-out`:
       // this cell keeps the vertical stack whatever the measurements say. The two
@@ -949,6 +982,13 @@
     // Everything below runs only for a cell that IS side by side: size its code
     // column, keep Monaco from wrapping in it, and keep the gutter caret centred.
     function layOut(area, host, details, metrics) {
+      // The banner is the output's own header strip, so on a side-by-side cell
+      // the toggle belongs there rather than in the toolbar over the code.
+      // notebook.scss puts it in the `outbar` grid area, on top of the ::before
+      // that paints the banner.
+      var toggle = area.querySelector(".webr-output-toggle");
+      if (toggle) area.appendChild(toggle);
+
       // Estimate an initial split from the longest source line, in pixels against
       // the width this cell actually has. The old form was `(maxChars + 10) / 145`,
       // which assumed ~145 characters span the full width; the real figure is ~109,
@@ -1276,7 +1316,7 @@
   // Document level settings ----
 
   // Determine if we need to install R packages
-  globalThis.qwebrInstallRPackagesList = ['dplyr', 'stringr', 'lubridate', 'gt'];
+  globalThis.qwebrInstallRPackagesList = ['dplyr', 'stringr', 'lubridate', 'gt', 'tidyr'];
 
   // Specify possible locations to search for the repository
   globalThis.qwebrPackageRepoURLS = ['https://repo.r-wasm.org/'];
@@ -2241,9 +2281,48 @@
   } 
 
   // Function to run the code using webR and parse the output
+  // How many characters of printed output fit across this cell's output box.
+  //
+  // Everything here is in CSS pixels, never getBoundingClientRect(): reveal
+  // scales the whole slide with a transform, so a rect is the scaled number
+  // while getComputedStyle and canvas.measureText are unscaled, and mixing the
+  // two gives a width out by the scale factor.
+  //
+  // The 80-character sample rather than one character because measureText
+  // rounds, and one rounded character multiplied by 124 is a visible error.
+  globalThis.qwebrOutputWidthChars = function (outputDiv) {
+      const DEFAULT_WIDTH = 80;
+      if (!outputDiv) return DEFAULT_WIDTH;
+      // The extension creates the output `pre` at load and keeps it hidden until
+      // the cell prints something, so its font is readable before the first run.
+      const probe = outputDiv.querySelector("pre") || outputDiv;
+      const usable = probe.clientWidth;  // content box: excludes the accent border
+      if (!usable) return DEFAULT_WIDTH;
+      const cs = getComputedStyle(probe);
+      const canvas = qwebrOutputWidthChars.canvas ||
+          (qwebrOutputWidthChars.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+      context.font = [cs.fontStyle, cs.fontWeight, cs.fontSize, cs.fontFamily]
+          .filter(Boolean).join(" ");
+      const perChar = context.measureText("0".repeat(80)).width / 80;
+      if (!perChar) return DEFAULT_WIDTH;
+      // qwebr-styling.css puts `margin: 1px 2px 1px 10px` on the div inside the
+      // pre, so 12px of the content box is never printable.
+      const chars = Math.floor((usable - 12) / perChar);
+      // Never NARROWER than R's own default. This only ever hands a cell more
+      // room than it had, so no slide that has already been read over prints
+      // differently unless its box was wider than 80 characters all along. A
+      // cell in a half-width `.column` measures about 60 and keeps 80, which is
+      // what it prints today: the tail scrolls, and trading that for a block
+      // two-thirds taller is not obviously the better deal on a slide.
+      // The ceiling is there because `options(width = )` is a hard limit in R,
+      // not a suggestion, and nothing on these decks wants a 300-character line.
+      return Math.max(DEFAULT_WIDTH, Math.min(200, chars));
+  };
+
   globalThis.qwebrComputeEngine = async function(
-      codeToRun, 
-      elements, 
+      codeToRun,
+      elements,
       options) {
 
       // Call into the R compute engine that persists within the document scope.
@@ -2305,6 +2384,19 @@
       // Store the code to run in history
       qwebrLogCodeToHistory(codeToRun, options);
 
+      // R wraps everything it prints at `getOption("width")` characters and webR
+      // leaves that at 80, whatever the box it is printing into. A full-width
+      // cell fits about 124 characters at the deck's code size, so a printed
+      // data frame stopped a third short of the right edge and R moved its last
+      // column into a second block underneath — which is how a six-column
+      // `st_join` result came out as five columns and then a lone `geometry`.
+      // Measure the box this cell actually got and let R use all of it.
+      //
+      // Safe to take at run time: webr-layout.html decides side-by-side versus
+      // stacked while the page loads and never revisits it (see assessOutput),
+      // so the width measured here is the width the output is printed into.
+      const widthFix = `options(width = ${qwebrOutputWidthChars(elements.outputCodeDiv)}); `;
+
       // webR's canvas draws text at the `pointsize` set above but still reports
       // its character metrics as if the font were 12pt. R sizes plot margins in
       // "lines" from those metrics, so on a 216 dpi canvas the margins come out
@@ -2321,7 +2413,7 @@
       // Evaluate the R code
       // Remove the active canvas silently
       const result = await mainWebRCodeShelter.captureR(
-          `${marginFix}${codeToRun}`,
+          `${widthFix}${marginFix}${codeToRun}`,
           captureOutputOptions
       );
 
@@ -2375,6 +2467,10 @@
 
           // Design an output object for messages
           const pre = document.createElement("pre");
+          // PATCHED: an `output: asis` cell hands back real HTML (a gt, kableExtra
+          // or tinytable table). It keeps the output box, but not the whitespace
+          // and font of a `pre`. See notebook.scss, and RULES.md section 7.
+          if (!showMarkup) { pre.classList.add("qwebr-output-asis"); }
           if (/\S/.test(out)) {
               // Display results as HTML elements to retain output styling
               const div = document.createElement("div");
@@ -2393,6 +2489,22 @@
           }
 
           elements.outputCodeDiv.appendChild(pre);
+
+          // PATCHED: HTML written by `output: asis` may carry its own <script>,
+          // which is how tinytable, modelsummary's default HTML output, fills its
+          // cells. innerHTML never runs a script, so the table arrived empty.
+          // Re-creating each script node runs it, and it must happen after the
+          // output is in the document or a detached node still does nothing.
+          if (!showMarkup) {
+              pre.querySelectorAll("script").forEach((original) => {
+                  const script = document.createElement("script");
+                  for (const attribute of original.attributes) {
+                      script.setAttribute(attribute.name, attribute.value);
+                  }
+                  script.textContent = original.textContent;
+                  original.replaceWith(script);
+              });
+          }
 
           // Determine if we have graphs to display
           if (result.images.length > 0) {
@@ -2919,7 +3031,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The point of this tab is that these two things look identical and are not. Run both cells. The first gives you character, the second gives you Date. On screen they may print much the same way, but R treats them completely differently. The three benefits underneath are why you should care. You can do calendar arithmetic, which means adding three months without worrying about how long February is. You can filter chronologically, so later than a given date actually means later rather than alphabetically after. And reformatting becomes one function call. Text that merely looks like a date gives you none of that.</p>
+<p>The point of this tab is that these two things look identical and are not. Run both cells. The first gives you character, the second gives you Date. On screen they may print much the same way, but R treats them completely differently. The three benefits underneath are why you should care. You can do calendar arithmetic, but month and year arithmetic needs invalid-date handling. Ordinary plus months can return N A, while percent m plus percent can roll back to the last day of the month. You can filter chronologically, so later than a given date actually means later rather than alphabetically after. And reformatting becomes one function call. Text that merely looks like a date gives you none of that.</p>
 </details>
 <p>R has an object class called <code>Date</code>.</p>
 <p>This is a date as <code>character</code>.</p>
@@ -3012,7 +3124,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Often you do not want the whole date, you want a piece of it. The year for grouping, the month for a seasonal comparison, the day of week to see whether Fridays are busier. The lubridate helpers on the left pull each piece out. Note the two people forget exist. yday gives day of year, one through three hundred and sixty five, which is what you want for anything seasonal. And wday gives day of week. Run the example and look at the columns side by side for the same dates, because seeing mday and yday next to each other makes the distinction obvious.</p>
+<p>Often you do not want the whole date, you want a piece of it. The year for grouping, the month for a seasonal comparison, the day of week to see whether Fridays are busier. The lubridate helpers on the left pull each piece out. Note the two people forget exist. yday gives day of year, one through three hundred and sixty five in common years and through three hundred and sixty six in leap years, which is what you want for anything seasonal. And wday gives day of week. Run the example and look at the columns side by side for the same dates, because seeing mday and yday next to each other makes the distinction obvious.</p>
 </details>
 <p>You can extract components (year, month, day) from a <code>Date</code> object using various helper functions offered by <code>lubridate</code>.</p>
 <ul>
@@ -3031,7 +3143,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>This is the tab that justifies the whole first half of the lecture. Three nested tabs. You can add and subtract periods, so plus years three does the sensible thing across leap years without you thinking about it. You can build sequences with seq, stepping by days, weeks or years, which is how you make a complete calendar to join other data onto. And you can compare dates inside filter and get chronological order rather than alphabetical. Try any of these on the original character column and you get an error or nonsense. That is the difference a proper Date makes.</p>
+<p>This is the tab that justifies the whole first half of the lecture. Three nested tabs. You can add and subtract periods, so plus years three does the sensible thing across leap years without you thinking about it. You can build sequences with seq, stepping by days, weeks or years, which is how you make a complete calendar to join other data onto. And you can compare dates inside filter and get chronological order rather than alphabetical. Addition and date sequences require proper Date objects, while comparisons against a Date can automatically convert parseable character values. Storing proper Dates keeps the type and intent explicit.</p>
 </details>
 <p>Unlike dates in character, you can do some math on <code>Date</code> objects.</p>
 <div class="panel-tabset">
@@ -3126,7 +3238,6 @@ Transcript
 </ul></li>
 <li>manage lengths
 <ul>
-<li><code>stringr::str_trim()</code></li>
 <li><code>stringr::str_pad()</code></li>
 </ul></li>
 </ul>
@@ -3139,9 +3250,9 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Joining strings together, with str underscore c.&nbsp;Read the sentence at the top carefully, because it has been corrected. str underscore c is close to paste, but not the same, and the difference shows up on the join three tab. Work through the four nested tabs in order. Join one is the basics, with a separator. Join two introduces recycling a single string against a vector. Join three is where it gets interesting, because two of those cells now fail deliberately. And use cases shows the two things you will actually do with this: building a combined variable, and generating file names.</p>
+<p>Joining strings together, with str underscore c.&nbsp;Read the sentence at the top carefully, because it has been corrected. str underscore c is close to paste, but not the same, and the difference shows up on the join three tab. Work through the four nested tabs in order. Join one is the basics, with a separator. Join two introduces recycling a single string against a vector. Join three is where it gets interesting: one cell fails deliberately, followed by a corrected all-combinations cell that succeeds. And use cases shows the two things you will actually do with this: building a combined variable, and generating file names.</p>
 </details>
-<p><code>stringr::str_c()</code> lets you concatenate a vector of strings. It is close to <code>paste()</code>, with one important difference you will meet on the “join 3” tab: <code>str_c()</code> refuses to recycle vectors of unequal length, whereas <code>paste()</code> does it silently. <!-- CHANGED: said "It is basically the same as paste()". Since stringr 1.5.0 that is no longer true in the one respect this slide goes on to demonstrate. --></p>
+<p><code>stringr::str_c()</code> lets you concatenate a vector of strings. It is close to <code>paste()</code>, with one important difference you will meet on the “join 3” tab: <code>str_c()</code> recycles length-one inputs but rejects other incompatible vector sizes, whereas <code>paste()</code> recycles them silently. <!-- CHANGED: said "It is basically the same as paste()". Since stringr 1.5.0 that is no longer true in the one respect this slide goes on to demonstrate. --></p>
 <div class="panel-tabset">
 <ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">join 1</a></li><li><a href="#tabset-5-2">join 2</a></li><li><a href="#tabset-5-3">join 3</a></li><li><a href="#tabset-5-4">use cases</a></li></ul>
 <div class="tab-content">
@@ -3547,7 +3658,7 @@ very next line. -->
 <summary>
 Transcript
 </summary>
-<p>Three small functions for changing case. To upper, to lower, and to title, which capitalises the first letter of each word. They look trivial, and individually each one is. What makes them worth a slide is that inconsistent capitalisation is one of the most common reasons a join silently fails. If one dataset says Lancaster and another says LANCASTER, those are different strings as far as R is concerned, and your join drops both rows without complaining. Forcing everything to one case before you join is a cheap habit that prevents a category of bug that is genuinely hard to spot afterwards.</p>
+<p>Three small functions for changing case. To upper, to lower, and to title, which capitalises the first letter of each word. They look trivial, and individually each one is. What makes them worth a slide is that inconsistent capitalisation is one of the most common reasons a join silently fails. If one dataset says Lancaster and another says LANCASTER, those are different strings as far as R is concerned, so they do not match. Whether the unmatched rows are dropped or retained depends on the join you use. Forcing everything to one case before you join is a cheap habit that prevents a category of bug that is genuinely hard to spot afterwards.</p>
 </details>
 <p>Here is the collection of functions that let you change the letter case of strings.</p>
 <p><br></p>
@@ -3568,9 +3679,9 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Padding makes strings a fixed width by adding a character until they reach the length you specify. The examples pad with question marks and dashes, which is deliberately silly, but the real use is almost always the same one: padding numbers with leading zeros. If you have identifiers one through one hundred and you pad them to three characters with zeros, they sort correctly as text, and they match identifiers in other datasets that were stored that way. Note the side argument, which controls whether padding goes left, right or both. Left is what you want for leading zeros.</p>
+<p>Padding extends strings shorter than a requested minimum width by adding a character until they reach it, but it does not truncate longer strings. The examples pad with question marks and dashes, which is deliberately silly, but the real use is almost always the same one: padding numbers with leading zeros. If you have identifiers one through one hundred and you pad them to three characters with zeros, they sort correctly as text, and they match identifiers in other datasets that were stored that way. Note the side argument, which controls whether padding goes left, right or both. Left is what you want for leading zeros.</p>
 </details>
-<p>You can pad strings with symbols of your choice so the resulting strings are of the length you specify.</p>
+<p>You can pad strings shorter than a requested minimum width with symbols of your choice. Longer strings are not truncated.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co">#--- NOT RUN ---#</span></span>
 <span id="cb23-2"><a></a>stringr<span class="sc">::</span><span class="fu">str_pad</span>(strings, string length, side, padding symbol)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
