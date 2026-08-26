@@ -1,0 +1,1113 @@
+---
+title: "A-2-2: Setting Up VS Code and Claude Code"
+abstract: "Appendix 2: Setup walkthrough"
+format: 
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same two navigation keys as the git setup deck, and the same reason for learning them. Three stacked lines in the bottom left corner for a table of contents, and the letter o for a panel view of every slide.
+
+This is a working session rather than a lecture, so you will not be on the same slide as me, and that is fine. What matters is being able to get back to the step you want.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### How this deck works
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same shape as the git setup deck, which you have already worked through. Everything in a blue box is either a command you type or a line you put in a file. None of it runs in the browser.
+
+Every section ends with a check. Run it, and if it does not do what the slide says, stop there rather than carrying the problem forward.
+
+One thing that is different from the git deck, and I want to flag it now rather than have you discover it. The prices and the exact install steps in this deck go out of date faster than anything else in this course, because these tools are changing every few months. Where that is true I have said so on the slide and pointed you at the page that has the current answer. Do not trust a number on a slide over the vendor's own pricing page.
+
+</details>
+
++ The boxes with a hint of blue are commands you type or lines you put in a file. Nothing runs in the browser.
++ **Every section ends with a Check.** If it does not do what the slide says, stop there.
+
+::: {.callout-important}
+This deck goes stale faster than anything else in the course, because these tools change every few months. Where a detail is likely to have moved, the slide says so and points at the page with the current answer.
+
+**Do not trust a number on a slide over the vendor's own page.**
+:::
+
+:::
+<!--end of panel-->
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three prerequisites, and the first one is not optional in the way the others are.
+
+You need to have finished A dash two dash zero, and git needs to work. Not because this deck uses git commands, but because of what we are about to do. You are about to install something that edits your files, and the only thing standing between that and a bad afternoon is being able to see what it changed and undo it. If git is not working, today is the wrong day to do this, and you should fix that first.
+
+You need a laptop you can install software on, same as before.
+
+And you need to have sorted out access, which is the cost slide in a few minutes. If your department is paying, you need whatever they gave you. If you are paying, you need to have signed up. If neither, we will cover what you can still do.
+
+</details>
+
+::: {.callout-important}
+## Finish A-2-0 first, and have git working
+Not because this deck uses git commands. Because you are about to install something that **edits your files**, and the only thing between that and a bad afternoon is being able to see what changed and undo it.
+
+If git is not working, today is the wrong day. Fix that first.
+:::
+
++ A laptop you can install software on, same as last time.
++ Access sorted out. Whether your department pays, you pay, or neither, is the cost slide in a few minutes.
+
+## What you will have at the end
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Six things again, and again only the last one is a real test.
+
+VS Code installed, with your project folder open in it. Claude Code installed and signed in. A CLAUDE dot m d file in your project. Evidence, and I mean actual evidence rather than belief, that the file is being read. A session where you asked for something and reviewed what came back before accepting it. And a commit containing that change, made by you, after you read it.
+
+The sixth is the one that matters, and notice its shape. It is not asked for something and it worked. It is asked, reviewed, decided, committed. That loop is what this whole deck is teaching, and the four steps in it are the reason the setup is worth an hour.
+
+</details>
+
+1. VS Code installed, with your project folder open in it
+2. Claude Code installed and signed in
+3. A `CLAUDE.md` in your project
+4. **Evidence** that the file is being read, not a belief that it is
+5. A session where you asked for something and reviewed what came back
+6. **A commit containing that change, made by you, after you read it**
+
+::: {.callout-important}
+Notice the shape of number 6. Not "asked for something and it worked". **Asked, reviewed, decided, committed.**
+
+That loop is what this deck teaches. The setup is what makes it possible.
+:::
+
+# VS Code
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Why a second editor
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let me answer the obvious objection first, because you have spent this whole course in RStudio and I am about to ask you to install something else.
+
+You are keeping RStudio. Read the first line and believe it. For writing and running R, RStudio is better, and nothing about today changes that. The console, the environment pane, the plot pane, the data viewer, the Quarto integration: none of that is in VS Code without a fight, and I am not asking you to have that fight.
+
+So why install VS Code at all. Two reasons.
+
+The first is that Claude Code's best experience is there, as an extension that sits beside your files.
+
+The second is the one I actually care about, and it is in the second bullet. VS Code shows you a change before you accept it, side by side, in colour. That is the single most important feature for what we are doing, because the whole discipline from A dash two dash three is read it before you keep it, and an editor that makes reading a change easy is an editor that makes that discipline cheap. In a terminal you read a patch in monospace and press y. That is a worse experience and you will skim.
+
+So the honest summary is the third line. Two editors, for two jobs. R work in RStudio, assistant work in VS Code, and the same folder open in both if you like, because they are both just looking at files on disk.
+
+One aside for the curious. Positron is Posit's editor, it is built on the same foundation as VS Code, and it has the R panes as well. If you end up wanting one editor rather than two, that is where to look. I am teaching VS Code because it is the common case and the free one.
+
+</details>
+
++ **You are keeping RStudio.** For writing and running R it is better, and nothing today changes that. The console, environment pane, plot pane and data viewer are not worth giving up.
++ **VS Code shows you a change before you accept it**, side by side, in colour. That is the reason. The discipline from A-2-3 is "read it before you keep it", and an editor that makes reading a change easy makes that discipline cheap. In a terminal you read a patch in monospace and press `y`, and you will skim.
++ **Two editors, two jobs.** R work in RStudio, assistant work in VS Code. The same folder can be open in both, because both are just looking at files on disk.
+
+::: {.callout-note}
+Positron is Posit's editor, built on the same foundation as VS Code, and it has the R panes too. If you would rather have one editor than two, that is where to look. I teach VS Code because it is the common case.
+:::
+
+## Install VS Code
+
+::: {.panel-tabset}
+
+### macOS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Go to code dot visualstudio dot com and click the download button, which will already have worked out that you are on a Mac.
+
+You get a zip file. Open it, and you get the application. Drag that into your Applications folder, which is the step people skip. If you run it from your Downloads folder it works, but then it is in your Downloads folder forever and you will eventually delete it by accident during a cleanup.
+
+Then open it. It is free, there is nothing to buy, and it will not ask you for a licence.
+
+</details>
+
+1. Go to [code.visualstudio.com](https://code.visualstudio.com) and click Download. It already knows you are on a Mac.
+2. Open the zip. **Drag the application into your Applications folder.**
+3. Open it.
+
+::: {.callout-note}
+Step 2 is the one people skip. Run it from Downloads and it works, but it lives in Downloads forever and you will delete it during a cleanup.
+:::
+
+### Windows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same page, code dot visualstudio dot com, click download, and run the installer you get.
+
+The installer is much less interrogative than the git one was, and the defaults are fine. There is one checkbox worth ticking, which is add to PATH. It is usually ticked already. That is what lets you type code and a folder name at a terminal to open it, which is convenient but not essential.
+
+It is free and there is nothing to buy.
+
+</details>
+
+1. Go to [code.visualstudio.com](https://code.visualstudio.com) and click Download.
+2. Run the installer. The defaults are fine.
+3. Tick **Add to PATH** if it is not already ticked. That lets you open a folder from a terminal.
+
+::: {.callout-note}
+Far fewer questions than the git installer. It is free and there is nothing to buy.
+:::
+
+:::
+<!--end of panel-->
+
+::: {.callout-note}
+## Check
+VS Code opens and shows a welcome screen.
+:::
+
+## Open a folder, not a file
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the most important slide about VS Code and it is one idea, so I am giving it a slide to itself.
+
+Open the folder, not the file.
+
+File, then Open Folder, and choose your project directory. The whole thing, the one with your data folder and your code folder in it, the one that is a git repository. Not a single script.
+
+Read the three consequences, because they are why this matters rather than being a preference.
+
+Claude Code works on the folder you have open. What it can see, and what it can change, is that folder. If you open one script, that is its entire world, and it will have no idea that your cleaning code exists.
+
+CLAUDE dot m d is found at the top of the folder you opened. Open a subfolder by mistake and the file is not there, and it is silently not read, with no message telling you.
+
+And the Source Control panel, which shows you your git changes, needs the folder to be a repository. Open something else and the panel is empty.
+
+So all three of the things you came here for are properties of the folder rather than the file. That is why this gets its own slide, and it is genuinely the most common setup mistake.
+
+The tip at the bottom is a good habit. If you already made an RStudio project, open exactly that folder. Then RStudio and VS Code are looking at the same thing, and there is only one project rather than two ideas about where it is.
+
+</details>
+
+**File → Open Folder**, and choose your **project directory**. The whole thing, the one with `data/` and `code/` in it, the one that is a git repository. Not a single script.
+
++ **Claude Code works on the folder you have open.** That folder is its entire world.
++ **`CLAUDE.md` is found at the top of the folder you opened.** Open a subfolder by mistake and it is silently not read, with no message.
++ **The Source Control panel needs the folder to be a repository.**
+
+::: {.callout-important}
+All three things you came here for are properties of the **folder**, not the file. This is the most common setup mistake.
+:::
+
+::: {.callout-tip}
+Already made an RStudio project? Open exactly that folder, so both editors are looking at the same thing.
+:::
+
+## Four parts of the window
+
+::: {.panel-tabset}
+
+### Explorer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The icon at the top of the strip down the left is Explorer, and it is a file tree of the folder you opened. Click a file to open it in the middle.
+
+That is genuinely all of it. It is a file browser, and if you have used the Files pane in RStudio you already know how this works.
+
+</details>
+
++ Top icon in the strip down the left. A file tree of the folder you opened.
++ Click a file to open it in the middle.
++ It is the Files pane in RStudio, with a different icon.
+
+### Editor
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The middle, where files open, in tabs across the top.
+
+The one thing worth knowing that is not obvious: a file opened with a single click appears in an italic tab, which means preview. Open another file and it replaces that tab rather than adding one. Double click the file, or double click the tab, and it becomes a permanent tab that stays.
+
+People find this maddening for about a day, decide the editor is losing their files, and then never think about it again once somebody explains it. So now somebody has.
+
+</details>
+
++ The middle, where files open, in tabs across the top.
++ A file opened with a **single click** gets an *italic* tab, meaning preview. Open another and it **replaces** that tab.
++ **Double-click** the file, or the tab, to make it permanent.
+
+::: {.callout-note}
+People find this maddening for a day and conclude the editor is losing their files. Then somebody explains it and they never think about it again.
+:::
+
+### Terminal
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Control and backtick opens a terminal at the bottom, and the same keys close it again. Backtick is the key above Tab on most keyboards, sharing with the tilde.
+
+The useful property is that it opens already inside your project folder, so you are never in the wrong directory, which was one of the git errors on the previous deck.
+
+If you cannot find the key, the menu route is Terminal, then New Terminal.
+
+</details>
+
++ **`Control` + `` ` ``** opens a terminal at the bottom, and closes it again. Backtick is above Tab, sharing with the tilde.
++ It opens **already inside your project folder**, so you are never in the wrong directory. That was one of the errors on the previous deck.
++ Cannot find the key? **Terminal → New Terminal**.
+
+### Source Control
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The branching icon in the left strip, and this is the one that connects today back to the last two decks.
+
+It lists every file you have changed since your last commit. Click one and you get the old version and the new version side by side, with what was removed in red and what was added in green.
+
+Read the callout, because this is the payoff for the git work you have already done, and it is the reason we are in this editor at all. Everything Claude Code does to your files shows up here, as a readable diff, before you commit it. That is what makes review a two second glance instead of a chore. You already know what a diff is from A dash two dash one, and this is where you are actually going to look at them.
+
+</details>
+
++ The branching icon in the left strip. Lists every file changed since your last commit.
++ Click one and you get old and new **side by side**, removed in red, added in green.
+
+::: {.callout-important}
+This is the payoff for the git work, and the reason we are in this editor.
+
+**Everything Claude Code does to your files shows up here, as a readable diff, before you commit it.** That makes review a two-second glance instead of a chore.
+:::
+
+:::
+<!--end of panel-->
+
+## Two shortcuts
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two, and then I will stop teaching you VS Code, because you are not here to become an expert in it.
+
+Command Shift P on a Mac, Control Shift P on Windows, opens the command palette. It is a search box for every single thing the editor can do. If you ever think, I am sure there is a way to do this and I cannot find the menu, that is the answer. Type what you want in plain words.
+
+And Control backtick for the terminal, which we just covered and which you will use constantly.
+
+That is enough VS Code. Everything else you will pick up when you need it, and the command palette is how you find it.
+
+</details>
+
++ **`Command + Shift + P`** on Mac, **`Control + Shift + P`** on Windows: the command palette. A search box for everything the editor can do. Type what you want in plain words.
++ **`Control` + `` ` ``**: the terminal.
+
+::: {.callout-note}
+That is enough VS Code. You are not here to become an expert in it, and the command palette is how you find everything else.
+:::
+
+# Claude Code
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## What it is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Back to the three shapes from A dash two dash three, where I described a chat window, an autocomplete in your editor, and an agent in your project. Claude Code is the third one, and this slide is about what that actually means in practice.
+
+It works inside the folder you opened. It reads your files, writes to them, and can run commands. So when you say the county join is dropping rows, can you look, it can go and look, at your actual code, rather than at your description of your code.
+
+That is the whole difference from a chat window and it is a large one. A chat window knows what you pasted into it. This knows what is in the folder.
+
+Which is also the risk, and it is in the callout. It changes files. That is the point of it and it is also why the very first prerequisite on this deck was that git has to work. Everything it does is visible in the Source Control panel and undoable with one command, but only because you set that up first. Without git, an agent editing your project is a thing you cannot see and cannot reverse.
+
+</details>
+
+The third of the three shapes from A-2-3: an agent that works inside your project folder.
+
++ It **reads your files, writes to them, and can run commands**.
++ So "the county join is dropping rows, can you look" means it goes and looks, at your actual code rather than at your description of it.
++ A chat window knows what you pasted. This knows what is in the folder.
+
+::: {.callout-important}
+Which is also the risk. **It changes files.** That is why the first prerequisite on this deck was that git has to work.
+
+Everything it does is visible in Source Control and undoable with one command, but only because you set that up first.
+:::
+
+## What it costs
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+I am going to be direct about this rather than vague, because you are graduate students and this is real money.
+
+There are two ways to pay and they work differently.
+
+A subscription is a flat monthly fee with usage limits, and there are several tiers. That is what most individuals use and it is the predictable option, because the bill does not depend on how much you work.
+
+API access is metered, which means you pay per unit of text processed, with no monthly minimum. That is cheaper if you use it rarely and it can get expensive fast if you use it heavily, and the bill arrives after the fact rather than before.
+
+Now read the important callout, and this is the thing I most want you to take from this slide. I have deliberately not put any prices on it. Not because I do not know them today, but because whatever I typed would be wrong within a few months, and a wrong price on a slide is worse than no price, because you would plan around it. Go to the pricing page and read the current answer.
+
+Then the three practical questions at the bottom, in the order you should ask them.
+
+Ask your advisor or your department first, before you spend anything. Research groups increasingly have accounts, and finding out afterwards that you paid for something you already had access to is a bad conversation.
+
+Check whether there is a student or academic rate. There often is, across all of these tools, and it is rarely advertised prominently.
+
+And if you are paying for it yourself, start with the cheapest tier that works. You can move up. Nobody has ever regretted starting on the small plan.
+
+</details>
+
+Two ways to pay, and they work differently.
+
++ **A subscription.** Flat monthly fee with usage limits, in several tiers. Predictable, because the bill does not depend on how much you work.
++ **API access.** Metered, per unit of text processed, no monthly minimum. Cheaper if you use it rarely, expensive fast if you use it heavily, and the bill arrives after the fact.
+
+::: {.callout-important}
+## There are deliberately no prices on this slide
+Not because I do not know them today. Because whatever I typed would be wrong within months, and **a wrong price is worse than no price**, since you would plan around it.
+
+Read the current answer at [claude.com/pricing](https://claude.com/pricing).
+:::
+
+Three questions, in this order:
+
+1. **Ask your advisor or department first**, before spending anything. Research groups increasingly have accounts.
+2. **Check for a student or academic rate.** There often is one, and it is rarely advertised prominently.
+3. **Paying yourself? Start on the cheapest tier that works.** You can move up. Nobody regrets starting small.
+
+## Install and sign in
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three steps, and this is one of the two places on this deck where the exact screens are most likely to have changed since I wrote it. If what you see does not match, follow what is on your screen and tell me, and I will fix the slide.
+
+One. In VS Code, click the extensions icon in the left strip, which looks like four squares with one lifting away. Search for Claude Code. Install it.
+
+Two. Open it, and sign in. It will send you to a browser, you approve, and you come back. This is the same shape as the g h auth login flow you did on the git deck, and it works for the same reason.
+
+Three. Confirm which account you are signed in as, because if your department has an account and you also have a personal one, you will at some point be signed into the wrong one and wonder why your usage limits look strange.
+
+The note at the bottom is for anyone whose extension will not install, which happens on locked-down machines. There is a terminal version that does the same job, and the documentation link has it.
+
+</details>
+
+1. **Extensions icon** in the left strip, the four squares with one lifting away. Search for **Claude Code**. Install.
+2. **Open it and sign in.** It sends you to a browser, you approve, you come back. Same shape as `gh auth login` from the git deck.
+3. **Confirm which account you are signed in as.** If your department has an account and you also have a personal one, you will eventually be on the wrong one and wonder why your limits look strange.
+
+::: {.callout-important}
+This is one of the two places on this deck most likely to have changed. If your screen does not match, follow your screen and tell me so I can fix the slide.
+:::
+
+::: {.callout-note}
+Extension will not install, which happens on locked-down machines? There is a terminal version that does the same job. See [code.claude.com/docs](https://code.claude.com/docs).
+:::
+
+::: {.callout-note}
+## Check
+Ask it something trivial, like "what files are in this project?", and get an answer that names your actual files.
+
+If it names files that are not yours, you have the wrong folder open. Go back to the "open a folder, not a file" slide.
+:::
+
+# The project file
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Which file, and where
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You already know what goes in this file, because A dash two dash four covers the contents in detail: the units section, the what is already fixed section, the traps section. This deck is about creating it and confirming it works, which is a different job.
+
+So, three facts about the file itself.
+
+It is a plain markdown file called CLAUDE dot m d, and it goes at the top of your project folder. The same place as your R project file. Nothing clever, no configuration format to learn, just a text file with a particular name in a particular place.
+
+Other tools use different names for the identical idea. AGENTS dot m d, or a copilot instructions file in a dot github folder. If you switch tools, you are renaming a file rather than rewriting it, and the thinking transfers completely.
+
+And it is read at the start of every session, automatically. You do not attach it, paste it, or mention it.
+
+The callout is the practical consequence and it is why this file is worth an hour of your time. You explain your project once, in writing, instead of every session, verbally, slightly differently each time and slightly worse by the fourth.
+
+</details>
+
+You already know **what goes in it** from A-2-4: units, what is already fixed, traps. This deck is about **creating it and confirming it works**.
+
++ A plain markdown file called `CLAUDE.md`, at the **top of your project folder**. Same place as your `.Rproj` file.
++ Other tools use different names for the identical idea: `AGENTS.md`, or a copilot instructions file under `.github/`. Switching tools is renaming a file, not rewriting it.
++ It is **read at the start of every session, automatically**. You do not attach it, paste it, or mention it.
+
+::: {.callout-note}
+That is why the file is worth an hour. You explain your project **once, in writing**, instead of every session, verbally, slightly differently each time and slightly worse by the fourth.
+:::
+
+## Let it write the first draft
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is a shortcut that is genuinely worth taking, and then a warning about it.
+
+Type slash init. It reads your project, works out roughly what it is, and writes a first CLAUDE dot m d for you. That saves you the blank page problem, which is the reason most people who intend to write this file never do.
+
+Now read the warning, because it matters. What it produces is a description of what it could see. It read your folder structure and your scripts and summarised them. Which means, by definition, it contains only things that were already visible in your project.
+
+And the whole value of this file is the opposite of that. It is for what your code cannot say. Slash init cannot know that a bushel of corn is fifty six pounds. It cannot know that Table two is in a submitted draft. It cannot know that the nineteen ninety-eight file has a different column order and cost you an afternoon. None of that is anywhere it could look.
+
+So the instruction at the bottom is the actual task. Treat the generated file as a skeleton, delete anything that is just restating your folder names, and add the three things it could not possibly know. Fifteen minutes, and that is the version that is worth having.
+
+</details>
+
+```default
+/init
+```
+
+It reads your project and writes a first `CLAUDE.md`. That solves the blank page problem, which is why most people who intend to write this file never do.
+
+::: {.callout-important}
+## But read what it produced
+It is a description of **what it could see**. It read your folders and scripts and summarised them, so by definition it contains only things already visible in your project.
+
+The value of this file is the opposite of that. `/init` cannot know that a corn bushel is 56 lb, that Table 2 is in a submitted draft, or that the 1998 file has a different column order and cost you an afternoon.
+:::
+
+::: {.callout-tip}
+Treat it as a skeleton. Delete anything that just restates your folder names, and add the three things it could not know. Fifteen minutes.
+:::
+
+## Global, project, and folder
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+There is more than one of these files and they stack, which nobody tells you and which explains some otherwise confusing behaviour.
+
+A global file, in a dot claude folder in your home directory, applies to everything you do on this machine. That is the right home for how you personally work. I prefer dplyr to data dot table. Do not write comments explaining what a line does when the line is obvious. Never use base R plotting. Things that are true of you rather than of a project.
+
+A project file, at the top of a project, applies to that project, and it is where everything from A dash two dash four goes.
+
+And a folder-level file, deeper in a project, applies when working in that part of it. Almost none of you will need this one, and I mention it so that you recognise it if you see it somewhere.
+
+They combine rather than replacing each other, and the more specific one wins where they disagree.
+
+The tip is worth acting on today. Put your personal preferences in the global file, once, and stop repeating them. Every time you find yourself correcting the same thing in a second project, that correction belongs in the global file rather than in your patience.
+
+</details>
+
+There is more than one of these, and they **stack**.
+
+| File | Applies to | Put here |
+|---|---|---|
+| `~/.claude/CLAUDE.md` | everything on this machine | How **you** work: dplyr not data.table, never base R plotting |
+| `CLAUDE.md` at the project top | that project | Everything from A-2-4 |
+| `CLAUDE.md` deeper in a project | that part of it | Almost none of you need this |
+
+They combine rather than replace, and the more specific one wins where they disagree.
+
+::: {.callout-tip}
+Put your personal preferences in the global file **once** and stop repeating them. The second time you correct the same thing in a new project, that correction belongs in the global file rather than in your patience.
+:::
+
+## What it does and does not do
+
+::: {.panel-tabset}
+
+### It is context, not enforcement
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the most important tab on the deck and it corrects the assumption almost everybody arrives with.
+
+Writing something in this file does not make it binding. The file is added to what the model reads. It is not a rule that gets checked, it is not validated, and nothing enforces it. It is closer to a note you leave for a new research assistant than to a setting in a program.
+
+Which means an instruction can be missed, especially a long file, especially an instruction buried in the middle of a wall of text, and especially when it competes with something you just said in the conversation.
+
+Read the practical consequence, because it changes how you use the file. Important things go early, they go short, and you state them as instructions rather than as background. Never write to data slash raw is a good line. A paragraph explaining your data management philosophy, with that fact somewhere in the third sentence, is a worse line even though it contains more information.
+
+And then the warning at the bottom, which is the honest one. For anything that genuinely must not happen, the file is not your protection. Your protection is git, and the fact that you review a diff before committing. The file makes the right thing likely. Review makes the wrong thing recoverable. You need both, and only one of them is a guarantee.
+
+</details>
+
++ **Writing it down does not make it binding.** The file is added to what the model reads. It is not a rule that gets checked, it is not validated, and nothing enforces it.
++ Closer to a note for a new research assistant than to a setting in a program.
++ An instruction can be missed. A long file especially, a line buried mid-paragraph especially, and one that competes with what you just said especially.
+
+::: {.callout-tip}
+So important things go **early, short, and stated as instructions**. "Never write to `data/raw/`" is a good line. A paragraph on your data management philosophy with that fact in the third sentence is worse, even though it contains more.
+:::
+
+::: {.callout-important}
+For anything that genuinely must not happen, **this file is not your protection**. Git is, and reviewing the diff before committing is.
+
+The file makes the right thing likely. Review makes the wrong thing recoverable. Only one of those is a guarantee.
+:::
+
+### It does not travel
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Second thing it does not do, and this catches people who work in more than one place.
+
+The file belongs to this tool, in this project, on this machine. Open a browser chat window and paste a question there, and none of it applies. Your units are not known, your submitted tables are not known, the assistant is starting from nothing.
+
+That sounds obvious stated plainly and it is not obvious in the moment. You will spend a week with a well configured project, get used to not having to explain your data, then ask a quick question in a browser tab because it is faster, and get an answer built on assumptions you thought you had ruled out.
+
+So the rule in the callout is worth remembering. The quick question in the other window is the one where you have to supply the context yourself, because nothing is supplying it for you.
+
+</details>
+
++ The file belongs to **this tool, in this project, on this machine**.
++ Open a browser chat window and none of it applies. Your units are not known. Your submitted tables are not known. It starts from nothing.
+
+::: {.callout-important}
+This is obvious stated plainly and not obvious in the moment. You spend a week with a well-configured project, get used to not explaining your data, then ask "a quick question" in a browser tab because it is faster, and get an answer built on the assumptions you thought you had ruled out.
+
+**The quick question in the other window is the one where you supply the context yourself.**
+:::
+
+### It does not show it your data
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Third one, and it is the correction to a hope rather than to an assumption.
+
+Writing down what your columns mean does not let it see your data. It reads the file, which is your description. It has not opened your two hundred thousand row csv and looked at the values.
+
+It can read a data file if you ask it to, and for a small file that is often exactly what you want. But that is a thing you asked for and it happens in front of you. It is not something the description in CLAUDE dot m d makes true in the background.
+
+So the practical consequence is at the bottom, and it connects to the four checks from A dash two dash three. Everything in that deck about running code on a case whose answer you know, and counting rows after a join, still applies in full. A well written project file makes the code that gets written better. It does not check the answer. Nothing here checks the answer except you.
+
+</details>
+
++ Writing down what your columns mean **does not let it see your data**. It reads your description, not your 200,000-row csv.
++ It *can* read a data file if you ask, and for a small file that is often what you want. But that is something you asked for, in front of you, not something the description makes true in the background.
+
+::: {.callout-important}
+So the four checks from A-2-3 still apply in full. A well-written project file makes the code that gets written **better**. It does not check the answer.
+
+Nothing here checks the answer except you.
+:::
+
+### What it genuinely does
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+To be fair to the file, having spent three tabs on its limits, here is what it actually buys you, because it is a lot.
+
+You stop repeating yourself. That sounds small and it is the largest one. Over a two year project you will explain your data hundreds of times, and every one of those explanations is a chance to explain it slightly wrong.
+
+The advice arrives in your idiom. If you said dplyr, you get dplyr, and you are not translating data dot table answers back into the style of the rest of your codebase.
+
+A whole category of guessing disappears. Units, definitions, what an observation is. Those are the guesses that produced the seven percent yield error in A dash two dash three, and they stop being guesses.
+
+And it works for people too. Your co-author reads it. The student who inherits this project reads it. You in eighteen months read it, and you will need it more than either of them.
+
+</details>
+
+Having spent three tabs on the limits, here is what it genuinely buys you.
+
++ **You stop repeating yourself.** The largest one. Over two years you will explain your data hundreds of times, and every one is a chance to explain it slightly wrong.
++ **Advice arrives in your idiom.** You said dplyr, you get dplyr, and you are not translating answers back into the style of your codebase.
++ **A whole category of guessing disappears.** Units, definitions, what an observation is. Those guesses produced the 7% yield error in A-2-3.
++ **It works for people too.** Your co-author, the student who inherits this, and you in eighteen months, who will need it most.
+
+:::
+<!--end of panel-->
+
+## Confirm it is actually read
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is a step almost nobody does, and it is exactly the same idea as every Check on the git deck. You have a file you believe in. Do you have evidence.
+
+The test takes one minute. Put a line at the very top of your CLAUDE dot m d that is distinctive and harmless. Something like, when you have read this file, start your first reply with the word acknowledged. Save it. Start a new session and ask anything at all.
+
+If the reply starts with acknowledged, the file is being read. If it does not, something is wrong, and the three likely causes are at the bottom.
+
+The wrong folder is open, which takes you back to the open a folder slide and is the most common one by a distance.
+
+The file is in a subfolder rather than at the top of the project.
+
+Or it is misnamed. Lower case, a dot t x t extension your operating system added and is hiding from you, something like that.
+
+Then take the line out again, because you do not want acknowledged at the start of every reply forever.
+
+Read the callout, because it is why this slide exists at all. The failure mode this protects you from is silent. A file that is not being read produces no error, no warning, and nothing unusual on screen. It produces answers that are slightly worse than they should be, forever, and you will never connect that to a file you wrote once in September and never verified.
+
+</details>
+
+Same idea as every Check on the git deck. You have a file you believe in. Do you have **evidence**?
+
+1. Put a distinctive, harmless line at the **very top** of your `CLAUDE.md`:
+
+```default
+When you have read this file, start your first reply with the word ACKNOWLEDGED.
+```
+
+2. Save it. Start a **new session**. Ask anything.
+3. Reply starts with ACKNOWLEDGED? The file is being read.
+4. **Take the line out again.**
+
+Not working? Three likely causes:
+
++ **The wrong folder is open.** The most common by a distance.
++ The file is in a **subfolder** rather than the top of the project.
++ It is **misnamed**. Lower case, or a `.txt` extension your operating system added and is hiding from you.
+
+::: {.callout-important}
+This slide exists because the failure is **silent**. A file that is not being read produces no error and nothing unusual on screen. It produces answers slightly worse than they should be, forever, and you will never connect that to a file you wrote once in September and never checked.
+:::
+
+# Running a session
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The shape of a session
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Five steps, and this is the loop, so it is worth getting into your hands rather than your notes.
+
+Commit first. You know why. It costs five seconds and it converts every possible disaster into an inconvenience.
+
+One task. Not four. Say what you want, singular.
+
+Read what it did, in the Source Control panel, as a diff. Not the summary it wrote you. The actual change.
+
+Decide. Keep it, or ask for a change, or throw it away, and throwing it away is a completely normal outcome that people are strangely reluctant to choose.
+
+Then commit it yourself, with your own message saying why.
+
+Then read the callout, because it is the one habit on this slide people skip and it costs them. Clear the conversation between tasks. A session that has been running all afternoon is carrying every wrong turn from that afternoon, and the tenth answer is worse than the first for no reason you can see. Fresh session per task, and the CLAUDE dot m d is re-read each time anyway, so you lose nothing that matters.
+
+</details>
+
+1. **Commit first.** Five seconds. Converts a disaster into an inconvenience.
+2. **One task.** Not four. Say what you want, singular.
+3. **Read what it did**, in the Source Control panel, as a diff. Not the summary it wrote you. The actual change.
+4. **Decide.** Keep, revise, or discard. Discarding is a normal outcome that people are strangely reluctant to choose.
+5. **Commit it yourself**, with your own message saying why.
+
+::: {.callout-important}
+## Clear the conversation between tasks
+A session running all afternoon is carrying every wrong turn from that afternoon, and the tenth answer is worse than the first for no reason you can see.
+
+Fresh session per task. `CLAUDE.md` is re-read each time, so you lose nothing that matters.
+:::
+
+## Read the diff, not the summary
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Step three deserves its own slide because it is the step that actually protects you, and it is the one people replace with a cheaper substitute.
+
+The cheaper substitute is reading the summary. It will tell you what it did, in prose, and that prose will be accurate and reassuring and it is not the same thing as the change. A summary is a description of an intention. A diff is what is now in your file.
+
+So open the Source Control panel, click the changed file, and read the red and the green.
+
+Three things to look for specifically, which are the ones worth training yourself on.
+
+Files you did not expect. If you asked for a change to one script and four files are listed, find out why before you go any further.
+
+Anything under data slash raw. That should be nothing, ever, and if it is not nothing that is the most important thing on your screen.
+
+And any change that is larger than the thing you asked for. A small request that produced a large diff usually means it decided to tidy something on the way, and that tidying is exactly the class of change that broke Table three in the A dash two dash four story.
+
+The callout is the sentence to leave with. If you did not read it, you did not review it, whatever you told yourself while clicking commit.
+
+</details>
+
+Step 3 protects you, and it is the step people replace with a cheaper substitute: reading the summary.
+
+::: {.callout-important}
+A summary is a description of an **intention**. A diff is what is **now in your file**. The summary will be accurate and reassuring, and it is not the same thing.
+:::
+
+Open Source Control, click the changed file, read the red and green. Three things to look for:
+
++ **Files you did not expect.** Asked for one script and four are listed? Find out why first.
++ **Anything under `data/raw/`.** That should be nothing, ever. If it is not nothing, it is the most important thing on your screen.
++ **A change larger than what you asked for.** A small request with a large diff usually means it tidied something on the way, and that is exactly what broke Table 3 in the A-2-4 story.
+
+::: {.callout-tip}
+If you did not read it, you did not review it, whatever you told yourself while clicking commit.
+:::
+
+## Decide what it may touch
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+By default it asks before editing a file or running a command, and you can approve each one or tell it to stop asking for a category of thing.
+
+That is a real decision and it is worth making deliberately rather than by clicking through prompts while thinking about something else.
+
+My advice is on the slide. Keep the asking on while you are learning, because the prompts are how you find out what it was about to do, and that is information you want in your first month.
+
+Then, once a particular kind of approval has become noise, turn that one off. Reading files, for example, is something you will approve fifty times before you get bored of it, and reading is harmless.
+
+But never turn off asking for anything that writes outside your code folder, and never for anything that deletes.
+
+And the callout is the connection back to A dash two dash four. The read only rule about raw data belongs in your CLAUDE dot m d, and it belongs in whatever permissions you set here, and neither of those is a guarantee on its own. Say it in both places, and then still look at the diff, because that is the part that is actually a guarantee.
+
+</details>
+
+By default it **asks before editing a file or running a command**. You can approve each one, or stop it asking for a category.
+
++ **Keep the asking on while you are learning.** The prompts are how you find out what it was about to do, and that is information you want in your first month.
++ **Turn off the ones that have become noise.** Reading files, for example. You will approve that fifty times and reading is harmless.
++ **Never turn off asking for anything that writes outside your code folder, or anything that deletes.**
+
+::: {.callout-important}
+The read-only rule about `data/raw/` belongs in your `CLAUDE.md` **and** in whatever permissions you set here, and neither is a guarantee on its own.
+
+Say it in both places, then still read the diff. That is the part that is a guarantee.
+:::
+
+## When to stop and do it yourself
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four situations, and knowing these saves you more time than any prompting technique.
+
+You have gone three rounds and it is not converging. Stop. Three failed attempts is information, and the information is usually that the problem is not what you think it is, or that you have not stated it properly. Going a fourth round is the sunk cost fallacy with a text box.
+
+You cannot describe what you want. That is not a prompting problem, it is a thinking problem, and no amount of rephrasing fixes it. Go and work out what you want.
+
+The task is genuinely small. If you can type it in thirty seconds, type it. The round trip of describing, waiting, and reviewing is slower than the work.
+
+And the one that matters most: the answer depends on judgement only you have. Which specification, which sample, whether that county belongs in the analysis. Those are not questions with a correct answer that you have failed to elicit. They are your decisions and they are the actual content of your dissertation.
+
+The callout is the general form. Every one of those four is a case where the bottleneck is your understanding rather than your typing, and these tools remove typing.
+
+</details>
+
++ **Three rounds and it is not converging.** Three failed attempts is information: usually that the problem is not what you think, or you have not stated it properly. A fourth round is the sunk cost fallacy with a text box.
++ **You cannot describe what you want.** Not a prompting problem, a thinking problem. No rephrasing fixes it.
++ **The task is genuinely small.** If you can type it in thirty seconds, type it. Describing, waiting, and reviewing is slower.
++ **The answer depends on judgement only you have.** Which specification, which sample, whether that county belongs. Those are not questions you failed to elicit correctly. They are your decisions, and they are the content of your dissertation.
+
+::: {.callout-important}
+All four are cases where the bottleneck is **your understanding** rather than your typing. These tools remove typing.
+:::
+
+# The test that matters
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## One real change, start to finish
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far was setup. This is the part that proves it, and everybody should get through it before we leave.
+
+One. Open your own project folder, the real one, not a test folder.
+
+Two. Commit whatever you have, so you are starting from a clean state.
+
+Three. Ask for one small real thing. The examples on the slide are the right size: add axis labels to a figure, write a function that converts these units, explain what this script does. Small, real, and checkable.
+
+Four. Open Source Control and read the diff. All of it.
+
+Five. Decide, and this is the step I want you to take seriously rather than defaulting. If it is not right, discard it. Doing that once, deliberately, today, while it does not matter, is worth more than four successful changes, because the reflex you need is the one that says no.
+
+Six. Commit it yourself with your own message.
+
+And the callout. If you did all six, you have the loop, and the loop is the whole thing. Everything else on this deck was installing software so that the loop was possible.
+
+</details>
+
+1. **Open your own project folder.** The real one, not a test folder.
+2. **Commit whatever you have**, so you start clean.
+3. **Ask for one small real thing.** "Add axis labels to this figure." "Write a function that converts these units." "Explain what this script does." Small, real, checkable.
+4. **Open Source Control and read the diff.** All of it.
+5. **Decide.** If it is not right, **discard it**.
+6. **Commit it yourself**, with your own message.
+
+::: {.callout-tip}
+Take step 5 seriously rather than defaulting. Discarding once, deliberately, today, while it does not matter, is worth more than four successful changes. The reflex you need is the one that says no.
+:::
+
+::: {.callout-important}
+All six done? You have the loop, and the loop is the whole thing. Everything else on this deck was installing software so the loop was possible.
+:::
+
+# When something goes wrong
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The four that actually happen
+
+::: {.panel-tabset}
+
+### It cannot see my files
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Almost always the wrong folder is open, and almost always it is a subfolder rather than a completely different place.
+
+Check the top of the Explorer panel, which shows the name of the folder you have open. Is that your project, or is it your code subfolder.
+
+File, Open Folder, and choose the project root, meaning the folder that contains your data folder, your code folder, and your R project file.
+
+And the callout, because this one failure causes three different symptoms that look unrelated. It cannot see your files, your CLAUDE dot m d is not read, and the Source Control panel is empty. Those are the same bug wearing three hats, and if you have any two of them at once this is the answer.
+
+</details>
+
+Almost always the wrong folder is open, and almost always a subfolder rather than somewhere else entirely.
+
++ Check the top of the Explorer panel. Is that your project, or your `code/` subfolder?
++ **File → Open Folder**, and choose the project root: the folder with `data/`, `code/`, and your `.Rproj` in it.
+
+::: {.callout-important}
+This one failure causes three symptoms that look unrelated: it cannot see your files, your `CLAUDE.md` is not read, and Source Control is empty.
+
+Same bug wearing three hats. Any two of them at once, and this is the answer.
+:::
+
+### It is ignoring my CLAUDE.md
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+First, establish whether it is actually ignoring it, using the acknowledged test from earlier. Do not debug a belief.
+
+If the test passes, the file is being read and the problem is what is in it rather than whether it arrives. Three things to look at.
+
+Is it too long. A short file is followed more reliably than a long one, and this is the most common answer.
+
+Is the instruction buried in the middle of a paragraph. Move it up, put it on its own line, and write it as an instruction rather than as background.
+
+Is something else contradicting it. Something you said earlier in the conversation, or your global file, which the project file does not automatically override on every point.
+
+And then the honest callout, which is the whole what it does and does not do tab restated. This file is context and not enforcement. If an instruction genuinely must hold every time, the file is the wrong mechanism. Reading the diff before you commit is the right one.
+
+</details>
+
+First, **establish whether it is actually being ignored**, using the ACKNOWLEDGED test. Do not debug a belief.
+
+Test passes? Then the file arrives and the problem is what is in it:
+
++ **Is it too long?** A short file is followed more reliably. Most common answer.
++ **Is the instruction buried mid-paragraph?** Move it up, own line, phrased as an instruction.
++ **Is something contradicting it?** Something you said earlier, or your global file.
+
+::: {.callout-important}
+This file is **context, not enforcement**. If an instruction genuinely must hold every time, the file is the wrong mechanism. Reading the diff before you commit is the right one.
+:::
+
+### It changed something I did not ask about
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Good. You noticed, which means you read the diff, which means the process worked exactly as designed.
+
+Undo it. Git restore for a file you have not committed, or discard the change in the Source Control panel, which is the same operation with a button. This is why step two of the session loop is commit first, and this is the moment that step pays for itself.
+
+Then think about why it happened, because it usually has a cause. A request that was broader than you meant. Or no CLAUDE dot m d line saying that this part of the project is settled and should not be reorganised.
+
+The callout is the thing to take away from this tab. This is not a malfunction and you should not treat it as one. This is the review step doing its job. The version of this that should worry you is the one where the same thing happened and nobody looked.
+
+</details>
+
+Good. You noticed, which means you read the diff, which means the process worked.
+
++ **Undo it.** `git restore`, or discard the change in the Source Control panel, which is the same thing with a button. This is why step 1 of the session loop is commit first.
++ **Then ask why.** Usually a request broader than you meant, or no `CLAUDE.md` line saying this part of the project is settled.
+
+::: {.callout-important}
+This is not a malfunction. This is the review step doing its job.
+
+The version that should worry you is the one where the same thing happened and nobody looked.
+:::
+
+### The screens do not match this deck
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Entirely possible, and it is the thing I warned about on the second slide.
+
+Follow what is actually on your screen. A menu that has been renamed is still the same menu, and a step that has moved is still the same step. The concepts on this deck change slowly. The buttons change quickly.
+
+The documentation link has the current version.
+
+And please tell me, so that I can fix the slide for the next person, which is genuinely useful and takes you ten seconds.
+
+</details>
+
+Entirely possible, and I warned about it on the second slide.
+
++ **Follow your screen.** A renamed menu is the same menu. A moved step is the same step. The concepts change slowly, the buttons change quickly.
++ [code.claude.com/docs](https://code.claude.com/docs) has the current version.
++ **Tell me**, so I can fix the slide for the next person.
+
+:::
+<!--end of panel-->
+
+## Where to go next
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You have working software and a loop, which is the right place to stop.
+
+A dash two dash three is how to ask for a single piece of code and, much more importantly, how to check what comes back. That is the deck with the four checks in it and the seven percent bushel error.
+
+A dash two dash four is the project level. What actually goes in your CLAUDE dot m d, which sections earn their place, and how these tools fit into a research project that runs for two years.
+
+And the callout is what I would like you to do this week rather than eventually. Write the three real sections of your CLAUDE dot m d, meaning what this project is, the units, and the data. Not the version slash init generated, which is a description of your folder names. The three things it could not possibly know. That is the file that is worth having, and it takes fifteen minutes while today is fresh.
+
+</details>
+
++ **A-2-3: Using AI to Write Code**, which is how to ask for one piece of code and, more importantly, how to check what comes back. The four checks and the 7% bushel error.
++ **A-2-4: Working with AI on a Research Project**, which is the project level: what actually goes in your `CLAUDE.md` and how these tools fit into two years of work.
+
+::: {.callout-tip}
+This week, not eventually: write the three real sections of your `CLAUDE.md`. What this project is, the units, and the data.
+
+Not the `/init` version, which describes your folder names. The three things it could not possibly know. Fifteen minutes while today is fresh.
+:::
+
+# Notes for the instructor
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## This deck goes stale
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+For whoever is teaching this rather than for the students.
+
+This is the most fragile deck in the appendix and it is worth knowing which parts. The table lists them with how fast each moves.
+
+Prices and plan tiers move fastest, which is why there are no numbers on the cost slide at all, only the structure and a link. Keep it that way. The moment a number goes on that slide it becomes something students plan around and it becomes wrong within a semester.
+
+The install and sign in steps move quickly too, and so do the extension marketplace details.
+
+The VS Code interface moves slowly, and the concepts, meaning what the project file is, what it does not do, and the session loop, barely move at all. That distribution is deliberate: most of the deck is in the slow-moving categories, and the volatile parts are isolated on two slides that are marked as such on the slide itself.
+
+So the instruction is: the week you teach this, do the install yourself from scratch, on a clean machine if you can borrow one, and check the two marked slides. And tell the students at the start that the screens may have moved and that they should follow their screen and tell you. That converts a stale slide from an embarrassment into a correction you collect for free.
+
+</details>
+
+| Part of this deck | How fast it moves |
+|---|---|
+| Prices and plan tiers | Fastest. **Keep numbers off the slide.** |
+| Install and sign-in steps | Quickly |
+| Extension marketplace details | Quickly |
+| The VS Code interface | Slowly |
+| The concepts: what the file is, what it does not do, the session loop | Barely at all |
+
++ Most of the deck is in the slow categories on purpose. The volatile parts are isolated on **two slides**, each marked as such on the slide itself.
++ **The week you teach this:** do the install yourself from scratch and check those two slides.
++ **Tell students at the start** that screens may have moved, that they should follow their screen, and that they should tell you. That turns a stale slide from an embarrassment into a correction you collect for free.
+
+## Timing, and the decision to make first
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+About an hour, distributed as in the table, and the two long items are VS Code and the session, which is right, because the first is unfamiliar software and the second is the whole point.
+
+But before any of that, read the callout, because there is a decision to make weeks ahead of the session rather than in it.
+
+Somebody has to pay. Work out beforehand whether the department has accounts, whether there is an academic rate, or whether students are paying themselves, and tell them before the session rather than during it. A room where half the people discover mid-session that they need a credit card is a room where you lose half the people.
+
+And have a plan for anybody without access, because there will be somebody. They can still do the VS Code half, which is a third of the deck and useful on its own, and they can watch a neighbour for the rest.
+
+</details>
+
+| Section | Minutes |
+|---|---|
+| VS Code install and the window | 20 |
+| Claude Code install and sign-in | 10 |
+| `CLAUDE.md`, including the ACKNOWLEDGED check | 15 |
+| The session loop and the test | 15 |
+
+::: {.callout-important}
+## Settle this weeks ahead, not in the room
+Somebody has to pay. Work out whether the department has accounts, whether there is an academic rate, or whether students pay themselves, **and tell them before the session**.
+
+A room where half the people discover mid-session that they need a credit card is a room where you lose half the people.
+:::
+
+::: {.callout-note}
+Have a plan for anyone without access, because there will be someone. They can still do the VS Code half, which is a third of the deck and useful on its own.
+:::
+
+## Running the room
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four things.
+
+The single most common failure is the wrong folder open, and it produces three symptoms that look unrelated, so students will describe it to you three different ways. Learn to recognise all three: cannot see my files, the project file is not being read, and Source Control is empty. When two of those appear together, check the Explorer panel before anything else.
+
+Make everybody do the acknowledged check. It is the only step on the deck that produces evidence rather than a feeling, and it is the one people skip because they are confident. Confidence is exactly what it is testing.
+
+Make everybody discard a change at step five of the test. Not everybody will want to, because it feels like wasting the work. That is the reflex worth building, and building it on a change that does not matter is much easier than building it on one that does.
+
+And a warning about pacing. The strong students will finish the install in fifteen minutes and want to go and do something ambitious. Point them at writing their real CLAUDE dot m d instead, because that is the part with lasting value, and the ambitious thing they want to try will go better afterwards anyway.
+
+</details>
+
++ **The most common failure is the wrong folder open**, and it produces three symptoms that look unrelated, so students describe it three different ways: cannot see my files, the project file is not read, Source Control is empty. Two together, check the Explorer panel first.
++ **Make everybody do the ACKNOWLEDGED check.** It is the only step that produces evidence rather than a feeling, and people skip it because they are confident. Confidence is what it is testing.
++ **Make everybody discard a change** at step 5 of the test. Not everyone will want to, because it feels like wasting the work. That is the reflex worth building, and it is easier to build on a change that does not matter.
++ **Watch the pacing.** Strong students finish the install in fifteen minutes and want to try something ambitious. Point them at writing their real `CLAUDE.md`, because that has lasting value and the ambitious thing goes better afterwards.

@@ -10,8 +10,13 @@ project:
     - "!lectures/Chapter-8-Table/test-quarto-live-table.qmd"
     # The AI appendix is a draft and is not on the website yet. An excluded deck
     # cannot be rendered on its own either, because outside the project the
-    # `webr` filter no longer resolves; comment this line out to render and
-    # preview, then restore it and delete docs/lectures/Appendix-2-AI/.
+    # `webr` filter no longer resolves. To preview: comment this line out,
+    # render, then restore it and do BOTH of these, or the appendix stays on
+    # the site:
+    #   rm -rf docs/lectures/Appendix-2-AI
+    #   quarto render lectures/index.qmd     # rebuilds the listing without it
+    # That second step is not optional. Rendering any deck in the folder also
+    # rebuilds lectures/index.qmd, which then carries links to all three.
     - "!lectures/Appendix-2-AI/"
     - "!sample-project-reproducible/code/main/*.qmd"
     - "!sample-project-reproducible/writing/*.qmd"

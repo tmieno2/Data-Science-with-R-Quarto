@@ -1,0 +1,1157 @@
+---
+title: "A-2-1: Version Control with Git and GitHub"
+abstract: "Appendix 2: Version Control"
+format: 
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks. The three stacked lines in the bottom left corner give you a table of contents, and the letter o gives you a panel view of every slide. Use them here more than on other decks. This one is long, and it is built to be a reference you come back to, because the first three or four times you hit a real situation with git you will want to look up what the words mean rather than remember them.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes here are static examples and there is nothing to run in the browser, because none of this is R. The commands are shell commands, typed in a terminal. The copy button in the top right corner of each box puts the command on your clipboard.
+
+You will see commands on these slides, and I want to be clear at the start about why they are there, because it is not so that you memorize them.
+
+An assistant can run every command in this deck. It can make the branch, write the ignore file, work out what a conflict is about, and find the thing you thought you had lost. That part of git has genuinely stopped being worth learning by heart, and I am not going to pretend otherwise.
+
+What the commands are for is vocabulary. Each one is named after the concept it performs, and those same words label every button in every git program and appear in every explanation you will ever read. Commit, branch, stage, merge, remote. You need those words to say what you want, and you need them again to check whether what came back is what you asked for.
+
+So read the commands the way you would read the name of a statistical test. You are learning what the thing is called and what it does, not preparing to type it from memory.
+
+</details>
+
++ The boxes with a hint of blue contain static examples. Nothing here runs in the browser, because none of it is R.
++ **The commands are here as vocabulary, not as something to memorize.** An assistant can run every one of them.
++ Each is named after the concept it performs, and those words label every button in every git program and appear in every explanation you will read.
++ Read them the way you read the name of a statistical test: what the thing is called and what it does.
+
+:::
+<!--end of panel-->
+
+## Learning objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Five objectives, and every one of them is understanding rather than doing. That is the whole design of this deck and it is worth saying why.
+
+Git used to be taught as a set of commands, and people found it hard, and they found it hard for a specific reason. They were handed a list of magic words before anyone gave them a picture of what the tool was doing. So every command felt like a coin toss, and the moment something unexpected happened they had nothing to reason from.
+
+That was always the wrong way round, and now it is obviously the wrong way round, because an assistant will run any of these commands for you and get the syntax right. Recalling how to type a merge has stopped being a skill worth having.
+
+What has not changed at all, and what is actually harder to acquire, is the model underneath. What a commit is. What a branch is. What it means to have pushed something. Read the callout, because it is the sentence the whole deck is built on. You cannot ask for what you cannot name, and you cannot check an answer you do not understand. Both halves of that matter. If you do not know what a branch is, you will not think to ask for one. And if you do not know what a commit is, you cannot look at the result and tell whether what you got was what you wanted.
+
+The fourth objective is the one that is genuinely new, and it is why there is a whole slide on it later. Some git operations are completely safe to hand off, and a small number can destroy work in a way nothing can undo. Knowing which is which is the practical skill that replaced memorizing the commands.
+
+And the fifth is the one that stops people using git properly for years. You have to stop being afraid of it, and the way to stop is to know what is actually dangerous, which turns out to be a very short list.
+
+</details>
+
++ Understand what git actually stores. This is most of the deck.
++ Know the vocabulary: repository, commit, staging, branch, remote, merge. These are the words you ask with.
++ Know what belongs in a repository and what must never go in one
++ **Know which operations are safe to hand off, and which you must run yourself**
++ Stop being afraid of it, because almost everything is recoverable
+
+::: {.callout-important}
+An assistant will run any command in this deck and get the syntax right. So this deck is about the model, not the mechanics.
+
+**You cannot ask for what you cannot name, and you cannot check an answer you do not understand.**
+:::
+
+::: {.callout-note}
+Chapter 2 said you do not need to learn git for this course, and that is still true. This is the appendix for when you do: your own research project, a co-author, or the moment you let an assistant edit your files.
+:::
+
+# Why bother
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The folder you already have
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let me start with the thing every one of you is doing right now, because I would rather name it than pretend otherwise.
+
+Read the folder on the slide. Everybody has this folder. I have had this folder. It is not a sign that you are disorganized, it is the completely rational thing to do when your only tool is Save As. You are about to change something and you are not sure the change is an improvement, so you keep a copy of what works. That instinct is correct. Version control is that instinct, done properly.
+
+Now the four problems underneath, because each one is a thing this folder cannot do for you.
+
+You do not know what is different between any two of those files. You could open both and read them side by side, and for a three hundred line script you will not, so in practice you do not know.
+
+You do not know why any of them exists. Something made you save a copy that day. Two months later that reason is gone, and the file name preserves none of it.
+
+You do not know which one made your results. Table two came out of one of these. Probably the third one. Probably.
+
+And you cannot go back to a state that no longer has a file. Everything you saved is here, and everything you did not think to save is gone permanently.
+
+The last line is the point of the whole slide. Every one of these four problems is a memory problem, not a storage problem. You have the files. What you do not have is the record of what happened and why, and that is precisely the thing git stores and Save As does not.
+
+</details>
+
+```default
+analysis.R
+analysis_v2.R
+analysis_v2_new.R
+analysis_final.R
+analysis_final_USE_THIS.R
+analysis_final_USE_THIS_v2.R
+```
+
++ You do not know what is **different** between any two of them.
++ You do not know **why** any of them exists.
++ You do not know **which one produced your results**.
++ You cannot go back to a state you did not think to save.
+
+::: {.callout-important}
+Every one of these is a memory problem, not a storage problem. You have the files. What you do not have is the record of what happened and why.
+:::
+
+## What you actually want
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the same thing stated as questions, because these are the four questions you will genuinely need answered during a research project, and today you cannot answer any of them.
+
+What did I change last Tuesday, and why. Not which files did I touch. What changed inside them, and what was I trying to achieve.
+
+Take me back to how this looked before I started the revision. Not the files I remembered to copy. The actual state of the whole project on that day, all of it.
+
+My co-author and I both edited the cleaning script this week. What did they change, and does it conflict with mine.
+
+And the one that is specific to research and that I want you to hold on to: the referee asks what you did differently in the revision, and you can answer exactly rather than approximately.
+
+The last line is the honest summary of the deck. Git is a machine for answering these four questions. That is what it is for. Everything else about it, all the vocabulary and the commands, exists to make those four answerable.
+
+</details>
+
++ "What did I change last Tuesday, and **why**?"
++ "Take me back to how this looked before I started the revision." The whole project, not the files you remembered to copy.
++ "My co-author edited the cleaning script this week. What did they change?"
++ "The referee asks what we did differently in the revision." You answer exactly, not approximately.
+
+::: {.callout-note}
+Git is a machine for answering those four questions. Everything else in this deck exists to make them answerable.
+:::
+
+## Why Dropbox is not this
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the objection I get every time, so let us take it seriously rather than waving it away. Your project is already in Dropbox or Google Drive, it already keeps old versions, so surely that is version control.
+
+It is not, and the difference is in the callout. Cloud storage stores file versions, one file at a time. Git stores changes, and a change is a set of edits across many files that belong together, with a message saying why they belong together.
+
+That sounds like a technicality until you need it, so read the three bullets, which are three moments where the difference is the whole thing.
+
+Your cleaning script, your analysis script and your figure code all changed together, because they had to, because you renamed a variable. In git that is one change with one explanation. In Dropbox it is three files with new timestamps and no connection between them, and reconstructing which three belonged together is your problem.
+
+Nothing in Dropbox says why. There is nowhere to write it down. Timestamps are all you get, and a timestamp tells you when, never why, and why is the expensive part.
+
+And you cannot go back to a moment. You can restore this file to Tuesday, and that file to Tuesday, one at a time, hoping you got all of them and did not miss the fourth one. Git restores the project to Tuesday in one operation, because Tuesday is a thing it stored.
+
+Now the warning at the bottom, which is not theoretical and did not happen to somebody else. This course repository used to live in Dropbox and then in Google Drive. In Dropbox, the sync client left conflicted copy files inside the internal folder git uses to store its own data, and in Drive, whole directories would briefly report as empty while the file provider caught up. Both produced failures that looked like bugs in the build and were not. The repository lives on ordinary local disk now, and that is the recommendation. If you want a copy elsewhere, the right mechanism is GitHub, which is designed for exactly this, not a file syncing client racing your editor.
+
+</details>
+
+Your project is already in Dropbox. Is that not version control?
+
++ **A change spans files.** Rename a variable and three scripts change together, for one reason. Git records that as one change. Dropbox records three timestamps with no connection between them.
++ **Nothing says why.** There is nowhere in Dropbox to write down the reason, and the reason is the expensive part.
++ **You cannot go back to a moment.** You restore files one at a time and hope you found all of them.
+
+::: {.callout-important}
+## This is not theoretical
+This course repository used to live in Dropbox and then in Google Drive. Dropbox left "conflicted copy" files inside git's own internal folder, and Drive reported whole directories as briefly empty. Both looked like build bugs and were not.
+
+Keep repositories on ordinary local disk. If you want a copy elsewhere, that is what GitHub is for.
+:::
+
+# The mental model
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## A repository
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four sentences of definition, and then we build everything else on top of them.
+
+A repository is an ordinary folder on your computer, plus its complete history. When you run git init inside a folder, git creates one hidden folder called dot git inside it, and that hidden folder is where the entire history lives. Everything else in your project stays exactly what it was: ordinary files you open and edit in the ordinary way.
+
+Two things follow that surprise people, and both are worth stating.
+
+Your history is local. It is on your disk, in that hidden folder, and git works completely with no internet connection. GitHub is optional and comes much later in this deck. People conflate the two constantly and it makes git seem more complicated than it is.
+
+And a repository is one project. Not one file, and not your entire home directory. In practice, one repository per paper is the right unit for research, and it should be the same folder that holds your R project file, so that opening the project and being in the repository are the same act.
+
+</details>
+
++ A repository is an ordinary folder, **plus its complete history**.
++ `git init` creates one hidden folder, `.git`, inside it. That is where the history lives. Everything else stays ordinary files you edit normally.
++ **The history is on your disk.** Git works with no internet connection. GitHub is optional and comes later in this deck.
++ **A repository is one project.** For research, one repository per paper, in the same folder as your `.Rproj` file.
+
+## A commit is the whole idea
+
+::: {.panel-tabset}
+
+### What a commit is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+If you take one concept from this deck, take this one, because every other piece of vocabulary is defined in terms of it.
+
+A commit is a snapshot of your entire project at one moment, with a message attached saying why. Not a file. The whole project. Every tracked file, as it stood, in one object, with your name, the time, and your explanation.
+
+Read the three properties, because each one is doing work.
+
+It is complete. If you go back to a commit you get the whole project as it was, not a single restored file sitting in a folder full of newer ones. This is what makes "take me back to Tuesday" a real operation.
+
+It is permanent. Once you commit, that state exists and continues to exist. You can go back to it in five years. Nothing you do afterwards destroys it, and this is the property that makes git safe to experiment in, which is a point I will make again at the end.
+
+And it carries a reason. That is the field Save As does not have and the reason your folder full of underscore final files is useless. The message is not paperwork. It is the entire difference between a backup and a history.
+
+</details>
+
+A commit is a **snapshot of your entire project at one moment**, with a message saying why.
+
++ **Complete.** Going back to a commit gives you the whole project as it was, not one restored file among newer ones.
++ **Permanent.** That state continues to exist. You can return to it in five years, and nothing you do later destroys it.
++ **It carries a reason.** This is the field Save As does not have, and it is the entire difference between a backup and a history.
+
+### What a commit is not
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three corrections, because these are the wrong pictures people arrive with, and each one leads to a specific confusion later.
+
+A commit is not a saved file. Saving is what you do in RStudio, constantly, without thinking. Committing is a separate deliberate act that you do perhaps five or ten times a day, when you have finished something coherent. Those are different operations at different rhythms and conflating them is the most common beginner error.
+
+A commit is not a backup. A backup protects you from losing the machine. A commit protects you from losing the answer to a question. Do both. They are different jobs and one does not replace the other.
+
+And a commit is not a diff, even though every git program shows you a diff when you look at one. The commit is the complete state; the diff is a convenience, computed by comparing this commit with the one before it, because the difference is what you actually want to read. This distinction matters exactly once, on the day something goes strange, when knowing that each commit is a complete state tells you that going back is always possible.
+
+</details>
+
++ **Not a saved file.** You save constantly without thinking. You commit deliberately, perhaps five or ten times a day, when you have finished something coherent.
++ **Not a backup.** A backup protects you from losing the machine. A commit protects you from losing the answer to a question. Do both.
++ **Not a diff.** The commit is the complete state. The diff you see is computed by comparing it with the previous commit, because the difference is what you want to read.
+
+### The message
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The message is the part everybody does badly and it is the part that pays you back, so I want to be specific about the form.
+
+A summary line, short, under about fifty characters, written as an instruction. Fix the county join rather than fixed the county join or county join fix. The reason for the instruction form is small but real: your history then reads as a list of things that were done, which is what you want when you are scanning it.
+
+Then, if the change needs it, a blank line and a paragraph. That paragraph is where the value is, and it should say why, not what. What is already visible in the diff, in full detail, forever. Why is in your head and nowhere else, and it evaporates in about two weeks.
+
+Look at the two examples and the difference between them. The bad one is a real message and it says nothing at all. The good one tells a reader, and it will be you, that county codes are text with a leading zero, that treating them as numbers silently loses twelve counties, and that the fix is a column type. That is a message that will save somebody an afternoon, quite possibly you.
+
+</details>
+
+```default
+Fix the county join by reading FIPS as character
+
+county_fips has a leading zero. read_csv() was inferring it as numeric,
+which dropped the zero and silently lost 12 counties in the join.
+Forced the column type instead.
+```
+
++ **Summary line**, under about 50 characters, written as an instruction: "Fix the county join", not "fixed" or "county join fix".
++ **Then a blank line and a paragraph**, if the change needs one. Say **why**, not what.
++ What is already in the diff, in full detail, forever. Why is in your head and evaporates in about two weeks.
+
+::: {.callout-important}
+The bad version of that message is `update`. It is a real message that thousands of people write, and it says nothing at all.
+:::
+
+:::
+<!--end of panel-->
+
+## The three places a file can be
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the piece of git that confuses everybody, and it confuses them because they were never told it exists. There are three places, not two, and the middle one is the one nobody expects.
+
+The working directory is your folder as you see it in Finder. Your actual files, right now, with all your edits in them. This is the only one of the three that is not a git concept at all; it is just your folder.
+
+The staging area, also called the index, is a list of the changes you have selected to go into your next commit. You add things to it. It is a shopping basket that you fill before you check out.
+
+And the repository is the permanent history, the chain of commits, in that hidden folder.
+
+Look at the diagram, then read the callout, because the obvious question is why the middle one exists at all.
+
+The answer is that it lets you choose. In a research session you will typically have touched four things: a real fix to the cleaning script, a half finished idea in a new file, a stray debugging line, and a figure tweak. Those are not one change. Without staging, a commit would have to be everything you touched, and your history would be a list of "everything I did that afternoon", which is nearly as useless as the folder of underscore final files. Staging is what lets you commit the fix on its own, with its own explanation, and leave the half finished idea sitting in your folder untouched.
+
+That is the entire justification, and it is a good one, but I will say the practical version too: for the first month you will stage everything every time, and that is completely fine. Learn that the middle box exists, and start using it the first time you want to commit half of what you did.
+
+</details>
+
+```default
+  working directory  ->   staging area   ->    repository
+  (your folder as     (what you have         (the permanent
+   you see it)         selected to go         chain of commits)
+                       into the next
+                       commit)
+
+       git add ------------->     git commit ------------>
+```
+
+::: {.callout-note}
+## Why the middle box exists
+It lets you **choose**. A typical session touches four things: a real fix, a half-finished idea, a stray debugging line, and a figure tweak. Those are not one change. Staging is what lets you commit the fix on its own, with its own explanation, and leave the rest sitting in your folder.
+:::
+
+::: {.callout-tip}
+For your first month you will stage everything every time, and that is fine. Just know the middle box is there, and start using it the first time you want to commit half of what you did.
+:::
+
+## History is a chain
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the shape of a history, and it is simpler than people expect.
+
+Each commit records which commit came before it. That is the whole structure. A chain, growing to the right, each link pointing back at its parent. The letters in the diagram are stand-ins for the identifiers git actually uses, which are long strings of hex digits, usually written as the first seven characters.
+
+Now the two words on the diagram, because they are labels and nothing more, and understanding that they are labels removes most of the mystery from git.
+
+Main is a label pointing at the newest commit on your main line of work. It is a pointer, not a container. When you make a new commit, the label moves forward to it. Some older projects call this label master; it is the same thing under a different name.
+
+HEAD is a label meaning where you are right now. Almost always it points at a branch label, and that branch points at a commit. When you switch branches, HEAD is what moves.
+
+Read the callout, because this is the sentence that makes git make sense. Branches and HEAD are labels attached to commits, and the commits themselves never move and are never edited. Almost every git operation that sounds frightening is just moving a label, and moving a label does not destroy the thing it was pointing at. That is why the recovery section at the end of this deck is as cheerful as it is.
+
+</details>
+
+```default
+A ---- B ---- C ---- D
+                     ^
+                     |
+                   main, HEAD
+```
+
++ Each commit records **which commit came before it**. That is the whole structure.
++ **`main`** is a label pointing at the newest commit on your main line of work. It moves forward when you commit. Older projects call it `master`.
++ **`HEAD`** is a label meaning "where you are right now".
+
+::: {.callout-important}
+Branches and HEAD are **labels attached to commits**. The commits themselves never move and are never edited. Almost every git operation that sounds frightening is just moving a label, and moving a label does not destroy what it pointed at.
+:::
+
+## Branches
+
+::: {.panel-tabset}
+
+### What a branch is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A branch is a movable label, and that really is the whole definition. Everything that sounds complicated about branching follows from that one fact.
+
+Look at the diagram. You are on main at commit C. You make a new label called revision, and now two labels point at C. You commit twice while on revision, and the revision label walks forward to E and F while main stays at C. Your history has a fork in it.
+
+Now the part that matters in practice, in the second bullet. Switching between the two labels changes the files in your folder. Switch to main and the files on disk are the C versions. Switch to revision and they are the F versions. Same folder, contents rewritten to match wherever you are standing. That is what a branch actually feels like to work in, and it takes about two switches to get used to.
+
+The third bullet is the payoff. The work on revision does not exist on main. You can do something ambitious and possibly stupid on revision and main is untouched throughout, not because you were careful, but because those commits are not on it.
+
+</details>
+
+```default
+A ---- B ---- C                (main)
+               \
+                E ---- F       (revision)
+```
+
++ A branch is a **movable label**. Making one just adds a second label to the commit you are on.
++ **Switching branches rewrites the files in your folder** to match. Same folder, different contents.
++ Work done on `revision` **does not exist on `main`**, so `main` stays untouched however ambitious you get.
+
+### Why a research project wants them
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Software teams use branches in fairly elaborate ways and you should ignore all of that. In a research project there are three situations where a branch genuinely earns its place, and they are the ones on the slide.
+
+A revision. The paper is submitted, the referee wants three new things, and you would like the submitted state to keep existing and keep working while you do them. Branch called revision, work there, and main is exactly what you submitted for as long as you want it to be.
+
+An idea you doubt. What if we used a different fixed effect, what if the sample was restricted differently. Branch, try it, look at the answer. If it is good you merge it into main. If it is bad you delete the label and everything associated with the attempt vanishes from your main line, with no half deleted experimental code left commented out in your scripts, which is what happens without branches.
+
+And a co-author. They work on their branch, you work on yours, and neither of you is editing the same files at the same moment in the same folder.
+
+Read the callout, because it is the honest scoping advice. For a solo project you can do good work with one branch and disciplined commits, and you should not feel you are doing it wrong. Learn branches when one of these three situations arrives, and it will.
+
+</details>
+
++ **A revision.** The paper is submitted. Branch called `revision`, and `main` stays exactly what you submitted, still working, for as long as you want.
++ **An idea you doubt.** Branch, try it, look at the answer. If it is bad, delete the label and the attempt vanishes, with no commented-out experimental code left in your scripts.
++ **A co-author.** They work on theirs, you work on yours.
+
+::: {.callout-note}
+For a solo project, one branch and disciplined commits is genuinely fine. Learn branches when one of these three arrives, and one of them will.
+:::
+
+### Merging
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Merging is bringing a branch's work back into another branch. You stand on main, you merge revision, and the commits that were only on revision are now part of main.
+
+Most of the time this is completely uneventful and you will wonder why merging has a reputation. Git looks at what changed on each side and combines them, and if the two sides touched different files, or different parts of the same file, there is nothing to decide and it just works.
+
+The reputation comes from the conflict case, which is the next tab, and which is much less dramatic than its name suggests.
+
+</details>
+
++ Merging brings a branch's work into another branch. Stand on `main`, merge `revision`, and those commits become part of `main`.
++ If the two sides touched different files, or different parts of the same file, there is nothing to decide and it simply works.
++ The reputation comes from the conflict case, which is the next tab and is much less dramatic than its name.
+
+### Conflicts
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A merge conflict is the situation everybody dreads and almost nobody has had explained to them, so here is what it actually is.
+
+Two branches changed the same lines of the same file, differently. Git cannot know which version you want, because that is a question about your research and not about text. So it stops and asks. That is the entire event. Git is not broken and it is not confused. It has found the one thing it is not entitled to decide.
+
+Look at what it puts in your file. The markers with the angle brackets and the equals signs are git showing you both versions in place. Above the equals signs is what was on the branch you are standing on. Below it is what was on the branch you are merging in.
+
+And the fix is at the bottom, and read it carefully because it is much more ordinary than people expect. You open the file, you delete the marker lines, and you leave the text you want. You are allowed to keep either version, or both, or write a third thing that is better than both. Then you save, stage the file, and commit. That is it.
+
+The one thing I want to correct is a feeling rather than a fact. A conflict is not a failure and it is not a sign that anything went wrong. It is git handing you a decision that only you can make, at exactly the right moment, which is before the bad merge instead of three weeks after it.
+
+</details>
+
+Two branches changed the same lines of the same file, differently. Git stops and asks, because which version you want is a question about your research, not about text.
+
+```default
+<<<<<<< HEAD
+yield_data <- filter(yield_data, year >= 2010)
+=======
+yield_data <- filter(yield_data, year >= 2005)
+>>>>>>> revision
+```
+
++ Above `=======` is the branch **you are standing on**. Below it is the branch **you are merging in**.
++ Open the file, delete the marker lines, leave the text you want. Keep either, both, or write a third thing.
++ Save, stage the file, commit. That is the whole fix.
+
+::: {.callout-note}
+A conflict is not a failure. It is git handing you a decision only you can make, at the right moment, which is before the bad merge rather than three weeks after it.
+:::
+
+:::
+<!--end of panel-->
+
+## Remotes and GitHub
+
+::: {.panel-tabset}
+
+### What a remote is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now, finally, the internet. Notice how far into the deck we are. Everything so far worked on your own machine with no network, and that is not an accident of the ordering, it is how git is built.
+
+A remote is a copy of your repository somewhere else. That is all it is. Usually it is on a server, usually the server is GitHub, and by convention the main remote is called origin, which is just a name.
+
+The second bullet is the one that reorganizes people's understanding. GitHub is not git. Git is the tool that stores history and runs on your computer. GitHub is a company that hosts copies of repositories and adds things around them: a web interface, issue tracking, permissions, web page hosting. You can use git for years with no GitHub account, and plenty of people do. You cannot usefully use GitHub without git.
+
+The third bullet is the sentence I want you to leave with, because it answers the Dropbox question properly. Because the remote is a full copy including all the history, pushing to GitHub is how you get your project onto another machine, or to a co-author, or off your laptop before it is stolen. That is a synchronisation mechanism that understands what a change is, which is exactly what a file syncing client does not.
+
+</details>
+
++ A **remote** is a copy of your repository somewhere else. By convention the main one is called `origin`.
++ **GitHub is not git.** Git stores history and runs on your computer. GitHub is a company that hosts copies and adds a web interface, issues, permissions, and page hosting. Git works fine with no GitHub account.
++ The remote is a **full copy, history included**. That is how your project reaches another machine, a co-author, or safety off your laptop.
+
+### The four commands
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four commands connect you to a remote, and each one is a single idea.
+
+Clone. Copy a repository from a remote onto your machine for the first time, with all of its history. This is the one thing Chapter two already taught you.
+
+Push. Send your commits up. Your local history now exists on the server too.
+
+Fetch. Download what other people have committed, but do not touch your files. Fetch is the safe look-before-you-leap version, and it is underused.
+
+Pull. Fetch, and then merge what arrived into what you have. This is the one you will use daily.
+
+Read the note, because it removes a common worry. Pull can produce a merge conflict, for exactly the reason from the previous tab: you and your co-author changed the same lines. If that happens, it is the same event with the same fix, and it is not a special network problem that needs different treatment.
+
+</details>
+
++ **`git clone`** copies a repository from a remote onto your machine for the first time, history included.
++ **`git push`** sends your commits up.
++ **`git fetch`** downloads what others committed, without touching your files.
++ **`git pull`** fetches, then merges what arrived into what you have. This is the daily one.
+
+::: {.callout-note}
+`git pull` can produce a merge conflict, for exactly the reason in the previous tab. Same event, same fix. It is not a special network problem.
+:::
+
+### What GitHub adds
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four things that are GitHub rather than git, and that are worth knowing exist.
+
+A place to put the remote, which is the main one and the reason most people have an account.
+
+Issues, which is a to-do list attached to the project. Underrated for research. A note saying check whether the 2013 weather file has the same units as the others is much more useful attached to the repository than in a text file on your desktop, and your co-author can see it.
+
+Pull requests, which are a proposal to merge a branch, with a page where people discuss it before it happens. That is the review mechanism of the entire open source world. For a two person paper it is usually more ceremony than you need, and it becomes worth it as soon as somebody wants their changes actually looked at before they land.
+
+And Pages, which serves a folder of HTML as a website. That is what this course site is. The slides you are reading right now are being served by GitHub Pages out of the docs folder of a repository.
+
+</details>
+
++ **A place to put the remote.** The main reason to have an account.
++ **Issues.** A to-do list attached to the project. "Check whether the 2013 weather file has the same units" belongs here, not in a text file on your desktop, and your co-author can see it.
++ **Pull requests.** A proposal to merge a branch, with a page to discuss it first. More ceremony than a two-person paper usually needs, until somebody wants their changes looked at before they land.
++ **Pages.** Serves a folder of HTML as a website. These slides are being served by GitHub Pages right now.
+
+:::
+<!--end of panel-->
+
+# The workflow
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The daily loop
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is what you actually do, every day, and it is five steps that become automatic within about two weeks.
+
+Pull first, before you start. This costs one second and it means you begin from what exists rather than discovering at the end of the day that your co-author moved the file you spent the afternoon editing.
+
+Then work normally. Nothing changes about how you use RStudio. Edit, save, run, all of it exactly as before.
+
+Then, when you have finished something coherent, check what you changed. Git status lists which files are different. Git diff shows you the actual lines. Do not skip this. It takes ten seconds and it is where you notice the debugging line you left in.
+
+Stage what belongs together, and commit it with a real message.
+
+And push, at least at the end of the day, which is what gets your work off your laptop.
+
+Read the callout, because it is the sentence that makes the habit stick. The loop is pull, work, check, commit, push. Everything else in git, all of it, is what you do on the rare day something unusual happens.
+
+</details>
+
+```default
+git pull                    # 1. start from what exists
+                            # 2. work normally: edit, save, run
+git status                  # 3. what did I change?
+git diff                    # 3. what exactly, line by line?
+git add code/01-clean.R     # 4. stage what belongs together
+git commit                  # 4. with a real message
+git push                    # 5. at least at the end of the day
+```
+
+::: {.callout-important}
+Pull, work, check, commit, push. Everything else in git is what you do on the rare day something unusual happens.
+:::
+
+::: {.callout-tip}
+Do not skip step 3. It takes ten seconds and it is where you notice the debugging line you left in.
+:::
+
+## What makes one commit
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The question people ask is how often to commit, and the answer is that frequency is the wrong way to think about it. The right unit is one logical change.
+
+One thing, and the test is whether you can describe it in one line without using the word and. Fix the county join is a commit. Fix the county join and add the new figure and rename two variables is three commits that were run together, and it will be useless to you when you are looking for the moment the join changed.
+
+Complete, meaning the project still runs afterwards. This is a goal rather than a law and you will break it, but aim at it, because a history where every point works is a history you can search through. A history where half the points are broken is one where going back is a gamble.
+
+And it should be small enough to read. If the diff is nine hundred lines, nobody is reading it, including you, and the reason you have a history at all is so that things can be read.
+
+Then the two heuristics at the bottom, and they are more useful than any rule.
+
+Commit at every point where you would be annoyed to lose the last hour. That is the natural rhythm and it is roughly right.
+
+And commit before you start anything risky. Before a big refactor, before running something that writes files, and above all before you let an assistant work on your project. Read the callout: that last commit is the difference between reviewing what it did and reconstructing what you had. Five seconds, in advance, every time.
+
+</details>
+
++ **One thing.** The test: can you describe it in one line without the word "and"?
++ **Complete.** The project still runs afterwards. A history where every point works is a history you can search. One where half the points are broken is a gamble.
++ **Small enough to read.** If the diff is 900 lines, nobody reads it, including you.
+
+Two heuristics that beat any rule:
+
++ Commit at every point where you would be annoyed to lose the last hour.
++ Commit **before** anything risky: a big refactor, a script that writes files, and above all before you let an assistant work on your project.
+
+::: {.callout-important}
+That last commit is the difference between **reviewing what it did** and **reconstructing what you had**. Five seconds, in advance, every time.
+:::
+
+## A revision, start to finish
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let me put the pieces together on a situation all of you will be in. The commands are on the slide, but what I want you to take from it is the shape, because the shape is the part you have to supply.
+
+The paper is submitted, so the first thing is to tag the submitted state. A tag is a permanent name for one commit, and unlike a branch it does not move. Now the exact state of the project on the day you submitted has a name you can say out loud in three years.
+
+Referee reports arrive. Branch. Do the work there, in as many commits as it takes, one per thing the referees asked for, because that structure is what pays you back at the end.
+
+When the revision is done, merge it back and tag that state too.
+
+Now, everything I just described you could ask for in one sentence. Tag this as submitted, make me a revision branch. An assistant will do it and get it right, and I have no objection to that at all.
+
+But notice what you had to know in order to ask. That a tag exists and is different from a branch. That a branch is what lets the submitted state keep existing while you change things. That one commit per referee point is a better shape than one commit at the end. None of that is in the commands. It is the decision about how to organize two months of work, and nothing is going to make that decision for you, because it depends on what your referees asked and how your paper is structured.
+
+Then read the callout, because it is the payoff and it is why the shape matters. Referees ask you to list what changed. If your revision is one commit called revision, you have nothing and you are reconstructing it from memory eight weeks later. If it is eleven commits with real messages, your response letter is nearly written.
+
+</details>
+
+```default
+git tag v1-submitted                 # a permanent name for this commit
+git push --tags
+
+git switch -c revision               # branch, and move to it
+# ... work, committing one thing at a time ...
+
+git switch main
+git merge revision
+git tag v2-revision-submitted
+git push --tags
+```
+
++ A **tag** is a permanent name for one commit. Unlike a branch, it does not move.
++ Now the exact state of the project on submission day has a name you can say out loud in three years.
+
+::: {.callout-note}
+## You could ask for all of this in one sentence
+And you should. But notice what you had to know to ask: that a tag differs from a branch, that a branch keeps the submitted state alive while you change things, and that one commit per referee point is a better shape than one at the end.
+
+That is a decision about how to organise two months of work. Nothing makes it for you.
+:::
+
+::: {.callout-important}
+## Why the shape pays for itself
+Referees ask you to list what changed. One commit called "revision" gives you nothing. Eleven commits with real messages gives you the response letter, nearly written.
+:::
+
+## Working with a co-author
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four rules, and the first two prevent almost every problem people have.
+
+Pull before you start. Push when you stop. If both of you do that, you are never more than one session out of step, and the merges stay small. Nearly every horror story about collaborating with git is somebody who did not pull for three weeks and then tried to merge a month of divergence in one go.
+
+Small commits with clear messages, because now the audience is a real other person, and the message is how they find out what you did without asking you.
+
+And agree on who owns what. This is not a git rule, it is a working rule that makes git easier. If you own the cleaning scripts and they own the analysis, you will almost never touch the same lines and conflicts will be rare. If you both edit everything constantly, you will get conflicts, and they are survivable, they are just friction you did not need.
+
+The note at the bottom is worth internalising early. Conflicts scale with how long you waited, not with how much you did. A day of divergence is a small merge. A month of divergence is a bad afternoon.
+
+</details>
+
++ **Pull before you start. Push when you stop.** Do this and you are never more than one session out of step.
++ **Small commits with clear messages.** The audience is now another person, and the message is how they learn what you did without asking.
++ **Agree who owns what.** Not a git rule, a working rule. If you own cleaning and they own analysis, you will rarely touch the same lines.
+
+::: {.callout-note}
+Conflicts scale with **how long you waited**, not with how much you did. A day of divergence is a small merge. A month is a bad afternoon.
+:::
+
+# What goes in a repository
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Yes, no, and it depends
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three lists, and the reasoning underneath each is more useful than the list itself.
+
+Always in. Every script, your Quarto and R Markdown sources, your CLAUDE dot m d, your README, your gitignore file, and your renv lock file if you use renv, which records exactly which package versions your project needs. All of these are text, all of them are small, and all of them are things you wrote.
+
+Never in. Credentials of any kind, meaning A P I keys, passwords, tokens. Read the callout carefully, because this is the one mistake on the slide that is genuinely expensive. Git history is permanent by design. Deleting a key in a later commit does not remove it, because the earlier commit still contains it and anybody who clones the repository gets the whole history. If a key ever reaches a public repository, the only correct response is to assume it is compromised and revoke it immediately. Do not spend the afternoon trying to scrub the history; just replace the key.
+
+Also never: anything under a data use agreement, and anything with identifiable human subjects data. Pushing that to GitHub is publishing it, whether or not the repository is private today, because private repositories become public by accident with some regularity.
+
+And it depends, which is mostly about size. Small data that you cannot regenerate, a few megabytes, belongs in the repository, because otherwise the code is useless to a future reader. Large data does not, and the next slide is about what to do instead. Rendered output usually does not, because you can regenerate it, with one important exception: this course website commits its rendered folder, because GitHub Pages serves files rather than running your code, so the output has to be in the repository for the site to exist at all.
+
+</details>
+
++ **Always in:** every script, your `.qmd` sources, `CLAUDE.md`, `README`, `.gitignore`, and `renv.lock` if you use it. All text, all small, all written by you.
++ **Never in:** credentials, anything under a data use agreement, anything with identifiable human subjects data.
++ **It depends:** small data you cannot regenerate, yes. Large data, no. Rendered output, usually no, because you can regenerate it.
+
+::: {.callout-important}
+## Credentials are the expensive mistake
+Git history is permanent by design. Deleting a key in a later commit does **not** remove it: the earlier commit still has it, and anyone who clones gets the whole history.
+
+If a key ever reaches a public repository, revoke it immediately. Do not spend the afternoon scrubbing history. Replace the key.
+:::
+
+::: {.callout-note}
+The exception for output: this course site commits its rendered `docs/` folder, because GitHub Pages serves files rather than running your code.
+:::
+
+## Data that is too big
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Some hard numbers first, because people guess and guess wrong. GitHub warns you above fifty megabytes per file and refuses outright above one hundred. There is no warning at all from git itself, which will happily commit a two gigabyte raster and make every future clone of your project take twenty minutes.
+
+Three things to do instead, in the order I would try them.
+
+Best, and this is genuinely the right answer for most agricultural and environmental work: commit a script that downloads the data rather than the data. Most of what you use comes from somewhere with an address. U S D A NASS, PRISM, the Cropland Data Layer, the Census. A download script is small, it is text, and it also documents where the data came from, which is a thing you will otherwise forget and then have to reconstruct for the data availability statement.
+
+Second, put the data in an archive that gives you a permanent identifier, and reference it from your README. Zenodo is the usual choice and it is free, and this is what journals increasingly want anyway.
+
+Third, git large file storage, which is a git extension for large files. It exists, it works, and I mention it mainly so you know it is not the answer you are looking for most of the time. It adds setup, it has quotas, and it solves a problem you usually do not have.
+
+And the rule at the bottom is the one to remember when none of this is convenient. Your repository should hold everything needed to reproduce the work, which is not the same as everything used to produce it. A script that fetches a file and a note saying where it came from are enough for someone to reproduce you. The four gigabyte file itself is not required, and putting it in makes the repository worse for everyone including you.
+
+</details>
+
++ **GitHub warns above 50 MB per file and refuses above 100 MB.** Git itself gives no warning at all, and will happily commit a 2 GB raster and make every future clone take twenty minutes.
+
+Three things to do instead:
+
+1. **Best: commit a script that downloads the data.** Most agricultural and environmental data has an address: USDA-NASS, PRISM, CDL, the Census. The script is small, it is text, and it documents where the data came from, which you will otherwise have to reconstruct for the data availability statement.
+2. **Archive it with a permanent identifier** and reference it from the README. Zenodo is free and is what journals increasingly want anyway.
+3. **Git LFS** exists. I mention it so you know it is usually *not* the answer: it adds setup and quotas and solves a problem you probably do not have.
+
+::: {.callout-note}
+Your repository should hold everything needed to **reproduce** the work, which is not the same as everything **used** to produce it.
+:::
+
+## `.gitignore`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Dot gitignore is a text file at the top of your repository listing what git should pretend it cannot see. Anything matching a line in it never shows up as a change, never gets staged, and never gets committed.
+
+There are two reasons to use it, and the second is the one people do not think of.
+
+The obvious one is keeping junk out of the history. The other is that git status becomes useful again. If forty untracked temporary files are listed every time you check what you changed, you stop reading the list, and once you stop reading it you have lost step three of the daily loop.
+
+The file on screen is a reasonable starting point for an R project and every line has a reason. R history and R data are R's own session leftovers and you do not want them. The R project user folder is RStudio's per user state. The renv library folder is thousands of installed package files that the lock file already describes exactly, so the lock file goes in and the library does not. The files and cache folders are Quarto and knitr intermediates, regenerated on every render. Data raw is there for the size reason on the previous slide, so uncomment that line if your raw data is large. And dot environment is where secrets live, which connects to the credentials warning two slides back.
+
+The note at the bottom is a genuine trap that will confuse you if you meet it without warning. Gitignore only applies to files git is not already tracking. If you committed something and then add it to gitignore, it stays tracked and keeps showing up, because git assumes you know what you are doing with a file you deliberately added. Removing it from tracking is a separate step.
+
+</details>
+
+A text file at the top of the repository listing what git should pretend it cannot see.
+
+```default
+.Rhistory
+.RData
+.Rproj.user/
+renv/library/
+*_cache/
+*_files/
+.env
+# data/raw/          # uncomment if your raw data is large
+```
+
++ The obvious reason is keeping junk out of the history.
++ The reason people miss: **`git status` stays useful.** If forty temporary files are listed every time you check what changed, you stop reading the list, and you have lost step 3 of the daily loop.
+
+::: {.callout-important}
+`.gitignore` only applies to files git is **not already tracking**. Add something to it after committing that file, and it stays tracked and keeps appearing. Untracking it is a separate step.
+:::
+
+# When it goes wrong
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Almost everything is recoverable
+
+::: {.panel-tabset}
+
+### I want to undo my last commit
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four panics, four answers. This section exists because fear of git is what stops people committing often, and not committing often is what actually loses work. So learn these four and the fear mostly goes.
+
+First panic. The last commit was wrong, or the message had a typo, or you forgot a file.
+
+If you have not pushed, amend it. That replaces the last commit with a corrected one. Fix the file, stage it, and commit with amend, and it is as though the mistake never happened.
+
+If you have pushed, revert it instead. Revert makes a new commit that undoes the old one. The mistake stays in the history, visibly, and the effect is removed. That is the right behaviour for anything other people might already have, and read the callout for the general principle: never rewrite history that other people may already have pulled. Amend and reset rewrite. Revert does not. When in doubt, revert, because a slightly untidy history costs nothing and a rewritten one costs your co-author an afternoon.
+
+</details>
+
+```default
+# not yet pushed: replace the last commit
+git commit --amend
+
+# already pushed: make a new commit that undoes it
+git revert <commit>
+```
+
+::: {.callout-important}
+Never rewrite history other people may already have pulled. `--amend` and `reset` rewrite it. `revert` does not.
+
+When in doubt, revert. An untidy history costs nothing. A rewritten one costs your co-author an afternoon.
+:::
+
+### I broke a file and want it back
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Second panic, and the most common one by a distance. You edited a file, made a mess of it, and want it back the way it was at the last commit.
+
+Restore, naming the file. Your edits since the last commit are discarded and the committed version comes back.
+
+Read the warning, because this is one of the few commands in this deck that genuinely destroys something. Restore throws away uncommitted work with no confirmation and no undo. Committed work is safe. Uncommitted work is not, and that asymmetry is the single strongest practical argument for committing often. Everything you have committed is protected from everything, including you. Everything you have not committed is protected from nothing.
+
+The older spelling using checkout with two dashes does the same thing, and you will see it in every answer written before about twenty twenty. Restore is the current name and it is clearer, because checkout also does several other unrelated things.
+
+</details>
+
+```default
+git restore code/01-clean.R     # back to the last committed version
+```
+
+::: {.callout-important}
+This genuinely destroys uncommitted work, with no confirmation and no undo.
+
+**Committed work is safe from everything, including you. Uncommitted work is safe from nothing.** That asymmetry is the strongest practical argument for committing often.
+:::
+
+::: {.callout-note}
+You will see `git checkout -- <file>` in older answers. Same thing. `restore` is the current name and is clearer, because `checkout` also does several unrelated jobs.
+:::
+
+### I want to see how it looked in March
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Third panic, which is not really a panic, it is the thing you bought git for.
+
+Log shows you the history. With the one line flag you get one commit per line, which is what you usually want when you are scanning for something.
+
+Then switch, with the detach flag, and the identifier of the commit you want. Your whole folder becomes what it was at that commit. Every file, at once. Open them, run them, look at the figure it produced.
+
+Then switch back to main and you are in the present again with nothing changed.
+
+The note explains the word detach, which sounds alarming and is not. It means you are standing on a commit rather than on a branch label. You are visiting rather than working. If you start committing while detached, those commits belong to no branch and are easy to lose, so the rule is simple: look, then switch back. If while looking you decide you want to work from there, make a branch at that point and you are on solid ground again.
+
+</details>
+
+```default
+git log --oneline               # one commit per line
+git switch --detach a3f9c21     # the whole folder, as it was
+git switch main                 # back to the present
+```
+
+::: {.callout-note}
+"Detach" sounds alarming and is not. It means you are standing on a commit rather than on a branch label: **visiting, not working**.
+
+Look, then switch back. If you decide you want to work from there, make a branch at that point first.
+:::
+
+### I have made a complete mess
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Fourth panic. Everything is wrong, you do not understand what state you are in, and you want the last known good moment back.
+
+Reset, hard, to HEAD. That throws away everything uncommitted and puts your folder back to the last commit exactly. It is the emergency button and it works, and it also destroys uncommitted work, so read what it says before you press it.
+
+Then the second command, which is the one almost nobody knows about and which is the reason for the cheerful callout at the bottom. Reflog is a log of everywhere your branch labels have been, including the places you moved away from and thought you had lost. So if you reset to the wrong place, or deleted a branch you needed, or rewrote something you should not have, reflog shows you where it was and you can go back to it. It keeps that record for about ninety days.
+
+Which gives you the sentence at the bottom, and I want to end this section on it because it is the attitude that makes people good at git. If you committed it, you can get it back. Almost anything that looks like a catastrophe in git is a label pointing at the wrong commit, and the commits themselves are still there. The habit that makes this true is committing often, which is where we came in.
+
+</details>
+
+```default
+git reset --hard HEAD    # emergency: back to the last commit exactly
+git reflog               # everywhere your branch labels have been
+```
+
++ `reset --hard` throws away everything uncommitted. It is the emergency button and it works. Read what it says before pressing it.
++ `reflog` is the one nobody knows about. It records everywhere your labels have been, including places you thought you had lost, and keeps that record for about 90 days. Reset to the wrong place, or delete a branch you needed, and this is how you find it again.
+
+::: {.callout-important}
+**If you committed it, you can get it back.** Almost anything that looks like a catastrophe in git is a label pointing at the wrong commit, and the commits themselves are still there.
+:::
+
+:::
+<!--end of panel-->
+
+## The three things that actually lose work
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+To keep the previous slide honest, here are the three ways you genuinely can lose something, so that the reassurance does not turn into carelessness.
+
+Uncommitted work. Said three times in this deck now because it is the only common one. Git protects what you gave it. Work you never committed was never given to it.
+
+Force pushing over somebody else's commits. Force push tells the server to accept your version of history instead of the one it has, and if the one it has contains your co-author's morning, that morning is gone from the server. If a push is refused, the correct response is to pull and merge, never to add the force flag because a forum post said it would make the error go away.
+
+And deleting the dot git folder, which is deleting the history itself, all of it, permanently. Worth saying because it is a hidden folder that occasionally shows up in a cleanup, and because dragging a project folder around between sync clients has been known to leave it behind.
+
+The rule at the bottom covers all three and it is short. Commit often, never force push, and let GitHub be your copy elsewhere.
+
+</details>
+
++ **Uncommitted work.** Git protects what you gave it. Work you never committed was never given to it.
++ **Force pushing over someone else's commits.** It tells the server to accept your history instead of the one it has. If a push is refused, pull and merge. Never add `--force` because a forum post said it makes the error go away.
++ **Deleting `.git`.** That is the history itself, all of it, permanently.
+
+::: {.callout-important}
+Commit often, never force push, and let GitHub be your copy elsewhere.
+:::
+
+## What you can hand off, and what you cannot
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the slide that has replaced memorizing the commands, so it is the practical heart of the deck now.
+
+Almost all of git is safe to hand off, and I want to be generous about that before I get to the exceptions, because the exceptions are few and I do not want you nervous about the whole tool.
+
+Read the first list. Anything that only reads is completely safe. Show me what changed since Tuesday, summarise this history, explain what this conflict is about. There is no risk at all, because reading changes nothing, and these are genuinely useful requests that would take you longer by hand.
+
+Anything that only adds is safe too, and this covers most of what you do. Making a commit, making a branch, making a tag. Remember why: these operations create new objects and move labels forward, and nothing that already existed is touched. If a new commit is wrong, the previous one is still exactly where it was.
+
+Drafting things is safe, and drafting a commit message from a diff is a good use, because the thing it is summarising is right there and you can read both and compare.
+
+Now the second list, and this is the part to actually learn.
+
+Anything that discards uncommitted work. Restore, reset hard, and switching branches while you have unsaved changes. The reason is the asymmetry I keep repeating in this deck: git protects what it has stored, and uncommitted work is the one category it has not stored. When a command reaches for that category, there is nothing behind it. No reflog, no recovery, nothing.
+
+And anything that rewrites history that has been pushed. Amend after a push, rebase, force push. These do not lose your work, they lose your co-author's, which is worse, because you will not notice and they will.
+
+Read the test in the callout, because it is one question and it covers both cases. Does this operation touch something git has not already stored, or something somebody else already has? If the answer is no, hand it off freely. If yes, you are the one who runs it, knowingly, after a commit.
+
+And then the last callout, which is the honest point about all of this. This whole slide is unusable if you do not know what a commit is, what pushed means, and what uncommitted means. You cannot apply the test without the model. Which is why the model was most of this deck and the commands were four slides.
+
+</details>
+
+**Hand off freely.** Anything that only reads, and anything that only adds:
+
++ "Show me what changed since Tuesday." "Summarise this history." "What is this conflict about?"
++ Making a commit, a branch, a tag. These create new objects and move labels forward. Nothing that already existed is touched.
++ Drafting a commit message from a diff, or writing a `.gitignore`.
+
+**Run these yourself, after a commit.** Anything that discards uncommitted work, or rewrites history that has been pushed:
+
++ `restore`, `reset --hard`, switching branches with unsaved changes. Git protects what it has stored, and uncommitted work is the one category it has not.
++ `commit --amend` after pushing, `rebase`, `push --force`. These do not lose your work. They lose your co-author's, which is worse, because you will not notice and they will.
+
+::: {.callout-important}
+## One question covers both
+**Does this touch something git has not already stored, or something somebody else already has?**
+
+No: hand it off freely. Yes: you run it, knowingly, after a commit.
+:::
+
+::: {.callout-note}
+This slide is unusable without the model. You cannot apply that test unless you know what a commit is, what "pushed" means, and what "uncommitted" means. That is why the model was most of this deck and the commands were four slides.
+:::
+
+# Practicalities
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Which program to use
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three ways to drive git, and my honest advice about each.
+
+Sublime Merge, which Chapter two already had you install. This is what I would use day to day. Its real strength is that it shows you the diff clearly and lets you stage individual lines by clicking them, which makes the staging area concrete instead of theoretical.
+
+The Git pane in RStudio, which is there already, appears once your project is a repository, and covers stage, commit, push and pull. It is enough for the daily loop and it has the advantage of being in front of you already, which matters more than feature lists for building a habit.
+
+And the command line, which is where every answer you will ever find on the internet is written. You do not have to live here. You do want to be able to type a command someone gives you and understand roughly what it will do, which is why this deck taught the commands.
+
+The note at the bottom is the point of the slide. All three are the same git. They are not different systems and they do not disagree. A commit made by clicking in RStudio is identical to one made by typing, and you can switch between all three in the same afternoon on the same repository. Pick whichever gets you committing regularly, because the tool matters far less than the habit.
+
+</details>
+
++ **Sublime Merge**, which Chapter 2 already had you install. What I would use daily. It shows diffs clearly and lets you stage individual lines by clicking them, which makes the staging area concrete rather than theoretical.
++ **The Git pane in RStudio.** Appears once your project is a repository. Covers stage, commit, push, pull. Enough for the daily loop, and it is already in front of you.
++ **The command line**, which is where every answer on the internet is written. You do not have to live here, but you want to understand a command someone hands you.
++ **Asking an assistant**, which is now a fourth way to drive git and a perfectly good one. It will get the syntax right. What it cannot do is decide what you wanted.
+
+::: {.callout-note}
+All four are the same git. A commit made by clicking in RStudio, by typing, or by asking, is the same commit, and you can switch between them in the same afternoon.
+
+Pick whichever gets you committing regularly. The habit matters far more than the tool.
+:::
+
+## Public, private, and the paper
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Last practical matter, and it is one that will come up when you submit.
+
+Private while you work. That is the default and it is correct. Nobody needs to watch you think.
+
+Public when you publish, which many journals now require, and which is what a data availability statement points at. Making a repository public is one setting, and there is no need to create a new repository or move anything.
+
+But read the important callout first, because making a repository public exposes its entire history, not just today's files. If a credential was ever committed, or a data file you should not have added was later deleted, it is all still there and all still visible. Look through your history before flipping that switch, and if something is in there that should not be, the honest answer is usually to start a fresh repository with a clean history rather than to attempt surgery on the old one.
+
+And the last point is the archiving one. A GitHub repository can move, be renamed, or be deleted, so a bare GitHub link is not a durable citation. Connecting the repository to Zenodo and making a release gives you a permanent identifier for a fixed snapshot, which is what belongs in the paper. Journals in our fields increasingly ask for exactly this, and it takes about ten minutes once.
+
+</details>
+
++ **Private while you work.** The correct default. Nobody needs to watch you think.
++ **Public when you publish.** Many journals now require it, and it is what a data availability statement points at. One setting, no new repository needed.
+
+::: {.callout-important}
+Making a repository public exposes its **entire history**, not just today's files. A credential ever committed, or a data file later deleted, is still there and now visible.
+
+Read your history before flipping that switch. If something is in it that should not be, starting a fresh repository is usually more honest than attempting surgery on the old one.
+:::
+
+::: {.callout-note}
+A GitHub link is not a durable citation, because repositories move, get renamed, and get deleted. Connect the repository to Zenodo and make a release: that gives a permanent identifier for a fixed snapshot, which is what goes in the paper.
+:::
+
+# Exercise
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Exercise: put your project under git
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Twenty minutes, on your own final project, with your actual files, because doing this on a toy example teaches you almost nothing.
+
+Read the instruction at the top first, because it is not what you would expect from an exercise. You may get this set up any way you like, including by asking an assistant to do all of it. I am not testing whether you can type git init. That is the whole premise of the reweighting we talked about.
+
+What I am asking for is parts two and three, which are the two things nobody else can do for you.
+
+Part two is answering questions from your own history. What does your first commit contain, and is it the whole project or only some of it. How many files is git ignoring, and can you say why each one is ignored. What exactly is different between your two commits. These sound simple and they are the real test, because to answer any of them you have to know what a commit is and what tracked means. Somebody who set this up by asking, and who cannot answer these, has a repository and no version control, because they will not be able to use it when something goes wrong.
+
+Part three is the one I want you to actually do rather than read about. Break a file on purpose, badly, save it, and get it back. Then look at the history and confirm the file is what it should be. That is the loop you will run for the rest of your career: something is wrong, you fix it, you check the fix. Notice that the checking step needs you.
+
+Then the callout, which is what I want you to leave with. The point is not the commands, which you can look up or ask for forever. It is the feeling of having a safety net, because that feeling is what makes you willing to commit often, and committing often is the entire practice.
+
+</details>
+
+Twenty minutes, on your own final project, with your real files.
+
+**Part 1. Set it up however you like, including by asking an assistant.** A repository, a `.gitignore` written before the first commit, two commits with real messages, and a private repository on GitHub. I am not testing whether you can type `git init`.
+
+**Part 2. Now answer these from your own history.** This is the part nobody can do for you.
+
++ What does your **first commit** contain? The whole project, or only part of it?
++ How many files is git **ignoring**, and why each one?
++ What exactly is **different** between your two commits?
+
+**Part 3. Break a file on purpose**, badly, save it, and get it back. Then look at the history and confirm the file is what it should be.
+
+::: {.callout-important}
+Part 2 sounds simple and is the real test. To answer any of it you have to know what a commit is and what "tracked" means. Somebody who set this up by asking and cannot answer these has a repository and no version control, because they cannot use it when something goes wrong.
+:::
+
+::: {.callout-tip}
+The point is not the commands, which you can look up or ask for forever. It is the feeling of having a safety net, because that is what makes you willing to commit often, and committing often is the entire practice.
+:::
+
+## What to take away
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Five sentences, and notice that not one of them is a command.
+
+A commit is a snapshot of the whole project with a reason attached. Everything else in git is defined in terms of that, and if you only keep one sentence from today, keep that one.
+
+Committed work is safe, uncommitted work is not, and that single asymmetry is what makes the whole habit worth having. It is also the test for what you can hand off and what you run yourself.
+
+The loop is pull, work, check, commit, push. Not because you must type it, but because that is the shape of a working day, and you have to know the shape in order to ask for it.
+
+Commit before anything risky, which now includes letting an assistant work on your project, and that is what the two AI decks in this appendix are about.
+
+And the last one is the one people get wrong most often. The message is the part that pays you back. What is in the diff forever, and why is only in your head, for about two weeks.
+
+Then the closing line, which is the whole reweighting of this deck in one sentence. Anything here can be typed for you. None of it can be understood for you, and understanding it is what lets you check whether what came back was what you wanted.
+
+</details>
+
++ **A commit is a snapshot of the whole project, with a reason attached.** Everything else is defined in terms of it.
++ **Committed work is safe. Uncommitted work is not.** That asymmetry justifies the habit, and it is the test for what you can hand off.
++ **Pull, work, check, commit, push.** Not because you must type it, but because it is the shape of a working day, and you have to know the shape to ask for it.
++ **Commit before anything risky**, which now includes letting an assistant work on your project.
++ **The message is the part that pays you back.** What is in the diff forever. Why is only in your head, for about two weeks.
+
+::: {.callout-important}
+Anything on this deck can be typed for you. None of it can be understood for you, and understanding it is what lets you check whether what came back was what you wanted.
+:::

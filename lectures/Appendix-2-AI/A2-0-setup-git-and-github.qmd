@@ -1,0 +1,940 @@
+---
+title: "A-2-0: Setting Up Git and GitHub"
+abstract: "Appendix 2: Setup walkthrough"
+format: 
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The two navigation tricks matter more on this deck than on any other, so learn them before we start rather than during.
+
+The three stacked lines in the bottom left corner give you a table of contents. The letter o gives you a panel view of every slide at once.
+
+The reason this matters here is that this is not a deck you watch, it is a deck you work through at your own machine, and you will not be on the same slide as me. Somebody will still be installing while somebody else is three sections ahead. That is completely fine and it is how these sessions go. What you need is to be able to get back to the section you want without paging through forty slides, and those two keys are how.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+::: {.callout-note}
+You will not be on the same slide as everybody else, and that is fine. Learn these two keys so you can get back to the step you want.
+:::
+
+### How this deck works
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This deck is different from every other one in the course, so here is how to use it.
+
+Everything in the blue boxes is a command you type at a terminal, not R code. You cannot run any of it in the browser. The copy button in the top right corner of each box puts the command on your clipboard, which is worth using, because a mistyped command produces an error that looks alarming and means nothing.
+
+Then the important one. Every section ends with a check, in a box labelled Check. Run it. If it prints what the slide says it should print, move on. If it does not, stop there rather than continuing, because every step after it depends on that one working, and a problem you carry forward gets three times harder to diagnose.
+
+The last point is about your operating system. Where Mac and Windows differ, there are tabs, one per system. Click the one that is yours and ignore the other. Where there are no tabs, the step is the same for everybody.
+
+And on the pasting note in the callout, because it catches somebody every single time: Control V does not paste in most terminals. On a Mac it is Command V. In Git Bash on Windows it is a right click.
+
+</details>
+
++ The boxes with a hint of blue are **commands you type at a terminal**, not R code. Nothing here runs in the browser.
++ Use the copy button in the top right corner of a box. A mistyped command gives an alarming error that means nothing.
++ **Every section ends with a Check.** Run it. If it does not print what the slide says, stop there rather than carrying the problem forward.
++ Where Mac and Windows differ there are tabs. Click yours and ignore the other.
+
+::: {.callout-tip}
+`Control + V` does not paste in most terminals. On a Mac it is `Command + V`. In Git Bash on Windows it is a right click.
+:::
+
+:::
+<!--end of panel-->
+
+## Before you start
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One thing to check before anything else, and please check it now rather than discovering it at step two.
+
+You need to be able to install software on this laptop. If you are on a machine your department or the university manages, you may not be able to, and there is no workaround I can give you in this room. So try it now: can you install an application without calling I T. If yes, you are fine and we can start. If no, tell me, and we will pair you with a neighbour so that you can watch the whole workflow, and sort the machine out separately afterwards.
+
+The second point is about time. This takes about an hour if nothing goes wrong, and something usually goes wrong somewhere in the room. That is expected and it is why we are doing it together rather than sending you away with instructions.
+
+</details>
+
+::: {.callout-important}
+## You need to be able to install software on this laptop
+On a university-managed machine you may not, and finding that out at step two wastes the session. Check now: can you install an application without calling IT?
+
+If you cannot, say so. You will pair with a neighbour and sort the laptop out afterwards.
+:::
+
++ This takes about an hour if nothing goes wrong.
++ Something usually goes wrong somewhere in the room. That is expected, and it is why we do this together rather than sending you away with instructions.
+
+## What you will have at the end
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Six things, and I want you to see the whole list before we start so that you know where this is going.
+
+Git installed, and your terminal able to find it. Git knowing your name and email, so your commits are attributed to you. A GitHub account with two-factor authentication on. Your machine able to push to GitHub without being asked for a password. RStudio showing a Git pane. And having actually pushed a change and seen it appear on the GitHub website.
+
+Now read the callout, because it is the honest version of that list. Only the sixth one matters. The first five are how you get to it, and if the sixth works then every one of them worked, because you cannot push a change to GitHub without git being installed, knowing who you are, and being able to authenticate. So the last step is not a formality at the end. It is the actual test, and everything before it is preparation for being able to run it.
+
+This deck explains nothing about what git is or why you would use it. That is the next deck in this appendix, and you can read it before or after this. This one only gets the software installed and talking to GitHub.
+
+</details>
+
+1. `git` installed, and your terminal can find it
+2. Git knows your name and email, so commits are attributed to you
+3. A GitHub account with two-factor authentication turned on
+4. Your machine can push to GitHub without being asked for a password
+5. RStudio shows a Git pane for a project that is a repository
+6. **You have pushed a real change and seen it appear on the GitHub website**
+
+::: {.callout-important}
+Only number 6 matters. The rest is how you get there, and if 6 works then all of them worked, because you cannot push without git installed, knowing who you are, and able to authenticate.
+:::
+
+::: {.callout-note}
+This deck explains nothing about what git *is*. That is A-2-1, and you can read it before or after. This one only gets the software working.
+:::
+
+# Installing git
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Open a terminal
+
+::: {.panel-tabset}
+
+### macOS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Almost everything today is typed at a command prompt, so you need one open in front of you.
+
+On a Mac the program is called Terminal. Press Command and Space together, which opens Spotlight search, type the word terminal, and press Return. You get a window with a blinking cursor. That is it. Leave it open for the rest of the session, because you will keep coming back to it.
+
+</details>
+
+Press `Command + Space`, type `terminal`, press Return.
+
+Leave it open. You will keep coming back to it.
+
+### Windows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Windows is slightly awkward at this exact moment, because the terminal I want you to use arrives with git, and you have not installed git yet.
+
+So for right now, use PowerShell. Press the Start button, type powershell, press Enter.
+
+Then after the next section, once git is installed, switch to Git Bash instead. Start button, type git bash, and use that from then on. It is worth the switch for one reason that will save you real confusion: Git Bash behaves like the Mac terminal, which means every command on the rest of this deck is identical for everybody in the room. If you stay in PowerShell some of them differ, and you will be the only person whose screen does not match mine.
+
+</details>
+
+**For now:** Start button, type `powershell`, press Enter.
+
+**After the next section:** switch to **Git Bash**, which arrives with git. Start button, type `git bash`.
+
+::: {.callout-note}
+Make the switch. Git Bash behaves like the Mac terminal, so every command on the rest of this deck is identical for everybody in the room. In PowerShell some of them differ and your screen will not match mine.
+:::
+
+:::
+<!--end of panel-->
+
+## Install git
+
+::: {.panel-tabset}
+
+### macOS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Macs often have git already, so check before you install anything. Type git space dash dash version and press Return.
+
+Three things can happen.
+
+If it prints a version number, something like git version 2 point 39 point 5, you are finished with this section. Go straight to the next one.
+
+If a window pops up offering to install the command line developer tools, click Install and wait a few minutes. People sometimes think that window is an error or an advertisement and dismiss it. It is not. That window is the installer, and clicking Install is the supported way to get git onto a Mac.
+
+And if you already use Homebrew, brew install git works too and gives you a newer version than Apple ships. If you do not know what Homebrew is, ignore this and use the window.
+
+</details>
+
+```default
+git --version
+```
+
++ Prints something like `git version 2.39.5`? **You are done.** Go to the next section.
++ A window offers to install the **command line developer tools**? Click Install and wait.
++ Have [Homebrew](https://brew.sh)? `brew install git` also works and gives you a newer version.
+
+::: {.callout-note}
+That pop-up window is not an advertisement and not an error. It **is** the installer, and it is the supported way to get git on a Mac.
+:::
+
+### Windows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Download Git for Windows from git dash s c m dot com slash download slash win, and run it.
+
+The installer asks a lot of questions, and most of the defaults are correct, but four of them matter and they are in the table. I will go through them while you click.
+
+Default editor. Choose anything except Vim. Notepad plus plus or Visual Studio Code if they are offered. I am not being flippant about this. Vim is genuinely hard to exit if you have never used it, and the moment it opens will be a moment when you are trying to write a commit message and are already slightly stressed.
+
+Adjusting your path. Choose git from the command line and also from third party software, which is the default. That is what lets RStudio find git later, and it is the single most common cause of the Git pane not appearing.
+
+Credential helper. Git Credential Manager, which is the default. That is what stops GitHub asking you for a password.
+
+Line endings. Leave the default alone.
+
+This installer also gives you Git Bash, which is the terminal to switch to now.
+
+</details>
+
+Download from [git-scm.com/download/win](https://git-scm.com/download/win) and run it. Accept the defaults **except** these four:
+
+| Screen | Choose |
+|---|---|
+| Default editor | **Anything except Vim.** Notepad++ or VS Code if offered. |
+| Adjusting your PATH | **"Git from the command line and also from 3rd-party software"** (the default). This is what lets RStudio find git. |
+| Credential helper | **Git Credential Manager** (the default). This is what stops GitHub asking for a password. |
+| Line endings | Leave the default. |
+
+This also installs **Git Bash**. Switch to it now.
+
+::: {.callout-tip}
+Vim is not a joke. It is genuinely hard to exit if you have never used it, and it will open at a moment when you are already slightly stressed.
+:::
+
+:::
+<!--end of panel-->
+
+::: {.callout-note}
+## Check
+```default
+git --version
+```
+It should print a version number. If it says `command not found` or `'git' is not recognized`, go to the troubleshooting section.
+:::
+
+## Tell git who you are
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Every commit records a name and an email address, and git refuses to make one until it knows them. Three lines, typed once, and they apply to every project on this machine from now on.
+
+The first two are your name and your email. Use your real name, because it appears next to every commit and your co-authors read it.
+
+The third one makes the first branch in any new repository be called main, which is what GitHub uses. Without it, older versions of git call it master and you get a mismatch that produces a confusing error on your first push.
+
+Now the callout, which is the part that is specific to your situation rather than generic advice. Use an email address you will still have after you graduate. University addresses get switched off some months after you leave, and the commits in your research repositories are permanent and public. Your dissertation code will outlive your student account.
+
+And if you would rather your address not be in a public commit log at all, there is a way to do that on the GitHub slide in a moment. Do it before your first commit, because setting it afterwards does not change commits you have already made.
+
+</details>
+
+```default
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+```
+
++ Use your **real name**. It appears next to every commit and your co-authors read it.
++ The third line makes the first branch `main`, which is what GitHub uses.
+
+::: {.callout-important}
+## Which email address
+One you will still have **after you graduate**. University addresses get switched off some months after you leave, and commits in research repositories are permanent and public. Your dissertation code will outlive your student account.
+:::
+
+::: {.callout-note}
+## Check
+```default
+git config --global --list
+```
+Your `user.name` and `user.email` should be in the output.
+:::
+
+# GitHub
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Create the account
+
+::: {.panel-tabset}
+
+### Choosing a username
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Go to github dot com and sign up, if you do not already have an account.
+
+A word about the username, because people choose it in four seconds and then live with it for a decade. It is public. It appears in the address of every repository you own. And you will eventually put one of those addresses in a paper, in a data availability statement, where a referee and then a reader will see it.
+
+So something close to your real name is the right choice. Something you picked for an online game in 2014 is not, and I have seen a published paper cite a repository under a username I will not repeat here.
+
+</details>
+
+Sign up at [github.com](https://github.com).
+
++ Your username is **public**, appears in the address of every repository you own, and you will eventually put one of those addresses in a paper.
++ Something close to your real name is right. Something you picked for a game in 2014 is not.
+
+### Which email
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Sign up with an address you will keep, for the same reason as the previous slide. You can add more addresses later under Settings and then Emails, so a university address is perfectly fine as a second one. It is being your only one that causes trouble.
+
+Then the option in the callout, which I would encourage most of you to take. GitHub can give you a forwarding address that hides your real one. Go to Settings, then Emails, and tick keep my email addresses private. GitHub then shows you an address that looks like a number, a plus sign, your username, and then users dot noreply dot github dot com.
+
+Take that address and put it in the git config line from the previous section, replacing what you typed there. Your commits still link to your GitHub account, so nothing is lost, and your actual address stays out of a permanent public record that anybody can scrape.
+
+The timing note matters. Do this before your first commit. Setting it afterwards does not change commits you have already made, and those are the ones that are permanent.
+
+</details>
+
+Sign up with an address you will keep. You can add more later under **Settings → Emails**, so a university address is fine as a *second* one.
+
+::: {.callout-tip}
+## Keep your address out of public commit logs
+1. **Settings → Emails**
+2. Tick **Keep my email addresses private**
+3. GitHub shows you an address like `12345678+username@users.noreply.github.com`
+4. Put **that** in your git config:
+
+```default
+git config --global user.email "12345678+username@users.noreply.github.com"
+```
+
+Commits still link to your account. Your real address stays out of a permanent public record.
+:::
+
+::: {.callout-important}
+Do this **before your first commit**. Setting it afterwards does not change commits you have already made.
+:::
+
+:::
+<!--end of panel-->
+
+## Two-factor authentication
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+GitHub requires two-factor authentication for accounts that contribute code, and it will prompt you for it. Do it now, calmly, rather than being prompted in the middle of something later.
+
+Settings, then password and authentication. Choose an authenticator app, which means Google Authenticator, Microsoft Authenticator, one Password, Authy, any of them, or a passkey if your machine supports it.
+
+Then the third step, and it is the one people skip, so I am going to wait while you do it. Save the recovery codes somewhere that is not your laptop. A password manager, or print them and put them somewhere you will find them.
+
+Read the callout. Those codes are how you get back into your account if you lose your phone. People do lose phones, it is not a rare event, and GitHub support cannot restore access without those codes. Losing access to the account that holds your dissertation code is a bad afternoon that is entirely avoidable in the next thirty seconds.
+
+</details>
+
+1. **Settings → Password and authentication**
+2. Choose an **authenticator app** (Google Authenticator, Microsoft Authenticator, 1Password, Authy) or a **passkey**
+3. **Save the recovery codes somewhere that is not your laptop**
+
+::: {.callout-important}
+Step 3 is the one people skip. Those codes are how you get back in if you lose your phone, and people do lose phones. Support cannot restore access without them.
+
+A password manager, or printed and filed. Do it now.
+:::
+
+# Let your machine push
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Your GitHub password will not work
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Stop and read this slide before doing anything, because this is the step where these sessions fall apart and I would rather you understood it than followed it.
+
+Git stopped accepting GitHub account passwords in August twenty twenty-one. So when git asks you for a password, and it will use exactly that word, it does not want the password you just chose when you made your account. It wants a token, which is a different thing that we are about to set up.
+
+That mismatch is the whole problem. The prompt says password, you type your password, it fails, and there is nothing on screen telling you that the word means something else here.
+
+So read the second callout and remember the shape of it rather than the wording. If you ever see support for password authentication was removed, that message is this step. It is not a typo, it is not your account being broken, and it is not something you did wrong. It means the thing you typed was a password and it needed to be a token.
+
+</details>
+
+::: {.callout-important}
+Git stopped accepting GitHub account passwords in **August 2021**.
+
+When git asks for a "password" it wants a **token**, not the password you just chose. The prompt says password, you type your password, it fails, and nothing on screen tells you the word means something else here.
+:::
+
+::: {.callout-note}
+If you ever see `Support for password authentication was removed`, that message is **this step**. Not a typo, not a broken account, not something you did wrong.
+:::
+
+The smoothest route on both systems is the GitHub command line tool, because it does the whole thing in a browser and then configures git for you.
+
+## Install the GitHub CLI
+
+::: {.panel-tabset}
+
+### macOS
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+If you have Homebrew, brew install g h, and it takes about thirty seconds.
+
+If you do not know what Homebrew is, do not install it now just for this. Go to c l i dot github dot com and download the p k g installer instead, and double click it like any other Mac application.
+
+</details>
+
+```default
+brew install gh
+```
+
+No Homebrew? Download the `.pkg` installer from [cli.github.com](https://cli.github.com) and double-click it.
+
+::: {.callout-note}
+Do not install Homebrew just for this. The `.pkg` is fine.
+:::
+
+### Windows
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Winget install, dash dash i d, GitHub dot c l i. Or if that does not work, go to c l i dot github dot com and download the installer.
+
+Then the important bit in the callout, which catches somebody every time. Close Git Bash and open it again afterwards. A terminal window that was already open when you installed something does not know about the new program, so g h will look as though it did not install. It did. Your terminal just has not noticed.
+
+</details>
+
+```default
+winget install --id GitHub.cli
+```
+
+Or download the installer from [cli.github.com](https://cli.github.com).
+
+::: {.callout-important}
+**Close Git Bash and open it again afterwards.** A terminal that was already open when you installed something does not know about it, so `gh` will look as though it failed to install. It did not. Your terminal has not noticed.
+:::
+
+:::
+<!--end of panel-->
+
+## Log in
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One command, g h auth login, and then four questions. The answers are in the table and I will read them out.
+
+What account do you want to log into. GitHub dot com.
+
+Preferred protocol. H T T P S.
+
+Authenticate git with your GitHub credentials. Yes. This is the one that matters and I will come back to it.
+
+How would you like to authenticate. Login with a web browser.
+
+It then shows you a one-time code, waits, and opens your browser. Paste the code into the browser, approve it, and come back to the terminal, which will have finished.
+
+Now the warning, and this is the single most important sentence in the whole deck. The third question, authenticate git with your GitHub credentials, is the step that stores your credentials so that git can push. Answering no to it produces no error at all. Everything looks like it worked. You find out it did not about ten minutes from now, when the push in the test section fails and you have no idea why, because the failure is nowhere near the cause.
+
+So if you are not certain what you answered, run g h auth login again right now. It costs twenty seconds and it saves the worst debugging session of the day.
+
+</details>
+
+```default
+gh auth login
+```
+
+| Prompt | Answer |
+|---|---|
+| What account do you want to log into? | **GitHub.com** |
+| Preferred protocol | **HTTPS** |
+| Authenticate Git with your GitHub credentials? | **Yes** |
+| How would you like to authenticate? | **Login with a web browser** |
+
+It shows a one-time code and opens your browser. Paste the code, approve, come back.
+
+::: {.callout-important}
+## The third question is the whole thing
+Answering **No** to "Authenticate Git with your GitHub credentials?" produces **no error at all**. Everything looks fine. You find out ten minutes from now when the push fails, and the failure is nowhere near the cause.
+
+Not sure what you answered? Run `gh auth login` again now. Twenty seconds.
+:::
+
+::: {.callout-note}
+## Check
+```default
+gh auth status
+```
+It should report that you are logged in as your username.
+:::
+
+## If you cannot install the CLI
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two fallbacks, for anyone the previous slide did not work for.
+
+The first is a personal access token, which is the manual version of what g h just did. On GitHub go to Settings, then Developer settings at the very bottom of the left column, then Personal access tokens, then Tokens classic. Generate one, tick the repo scope, and copy it. The next time git asks you for a password, paste the token instead of typing anything. Your credential helper stores it, so you are only asked once.
+
+The warning matters. Copy the token at the moment it is shown to you. GitHub will never show it again, and if you navigate away you have to delete it and make another one.
+
+The second is Windows only and it is good news. Git for Windows already installed Git Credential Manager, so your first push may simply open a browser window and finish by itself with no setup at all. If that happens, you are done and you need none of this slide.
+
+</details>
+
+**Personal access token.** The manual version of what `gh` does.
+
+1. **Settings → Developer settings → Personal access tokens → Tokens (classic)**
+2. Generate one with the `repo` scope
+3. Copy it
+4. Next time git asks for a password, **paste the token** instead
+
+::: {.callout-important}
+Copy the token **when it is shown**. GitHub will never show it again. Navigate away and you have to delete it and make another.
+:::
+
+::: {.callout-note}
+## Windows only, and it is good news
+Git for Windows already installed Git Credential Manager, so your first push may simply open a browser and finish by itself. If that happens you need none of this slide.
+:::
+
+# Connect RStudio
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Point RStudio at git
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+RStudio can drive git for you, with buttons rather than commands, but it has to find the program first and it does not always manage that on its own.
+
+Tools, then Global Options, then Git slash S V N in the left column.
+
+Tick enable version control interface for RStudio projects.
+
+Then check that the Git executable box is filled in. On Windows it is usually C colon slash Program Files slash Git slash bin slash git dot exe. On a Mac it is usually slash u s r slash bin slash git. If the box is empty, click Browse and go and find it.
+
+Then step four, and it is the one everybody misses, which is why it is in bold and in a callout. Restart RStudio. The setting does not take effect until you do. If you skip it, everything looks correctly configured and the Git pane still will not appear, and you will go round the settings dialog three times before somebody tells you.
+
+</details>
+
+1. **Tools → Global Options → Git/SVN**
+2. Tick **Enable version control interface for RStudio projects**
+3. Check the **Git executable** box is filled in
+   + Windows: usually `C:/Program Files/Git/bin/git.exe`
+   + macOS: usually `/usr/bin/git`
+   + Empty? Click Browse and find it.
+4. **Restart RStudio**
+
+::: {.callout-important}
+Step 4 is the one everybody misses. The setting does not take effect until you restart. Skip it and everything looks correctly configured while the Git pane still does not appear.
+:::
+
+::: {.callout-note}
+## Check
+**File → New Project → New Directory → New Project**, and tick **Create a git repository**.
+
+A **Git** tab should appear in the pane with Environment and History.
+:::
+
+# The test that matters
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Six steps, about five minutes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Everything so far was preparation. This is the part that proves it worked, and everybody should finish it before we leave the room.
+
+One. Make a repository on GitHub. Click the plus at the top right of the page, choose new repository, name it git dash test, set it to private, tick add a README file, and click create.
+
+Two. On the repository page, click the green Code button and copy the H T T P S address.
+
+Three. Clone it, by whichever of the three routes you prefer. RStudio, File, New Project, Version Control, Git, and paste the address. Or Sublime Merge, File, Clone Repository. Or in the terminal, git clone and then the address.
+
+Four. Open the README file and add a line. Any line at all. Save it.
+
+Five. Commit and push, either with the three commands on the slide or by ticking the file in RStudio's Git pane, clicking Commit, typing a message, clicking Commit, then clicking Push.
+
+Six. Go back to your browser and refresh the repository page. Your line is there.
+
+And that is the whole setup verified. Read the callout: if step six shows your line, then git is installed, it knows who you are, your credentials are stored, and your machine can talk to GitHub, because none of those things can be false and still produce a line on that page.
+
+</details>
+
+1. **Make a repository.** The `+` at the top right of github.com → New repository. Name it `git-test`, set it **Private**, tick **Add a README file**, Create.
+2. **Copy its address.** Green **Code** button, copy the HTTPS URL.
+3. **Clone it.** Any one of:
+   + RStudio: File → New Project → Version Control → Git, paste the URL
+   + Sublime Merge: File → Clone Repository, paste the URL
+   + Terminal: `git clone <the url>`
+4. **Change something.** Open `README.md`, add any line, save.
+5. **Commit and push.**
+
+```default
+git add README.md
+git commit -m "Add a line to the README"
+git push
+```
+
+6. **Refresh the GitHub page.** Your line is there.
+
+::: {.callout-important}
+## If step 6 shows your line, you are finished
+Git is installed, it knows who you are, your credentials are stored, and your machine can talk to GitHub. None of those can be false and still produce a line on that page.
+:::
+
+# When something goes wrong
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Installing and identity
+
+::: {.panel-tabset}
+
+### `git: command not found`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+On Windows this appears as git is not recognized as an internal or external command, which is the same problem in different words.
+
+It means git is not installed, or your terminal cannot find it.
+
+The first thing to try, and try this before anything else because it fixes it more often than not, is to close the terminal window and open a new one. A terminal that was already open when you installed git does not know that git now exists. It only reads the list of available programs when it starts.
+
+If that does not fix it on Windows, you probably chose the wrong path option in the installer. Run the installer again and choose git from the command line and also from third party software.
+
+</details>
+
+Windows shows this as `'git' is not recognized as an internal or external command`.
+
++ **First, close the terminal and open a new one.** A terminal that was already open when you installed git does not know it exists. This fixes it more often than not.
++ **Still failing on Windows?** You chose the wrong PATH option. Run the installer again and choose "Git from the command line and also from 3rd-party software".
+
+### `Please tell me who you are`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The full message mentions author identity unknown, and then tells you to run some configuration commands, which is unusually helpful of git.
+
+It means you skipped the section where you tell git your name and email, or you typed those lines without the dash dash global flag, in which case they applied only to one folder.
+
+Run both config lines again, and make sure dash dash global is in there.
+
+</details>
+
+The full message says `Author identity unknown`.
+
+You skipped the identity step, or typed those lines **without `--global`**, in which case they applied to one folder only.
+
+```default
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+### `fatal: not a git repository`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You are standing in a folder that is not a repository. Two possibilities and it is easy to tell them apart.
+
+Either you are in the wrong folder, and p w d will print where you actually are, which is frequently not where you thought.
+
+Or the folder was never made into a repository in the first place, in which case git init makes it one, or you clone an existing one from GitHub.
+
+</details>
+
+You are in a folder that is not a repository.
+
++ **Wrong folder?** `pwd` prints where you actually are, which is frequently not where you thought.
++ **Never made into one?** `git init` does that, or clone an existing one.
+
+### `LF will be replaced by CRLF`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Windows only, and this is a warning rather than an error, which is a distinction worth learning to spot in general.
+
+Windows marks the end of a line differently from every other operating system, and git is telling you that it is translating between the two so that your files work everywhere. That is the correct behaviour, it is what you asked for in the installer, and you can ignore the message entirely.
+
+I mention it only because it appears in red on some terminals and looks like something broke.
+
+</details>
+
+Windows only, and it is a **warning, not an error**.
+
+Windows marks the ends of lines differently from everyone else, and git is translating so your files work everywhere. That is correct behaviour and you can ignore it.
+
+::: {.callout-note}
+It appears in red on some terminals, which is why it looks like something broke.
+:::
+
+:::
+<!--end of panel-->
+
+## Pushing and RStudio
+
+::: {.panel-tabset}
+
+### `Support for password authentication was removed`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Your GitHub password is not the answer and never will be. This is the authentication step and you need to go back to it.
+
+But the specific thing to check first, because it is the cause about four times out of five, is in the callout. If you already ran g h auth login, run it again, and this time make certain you answer yes to authenticate git with your GitHub credentials. Answering no there is the single most common cause of this error, and because answering no produces no error of its own, this message is the first sign anything went wrong.
+
+</details>
+
+Your GitHub password is not the answer and never will be. Go back to the authentication section.
+
+::: {.callout-important}
+Check this first, because it is the cause about four times in five. If you already ran `gh auth login`, **run it again** and make certain you answer **Yes** to "Authenticate Git with your GitHub credentials?".
+
+Answering No produces no error of its own, so this message is the first sign anything went wrong.
+:::
+
+### `Updates were rejected`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The full message says the remote contains work that you do not have.
+
+Somebody pushed something you have not downloaded. That somebody is often you, on a different machine, or the README that GitHub created when you ticked the box.
+
+The fix is to get their work first and then send yours: git pull, then git push.
+
+And read the warning, because this is the moment people get into real trouble. Do not solve this with dash dash force. A forum post will tell you to, and it will make the error go away, and what it does is tell GitHub to throw away whatever it had and accept your version instead. If what it had was your co-author's morning, that morning is gone. Pull first. Always.
+
+</details>
+
+The full message says the remote contains work you do not have. Somebody pushed something you have not downloaded, often you on another machine.
+
+```default
+git pull
+git push
+```
+
+::: {.callout-important}
+**Never solve this with `--force`.** A forum post will tell you to, and it will make the error go away by telling GitHub to throw away whatever it had. If that was your co-author's morning, it is gone.
+:::
+
+### RStudio has no Git pane
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three things to check, and check them in this order because they are in increasing order of how annoying it is to have missed them.
+
+Is the folder actually a repository. The pane only appears for a project that is one, so if you made an ordinary project without ticking the box, there is nothing for it to show.
+
+Is the Git executable path filled in, under Tools, Global Options, Git slash S V N.
+
+And did you restart RStudio after filling it in. That is the one. It is nearly always that one.
+
+</details>
+
+In this order:
+
+1. **Is the folder a repository?** The pane only appears for a project that is one.
+2. **Tools → Global Options → Git/SVN**: is the executable path filled in?
+3. **Did you restart RStudio afterwards?**
+
+::: {.callout-note}
+It is nearly always number 3.
+:::
+
+### `Permission denied (publickey)`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You cloned using an S S H address, which needs a cryptographic key you have not set up.
+
+There is nothing wrong and nothing to fix. Just use the H T T P S address instead, which is the one that starts with h t t p s under the green Code button. There is a small dropdown there letting you switch between the two, and S S H is sometimes remembered from a previous visit.
+
+S S H keys are a perfectly good way to authenticate and you may set them up one day. Today is not that day.
+
+</details>
+
+You cloned with an **SSH** address, which needs a key you have not set up.
+
+Use the **HTTPS** address instead: the one starting with `https://` under the green Code button. There is a small dropdown there to switch between them, and SSH is sometimes remembered from a previous visit.
+
+::: {.callout-note}
+SSH keys are a perfectly good way to authenticate, and you may set them up one day. Today is not that day.
+:::
+
+:::
+<!--end of panel-->
+
+## One more, and it is not an error message
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This one does not announce itself, which is why it gets its own slide rather than being a tab with the others.
+
+If your project lives in Dropbox or Google Drive, move it out. Somewhere like Documents or a projects folder on ordinary local disk.
+
+Sync clients and git fight over the same files, because both of them are watching that folder and writing to it, and neither knows about the other.
+
+Read the callout, because this is not a hypothetical warning I am passing on from the internet. The repository that builds this course website has been damaged this way twice. Dropbox left conflicted copy files inside the hidden folder git uses for its own storage. Google Drive reported entire directories as briefly empty while it caught up with itself. Both produced failures that looked like bugs in the website build and took real time to diagnose as sync problems.
+
+Your copy somewhere else is GitHub. That is precisely what it is for, and unlike a sync client it understands what a change is.
+
+</details>
+
+If your project lives in **Dropbox or Google Drive, move it out**, to somewhere like `~/Documents` or `~/projects` on ordinary local disk.
+
+Sync clients and git fight over the same files. Both are watching that folder and writing to it, and neither knows about the other.
+
+::: {.callout-important}
+## This is not hypothetical
+The repository that builds this course website has been damaged this way twice. Dropbox left "conflicted copy" files inside git's own hidden storage. Google Drive reported whole directories as briefly empty. Both looked like bugs in the site build and took real time to trace back to sync.
+:::
+
+::: {.callout-note}
+Your copy somewhere else is GitHub. That is what it is for, and unlike a sync client it understands what a change is.
+:::
+
+## Where to go next
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You have working software and nothing else, which is the right place to stop for today.
+
+A dash two dash one is the next deck, and it is the one that explains what any of this actually means: what a commit is, what a branch is, and how you use it during a working week. Read it whenever you like, before or after this session.
+
+A dash two dash four is about working with an assistant on a research project, and its very first recommendation is to put the project under version control, which you have just made possible.
+
+And the callout is what I would like you to do this week rather than next month. Put one real project under git. Not git dash test, which you can delete. Something you actually care about. The habit only starts when there is something at stake.
+
+</details>
+
++ **A-2-1: Version Control with Git and GitHub**, which explains what any of this means: what a commit is, what a branch is, and how you use it during a working week.
++ **A-2-4: Working with AI on a Research Project**, whose first recommendation is the one you have just made possible.
+
+::: {.callout-tip}
+This week, not next month: put **one real project** under git. Not `git-test`, which you can delete. Something you actually care about. The habit only starts when there is something at stake.
+:::
+
+# Notes for the instructor
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Before the session
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+These last slides are for whoever is teaching this, not for the students, and they are here rather than in a separate file so that they cannot get separated from the material they describe.
+
+The first point is the one that will bite you. Work through this deck yourself, on both operating systems if you can borrow a machine, in the same week you teach it. Installer screens, the g h auth login prompts and GitHub's settings pages all change without notice, and the two tables on this deck are exactly the parts that go stale first. A table that is wrong is worse than no table, because twenty people follow it simultaneously.
+
+Second, tell students in advance that they need a laptop they can install software on. That is the one blocker you cannot solve in the room, and knowing about it beforehand lets you plan a pairing rather than improvise one.
+
+Third, have Sublime Merge already covered, or be ready to skip it. This deck mentions it as one of three ways to clone and does not depend on it.
+
+</details>
+
++ **Work through this deck yourself, on both systems, the same week you teach it.** Installer screens, the `gh auth login` prompts, and GitHub's settings pages change without notice, and the two tables here are the first things to go stale. A wrong table is worse than no table, because twenty people follow it at once.
++ **Tell students in advance they need a laptop they can install software on.** The one blocker you cannot solve in the room.
++ Have Sublime Merge covered already, or be ready to skip it. This deck offers it as one of three ways to clone and does not depend on it.
+
+## Timing, and where the room splits
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+About an hour for a room of twenty, distributed as in the table. The number to notice is fifteen minutes on authentication, which is more than it looks like it needs and less than it will actually take.
+
+Then the two places the room diverges, and both are worth planning for.
+
+The Windows installer, because it asks eight questions and four of the answers matter. Consider projecting your own screen and walking through it while the Windows users follow. The Mac users will have finished in two minutes and will need something to do, so point them at the identity slide and let them run ahead.
+
+And authentication, which is the only step in the whole deck with a wrong answer that fails silently. Watch specifically for people answering no to authenticate git with your GitHub credentials. It produces no error, so you will not see it, and neither will they, until the push fails twenty minutes later at a point in the deck that has nothing to do with the cause. If you only stand behind people during one step, make it that one.
+
+</details>
+
+| Section | Minutes | Note |
+|---|---|---|
+| Install git | 15 | Windows takes most of it. Mac users finish in two minutes and need something to do. |
+| Identity | 5 | Uneventful. |
+| GitHub account and 2FA | 10 | Slower than it looks, because of phones and authenticator apps. |
+| Authentication | 15 | **The hard part.** More than it looks like it needs. |
+| RStudio | 5 | The restart is what people miss. |
+| The test | 10 | Everyone should finish this in the room. |
+
++ **The Windows installer** asks eight questions and four answers matter. Project your own screen through it and let the Mac users run ahead.
++ **Authentication** is the only step with a wrong answer that fails **silently**. If you stand behind people during one step, make it that one.
+
+## Running the room
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three practical things.
+
+Use the checks. Every section ends with a command that prints something, and that is deliberate. Walk the room and look at screens rather than asking whether everybody is fine, because they will say yes and about a fifth of them will be wrong. The two worth looking at yourself are git config global list and g h auth status.
+
+If somebody genuinely cannot install anything, do not spend the session on it, because you will lose the other nineteen people. Pair them with a neighbour so they see the whole workflow, and deal with the laptop afterwards. They can still make the GitHub account and turn on two-factor authentication on their own machine, which is a third of the material.
+
+And have something ready for the people who finish early, because several will. Deleting git dash test and putting a real project under git, with a gitignore written before the first commit, is the exercise at the end of the next deck and they may as well start it.
+
+</details>
+
++ **Use the checks.** Every section ends with a command that prints something. Walk the room and look at screens rather than asking whether everyone is fine, because they will say yes and a fifth of them will be wrong. `git config --global --list` and `gh auth status` are the two worth seeing yourself.
++ **If someone cannot install anything, do not spend the session on it.** Pair them with a neighbour so they see the workflow. They can still do the account and 2FA, which is a third of the material.
++ **Have something for the fast finishers.** Delete `git-test`, then put a real project under git with a `.gitignore` written before the first commit. That is the exercise at the end of A-2-1.
