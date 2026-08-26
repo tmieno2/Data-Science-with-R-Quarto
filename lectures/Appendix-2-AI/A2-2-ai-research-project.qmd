@@ -1,0 +1,606 @@
+---
+title: "A-2-2: Working with AI on a Research Project"
+abstract: "Appendix 2: Working with AI"
+format: 
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header: ../transcript-support.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks. The three stacked lines in the bottom left corner give you a table of contents, and the letter o gives you a panel view of every slide. This deck is a reference more than most, because the middle of it is a file you are going to write for your own project and then keep editing for the next two years. You will want to come back to that section rather than remember it.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes in this deck are static examples. You can use the copy button in the top right corner to put the contents on your clipboard, but you cannot edit or run anything in the slides. That is deliberate this time rather than a limitation. Almost everything in this deck is a file or a folder rather than an expression, and there is nothing useful to run in a browser. What you should do instead is have your own project folder open next to the slides, because the exercise at the end asks you to write a real file in it.
+
+</details>
+
++ The boxes with a hint of blue contain static code examples.
++ You cannot edit or execute these examples within the slides.
++ Click the icon with two sheets of paper stacked on top of each other at the top right corner of a code block to copy it.
++ Have your own project folder open beside the slides. The exercise at the end writes a real file into it.
+
+:::
+<!--end of panel-->
+
+## Learning objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The previous deck was about one piece of code. You asked for something, something came back, is it right. This one is about a project that runs for two years, produces a paper, and then has to survive a referee who asks you to change one thing.
+
+Those are different problems and they need different answers. A check you perform by hand does not scale to two years and four hundred commits. What scales is the way the project is set up, so that the sensible thing is also the easy thing, every day, without you having to remember.
+
+Four objectives. Set a project up so an assistant can work in it without doing damage. Write the file that tells it what it cannot see. Know which stages of a research project these tools are good at and which they are actively bad at. And keep the whole thing reproducible while you do it.
+
+</details>
+
++ Set up a research project so an assistant can work in it without doing damage
++ Write a `CLAUDE.md` for your own project
++ Know which stages of a research project these tools help with, and which they make worse
++ Keep the project reproducible while you use them
+
+::: {.callout-note}
+The previous deck was about one piece of code. This one is about a project that runs for two years and has to survive a referee.
+:::
+
+# Why the project is the unit
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The failure this deck prevents
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let me start with the thing that goes wrong, because it is not what you would expect and it is not the kind of mistake the previous deck was about.
+
+Read the story on the slide. You ask an assistant to tidy up a cleaning script. It does, competently. The code is shorter and clearer and it runs. Somewhere in the tidying it changed how one filter treats a boundary case, by a single row, and that script produces Table three of a paper you submitted six weeks ago.
+
+Now stop and notice what did and did not happen. The code it wrote was not wrong. It was arguably better than what was there. It ran, it produced numbers, nothing errored, and nothing in the four checks from the previous deck would have caught this, because there is nothing to catch. The problem is not the code. The problem is that the number was already public and the assistant had no way to know that, because nothing in your project says so.
+
+That is what I mean by the project being the unit. Reading each line carefully protects you from bad code. It does not protect you from correct code applied to the wrong thing, and over two years that second category is the one that will actually bite you. What protects you from it is the project being set up so the assistant knows what it is standing in.
+
+</details>
+
+You ask an assistant to tidy up a cleaning script. It does, competently.
+
++ The code is shorter, clearer, and runs.
++ In the tidying, one filter now treats a boundary case differently. One row.
++ That script produces **Table 3 of a paper you submitted six weeks ago**.
+
+::: {.callout-important}
+Nothing here was a coding error, so none of the four checks from the previous deck would have caught it. Correct code was applied to the wrong thing, because nothing in the project said that number was already public.
+:::
+
+## Two years is different from one afternoon
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the same point stated generally, in three lines.
+
+The first line is about memory. Every conversation starts empty. Whatever you explained yesterday about your data is gone, and you will explain it again, and you will get it slightly wrong the third time because you are bored of explaining it. A person joining your project would read the folder and ask questions. This does not, unless you leave the answers where they will be read.
+
+The second is about how much of your project is invisible. What your columns actually mean, what the units are, why one county is excluded, which script really produced which table, and which numbers are already in a submitted draft. None of that is in the code. Most of it is in your head, which is not a location anything else can read, including you in eighteen months.
+
+The third is the fix, and it is why this deck is mostly about setup rather than about prompting. You do not solve this by writing better prompts each time. You solve it once, in the project, and then it applies to every session automatically. Set up well, a project makes the careful thing the default thing.
+
+</details>
+
++ **Every conversation starts empty.** What you explained yesterday is gone, and you will explain it again, slightly differently.
++ **Most of your project is invisible.** What the columns mean, the units, why one county is excluded, which numbers are already public. None of that is in the code.
++ **You fix this once, in the project, not every time in a prompt.**
+
+# Set the project up first
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Four things, in order of what they save you
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four things, and I have put them in the order of how much trouble each one saves, so if you only do the first you have still done the most valuable one.
+
+Git first, and I will spend a slide on why the answer is not Dropbox. Then the file that this deck is mostly about. Then the folder layout you already learned, with one rule added to it. Then a short list of what the assistant must not touch.
+
+None of this is about A I in any deep sense. Every one of these four is something a well run research project should have anyway, and the people who have been doing computational research carefully have been doing all four for twenty years. What changed is the cost of not having them. A project with no version control and no written conventions used to be merely unpleasant. Now it is a project where something can rewrite forty files in ten seconds while you watch.
+
+</details>
+
+1. **Version control.** Before anything else.
+2. **A `CLAUDE.md`.** Most of this deck.
+3. **A folder structure with a read-only rule.**
+4. **A short list of what is off limits.**
+
+::: {.callout-note}
+None of these is really about AI. They are what a well run computational project has always had. What changed is the cost of not having them.
+:::
+
+## Version control, and why Dropbox is not it
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You learned git in Chapter two, so I am not teaching it again. What I want to do is answer the objection, because almost every one of you is keeping your project in Dropbox or Google Drive right now and thinking that is the same thing.
+
+It is not, and the callout says why in one sentence. Cloud storage gives you file history. It tells you that this file looked different yesterday, one file at a time. Git gives you a change, which is a set of edits across many files that belong together, with a message saying why.
+
+That distinction is abstract until the day you need it, so read the three bullets, which are the three moments it matters.
+
+First, seeing what actually happened. An assistant edits nine files. Git shows you all nine changes as one diff you can read top to bottom. Dropbox shows you nine files with new timestamps and offers to show you previous versions one at a time, and you have to remember which nine.
+
+Second, undoing selectively. You worked for two hours, then let it do one task, and that task was a mistake. Git separates your two hours from its ten minutes. Dropbox has no concept of whose change was whose.
+
+Third, and this is the one people underrate, a commit before you start is a known good state to come back to. It costs five seconds and it converts every subsequent disaster into an inconvenience.
+
+The habit at the bottom is the whole slide compressed. Commit before you turn anything loose on your project. If you take one thing from this deck, take that.
+
+</details>
+
+You learned git in Chapter 2. The objection is that your project is in Dropbox already.
+
++ **See what happened.** Nine files edited becomes one diff you read top to bottom, not nine timestamps.
++ **Undo selectively.** Your two hours of work and its ten minutes are separable.
++ **A known good state.** A commit before you start costs five seconds and turns a disaster into an inconvenience.
+
+::: {.callout-important}
+Cloud storage gives you file history, one file at a time. Git gives you a change: a set of edits that belong together, with a message saying why.
+:::
+
+::: {.callout-tip}
+## The habit
+Commit before you turn anything loose on your project.
+:::
+
+## Folder structure, with one rule added
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The structure itself is the one from the project organization lecture, so this is a reminder rather than new material. Raw data in its own folder, processed data separately, code, results, writing.
+
+The addition is the line in red, and it is one line: raw data is read only. Nothing writes to that folder. Not a script, not you, not an assistant. Every cleaning step reads from raw and writes into processed, which means the processed folder is disposable and can always be rebuilt.
+
+Two reasons this matters more than it used to. The first is ordinary reproducibility and you already know it: if a raw file can be modified in place, then your pipeline no longer starts from a fixed input and nobody can rerun it, including you. The second is new. Give a capable assistant a task and it will do what is necessary to complete it, and if fixing a data problem at the source looks like the efficient route, that is a route it can take. Raw data that can be written to is raw data that can be silently corrected. And a silent correction to a raw file is the one error in this entire lecture that you genuinely cannot recover from, because the thing you would compare against is what got overwritten.
+
+So write the rule down where it will be read, which is the file we are coming to next.
+
+</details>
+
+The structure is the one from the project organization lecture. One line is added to it.
+
+```default
+project/
+  data/
+    raw/          <- READ ONLY. Nothing writes here. Ever.
+    processed/    <- disposable, rebuilt by the code
+  code/
+  results/
+  writing/
+  CLAUDE.md
+```
+
+::: {.callout-important}
+Every cleaning step reads from `raw/` and writes into `processed/`, so `processed/` can always be rebuilt.
+
+A raw file that can be written to is a raw file that can be silently corrected, and that is the one error in this deck you cannot recover from. The thing you would compare against is what got overwritten.
+:::
+
+# What goes in a CLAUDE.md
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## What this file is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A CLAUDE dot m d is a plain markdown file at the top of your project that is read at the start of every session. There is nothing clever about it. It is a text file with a particular name, and its whole power is that it gets read every time without you having to remember to paste it.
+
+Now the three points, because each one corrects a wrong assumption people have about this file.
+
+It is not a README. A README is written for somebody who might use your code, and it describes what the project does. This is written for whoever is about to change your code, and it describes what they need to know before touching it. Those overlap but they are not the same document, and the second one is far more useful to you personally.
+
+It holds what the code cannot say. Anything an intelligent reader could work out by reading your scripts does not belong in it, because your scripts already say it. What belongs in it is everything that is not in the scripts: what the units are, why a county is missing, which numbers are already public.
+
+And the third one is the point people miss entirely, so read it twice. It is not really for the machine. It is for you in eighteen months, and for the co-author who joins next spring, and for the graduate student who inherits this project after you defend. Even if you never used one of these tools again, this file would still be worth the hour it takes to write.
+
+</details>
+
+A plain markdown file at the top of your project, read at the start of every session.
+
++ **Not a README.** A README is for someone who might *use* your code. This is for whoever is about to *change* it.
++ **It holds what the code cannot say.** Anything a careful reader could work out from your scripts does not belong here. Your scripts already say it.
++ **It is not really for the machine.** It is for you in eighteen months, for a new co-author, and for whoever inherits the project. It would be worth writing even if you never used these tools again.
+
+## The skeleton
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the whole thing on one slide. Copy it, put it at the top of your project, and fill it in. We will go through the sections that need explaining on the next few slides, but I want you to see the shape first, because it is short. This is a one page file, not a manual, and a one page file that gets read beats a ten page file that does not.
+
+The seven headings, quickly. What this project is, which is context. Data, which is where things live and what may not be touched. Units and definitions, which is the section that will save you the most and which almost nobody writes. The pipeline, meaning which script makes which output. What is already fixed, which is the submitted-paper problem from the start of the lecture. Conventions, so you stop getting answers in a style you do not use. And traps, which is the section that grows.
+
+One thing to notice before we go through them. Every section is about something that is true of your project and not visible in it. There is nothing in here explaining what dplyr is or how to write a regression, because that is not what this file is for.
+
+</details>
+
+```markdown
+# What this project is
+
+One paragraph: the research question, the paper it is for, and the stage
+it is at.
+
+# Data
+
+- Raw data lives in `data/raw/`. It is READ ONLY. Nothing writes there.
+- Where each raw file came from, and when it was downloaded.
+- Anything under a data use agreement, and what that agreement forbids.
+
+# Units and definitions
+
+- Yield is bushels per acre. A corn bushel is 56 lb.
+- Water use is acre-inches per acre, not total acre-feet.
+- Prices are nominal, not deflated.
+
+# The pipeline
+
+Which script produces which output, in order.
+
+# What is already fixed
+
+Results that appear in a submitted draft or a referee response. If one of
+these numbers changes, that is something to tell me about, not something
+to quietly fix.
+
+# Conventions
+
+dplyr, not data.table. `here::here()` for every path. ggplot2 for every
+figure. The seed is 5748392 and it does not change.
+
+# Traps that have already cost time
+
+One line each, added the day it happens.
+```
+
+## The sections that earn their place
+
+::: {.panel-tabset}
+
+### Units and definitions
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the section almost nobody writes and the one I would fight hardest to keep.
+
+Think back to the bushel example in the previous deck. You asked for a conversion from bushels per acre to kilograms per hectare, and what came back used sixty pounds per bushel, which is soybeans, on corn, which is fifty six. The answer was seven percent high and looked completely normal. The reason that happened is simple: a bushel weight is not in your column names, it is not in your data, and it is not anywhere the assistant can see. It had to guess, and it guessed reasonably and wrongly.
+
+Write the units down once and that entire class of error disappears, permanently, for everyone who ever works on the project. It is three lines. It is the highest return per keystroke of anything in this lecture.
+
+And do not restrict it to units in the physics sense. Definitions count too. Whether your yield is per planted acre or per harvested acre. Whether an observation is a field, a farm, or a field-year. Whether prices are nominal or real, and if real, in what base year. Every one of those is something you know so well that it has stopped feeling like information, which is exactly the property that makes it dangerous.
+
+</details>
+
+The bushel example from the previous deck was **seven percent high** because a bushel weight is not in your column names, your data, or anywhere else the assistant can see. It had to guess.
+
+Write them down once and the whole class of error disappears.
+
++ Units: bushels per acre, acre-inches, nominal dollars.
++ Definitions: per planted or per harvested acre. Is an observation a field, a farm, or a field-year?
++ Prices: nominal or real, and if real, what base year.
+
+::: {.callout-tip}
+The things you know so well that they have stopped feeling like information are exactly the things to write here.
+:::
+
+### What is already fixed
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the section that prevents the story I opened with, and it is the one that is specific to research rather than to programming generally.
+
+Software has no equivalent of this. If a software engineer improves a function and the output gets better, that is the entire point of the job. In research, a number that has left your building is different in kind from a number that has not. It is in a submitted manuscript, or a referee response, or a conference talk, or a preprint with a D O I. It can still be wrong and you can still fix it, but fixing it is an event. You tell your co-authors, you check whether the discussion still holds, and you may have to write to an editor.
+
+So write down which numbers those are. Table two and figure three are in the submitted draft. The elasticity in the abstract is in the referee response. And say what should happen if one of them moves: tell me, do not quietly correct it.
+
+Read the callout, because it is a sentence worth having ready for your own sake as much as anybody else's. A quietly corrected public number is much worse than a loudly wrong one. The wrong one is a correction. The quiet one is a discrepancy that somebody else finds, and then the question stops being about your arithmetic and starts being about your care.
+
+</details>
+
+Software has no equivalent of this section. A number that has left your building is different in kind from one that has not.
+
++ Which tables and figures are in the submitted draft.
++ Which numbers appear in a referee response, a talk, or a preprint with a DOI.
++ What should happen if one of them moves: **tell me, do not quietly correct it.**
+
+::: {.callout-important}
+A quietly corrected public number is much worse than a loudly wrong one. The wrong one is a correction. The quiet one is a discrepancy somebody else finds.
+:::
+
+### Traps that have cost time
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The last section is the one that grows, and it is the most valuable part of the file after about six months.
+
+The rule for writing it is on the slide. One line, added the day the thing happens, while you still remember what actually went wrong rather than your tidied-up memory of it. Not a category. A specific incident, and what it cost.
+
+Read the three examples, because the shape matters more than the content. Each one names a concrete thing that happened and the consequence. The county code in this file is a character with a leading zero, and reading it as a number silently drops it. The nineteen ninety-eight file has a different column order from every other year. Rendering with cache equals true after changing a data file gives you the old results with no warning at all.
+
+Every one of those cost somebody an afternoon. Written down, none of them ever costs anybody an afternoon again. That is the entire return, and it compounds, because a trap you avoid is also a trap your co-author avoids and a trap the next student avoids.
+
+The callout is the practical point. Do not sit down to write this section in advance. You cannot. Written up front it is guesswork about problems you have not had yet. It only becomes valuable by accumulation, which means the discipline is not writing it, it is adding to it on the day, when you are annoyed and want to move on. Take the thirty seconds.
+
+</details>
+
+One line, added **the day it happens**, while you still remember what actually went wrong.
+
+```default
+# Traps that have already cost time
+
+- `county_fips` is a character with a leading zero. Reading it as a
+  number silently drops the zero and the join then fails on 12 counties.
+- The 1998 raw file has a different column order from every other year.
+- Rendering with `cache: true` after changing a data file gives you the
+  old results, with no warning.
+```
+
+::: {.callout-tip}
+Do not write this section in advance. Written up front it is guesswork about problems you have not had. It is only valuable by accumulation, so the discipline is adding to it on the day, when you are annoyed and want to move on. Take the thirty seconds.
+:::
+
+:::
+<!--end of panel-->
+
+## A file that is read is better than a file that is right
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three warnings about how this file goes wrong, all of them failure by growth.
+
+Keep it to a page. A long file gets skimmed, by a model and by a person, and a rule buried on page four of a document nobody finishes is the same as a rule you never wrote. If a section is growing, that usually means it wants to be its own document with a link from here.
+
+Do not restate what the code says. A list of every function in every script is not useful, because your scripts contain that already and your list will be out of date within a month. Write only what the code cannot say.
+
+And keep it current, because a stale instruction is worse than no instruction. If it says the pipeline starts with zero one dash clean dot R and that script was renamed in March, you have not left a neutral note, you have left a confident wrong one, and confident wrong instructions get followed. The moment to update this file is the same edit in which you change the thing it describes. Not later. Later means never, and you have seen what that produces.
+
+</details>
+
+Three ways this file goes wrong, all of them failure by growth.
+
++ **Keep it to a page.** A rule buried on page four of a document nobody finishes is a rule you did not write.
++ **Do not restate the code.** A list of every function is out of date within a month, and your scripts already say it.
++ **Keep it current.** A stale instruction is worse than none, because confident wrong instructions get followed.
+
+::: {.callout-important}
+Update this file in the same edit that changes the thing it describes. Not later. Later means never.
+:::
+
+# Across the life of a project
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Where these tools sit, stage by stage
+
+::: {.panel-tabset}
+
+### Genuinely good
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the second half, which is where in a research project these tools actually help. Read the list and then the line underneath it, because the line is what unifies them.
+
+Download and A P I scripts. You can see whether the file arrived.
+
+Cleaning code, with the caveats from the previous deck. Tables and figures, which are the clearest case of all, because a figure is either what you wanted or it is not and you can tell by looking.
+
+Simulation code deserves special mention, and it is the strongest item on this list for a reason that is worth understanding. In a simulation you built the truth yourself. You chose the coefficient, so you know exactly what your estimator should recover, and if it does not, something is wrong. That is the only part of empirical research that comes with its own answer key, which makes it the one place you can lean on these tools hardest with the least risk. If you are doing a Monte Carlo study, this is where they will save you the most time.
+
+And writing the archive README at the end, which is a summarising job over material you already have, and which everybody puts off.
+
+The unifying property is the same one from the previous deck. In every one of these cases, you can tell quickly whether the answer is right. That, not the difficulty of the task, is what determines whether these tools are safe to lean on.
+
+</details>
+
++ Download and API scripts. You can see whether the file arrived.
++ Cleaning code, with the checks from the previous deck.
++ Tables and figures. A figure is either what you wanted or it is not.
++ **Simulation code.** You built the truth yourself, so you know what the estimator should recover.
++ The archive README at the end.
+
+::: {.callout-note}
+The same property every time: you can tell quickly whether the answer is right. That, not the difficulty of the task, decides whether leaning on these tools is safe.
+:::
+
+### Where the silent errors live
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Merging and reshaping is on the good list and also on this one, because it is the stage where a wrong answer is least likely to announce itself. This is where the four checks earn their keep, so this tab is mostly a pointer back to them.
+
+Read the four. Read it before you keep it. Run it on a case whose answer you know. Count your rows after every join. Look at what got dropped.
+
+The one addition at the project level is the habit in the callout, and it is a small change with a large effect. Ask for the check in the same request as the code. Not after. Say join these two and show me the row count before and after. Say write the conversion and test it on a value we both know. These tools are perfectly willing to write the verification, they simply do not do it unprompted, and it costs you nothing to ask in the first pass. Asking afterwards means you have already seen a plausible answer, and by then you are much less motivated to go looking for a reason to distrust it.
+
+</details>
+
+Merging and reshaping is on the good list and on this one, because a wrong answer here is least likely to announce itself. The four checks are for this stage:
+
+1. Read it before you keep it.
+2. Run it on a case whose answer you know.
+3. Count your rows after every join.
+4. Look at what got dropped.
+
+::: {.callout-tip}
+## The project-level habit
+Ask for the check in the **same request** as the code. "Join these and show me the row count before and after." Asking afterwards means you have already seen a plausible answer and are much less motivated to distrust it.
+:::
+
+### The code is fine, the advice is not
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is repeated from the previous deck on purpose, because it is the one that follows you into your thesis and a single mention is not enough.
+
+Model choice, standard errors, identification. Ask about any of them and what comes back reads like a methods section, is fluent, is confident, and is sometimes right. The code it gives you is usually fine. It runs, the estimates appear, the standard errors appear. There is no output anywhere that tells you whether clustering at the county level was the correct decision for your design.
+
+The reason this is worse in a project than in a single session is at the bottom of the slide, and it is about accumulation. Wrong code gets caught eventually, because at some point it produces something that is visibly absurd. A wrong methodological choice does not get caught by anything you run. It gets caught by a referee, if you are lucky, eighteen months later, after everything downstream of it has been written on top of it. By then it is not a fix, it is a restructure.
+
+</details>
+
+Repeated from the previous deck on purpose, because it is the one that follows you into the thesis.
+
++ Model choice, standard errors, identification.
++ The code it writes is usually fine. The regression runs either way.
++ Nothing in the output tells you whether the choice was right for your design.
+
+::: {.callout-important}
+Wrong code is caught eventually, because it eventually produces something absurd. A wrong methodological choice is caught by a referee, eighteen months later, after everything downstream has been written on top of it.
+:::
+
+### Do not use it for this
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+One stage where my advice is simply do not, and it is the one students are most tempted by.
+
+Do not use these tools to find literature. Ask for papers on a topic and you will get citations that look completely real: plausible authors who genuinely work in the field, in journals that genuinely exist, with titles that sound exactly like papers that ought to have been written. Some fraction of them will not exist. And the failure is worse than useless, because a fabricated citation is far more expensive to detect than an absence. A gap in a literature review is something you notice. A confident citation to a paper that was never written is something you copy into your bibliography, and then your advisor goes looking for it.
+
+The distinction to hold is in the callout. These tools are good at explaining a paper you already have in your hand, because the paper is right there and you can check what you are told against it. They are bad at telling you a paper exists, because that claim is unverifiable at the moment it is made and requires a search you were trying to avoid doing.
+
+Use the actual tools for the actual job. Google Scholar, Web of Science, and the reference lists of papers you already trust.
+
+</details>
+
++ Ask for papers on a topic and you will get citations that look real: plausible authors, real journals, titles that sound like papers that ought to exist.
++ A fabricated citation is more expensive than a gap. A gap you notice. A confident wrong citation goes into your bibliography.
+
+::: {.callout-important}
+Good at explaining a paper you have in your hand, because you can check it. Bad at telling you a paper exists, because that claim cannot be checked at the moment it is made.
+:::
+
+Use Google Scholar, Web of Science, and the reference lists of papers you already trust.
+
+:::
+<!--end of panel-->
+
+## Reproducibility does not change
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+To close the second half, the connection back to Chapter six, because a reasonable question at this point is whether any of the reproducibility material still applies. It all does, unchanged.
+
+The standard is the same as it always was. A script runs from raw data to final table with no manual steps in between. That is the whole of it, and it does not care how any particular line got written.
+
+Which means the conversation is not part of your materials. You do not need to keep your chats, or log your prompts, or record which lines came from where. Nobody can reproduce your work from a transcript, and nobody wants to try. The code and the data are the materials. That is the entire list.
+
+The one thing that does get harder is at the bottom, and it is worth saying plainly. It is now very easy to end up with a folder full of scripts that each ran once, in an order you no longer remember, producing outputs you cannot regenerate. That has always been the natural end state of an undisciplined project, and these tools accelerate it, because the cost of producing another script just went to nearly zero.
+
+So the test is unchanged and you should run it more often than you used to. Delete your processed data and your results, run the pipeline from raw, and see whether everything comes back. Do that before you submit anything, and do it once in the middle of the project rather than discovering the answer at the end.
+
+</details>
+
+The standard is exactly what it was in Chapter 6.
+
++ **A script runs from raw data to final table, with no manual steps.** That is the whole of it, and it does not care how a line was written.
++ **The conversation is not part of your materials.** Nobody reproduces your work from a transcript. The code and the data are the list.
+
+::: {.callout-important}
+## What did get harder
+It is now very easy to end up with a folder of scripts that each ran once, in an order you no longer remember. Delete `processed/` and `results/`, run the pipeline from `raw/`, and see whether everything comes back. Do it once in the middle of the project, not at the end.
+:::
+
+# Exercise
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Exercise: write yours
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Fifteen minutes, on your own final project, right now while I am here to answer questions.
+
+Copy the skeleton. Fill in three sections only: what this project is, units and definitions, and data. Skip the rest for today. If your project has no data yet, use what you intend to collect, because the units are usually the part you already know.
+
+Then the second half, which is the part that actually teaches you something. Swap with the person next to you. Their job is to read your file and tell you which lines they could not have worked out by opening your project folder and looking around for two minutes.
+
+The line they name is the one that was worth writing. Everything they could have guessed is padding, and you should cut it, because remember the rule from earlier: a file that is read beats a file that is right, and length is what stops it being read.
+
+One last thing to notice, and it is the real point of the exercise. Every question your partner has to ask you is a question an assistant would have had to guess at, silently, without telling you it was guessing. That is what this file is for.
+
+</details>
+
+Fifteen minutes, on your own final project.
+
+1. Copy the skeleton into your project as `CLAUDE.md`.
+2. Fill in **three sections only**: what this project is, units and definitions, and data. If you have no data yet, use what you intend to collect.
+3. Swap with the person next to you.
+4. Their job: name the lines they could **not** have worked out by looking through your project folder for two minutes.
+
+::: {.callout-tip}
+The lines they name are the ones worth writing. Cut everything they could have guessed.
+
+Every question your partner has to ask you is a question an assistant would have guessed at silently, without telling you it was guessing.
+:::
+
+## What to take away
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four sentences.
+
+Commit before you turn anything loose. Five seconds, and it is the difference between an inconvenience and a disaster.
+
+Write down what the code cannot say. Units, definitions, which numbers are already public. Those are the things that are invisible from inside your project and they are where the expensive errors come from.
+
+Reproducibility is unchanged. The test is still whether the pipeline runs from raw data to final table, and it does not care how any line got written.
+
+And the last one is the one to keep, and it is the same sentence the previous deck ended on, applied to a whole project rather than to one function. Everything in your repository is yours the moment you keep it.
+
+</details>
+
++ **Commit before you turn anything loose.** Five seconds, and it is the difference between an inconvenience and a disaster.
++ **Write down what the code cannot say.** Units, definitions, and which numbers are already public.
++ **Reproducibility is unchanged.** Does the pipeline run from raw data to final table?
++ **Everything in your repository is yours the moment you keep it.**
