@@ -91,7 +91,7 @@ Learn how to handle raster datasets using R.
 
 ```{webr-r}
 #| context: setup
- 
+
 #--- install and library the data package ---#
 #--- Both repos are required. r.spatial.workshop.datasets declares         ---#
 #--- Imports: sf, and webr::install() resolves dependencies ONLY in the     ---#
@@ -318,7 +318,7 @@ file path is still tied to that file on your disk. Move or delete the file and
 the object stops working:
 
 ```{r, eval = FALSE}
-r <- terra::rast("data/reflec_blue.tif")   # source(s) : reflec_blue.tif
+r <- terra::rast("data/reflec_blue.tif") # source(s) : reflec_blue.tif
 file.remove("data/reflec_blue.tif")
 terra::values(r)
 #> Error: [readStart] file does not exist: data/reflec_blue.tif
@@ -361,7 +361,7 @@ You can simply use `c()` function to create a multi-layer `SpatRaster` just like
 
 ```{webr-r}
 (
-reflec_all <- c(reflec_blue, reflec_red, reflec_green)
+  reflec_all <- c(reflec_blue, reflec_red, reflec_green)
 )
 ```
 
@@ -404,7 +404,7 @@ You can convert a `SpatRaster` to a `Raster`* object using `as(SpatRaster, "Rast
 
 ```{webr-r}
 (
-reflec_blue_rl <- as(reflec_blue, "Raster")
+  reflec_blue_rl <- as(reflec_blue, "Raster")
 )
 ```
 
@@ -416,7 +416,7 @@ Since, `reflec_blue` is a single-layer `SpatRaster`, it was converted into a `Ra
 
 ```{webr-r}
 (
-reflec_all_rl <- as(reflec_all, "Raster")
+  reflec_all_rl <- as(reflec_all, "Raster")
 )
 ```
 
@@ -706,7 +706,7 @@ reflec_blue <- terra::rast("data-files-for-participants/reflec_blue.tif")
 It looks like this for me:
 
 ```{r, eval = F}
-reflec_all <- 
+reflec_all <-
   terra::rast(
     c(
       "data-files-for-participants/reflec_blue.tif",
@@ -788,7 +788,7 @@ terra::writeRaster(SpatRaster, path to the file)
 **Example (does not run)**
 
 ```{r, eval = FALSE}
-writeRaster(reflec_blue, "./data/reflec_blue.tif", overwrite = TRUE) 
+writeRaster(reflec_blue, "./data/reflec_blue.tif", overwrite = TRUE)
 ```
 
 + This code saves `reflec_blue` (a `SpatRaster` object) as a GeoTiff file. 
@@ -969,7 +969,7 @@ Then, plot it to see what it looks like.
 
 ```{r, eval = FALSE}
 #| code-fold: true
- 
+
 NDVI <- (NIR - RED) / (NIR + RED)
 
 #--- see what it looks like ---#
@@ -1034,7 +1034,7 @@ there, which takes the most common value in the block.
 ```{webr-r}
 #| autorun: true
 (
-reflec_blue_agg_5 <- aggregate(reflec_blue, fact = 5)
+  reflec_blue_agg_5 <- aggregate(reflec_blue, fact = 5)
 )
 ```
 
@@ -1117,8 +1117,8 @@ Fake precipitation data:
 
 ```{webr-r}
 #| out-width: 100%
-#| autorun: true 
-precip <- rast(xmin=1, xmax=11, ymin=1, ymax=11, nrows=10, ncols = 10, vals = rnorm(100), crs = "EPSG:4326")
+#| autorun: true
+precip <- rast(xmin = 1, xmax = 11, ymin = 1, ymax = 11, nrows = 10, ncols = 10, vals = rnorm(100), crs = "EPSG:4326")
 
 plot(precip)
 ```
@@ -1131,7 +1131,7 @@ Fake soil data:
 ```{webr-r}
 #| autorun: true
 #| out-width: 100%
-soil <- rast(xmin=0, xmax=12, ymin=0, ymax=12, nrows=26, ncols = 26, vals = 100 * runif(26 * 26), crs = "EPSG:4326")
+soil <- rast(xmin = 0, xmax = 12, ymin = 0, ymax = 12, nrows = 26, ncols = 26, vals = 100 * runif(26 * 26), crs = "EPSG:4326")
 
 plot(soil)
 ```
@@ -1151,13 +1151,13 @@ plot(soil)
 
 
 ```{webr-r}
-#| context: output 
+#| context: output
 
-precip_sf <- 
+precip_sf <-
   st_as_stars(precip) %>%
   st_as_sf()
 
-soil_sf <- 
+soil_sf <-
   st_as_stars(soil) %>%
   st_as_sf()
 
@@ -1242,7 +1242,7 @@ For demonstration purpose, we will use two `SpatRaster` objects: `prism_saunders
 
 ```{webr-r}
 #| autorun: true
-#| code-track: 0.4 
+#| code-track: 0.4
 ggplot() +
   geom_spatraster(data = prism_saunders) +
   geom_spatraster(data = prism_douglas) +
@@ -1266,7 +1266,7 @@ prism_merged <- terra::merge(prism_saunders, prism_douglas)
 You can check the result of the merging below:
 
 ```{webr-r}
-#| code-track: 0.4 
+#| code-track: 0.4
 ggplot() +
   geom_spatraster(data = prism_merged) +
   scale_fill_viridis_c()

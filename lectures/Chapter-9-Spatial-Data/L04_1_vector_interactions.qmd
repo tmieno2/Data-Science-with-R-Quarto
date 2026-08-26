@@ -263,9 +263,9 @@ point_2 <- sf::st_point(c(1, 1))
 point_3 <- sf::st_point(c(1, 3))
 
 #--- combine the points to make a single  sf of points ---#
-points <- list(point_1, point_2, point_3) %>% 
-  sf::st_sfc() %>% 
-  sf::st_as_sf() %>% 
+points <- list(point_1, point_2, point_3) %>%
+  sf::st_sfc() %>%
+  sf::st_as_sf() %>%
   mutate(point_name = c("point 1", "point 2", "point 3"))
 
 #--- create lines ---#
@@ -273,28 +273,28 @@ line_1 <- sf::st_linestring(rbind(c(0, 0), c(2.5, 0.5)))
 line_2 <- sf::st_linestring(rbind(c(1.5, 0.5), c(2.5, 2)))
 
 #--- combine the points to make a single  sf of points ---#
-lines <- list(line_1, line_2) %>% 
-  sf::st_sfc() %>% 
-  sf::st_as_sf() %>% 
+lines <- list(line_1, line_2) %>%
+  sf::st_sfc() %>%
+  sf::st_as_sf() %>%
   mutate(line_name = c("line 1", "line 2"))
 
 #--- create polygons ---#
 polygon_1 <- sf::st_polygon(list(
-  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0)) 
+  rbind(c(0, 0), c(2, 0), c(2, 2), c(0, 2), c(0, 0))
 ))
 
 polygon_2 <- sf::st_polygon(list(
-  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5)) 
+  rbind(c(0.5, 1.5), c(0.5, 3.5), c(2.5, 3.5), c(2.5, 1.5), c(0.5, 1.5))
 ))
 
 polygon_3 <- sf::st_polygon(list(
-  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5)) 
+  rbind(c(0.5, 2.5), c(0.5, 3.2), c(2.3, 3.2), c(2, 2), c(0.5, 2.5))
 ))
 
 #--- combine the polygons to make an sf of polygons ---#
-polygons <- list(polygon_1, polygon_2, polygon_3) %>% 
-  sf::st_sfc() %>% 
-  sf::st_as_sf() %>% 
+polygons <- list(polygon_1, polygon_2, polygon_3) %>%
+  sf::st_sfc() %>%
+  sf::st_as_sf() %>%
   mutate(polygon_name = c("polygon 1", "polygon 2", "polygon 3"))
 ```
 
@@ -303,17 +303,16 @@ polygons <- list(polygon_1, polygon_2, polygon_3) %>%
 ```{webr-r}
 #| autorun: true
 (
-g_all <- 
-  ggplot() +
-  geom_sf(data = polygons, aes(fill = polygon_name), alpha = 0.3) +
-  scale_fill_discrete(name = "Polygons") +
-  geom_sf(data = lines, aes(color = line_name)) +
-  scale_color_discrete(name = "Lines") + 
-  geom_sf(data = points, aes(shape = point_name), size = 3) +
-  scale_shape_discrete(name = "Points") +
-  theme_void()
+  g_all <-
+    ggplot() +
+    geom_sf(data = polygons, aes(fill = polygon_name), alpha = 0.3) +
+    scale_fill_discrete(name = "Polygons") +
+    geom_sf(data = lines, aes(color = line_name)) +
+    scale_color_discrete(name = "Lines") +
+    geom_sf(data = points, aes(shape = point_name), size = 3) +
+    scale_shape_discrete(name = "Points") +
+    theme_void()
 )
-
 ```
 
 #### points and polygons
@@ -324,9 +323,9 @@ g_all <-
 
 ::: {.column width="40%"}
 ```{webr-r}
-#| context: output 
-#| out-width: 120% 
-g_all 
+#| context: output
+#| out-width: 120%
+g_all
 ```
 :::
 
@@ -366,9 +365,9 @@ st_intersects(points, polygons, sparse = FALSE)
 
 ::: {.column width="40%"}
 ```{webr-r}
-#| context: output 
-#| out-width: 120% 
-g_all 
+#| context: output
+#| out-width: 120%
+g_all
 ```
 :::
 
@@ -394,9 +393,9 @@ The output is a list of which polygon(s) each of the lines intersect with.
 
 ::: {.column width="40%"}
 ```{webr-r}
-#| context: output 
-#| out-width: 120% 
-g_all 
+#| context: output
+#| out-width: 120%
+g_all
 ```
 :::
 
@@ -451,15 +450,17 @@ projected or CRS-free data.
 Create two sets of points and then inspect each of them.
 
 ```{webr-r}
-#| autorun: true 
+#| autorun: true
 set.seed(884738)
 
-points_set_1 <- lapply(1:5, function(x) st_point(runif(2))) %>% 
-  st_sfc() %>% st_as_sf() %>% 
+points_set_1 <- lapply(1:5, function(x) st_point(runif(2))) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
   mutate(id = 1:nrow(.))
 
-points_set_2 <- lapply(1:5, function(x) st_point(runif(2))) %>% 
-  st_sfc() %>% st_as_sf() %>% 
+points_set_2 <- lapply(1:5, function(x) st_point(runif(2))) %>%
+  st_sfc() %>%
+  st_as_sf() %>%
   mutate(id = 1:nrow(.))
 ```
 
@@ -479,7 +480,7 @@ ggplot() +
     data = points_set_2,
     aes(label = id),
     color = "blue"
-  ) 
+  )
 ```
 
 #### Expected Outcomes
@@ -496,40 +497,40 @@ buffer_1 <- st_buffer(points_set_1, dist = 0.2)
 
 ggplot() +
   geom_sf(
-    data = buffer_1, 
-    color = "red", 
+    data = buffer_1,
+    color = "red",
     fill = NA
   ) +
   geom_sf_text(
-    data = points_set_1, 
-    aes(label = id), 
+    data = points_set_1,
+    aes(label = id),
     color = "red"
   ) +
   geom_sf_text(
-    data = points_set_2, 
-    aes(label = id), 
+    data = points_set_2,
+    aes(label = id),
     color = "blue"
-  ) 
+  )
 ```
 
 #### Apply the function
 
 ```{webr-r}
 #| out-width: 100%
-#| code-track: 0.4 
+#| code-track: 0.4
 ggplot() +
   geom_sf(
-    data = st_buffer(points_set_1, dist = 0.2), color = "red", 
+    data = st_buffer(points_set_1, dist = 0.2), color = "red",
     fill = NA
   ) +
   geom_sf_text(
-    data = points_set_1, 
-    aes(label = id), 
+    data = points_set_1,
+    aes(label = id),
     color = "red"
   ) +
   geom_sf_text(
-    data = points_set_2, 
-    aes(label = id), 
+    data = points_set_2,
+    aes(label = id),
     color = "blue"
   )
 ```  
@@ -578,18 +579,18 @@ st_nearest_feature(sf_1, sf_2)
 #| code-track: 0.4
 ggplot() +
   geom_sf(
-    data = buffer_1, 
-    color = "red", 
+    data = buffer_1,
+    color = "red",
     fill = NA
   ) +
   geom_sf_text(
-    data = points_set_1, 
-    aes(label = id), 
+    data = points_set_1,
+    aes(label = id),
     color = "red"
   ) +
   geom_sf_text(
-    data = points_set_2, 
-    aes(label = id), 
+    data = points_set_2,
+    aes(label = id),
     color = "blue"
   )
 ```
@@ -650,7 +651,6 @@ Use `sf::st_intersects()` to find out which of the points in `mower_sensor_sf` a
 
 ```{webr-r}
 #--- type your answer here ---#
-
 ```
 
 <br>
@@ -663,8 +663,8 @@ That is okay for now. We will later learn how to filter `sf` objects spatially.
 
 **Answer codes**
 ```{r}
-#| code-fold: true 
-#| eval: false 
+#| code-fold: true
+#| eval: false
 st_intersects(mower_sensor_sf, fairway_grid)
 ```
 
@@ -705,13 +705,13 @@ The first live cell prints ne counties, wells N E, railroads N E, and h p bounda
 Here are the datasets we will use here. Inspect them to familiarize yourself with the datasets.
 
 ```{webr-r}
-#--- Nebraska county boundary ---# 
+#--- Nebraska county boundary ---#
 ne_counties
 
 #--- Irrigation wells in Nebraska ---#
 wells_ne
 
-#--- Railroads in Nebraska ---#  
+#--- Railroads in Nebraska ---#
 railroads_ne
 
 #--- High-Plains aquifer boundary ---#
@@ -721,7 +721,7 @@ hp_boundary
 
 ```{webr-r}
 #| context: setup
-#--- Nebraska county boundary ---# 
+#--- Nebraska county boundary ---#
 data(ne_counties, package = "r.spatial.workshop.datasets")
 
 #--- Irrigation wells in Nebraska ---#
@@ -736,7 +736,7 @@ wells_ne <-
     crs = 4269
   )
 
-#--- Railroads in Nebraska ---#  
+#--- Railroads in Nebraska ---#
 data(railroads_ne, package = "r.spatial.workshop.datasets")
 
 #--- High-Plains aquifer boundary ---#
@@ -853,7 +853,7 @@ Assign 1 or 0 to a new variable called `in_hpa` based on the list.
 ```{webr-r}
 #| autorun: true
 (
-ne_counties <- dplyr::mutate(ne_counties, in_hpa = ifelse(countyfp %in% county_fp_intersected_list, 1, 0))
+  ne_counties <- dplyr::mutate(ne_counties, in_hpa = ifelse(countyfp %in% county_fp_intersected_list, 1, 0))
 )
 ```
 
@@ -864,7 +864,7 @@ You can specify the topological relation as in
 ```{r}
 #| eval: false
 #--- NOT RUN ---#
-sf_1[sf_2, , op = topological_relation_type] 
+sf_1[sf_2, , op = topological_relation_type]
 ```
 
 <br>
@@ -884,7 +884,7 @@ Check visually:
 #| layout: stacked
 ggplot() +
   geom_sf(data = ne_counties_completely_within_hpa) +
-  geom_sf(data = hp_boundary, fill = "blue" ,alpha = 0.4) +
+  geom_sf(data = hp_boundary, fill = "blue", alpha = 0.4) +
   theme_void()
 ```
 :::
@@ -922,7 +922,7 @@ ggplot() +
     data = wells_ne,
     size = 0.1
   ) +
-  theme_void()  
+  theme_void()
 ```
 
 #### Demonstration
@@ -949,7 +949,7 @@ ggplot() +
     data = wells_ne_in_hpa,
     size = 0.1
   ) +
-  theme_void()   
+  theme_void()
 ```
 
 #### Flagging
@@ -968,7 +968,7 @@ Assign 1 or 0 to a new variable called `in_hpa` based on the list.
 ```{webr-r}
 #| autorun: true
 (
-wells_ne <- dplyr::mutate(wells_ne, in_hpa = ifelse(wellid %in% wellid_list, 1, 0))
+  wells_ne <- dplyr::mutate(wells_ne, in_hpa = ifelse(wellid %in% wellid_list, 1, 0))
 )
 ```
 
@@ -1020,7 +1020,7 @@ ggplot() +
     data = railroads_ne,
     size = 0.1
   ) +
-  theme_void() 
+  theme_void()
 ```
 
 #### Demonstration
@@ -1029,7 +1029,7 @@ Just like we did in the two previous examples:
 
 ```{webr-r}
 #| autorun: true
-railroads_lancaster <- railroads_ne[lancaster_county, ] 
+railroads_lancaster <- railroads_ne[lancaster_county, ]
 ```
 <br>
 
@@ -1072,8 +1072,8 @@ Assign 1 or 0 to a new variable called `in_lancaster` based on the list.
 ```{webr-r}
 #| autorun: true
 (
-railroads_ne <- dplyr::mutate(railroads_ne, in_lancaster = ifelse(LINEARID %in% railroads_id_list, 1, 0))
-) 
+  railroads_ne <- dplyr::mutate(railroads_ne, in_lancaster = ifelse(LINEARID %in% railroads_id_list, 1, 0))
+)
 ```
 
 :::
@@ -1149,8 +1149,8 @@ The bounding box looks like this (red rectangle):
 ggplot() +
   geom_sf(data = hp_boundary) +
   geom_sf(
-    data = hp_bbox_sfc, 
-    fill = NA, 
+    data = hp_bbox_sfc,
+    fill = NA,
     color = "red"
   )
 ```
@@ -1173,7 +1173,7 @@ Now, let's crop Nebraska counties to the bounding box of the High-Plains aquifer
 
 ```{webr-r}
 (
-ne_counties_cropped_to_hp <- st_crop(ne_counties, hp_boundary)
+  ne_counties_cropped_to_hp <- st_crop(ne_counties, hp_boundary)
 )
 ``` 
 <br>
@@ -1189,22 +1189,22 @@ st_crop(ne_counties, hp_bbox_sfc)
 #| code-track: 0.4
 ggplot() +
   geom_sf(
-    data = hp_boundary, 
-    color = "blue", 
+    data = hp_boundary,
+    color = "blue",
     linewidth = 1
   ) +
   geom_sf(
-    data = ne_counties, 
+    data = ne_counties,
     fill = NA
   ) +
   geom_sf(
-    data = hp_bbox_sfc, 
-    fill = NA, 
+    data = hp_bbox_sfc,
+    fill = NA,
     color = "red"
   ) +
   geom_sf(
-    data = ne_counties_cropped_to_hp, 
-    fill = "orange", 
+    data = ne_counties_cropped_to_hp,
+    fill = "orange",
     alpha = 0.4
   )
 ```
@@ -1230,19 +1230,19 @@ Note that `st_crop()` will chop off the parts that are not intersecting.
 ggplot() +
   #--- subsetted ---#
   geom_sf(
-    data = ne_counties_in_hpa, 
-    fill = "green", 
+    data = ne_counties_in_hpa,
+    fill = "green",
     alpha = 0.3
   ) +
   #--- cropped ---#
   geom_sf(
-    data = ne_counties_cropped_to_hp, 
-    fill = "blue", 
+    data = ne_counties_cropped_to_hp,
+    fill = "blue",
     alpha = 0.3
   )
-  # +
-  # #--- HPA ---#
-  # geom_sf(data = hp_boundary, fill = NA, color = "red")
+# +
+# #--- HPA ---#
+# geom_sf(data = hp_boundary, fill = NA, color = "red")
 ```
 
 :::

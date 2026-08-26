@@ -87,25 +87,25 @@ You do not have to run an entire live cell. Highlight just the lines you want, t
 ```{r }
 #| label: taste-flextable
 #| cache: false
-#| include: false 
-head(mtcars, 20) %>% #BREAK
-  dplyr::select(am, carb, gear, mpg, drat) %>% #BREAK
-  flextable() %>% #BREAK
-  theme_vanilla() %>% #BREAK 
-  set_header_labels(mpg = "miles per gallon") %>% #BREAK 
-  autofit() %>% #BREAK 
-  merge_v(j = c("am", "carb")) %>% #BREAK 
-  italic(j = 1) %>% #BREAK 
-  bg(bg = "#C90000", part = "header") %>% #BREAK 
-  color(color = "blue", j = 5) %>% #BREAK 
-  color(color = "red", i = 5:10, j = 2) %>% #BREAK 
-  color(color = "white", part = "header") %>% #BREAK 
-  bold(~ drat > 3.2, ~ gear, bold = TRUE) %>% #BREAK 
-  align(j = 1) %>% #BREAK
-  fontsize(i = 12:18, size = 8) %>% #BREAK
-  add_footer_row(values = "blah blah", colwidths = 5) %>% #BREAK
-  border_outer(fp_border(color="red", width = 2)) %>% #BREAK 
-  line_spacing(space = 1.5) %>% #BREAK
+#| include: false
+head(mtcars, 20) %>% # BREAK
+  dplyr::select(am, carb, gear, mpg, drat) %>% # BREAK
+  flextable() %>% # BREAK
+  theme_vanilla() %>% # BREAK
+  set_header_labels(mpg = "miles per gallon") %>% # BREAK
+  autofit() %>% # BREAK
+  merge_v(j = c("am", "carb")) %>% # BREAK
+  italic(j = 1) %>% # BREAK
+  bg(bg = "#C90000", part = "header") %>% # BREAK
+  color(color = "blue", j = 5) %>% # BREAK
+  color(color = "red", i = 5:10, j = 2) %>% # BREAK
+  color(color = "white", part = "header") %>% # BREAK
+  bold(~ drat > 3.2, ~gear, bold = TRUE) %>% # BREAK
+  align(j = 1) %>% # BREAK
+  fontsize(i = 12:18, size = 8) %>% # BREAK
+  add_footer_row(values = "blah blah", colwidths = 5) %>% # BREAK
+  border_outer(fp_border(color = "red", width = 2)) %>% # BREAK
+  line_spacing(space = 1.5) %>% # BREAK
   theme_tron()
 ```
 
@@ -166,29 +166,29 @@ library(gt)
 
 #--- create a dataset ---#
 (
-tab_data <- 
-  countrypops %>%
-  dplyr::filter(country_code_2 %in% c(
-    Australasia, Melanesia, Polynesia
-  )) %>%
-  dplyr::filter(year %in% c(1995, 2005, 2015)) %>%
-  mutate(region = case_when(
-    country_code_2 %in% Australasia ~ "Australasia",
-    country_code_2 %in% Melanesia ~ "Melanesia",
-    country_code_2 %in% Polynesia ~ "Polynesia",
-  )) %>%
-  pivot_wider(
-    values_from = population,
-    names_from = year,
-    names_prefix = "y_"
-  ) %>%
-  dplyr::arrange(region, desc(y_2015)) %>%
-  dplyr::select(-starts_with("country_code")) %>%
-  mutate(
-    #--- CHANGED: was named pop_ratio_10_15, but it divides 2015 by 2005 ---#
-    pop_ratio_05_15 = y_2015 / y_2005,
-    date = "2013-11-14"
-  )
+  tab_data <-
+    countrypops %>%
+    dplyr::filter(country_code_2 %in% c(
+      Australasia, Melanesia, Polynesia
+    )) %>%
+    dplyr::filter(year %in% c(1995, 2005, 2015)) %>%
+    mutate(region = case_when(
+      country_code_2 %in% Australasia ~ "Australasia",
+      country_code_2 %in% Melanesia ~ "Melanesia",
+      country_code_2 %in% Polynesia ~ "Polynesia",
+    )) %>%
+    pivot_wider(
+      values_from = population,
+      names_from = year,
+      names_prefix = "y_"
+    ) %>%
+    dplyr::arrange(region, desc(y_2015)) %>%
+    dplyr::select(-starts_with("country_code")) %>%
+    mutate(
+      #--- CHANGED: was named pop_ratio_10_15, but it divides 2015 by 2005 ---#
+      pop_ratio_05_15 = y_2015 / y_2005,
+      date = "2013-11-14"
+    )
 )
 ```
 
@@ -211,8 +211,8 @@ We can apply `flextable()` to a `data.frame` to initiate a table:
 
 ```{r eval = F}
 flextable(
-  tab_data, 
-  col_keys = 
+  tab_data,
+  col_keys =
     c(
       "country_name",
       "lufhierh",
@@ -220,7 +220,7 @@ flextable(
       "y_1995",
       "y_2005"
     )
- )
+)
 ```
 
 where `col_keys` are the list of the name of the variables from the `data.frame` (providing variable names that do not exist in the dataset creates blank columns) 
@@ -234,12 +234,12 @@ where `col_keys` are the list of the name of the variables from the `data.frame`
 #| eval: false
 flextable(
   tab_data,
-  col_keys = 
+  col_keys =
     c(
-      "country_name", 
-      "lufhierh", 
-      "region", 
-      "y_1995", 
+      "country_name",
+      "lufhierh",
+      "region",
+      "y_1995",
       "y_2005"
     )
 )
@@ -310,23 +310,23 @@ We will be building on `ft` created below:
 ::: {.column width="50%"}
 ```{r}
 ft <-
-  tab_data %>% 
+  tab_data %>%
   flextable(
-    col_keys = 
+    col_keys =
       c(
         "country_name",
         "region",
         "y_1995",
         "y_2005"
       )
-  ) 
+  )
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft 
+ft
 ```
 :::
 <!--end of the 2nd column-->
@@ -375,7 +375,7 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   color(
     i = ~ y_2005 > 2e5,
     j = ~ country_name + region,
@@ -445,7 +445,7 @@ Rep of true comma false, each equals five produces five TRUE values followed by 
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   color(
     i = rep(c(TRUE, FALSE), each = 5),
     j = c(1, 3),
@@ -457,7 +457,7 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   color(
     i = rep(c(TRUE, FALSE), each = 5),
     j = c(1, 3),
@@ -494,10 +494,10 @@ You can refer to parts of the table using `part =` option. The available options
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-tab_data %>% 
+tab_data %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+  ) %>%
   color(
     part = "header",
     color = "red"
@@ -508,10 +508,10 @@ tab_data %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-tab_data %>% 
+tab_data %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+  ) %>%
   color(
     part = "header",
     color = "red"
@@ -596,11 +596,11 @@ The live help cell runs question mark fp underscore text so you can inspect the 
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
-    pr_t = 
+    j = ~country_name,
+    pr_t =
       fp_text(
         color = "red",
         bold = TRUE,
@@ -613,11 +613,11 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
-    pr_t = 
+    j = ~country_name,
+    pr_t =
       fp_text(
         color = "red",
         bold = TRUE,
@@ -652,7 +652,7 @@ The style call supplies both property objects and leaves i and j unspecified, so
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   style(
     pr_p = fp_par(
       border.bottom = fp_border(width = 2, color = "blue")
@@ -667,7 +667,7 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   style(
     pr_p = fp_par(
       border.bottom = fp_border(width = 2, color = "blue")
@@ -714,10 +714,10 @@ Use the live help cell, which runs question mark fp underscore par, when you nee
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
+    j = ~country_name,
     pr_p = fp_par(
       text.align = "left",
       shading.color = "grey"
@@ -729,10 +729,10 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
+    j = ~country_name,
     pr_p = fp_par(
       text.align = "left",
       shading.color = "grey"
@@ -777,10 +777,10 @@ The Introduction help cell runs question mark fp underscore cell. In Example, i 
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
+    j = ~country_name,
     pr_c = fp_cell(
       margin = 2,
       vertical.align = "top",
@@ -793,10 +793,10 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   style(
     i = 4:6,
-    j = ~ country_name,
+    j = ~country_name,
     pr_c = fp_cell(
       margin = 2,
       vertical.align = "top",
@@ -895,26 +895,26 @@ ft %>%
 <!--end of panel-->
 
 ```{r format-flip, cache = F, include = F}
-tab_data %>% #BREAK 
+tab_data %>% # BREAK
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% #BREAK 
+  ) %>% # BREAK
   #--- text color ---#
-  color(i = 1, j = 2, "#fcba03") %>% #BREAK 
+  color(i = 1, j = 2, "#fcba03") %>% # BREAK
   #--- background ---#
-  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>% #BREAK 
+  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>% # BREAK
   #--- font type ---#
-  font(i = 5, j = ~ country_name + y_2005, fontname = "Times") %>% #BREAK 
+  font(i = 5, j = ~ country_name + y_2005, fontname = "Times") %>% # BREAK
   #--- font size ---#
-  fontsize(i = 7, size = 16) %>% #BREAK 
+  fontsize(i = 7, size = 16) %>% # BREAK
   #--- italicize ---#
-  italic(j = 2) %>% #BREAK 
+  italic(j = 2) %>% # BREAK
   #--- bold ---#
-  bold(j = 4) %>% #BREAK 
+  bold(j = 4) %>% # BREAK
   #--- vertical text alignment ---#
-  valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% #BREAK 
+  valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% # BREAK
   #--- text direction ---#
-  rotate(i = 1, j = 2, rotation = "tbrl") 
+  rotate(i = 1, j = 2, rotation = "tbrl")
 ```
 
 `r chunk_reveal_quarto(
@@ -973,14 +973,14 @@ In the example, hline is the placement function. I equals three targets row thre
 
 ```{r eval = F}
 hline(
-    i = 3, 
-    j = 1:3, 
-    border = fp_border( 
-      color = "red", 
-      style = "dotted", 
-      width = 4 
-    ) 
-  ) 
+  i = 3,
+  j = 1:3,
+  border = fp_border(
+    color = "red",
+    style = "dotted",
+    width = 4
+  )
+)
 ```
 
 
@@ -1016,14 +1016,14 @@ The border description itself, and it takes only a few arguments: colour, style 
 #| eval: false
 ft %>%
   hline(
-    i = 3, 
-    j = 1:3, 
+    i = 3,
+    j = 1:3,
     border = fp_border(
       color = "red",
       style = "dotted",
       width = 4
     )
-  ) 
+  )
 ```
 :::
 <!--end of the 1st column-->
@@ -1032,14 +1032,14 @@ ft %>%
 #| echo: false
 ft %>%
   hline(
-    i = 3, 
-    j = 1:3, 
+    i = 3,
+    j = 1:3,
     border = fp_border(
       color = "red",
       style = "dotted",
       width = 4
     )
-  ) 
+  )
 ```
 :::
 <!--end of the 2nd column-->
@@ -1055,38 +1055,39 @@ ft %>%
 ```{r borders-f}
 #| cache: false
 #| include: false
-tab_data %>% #BREAK 
+tab_data %>% # BREAK
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% #BREAK 
+  ) %>% # BREAK
   #--- remove all borders ---#
-  border_remove() %>% #BREAK
+  border_remove() %>% # BREAK
   #--- horizontal lines ---#
-  hline(i = 3, j = 1:3, border = fp_border(color = "red")) %>% #BREAK 
+  hline(i = 3, j = 1:3, border = fp_border(color = "red")) %>% # BREAK
   #--- horizontal line at the bottom ---#
-  hline_bottom(j = 3:4, border = fp_border(color = "green")) %>% #BREAK 
+  hline_bottom(j = 3:4, border = fp_border(color = "green")) %>% # BREAK
   #--- horizontal line at the top ---#
-  hline_top(j = 1:3, border = fp_border(color = "orange")) %>% #BREAK 
+  hline_top(j = 1:3, border = fp_border(color = "orange")) %>% # BREAK
   #--- vertical lines ---#
-  vline(border = fp_border(color = "orange")) %>% #BREAK 
+  vline(border = fp_border(color = "orange")) %>% # BREAK
   #--- vertical on the left edge  ---#
-  vline_left(border = fp_border(color = "grey", width = 2)) %>% #BREAK 
+  vline_left(border = fp_border(color = "grey", width = 2)) %>% # BREAK
   #--- vertical on the right edge  ---#
-  vline_right(border = fp_border(color = "red", width = 2)) %>% #BREAK 
+  vline_right(border = fp_border(color = "red", width = 2)) %>% # BREAK
   #--- borders of individual cells ---#
-  border(i = 4, j = 2, 
+  border(
+    i = 4, j = 2,
     border.top = fp_border(color = "red", width = 3),
     border.left = fp_border(color = "green", width = 3),
     border.right = fp_border(color = "black", width = 3),
     border.bottom = fp_border(color = "pink", width = 3)
-  ) %>% #BREAK 
+  ) %>% # BREAK
   #--- horizontal lines (inner) ---#
-  border_inner_h(border = fp_border(color = "black")) %>% #BREAK 
+  border_inner_h(border = fp_border(color = "black")) %>% # BREAK
   #--- vertical lines (inner) ---#
-  border_inner_v(border = fp_border(color = "black")) %>% #BREAK 
-  border_remove() %>% #BREAK 
+  border_inner_v(border = fp_border(color = "black")) %>% # BREAK
+  border_remove() %>% # BREAK
   #--- the outer lines ---#
-  border_outer(border = fp_border(color = "red", width = 4)) 
+  border_outer(border = fp_border(color = "red", width = 4))
 ```
 
 `r chunk_reveal_quarto(
@@ -1126,9 +1127,9 @@ You can use these functions to add a row to the top or the bottom of a table:
 **Syntax**
 
 ```{r eval = F}
-add_*_row(flextable, 
-  values = vector of characters, 
-  colwidths = vector of integers 
+add_*_row(flextable,
+  values = vector of characters,
+  colwidths = vector of integers
 )
 ```
 
@@ -1154,13 +1155,13 @@ You might want to use `footnote()` to create footnotes instead of `add_footer_ro
 #### Example
 
 ```{r}
-ft %>% 
+ft %>%
   add_header_row(
     values = c("3-column label", "1-column label"),
     colwidths = c(3, 1)
-  ) %>% 
-  align(align = "center", part = "header") %>% 
-  autofit() %>% 
+  ) %>%
+  align(align = "center", part = "header") %>%
+  autofit() %>%
   add_footer_row(
     values = "4-column footnote, which is made longer to show it spans across the entire columns.",
     colwidths = 4
@@ -1263,9 +1264,9 @@ In the example's named list, country underscore name becomes the displayed label
 
 ```{r eval = F}
 set_header_labels(
-  values = list( 
-    existing name 1 = "new name 1", 
-    existing name 2 = "new name 2" 
+  values = list(
+    existing name 1 = "new name 1",
+    existing name 2 = "new name 2"
   )
 )
 ```
@@ -1285,8 +1286,8 @@ ft %>%
       country_name = "Country Name",
       region = "Region"
     )
-  ) %>% 
-  autofit() 
+  ) %>%
+  autofit()
 ```
 :::
 <!--end of the 1st column-->
@@ -1299,8 +1300,8 @@ ft %>%
       country_name = "Country Name",
       region = "Region"
     )
-  ) %>% 
-  autofit() 
+  ) %>%
+  autofit()
 ```
 :::
 <!--end of the 2nd column-->
@@ -1338,7 +1339,7 @@ The default is to delete the header.
 ::: {.column width="50%"}
 ```{r}
 #| eval: false
-ft %>% 
+ft %>%
   delete_part()
 ```
 :::
@@ -1346,7 +1347,7 @@ ft %>%
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
-ft %>% 
+ft %>%
   delete_part()
 ```
 :::
@@ -1359,17 +1360,16 @@ ft %>%
 You can still (or have to) use the original variable names from the dataset for selectors even after you delete the header:
 
 ```{r }
-tab_data %>%  
+tab_data %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  delete_part() %>% 
+  ) %>%
+  delete_part() %>%
   hline(
-    i = 3, 
-    j = ~ country_name + region, 
-    border = fp_border(color = "red", style = "dotted", width = 4 
-    ) 
-  )  
+    i = 3,
+    j = ~ country_name + region,
+    border = fp_border(color = "red", style = "dotted", width = 4)
+  )
 ```
 
 :::
@@ -1433,7 +1433,7 @@ Vertical merging collapses adjacent cells in a column that hold the same value i
 **Before**
 
 ```{r }
-ft 
+ft
 ```
 :::
 <!--end of the 1st column-->
@@ -1441,7 +1441,7 @@ ft
 **After**
 
 ```{r }
-ft %>%  merge_v(j = ~ region)
+ft %>% merge_v(j = ~region)
 ```
 :::
 <!--end of the 2nd column-->
@@ -1467,11 +1467,11 @@ Both sides begin with tab data. Mutate uses ifelse to replace Australia with the
 
 ```{r}
 tab_data %>%
-  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  merge_v(j = ~ region)
+  ) %>%
+  merge_v(j = ~region)
 ```
 :::
 <!--end of the 1st column-->
@@ -1480,11 +1480,12 @@ tab_data %>%
 
 ```{r }
 tab_data %>%
-  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  merge_v(j = ~ region) %>% autofit()
+  ) %>%
+  merge_v(j = ~region) %>%
+  autofit()
 ```
 
 It adjusted the width of the 1st column so that more texts are displayed in a single row.
@@ -1516,10 +1517,10 @@ The two columns deliberately repeat the same setup so the final function is the 
 
 ```{r}
 tab_data %>%
-  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
+  ) %>%
   autofit()
 ```
 :::
@@ -1529,11 +1530,11 @@ tab_data %>%
 
 ```{r}
 tab_data %>%
-  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>% 
+  mutate(country_name = ifelse(country_name == "Australia", "super long country name .......... bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh bluh", country_name)) %>%
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% 
-  autofit() %>% 
+  ) %>%
+  autofit() %>%
   fit_to_width(max_width = 6)
 ```
 :::
@@ -1568,9 +1569,9 @@ ft %>%
 **After**
 
 ```{r}
-ft %>% 
-  autofit() %>% 
-  width(j = ~ country_name, width = 1)
+ft %>%
+  autofit() %>%
+  width(j = ~country_name, width = 1)
 ```
 :::
 <!--end of the 2nd column-->
@@ -1606,9 +1607,9 @@ We can save the table in various formats.
 Let's create a table for demonstration:
 
 ```{r}
-table_temp <- 
-  tab_data %>%  
-  flextable(col_keys = c("country_name", "region", "y_1995", "y_2005")) 
+table_temp <-
+  tab_data %>%
+  flextable(col_keys = c("country_name", "region", "y_1995", "y_2005"))
 ```
 
 ### Word or Power Point
@@ -1654,7 +1655,7 @@ No extra package to install. `save_as_image()` draws the table with R's own grap
 **png**
 
 ```{r eval = F}
-save_as_image(table_temp, path = "temp_table.png") 
+save_as_image(table_temp, path = "temp_table.png")
 ```
 
 <br>
@@ -1662,7 +1663,7 @@ save_as_image(table_temp, path = "temp_table.png")
 **png, at print resolution**
 
 ```{r eval = F}
-save_as_image(table_temp, path = "temp_table.png", res = 300) 
+save_as_image(table_temp, path = "temp_table.png", res = 300)
 ```
 
 <br>
@@ -1670,7 +1671,7 @@ save_as_image(table_temp, path = "temp_table.png", res = 300)
 **svg** (vector, so it stays sharp at any size)
 
 ```{r eval = F}
-save_as_image(table_temp, path = "temp_table.svg") 
+save_as_image(table_temp, path = "temp_table.svg")
 ```
 
 <br>

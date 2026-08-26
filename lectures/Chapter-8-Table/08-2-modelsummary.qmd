@@ -104,7 +104,7 @@ Then, get the data:
 #--- get the data ---#
 data(county_yield, package = "r.spatial.workshop.datasets")
 
-county_yield <- dplyr::select(county_yield, - geometry)
+county_yield <- dplyr::select(county_yield, -geometry)
 ```
 
 #### Look at the data
@@ -264,44 +264,42 @@ In the table, the coefficient rows are placed in the order they are ordered in t
 
 ```{r coef, eval = F}
 #| eval: false
- 
+
 #--- define a coef_map vector ---#
 coef_map_vec <- c(
-  "d1_5_9" = "DI: category 1", 
-  "d2_5_9" = "DI: category 2", 
-  "d3_5_9" = "DI: category 3", 
-  "d4_5_9" = "DI: category 4", 
+  "d1_5_9" = "DI: category 1",
+  "d2_5_9" = "DI: category 2",
+  "d3_5_9" = "DI: category 3",
+  "d4_5_9" = "DI: category 4",
   "(Intercept)" = "Constant"
-) 
+)
 
 #--- create a table ---#
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
+  list(model_2_corn, model_2_soy),
   coef_map = coef_map_vec
 )
-
 ```
 :::
 <!--end of the 1st column-->
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
- 
+
 #--- define a coef_map vector ---#
 coef_map_vec <- c(
-  "d1_5_9" = "DI: category 1", 
-  "d2_5_9" = "DI: category 2", 
-  "d3_5_9" = "DI: category 3", 
-  "d4_5_9" = "DI: category 4", 
+  "d1_5_9" = "DI: category 1",
+  "d2_5_9" = "DI: category 2",
+  "d3_5_9" = "DI: category 3",
+  "d4_5_9" = "DI: category 4",
   "(Intercept)" = "Constant"
-) 
+)
 
 #--- create a table ---#
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
+  list(model_2_corn, model_2_soy),
   coef_map = coef_map_vec
 )
-
 ```
 :::
 <!--end of the 2nd column-->
@@ -325,8 +323,8 @@ You supply a vector of strings (and/or regular expressions), and coefficient row
 ```{r}
 #| eval: false
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
-  coef_omit ="d2"
+  list(model_2_corn, model_2_soy),
+  coef_omit = "d2"
 )
 ```
 
@@ -340,8 +338,8 @@ modelsummary::msummary(
 ```{r}  
 #| echo: false
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
-  coef_omit ="d2"
+  list(model_2_corn, model_2_soy),
+  coef_omit = "d2"
 )
 ```
 :::
@@ -367,8 +365,8 @@ You supply a vector of strings (and/or regular expressions), and statistics that
 ```{r}
 #| eval: false
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
-  gof_omit ="IC|Adj"
+  list(model_2_corn, model_2_soy),
+  gof_omit = "IC|Adj"
 )
 ```
 
@@ -380,8 +378,8 @@ modelsummary::msummary(
 ```{r}
 #| echo: false
 modelsummary::msummary(
-  list(model_2_corn, model_2_soy), 
-  gof_omit ="IC|Adj"
+  list(model_2_corn, model_2_soy),
+  gof_omit = "IC|Adj"
 )
 ```
 :::
@@ -398,10 +396,10 @@ modelsummary::msummary(
 ```{r}
 #--- create a table (data.frame) to insert ---#
 (
-rows <- data.frame(
-  c1 = c("FE: County", "FE: Year"),
-  c2 = c("Yes", "Yes"),
-  c3 = c("No", "No")   #--- CHANGED: second entry read "Now" ---#
+  rows <- data.frame(
+    c1 = c("FE: County", "FE: Year"),
+    c2 = c("Yes", "Yes"),
+    c3 = c("No", "No") #--- CHANGED: second entry read "Now" ---#
   )
 )
 ```
@@ -416,8 +414,8 @@ attr(rows, "position") <- c(3, 4)
 
 #--- create a table with rows inserted ---#
 modelsummary::msummary(
-  list(Model1 = model_2_corn, Model2 = model_2_soy), 
-  gof_omit ="IC|Adj",
+  list(Model1 = model_2_corn, Model2 = model_2_soy),
+  gof_omit = "IC|Adj",
   coef_omit = "d",
   add_rows = rows #<<   #--- CHANGED: was add_row; it worked only by R's partial argument matching ---#
 )
@@ -463,7 +461,7 @@ You can achieve this using the `vcov` option. You give it a list of variance-cov
 
 **Syntax:**
 ```{r eval = F}
-vcov = list(vcov_1, vcov_2, ...)
+vcov <- list(vcov_1, vcov_2, ...)
 ```
 
 <br>
@@ -483,11 +481,11 @@ Default:
 
 ```{r }
 modelsummary::msummary(
-  list(Model1 = model_2_corn, Model2 = model_2_soy), 
+  list(Model1 = model_2_corn, Model2 = model_2_soy),
   gof_omit = "IC|R",
   coef_omit = "d3|d4"
   #--- no statistical override ---#
-)  
+)
 ```
 :::
 <!--end of the 1st column-->
@@ -496,7 +494,7 @@ VCOV swapped:
 
 ```{r }
 modelsummary::msummary(
-  list(Model1 = model_2_corn, Model2 = model_2_soy), 
+  list(Model1 = model_2_corn, Model2 = model_2_soy),
   gof_omit = "IC|R",
   coef_omit = "d3|d4",
   #--- CHANGED: was statistic_override, which is silently ignored ---#
@@ -575,7 +573,7 @@ Using the `output` option in `modelsummary::msummary()`, you can turn the regres
 
 ```{r}
 #--- create a regression table and turn it into a flextable object ---#
-reg_table_ft <- list(model_1_corn, model_1_soy)%>% 
+reg_table_ft <- list(model_1_corn, model_1_soy) %>%
   modelsummary::msummary(output = "flextable")
 
 #--- check the class ---#
@@ -588,7 +586,7 @@ class(reg_table_ft)
 
 ```{r }
 #--- create a regression table and turn it into a gt_tbl ---#
-reg_table_gt <- list(model_1_corn, model_1_soy)%>% 
+reg_table_gt <- list(model_1_corn, model_1_soy) %>%
   modelsummary::msummary(output = "gt")
 
 #--- check the class ---#
@@ -637,17 +635,17 @@ Here I will just give you an example of the use of `flextable` operations.
 ```{r}
 #| eval: false
 list(
-  "Corn 1" = model_1_corn, 
-  "Corn 2" =  model_2_corn, 
-  "Soy 1" = model_1_soy, 
+  "Corn 1" = model_1_corn,
+  "Corn 2" = model_2_corn,
+  "Soy 1" = model_1_soy,
   "Soy 2" = model_2_soy
-) %>% 
-modelsummary::msummary(
-  output = "flextable",
-  gof_omit ="IC|Adj",
-) %>%  
-bold(i = 9, j = c(3, 5), bold = TRUE) %>% 
-color(i = 3, j = 2, color = "red")
+) %>%
+  modelsummary::msummary(
+    output = "flextable",
+    gof_omit = "IC|Adj",
+  ) %>%
+  bold(i = 9, j = c(3, 5), bold = TRUE) %>%
+  color(i = 3, j = 2, color = "red")
 ```
 :::
 <!--end of the 1st column-->
@@ -655,17 +653,17 @@ color(i = 3, j = 2, color = "red")
 ```{r edit-ft}  
 #| echo: false
 list(
-  "Corn 1" = model_1_corn, 
-  "Corn 2" =  model_2_corn, 
-  "Soy 1" = model_1_soy, 
+  "Corn 1" = model_1_corn,
+  "Corn 2" = model_2_corn,
+  "Soy 1" = model_1_soy,
   "Soy 2" = model_2_soy
-) %>% 
-modelsummary::msummary(
-  output = "flextable",
-  gof_omit ="IC|Adj",
-) %>%  
-bold(i = 9, j = c(3, 5), bold = TRUE) %>% 
-color(i = 3, j = 2, color = "red")
+) %>%
+  modelsummary::msummary(
+    output = "flextable",
+    gof_omit = "IC|Adj",
+  ) %>%
+  bold(i = 9, j = c(3, 5), bold = TRUE) %>%
+  color(i = 3, j = 2, color = "red")
 ```
 :::
 <!--end of the 2nd column-->
@@ -694,21 +692,21 @@ For the details of how to use the `gt` package, see the `gt` documentation. Here
 ```{r} 
 #| eval: false
 list(
-  "Corn 1" = model_1_corn, 
-  "Corn 2" =  model_2_corn, 
-  "Soy 1" = model_1_soy, 
+  "Corn 1" = model_1_corn,
+  "Corn 2" = model_2_corn,
+  "Soy 1" = model_1_soy,
   "Soy 2" = model_2_soy
-) %>% 
+) %>%
   modelsummary::msummary(
     output = "gt",
-    gof_omit ="IC|Adj",
-  ) %>%  
+    gof_omit = "IC|Adj",
+  ) %>%
   gt::tab_spanner( #<<
     label = "Corn", #<<
     columns = vars("Corn 1", "Corn 2") #<<
   ) %>% #<<
   gt::tab_style( #<<
-    style = cell_text(color = 'red'), #<<
+    style = cell_text(color = "red"), #<<
     locations = cells_body(rows = 7:8) #<<
   ) #<<
 ```
@@ -718,21 +716,21 @@ list(
 ```{r} 
 #| echo: false
 list(
-  "Corn 1" = model_1_corn, 
-  "Corn 2" =  model_2_corn, 
-  "Soy 1" = model_1_soy, 
+  "Corn 1" = model_1_corn,
+  "Corn 2" = model_2_corn,
+  "Soy 1" = model_1_soy,
   "Soy 2" = model_2_soy
-) %>% 
+) %>%
   modelsummary::msummary(
     output = "gt",
-    gof_omit ="IC|Adj",
-  ) %>%  
+    gof_omit = "IC|Adj",
+  ) %>%
   gt::tab_spanner( #<<
     label = "Corn", #<<
     columns = vars("Corn 1", "Corn 2") #<<
   ) %>% #<<
   gt::tab_style( #<<
-    style = cell_text(color = 'red'), #<<
+    style = cell_text(color = "red"), #<<
     locations = cells_body(rows = 7:8) #<<
   ) #<<
 ```
@@ -760,17 +758,17 @@ On the right of the tilde, state name times Mean plus S-D creates a Mean and an 
 </details>
 
 ```{r exmaple-table}
-county_yield %>% 
-  dplyr::filter(year %in% 2010:2012) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2010:2012) %>%
   modelsummary::datasummary(
-    (Year = factor(year)) * (
-      (`Corn Yield (bu/acre)` = corn_yield) + 
-      (`Soy Yield (bu/acre)` = soy_yield) + 
-      (`DI: category 4` = d4_5_9)
-    ) ~ 
-    state_name * (Mean + SD) ,
+    (Year <- factor(year)) * (
+      (`Corn Yield (bu/acre)` <- corn_yield) +
+        (`Soy Yield (bu/acre)` <- soy_yield) +
+        (`DI: category 4` <- d4_5_9)
+    ) ~
+      state_name * (Mean + SD),
     data = .
-  )  
+  )
 ```
 
 ## `modelsummary::datasummary()`
@@ -894,12 +892,12 @@ You can use a user-defined function that takes a vector of values and return a s
 
 ```{r user-defined}  
 #--- define a function ---#
-MinMax <- function(x){
-  paste0('[', min(x, na.rm = TRUE), ', ', max(x, na.rm = TRUE), ']')
-} 
+MinMax <- function(x) {
+  paste0("[", min(x, na.rm = TRUE), ", ", max(x, na.rm = TRUE), "]")
+}
 
 #--- use it ---#
-modelsummary::datasummary(corn_yield ~ MinMax, data = county_yield) 
+modelsummary::datasummary(corn_yield ~ MinMax, data = county_yield)
 ```
 
 
@@ -919,7 +917,7 @@ You can add more variables and statistics using `+`.
 ```{r plus}  
 modelsummary::datasummary(
   corn_yield + soy_yield + d0_5_9 + d1_5_9
-  ~ Mean + SD+ MinMax + Histogram, 
+  ~ Mean + SD + MinMax + Histogram,
   data = county_yield
 )
 ```
@@ -944,8 +942,8 @@ In current `modelsummary`, `All()` can summarize the numeric columns of a `tibbl
 
 ```{r all, cache = F}  
 modelsummary::datasummary(
-  All(county_yield) 
-  ~ Mean + SD, 
+  All(county_yield)
+  ~ Mean + SD,
   data = county_yield
 )
 ```
@@ -976,10 +974,10 @@ You can nest categorical variables with `*`, meaning you can get summary statist
 
 ```{r eval = F}
 #--- single stat ---#
-variable ~ category_variable * stat  
+variable ~ category_variable * stat
 
 #--- multiple stats ---#
-variable ~ category_variable * (stat 1 + stat 2 + ...)  
+variable ~ category_variable * (stat 1 + stat 2 + ...)
 ```
 
 <br>
@@ -1011,12 +1009,12 @@ You can nest with multiple categorical variables by multiplying stats with multi
 **Example**:
 
 ```{r deeper}  
-county_yield %>% 
-  dplyr::filter(year %in% 2011:2012) %>% 
-  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2011:2012) %>%
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
     corn_yield + soy_yield + d0_5_9 + d1_5_9
-    ~ factor(year) * state_name * (Mean + SD) + MinMax, 
+    ~ factor(year) * state_name * (Mean + SD) + MinMax,
     data = .
   )
 ```
@@ -1043,12 +1041,12 @@ You can provide labels by the following syntax: `(label = variable/stat)`
 **Example**:
 
 ```{r renaming}  
-county_yield %>% 
-  dplyr::filter(year %in% 2011:2012) %>% 
-  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2011:2012) %>%
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
-    (`Corn Yield (bu/acre)` = corn_yield)
-    ~ state_name * (Mean + (Std.Dev. = SD)), 
+    (`Corn Yield (bu/acre)` <- corn_yield)
+    ~ state_name * (Mean + (Std.Dev. <- SD)),
     data = .
   )
 ```
@@ -1085,13 +1083,13 @@ You can pass option arguments to the stats function by: `stat * Argument(options
 **Example**:
 
 ```{r arguments}  
-county_yield %>% 
-  dplyr::filter(year %in% 2011:2012) %>% 
-  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2011:2012) %>%
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
-    corn_yield 
+    corn_yield
     ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) +
-      quantile * Arguments(probs = 0.1, na.rm = TRUE), 
+      quantile * Arguments(probs = 0.1, na.rm = TRUE),
     data = .
   )
 ```
@@ -1114,13 +1112,13 @@ The rest of this call deliberately repeats the previous tab. The two filters def
 **Example**
 
 ```{r title}  
-county_yield %>% 
-  dplyr::filter(year %in% 2011:2012) %>% 
-  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2011:2012) %>%
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
-    corn_yield 
-    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) + 
-      quantile * Arguments(probs = 0.1, na.rm = TRUE),  
+    corn_yield
+    ~ state_name * (mean + sd) * Arguments(na.rm = TRUE) +
+      quantile * Arguments(probs = 0.1, na.rm = TRUE),
     data = .,
     title = "A title",
     notes = c("first note", "second note")
@@ -1151,13 +1149,13 @@ The `n`th letter corresponds to `n`th column.
 **Example**:
 
 ```{r align}  
-county_yield %>% 
-  dplyr::filter(year %in% 2011:2012) %>% 
-  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>% 
+county_yield %>%
+  dplyr::filter(year %in% 2011:2012) %>%
+  dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
-    corn_yield 
-    ~ state_name * (`This is M E A N` = mean) * Arguments(na.rm = TRUE) + 
-      (`This is Q U A N T I L E` = quantile) * Arguments(probs = 0.1, na.rm = TRUE),
+    corn_yield
+    ~ state_name * (`This is M E A N` <- mean) * Arguments(na.rm = TRUE) +
+      (`This is Q U A N T I L E` <- quantile) * Arguments(probs = 0.1, na.rm = TRUE),
     data = .,
     align = "lrlc"
   )
@@ -1211,12 +1209,12 @@ modelsummary::datasummary_balance(variables to summarize ~ treatment dummy)
 **Example**:
 
 ```{r balance-tab, eval = F}  
-county_yield %>% 
-  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
-  dplyr::select(c(state_name, where(is.numeric))) %>% 
-  dplyr::select(- year) %>% 
+county_yield %>%
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>%
+  dplyr::select(c(state_name, where(is.numeric))) %>%
+  dplyr::select(-year) %>%
   modelsummary::datasummary_balance(
-    All (data.frame(.))~ state_name,
+    All(data.frame(.)) ~ state_name,
     data = .
   )
 ```
@@ -1241,10 +1239,10 @@ Use datasummary correlation when that standard matrix is the table you need. Ret
 You can create a correlation table with `datasummary_correlation()`.
 
 ```{r }
-county_yield %>% 
-  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>% 
-  dplyr::select(c(state_name, where(is.numeric))) %>% 
-  dplyr::select(- year) %>% 
+county_yield %>%
+  dplyr::filter(state_name %in% c("Nebraska", "Kansas")) %>%
+  dplyr::select(c(state_name, where(is.numeric))) %>%
+  dplyr::select(-year) %>%
   modelsummary::datasummary_correlation()
 ```
 

@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-edea051d6e4e30bb96c61747156a7319.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-5cbf9ce0bec82c5b0c7629bb4ee56cc4.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -565,7 +565,7 @@
       var available = Math.max(1, (area.clientWidth || 1005) - 16);
       var share = parseFloat(host.style.getPropertyValue("--webr-code-share")) / 100;
       if (!share) return;
-      if (available * (1 - share) < MIN_PLOT_PX) stack(host, false);
+      if (available * (1 - share) < MIN_PLOT_PX) stack(area, host, false);
     }
 
     function measureRenderedCode(area, host, code, attempt) {
@@ -653,7 +653,7 @@
       if (share >= MAX_CODE_SHARE || attempt > 40) {
         // Even at the widest permitted code column the line will not fit, so the
         // cell has no business being side by side at all.
-        stack(host, true);
+        stack(area, host, true);
         return;
       }
       setTracks(host, area, share + 0.02);
@@ -766,13 +766,12 @@
     // The one remaining way out of the side-by-side layout, and it can only fire
     // during load: the code will not fit on one line even in the widest column
     // allowed. Nothing a cell does at RUN time reaches here.
-    function stack(host, force) {
+    function stack(area, host, force) {
       // `::: {.side-out}` is a REQUEST, not an override: it cannot make code fit
       // that does not fit. What the exemption buys is that ordinary measurement
       // noise will not tear a deliberate wrapper down.
       if (host.dataset.webrLayoutManual === "true" && !force) return;
-      host.classList.remove("side-out");
-      host.dataset.webrLayout = "stacked";
+      markStacked(area, host);
     }
 
     // Called whenever the cell's DOM changes, which in practice means "the cell
@@ -790,16 +789,25 @@
       requestAnimationFrame(function () { markGutter(area, host); });
     }
 
-    // `::: {.stacked}` and `#| layout: stacked` both land here. Undoing the
-    // side-out wrapper is not enough on its own: custom.scss puts ANY cell that
-    // has drawn a figure side by side, keyed off `:has(... canvas)`, and that
-    // rule knows nothing about what this script decided. So a stacked plot cell
-    // obeyed the option until the moment the plot appeared and then reflowed into
-    // two columns anyway. The marker goes on the interactive area itself, which
-    // is the element that selector matches, so the stylesheet can stand aside.
-    function markStacked(area) {
+    // EVERY path that decides a cell stays stacked must come through here, and
+    // the reason is the attribute on the AREA. custom.scss puts any cell that has
+    // drawn a figure side by side, keyed off
+    // `:has(.qwebr-output-graph-area canvas):not([data-webr-layout="stacked"])`,
+    // and that `:not()` matches the interactive area — not the wrapper this
+    // script mostly works with. Stamping only the wrapper leaves that rule free
+    // to fire, and it fires at the moment the plot appears.
+    //
+    // What that looked like, measured on `L05_vector_raster_interaction.html`:
+    // the cell sat stacked until its plot was drawn, then flipped to
+    // `display: grid` with columns `1021px 9px` — custom.scss asks for `1fr 1fr`,
+    // but a `1fr` track may not shrink below its item's min-content width and
+    // Monaco's is the full slide — and the figure landed in the 9px track, 0x0,
+    // off the right edge of the slide. "The plot never appears." Adding
+    // `#| layout: stacked` by hand fixed it only because that option came through
+    // this function and stamped the area.
+    function markStacked(area, host) {
       area.dataset.webrLayout = "stacked";
-      var host = area.closest(".side-out") || area.closest(".cell") ||
+      host = host || area.closest(".side-out") || area.closest(".cell") ||
         area.parentElement;
       if (host) {
         host.classList.remove("side-out");
@@ -892,8 +900,26 @@
       var metrics = codeMetrics(details.code);
       if (!metrics.lines) return;
       // Too many lines, or a line too long for any column: no automatic split.
+      //
+      // Walking away silently was not the same as saying stacked, and the
+      // difference was 36 cells across the two courses. custom.scss's figure rule
+      // takes any unstamped cell that has drawn a plot into two columns of its
+      // own, which is the very layout this gate refuses: the code is too wide for
+      // half a slide, so the editor wraps. Record the decision instead.
+      //
+      // Only the AREA is stamped, and only the stylesheet reads it. A
+      // `::: {.side-out}` wrapper in the markup is left alone, because
+      // custom.scss already stands aside inside one and notebook.scss lays that
+      // cell out from the class — an author who typed the wrapper still gets it.
+      // `classes: qwebr-side-by-side` is exempt for the same reason: it is the
+      // author asking for custom.scss's layout by name.
       if (!fixedSplit &&
-        (metrics.lines > MAX_CODE_LINES || metrics.maxChars > 88)) return;
+        (metrics.lines > MAX_CODE_LINES || metrics.maxChars > 88)) {
+        if (!area.classList.contains("qwebr-side-by-side")) {
+          area.dataset.webrLayout = "stacked";
+        }
+        return;
+      }
 
       var existingWrapper = area.closest(".side-out");
 
@@ -906,10 +932,7 @@
       // two columns regardless of what this script decides, and the halved width
       // is not something the author who typed `::: {.side-out}` accounted for.
       if (area.closest(".column") && !fixedSplit) {
-        if (existingWrapper) {
-          existingWrapper.classList.remove("side-out");
-          existingWrapper.dataset.webrLayout = "stacked";
-        }
+        if (existingWrapper) markStacked(area, existingWrapper);
         return;
       }
 
@@ -963,6 +986,11 @@
         // A measured cell is judged on what R really printed.
         if (!entry && printsNothing(details.code) &&
           host.dataset.webrCodeFixed !== "true") {
+          // Not markStacked(): that also strips a `::: {.side-out}` wrapper, and
+          // this branch is a guess from the source rather than a measurement, so
+          // it must not tear an author's wrapper down. Only the two attributes,
+          // which is what keeps custom.scss's figure rule off the cell.
+          area.dataset.webrLayout = "stacked";
           host.dataset.webrLayout = "stacked";
           return;
         }
@@ -970,7 +998,7 @@
           // force: a `::: {.side-out}` wrapper is a request, and the class is in
           // the markup, so it must be REMOVED here or the stylesheet lays the cell
           // out in two columns whatever this script decided.
-          stack(host, true);
+          stack(area, host, true);
           return;
         }
         if (entry && entry.plot) host.dataset.webrPlot = "true";
@@ -1023,8 +1051,35 @@
       requestAnimationFrame(function () { assessOutput(area, host); });
     }
 
+    // `#| fig-max-height: 600`, or `#| fig-max-height: none` to lift the cap
+    // entirely for this cell. The 420px cap in notebook.scss is a floor plan for
+    // a slide that also carries a title, a tab bar and a couple of lines of text.
+    // Two things it cannot see: a slide with less on it than that, and a portrait
+    // figure, which gets nothing at all from the width it is handed and is held
+    // at whatever the cap allows in height. This writes the custom property the
+    // cap reads onto this cell only, so no other figure on the deck moves.
+    //
+    // Called from scan() rather than configure(), because configure() returns
+    // early for a setup cell, for `.stacked`, and for a cell inside a `.column`,
+    // and a figure in any of those is capped like every other.
+    function applyFigureCap(area) {
+      if (area.dataset.webrFigCap) return;
+      var details = detailsFor(area);
+      var raw = details && details.options && details.options["fig-max-height"];
+      if (!raw) return;
+      raw = String(raw).trim();
+      var value = raw === "none" ? "none"
+        : (parseFloat(raw) > 0 ? parseFloat(raw) + "px" : null);
+      if (!value) return;
+      area.dataset.webrFigCap = value;
+      area.style.setProperty("--webr-fig-max-height", value);
+    }
+
     function scan() {
-      document.querySelectorAll(".qwebr-interactive-area").forEach(configure);
+      document.querySelectorAll(".qwebr-interactive-area").forEach(function (area) {
+        applyFigureCap(area);
+        configure(area);
+      });
     }
 
     var pageObserver = new MutationObserver(scan);
@@ -2969,7 +3024,7 @@ globalThis.qwebrCreateMonacoEditorInstance = function (cellData) {
 <summary>
 Transcript
 </summary>
-<p>Last deck told you which features are related to which. This one puts that to work. A spatial join takes the attributes of one layer and attaches them to another based on where things are, rather than on a shared identifier. That is the operation that turns spatial data into something you can regress. You have county-level nitrogen use and watershed-level water quality with no common key between them, only geography, and a spatial join is what marries the two. We work through every combination of points and polygons, then two refinements: doing the join and the summary in one step, and weighting by how much area actually overlaps.</p>
+<p>Last deck told you which features are related to which. This one puts that to work. A spatial join takes the attributes of one layer and attaches them to another based on where things are, rather than on a shared identifier. That is the operation that turns spatial data into something you can regress. You have county-level nitrogen use and watershed-level water quality with no common key between them, only geography, and a spatial join is what marries the two. We work through every combination of points and polygons, then two refinements: doing the join and the summary in one step, and weighting by how much area actually overlaps. The learning objective on screen is therefore broader than memorising one function: you should be able to overlay two s-f objects, identify the relevant source features for each target feature, and bring their attributes together. The table of contents gives you the route. We start with the spatial-join idea, work through points against polygons, polygons against points, and polygons against polygons, then change the topological relation, combine a join and summary with aggregate, and finish with a cropping join. If the plotting or data-manipulation syntax is unfamiliar, use the ggplot-two and d-plyr primer links on the right before continuing.</p>
 </details>
 <p><br></p>
 <h3 id="learning-objectives">Learning objectives</h3>
@@ -3008,7 +3063,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Same arrangement as always. One habit that pays off particularly on this deck: after every join, print the result and count the rows. Joins change the shape of your data in ways that are easy to miss, and a join that silently multiplied your dataset fivefold will quietly ruin everything downstream. Several slides here exist precisely to make you look at row counts. Take them seriously rather than skimming to the next piece of syntax, because knowing what a join did to your data is most of the skill. The other thing worth doing is reading the row counts against the counts you started with, every time.</p>
+<p>Same arrangement as always. One habit that pays off particularly on this deck: after every join, print the result and count the rows. Joins change the shape of your data in ways that are easy to miss, and a join that silently multiplied your dataset fivefold will quietly ruin everything downstream. Several slides here exist precisely to make you look at row counts. Take them seriously rather than skimming to the next piece of syntax, because knowing what a join did to your data is most of the skill. The other thing worth doing is reading the row counts against the counts you started with, every time. The controls on screen let you review actively. Open the three-line menu at the lower left to jump through the table of contents, or press the letter o to see the whole deck in overview. The pale-blue area is an editable code area. Run Code evaluates the entire area, while highlighting only the lines you want and pressing Command-Enter on a Mac or Control-Enter on Windows evaluates just that selection. The two-sheets icon copies the code so you can paste it into R on your own computer. If your edits leave a cell in a confusing state, the reload icon immediately to the left of copy restores the original code. Use those controls to test the row-count habit rather than only reading about it.</p>
 </details>
 <p><br></p>
 <h3 id="interactive-navigation-tools">Interactive navigation tools</h3>
@@ -3123,7 +3178,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The first and simplest case. Every point falls in exactly one polygon, so every point gets exactly one set of values, and the join adds columns without adding rows. That is the easy case and the one people wrongly assume is typical. The function is st_join, target first and source second, and that argument order is the whole interface. As with subsetting last deck, the default relation is intersects, and for points there is nothing to worry about there, because a point either is inside a polygon or is not.</p>
+<p>The first and simplest case. In this example, every well matches exactly one county, so every well gets exactly one set of values, and the join adds columns without adding rows. Point-to-polygon joins do not guarantee one row per point: an unmatched point is retained with missing source attributes by default, while a point intersecting overlapping polygons is duplicated. The function is st_join, target first and source second, and that argument order is the whole interface. As with subsetting last deck, the default relation is intersects, and the polygons that intersect each point determine its matches.</p>
 </details>
 <p><strong>What?</strong></p>
 <p>For each of the observations (points) in the target points data,</p>
@@ -3145,7 +3200,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Nebraska irrigation wells as the target, county boundaries as the source. The map shows the setup: thousands of points scattered over ninety-odd polygons. The question this join answers is which county each well is in, which sounds trivial and is exactly the sort of thing you would otherwise do by hand or get wrong. Notice you are not told which county any well belongs to anywhere in the data. That information exists only in the coordinates, which is exactly the point of a spatial join. Any other kind of join would need a shared column, and here there simply is not one to use.</p>
+<p>Nebraska irrigation wells as the target, county boundaries as the source. The map shows the setup: thousands of points scattered over ninety-odd polygons. The question this join answers is which county each well is in, which sounds trivial and is exactly the sort of thing you would otherwise do by hand or get wrong. Notice you are not told which county any well belongs to anywhere in the data. That information exists only in the coordinates, which is exactly the point of a spatial join. Any other kind of join would need a shared column, and here there simply is not one to use. Read the plotting code from top to bottom. An empty ggplot call starts the canvas, the first geom-s-f draws ne-counties, and the second draws wells-ne on top so the points are not hidden by the polygons. Theme-void removes axes, ticks, and grid lines because those decorations do not help you see containment. The cell runs automatically when the slide opens, so the displayed map is the visual statement of the join problem. Move to Code to turn that spatial relationship into columns.</p>
 </details>
 <p>We use <code>wells_ne</code> (points) and <code>ne_counties</code> (polygons) data for illustration. Here is the map:</p>
 <div id="qwebr-insertion-location-2"></div>
@@ -3167,7 +3222,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Print the result and you will see statefp, countyfp and name appended to each well. Then do the check on this slide, which is the habit worth forming: filter to one county according to the join, pull that county’s boundary separately, and plot the two together. If the join worked, every point lands inside the outline. If it did not, you will see it instantly. Verifying a spatial join visually costs about four lines and catches the mistakes that are otherwise invisible, particularly mismatched coordinate systems, which produce a join that runs happily and returns nothing but missing values.</p>
+<p>Print the result and you will see statefp, countyfp and name appended to each well. Then do the check on this slide, which is the habit worth forming: filter to one county according to the join, pull that county’s boundary separately, and plot the two together. If the join worked, every point lands inside the outline. If it did not, you will see it instantly. Verifying a spatial join visually costs about four lines and catches mistakes that are otherwise invisible. A mismatched coordinate system stops the join with an error, while correctly aligned layers with no spatial matches return missing source attributes in the default left join. The first filter keeps joined rows whose appended name equals Adams, so those are wells classified as being in Adams County. The second filter applies the same name test to ne-counties to obtain the reference boundary independently. In the verification plot, the county geometry is drawn first and the selected wells second, then theme-void removes non-spatial decoration. That order makes any point outside the Adams outline easy to spot. This check tests the spatial assignment itself, not merely whether the expected columns exist.</p>
 </details>
 <div id="qwebr-insertion-location-4"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3216,7 +3271,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The same two layers, swapped round. The extraction figures are invented, generated with runif, since the real ones are not public, but they behave like the real thing for our purposes. What matters is the goal: an average per county. Right now that number does not exist anywhere. Extraction is recorded per well, counties have no extraction figure at all, and the only thing linking them is position. Two steps get you there. The join is the first, attaching every well’s extraction figure to the county it sits in, and the summarise is the second. Neither step is spatial on its own.</p>
+<p>The same two layers, swapped round. The extraction figures are invented, generated with runif, since the real ones are not public, but they behave like the real thing for our purposes. What matters is the goal: an average per county. Right now that number does not exist anywhere. Extraction is recorded per well, counties have no extraction figure at all, and the only thing linking them is position. Two steps get you there. The join is the first, attaching every well’s extraction figure to the county it sits in, and the summarise is the second. The join is spatial, while the summarisation is an ordinary non-spatial calculation. The first automatically run cell repeats the map, with county polygons drawn before well points and theme-void clearing the axes. The next cell changes the data. Mutate adds a column called g-w-extraction to wells-ne; n-row supplies one draw for every well, and run-if draws each fake value between the named minimum of fifty and maximum of four hundred acre-feet. The dot refers to the piped wells-ne object when its row count is calculated. The assignment saves the new column, while the outer parentheses also print the updated object so you can inspect it. Move to Code with the target, source, and outcome now clearly defined.</p>
 </details>
 <p>We use <code>ne_counties</code> (polygons) and <code>wells_ne</code> (points) data for illustration. Here is the map:</p>
 <div id="qwebr-insertion-location-7"></div>
@@ -3244,7 +3299,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is the one-to-many consequence, and it is the most important slide in the section. Each county now appears once per well inside it. Loup county, the first row, has no wells, so it appears once with missing values. Adams county has fifty-three wells, so it appears fifty-three times, with the identical county geometry repeated in every one of those rows. The identical check at the bottom proves that. This is normal and expected for a one-to-many join, but if you did not know to look, you would think your data had been corrupted.</p>
+<p>Here is the one-to-many consequence, and it is the most important slide in the section. Each county now appears once per well inside it. Loup county, the first row, has no wells, so it appears once with missing values. Adams county has fifty-three wells, so it appears fifty-three times, with the identical county geometry repeated in every one of those rows. The identical check at the bottom proves that. This is normal and expected for a one-to-many join, but if you did not know to look, you would think your data had been corrupted. The printed joined object has 1,052 rows rather than the 93 county rows you began with, which is the multiplication you are diagnosing. Filter then uses the county FIPS code string zero-zero-one to isolate Adams and saves those 53 rows as adams-county; the outer parentheses print them as part of the same action. Finally, selecting row one and row two with only the geometry column gives two one-row s-f objects, and identical returns true because both carry the same Adams multipolygon. Once you understand why that repetition occurs, move to Post-join processing to collapse the repeated rows to a county summary.</p>
 </details>
 <p>Evaluate <code>county_joined_with_wells</code> and you will see that <code>wellid</code> and <code>gw_extraction</code> variables are appended.</p>
 <div id="qwebr-insertion-location-10"></div>
@@ -3268,7 +3323,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The second step: group by county and summarise, which is ordinary dplyr with nothing spatial about it. Now read the two bullets, because they explain something you will hit constantly. Summarising an sf object is slow, and the reason is that geometry travels with the data, so summarise unions the geometries of each group as well as averaging the numbers. That is real work you did not ask for. Uncomment the line that drops the geometry and it becomes a plain data frame operation. Drop the geometry whenever you do not need it back.</p>
+<p>The second step: group by county and summarise, which is ordinary dplyr with nothing spatial about it. Now read the two bullets, because they explain something you will hit constantly. Summarising an sf object is slow, and the reason is that geometry travels with the data, so summarise unions the geometries of each group as well as averaging the numbers. That is real work you did not ask for. Uncomment the line that drops the geometry and it becomes a plain data frame operation. Drop the geometry whenever you do not need it back. In the pipeline, county-joined-with-wells enters first, group-by on county-f-p defines one group per county code, and summarize creates mean-g-w-extraction by applying mean to the joined well values in each group. A county with no wells has only a missing extraction value, so its reported mean remains missing with the code exactly as shown. If you keep the geometry, s-f must union the repeated county geometries and the result stays spatial. If you uncomment st-drop-geometry, the geometry column disappears before grouping, the unnecessary union is avoided, and the result is a much faster ordinary table. You could replace the expression inside summarize to calculate a different county statistic without changing the spatial join.</p>
 </details>
 <p>Since we joined the two layers, we can now do calculations that were not possible before. Here, we will calculate the average groundwater extraction by county.</p>
 <div id="qwebr-insertion-location-13"></div>
@@ -3306,7 +3361,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two Iowa datasets that share no key at all. Nitrogen use is recorded by county; the hydrologic units, the watersheds, follow rivers and ignore county lines entirely. There is no column you could join these on. Plot them and you can see the problem: the two sets of boundaries cut across each other with no relationship whatsoever. The nitrogen figures are simulated, but the geography is real, and that mismatch between administrative boundaries and natural ones is among the most common reasons anyone needs a spatial join at all. Data is collected on the units that are convenient to collect on, not the units you want to analyse.</p>
+<p>Two Iowa datasets that share no key at all. Nitrogen use is recorded by county; the hydrologic units, the watersheds, follow rivers and ignore county lines entirely. There is no column you could join these on. Plot them and you can see the problem: the two sets of boundaries cut across each other with no relationship whatsoever. The nitrogen figures are simulated, but the geography is real, and that mismatch between administrative boundaries and natural ones is among the most common reasons anyone needs a spatial join at all. Data is collected on the units that are convenient to collect on, not the units you want to analyse. Use both inner tabs to inspect what each row represents before joining. On Nitrogen use, printing i-a-nitrogen shows the county attributes and geometry, and the map passes that object to geom-s-f while mapping nitrogen-rate to fill, so colour displays the simulated pounds-per-acre values. On Hydrologic units, printing huc-i-a shows the HUC attributes and geometry, and its map draws those watershed polygons without an attribute fill. Flipping between the two tabs makes the incompatible boundaries, units of observation, and available attributes explicit. The Story tab then explains why those two layers need to meet.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">Nitrogen use</a></li><li><a href="#tabset-4-2">Hydrologic units</a></li></ul>
@@ -3335,14 +3390,14 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is the research question that motivates the whole section. You want to know whether nitrogen use affects water quality. Water quality is measured by watershed. Nitrogen use is recorded by county. To run any regression at all you need both variables on the same rows, and geography is the only thing that can put them there. Look at the overlaid map and think about what a sensible answer would even be for a watershed that spans eight counties. That question, what a sensible answer looks like when one watershed spans eight different counties, is exactly where this section ends up.</p>
+<p>Here is the research question that motivates the whole section. You want to know whether nitrogen use affects water quality. Assume water quality is measured by watershed, while nitrogen use is recorded by county. This demonstration contains no water quality variable; it only attaches county nitrogen rates to HUC geometries. To run a regression with water quality data, you would need both variables on the same rows, and geography is the only thing that can put them there. Look at the overlaid map and think about what a sensible answer would even be for a watershed that spans eight counties. That question, what a sensible answer looks like when one watershed spans eight different counties, is exactly where this section ends up. The map puts that question on screen. The first geom-s-f draws the county layer and maps nitrogen-rate to fill; alpha at zero-point-six makes the fill translucent so boundaries from both systems can remain visible. The second geom-s-f adds the HUC layer with alpha equal to zero, leaving its outlines over the counties. Theme-void removes axes and grid lines, and the final theme call moves the nitrogen legend to the bottom where it does not cover the map. Follow those crossing outlines into Demonstration, where location supplies the missing connection.</p>
 </details>
 <p>You are interested in understanding the impact of nitrogen use for agricultural production on water quality.</p>
 <ul>
-<li>You observe water quality for each of the hydrologic units (<code>huc_ia</code>)</li>
+<li>Assume water quality is observed for each hydrologic unit; this demonstration only attaches county nitrogen rates to the HUC geometries in <code>huc_ia</code></li>
 <li>You observe nitrogen use (lb/acre) at the county level (<code>ia_nitrogen</code>)</li>
 </ul>
-<p>You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of corn production on water quality.</p>
+<p>You would like to associate nitrogen use values with water quality values so that you can run statistical analysis on the impact of nitrogen use on water quality.</p>
 <div id="qwebr-insertion-location-18"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
 </div>
@@ -3351,7 +3406,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The join itself, one line as always, and then the row counts tell the story. The watershed with code 07060004 intersects eight counties, so it comes back as eight rows, each carrying the identical watershed geometry and one county’s nitrogen figure. Then the summarise gives you a mean per watershed. Notice that this treats all eight counties as equal, which is the assumption the next tab attacks. For now the mechanics are what matter: join, then group, then summarise, exactly the same three steps as the previous section. The assumption buried in that mean is what the next tab is about.</p>
+<p>The join itself, one line as always, and then the row counts tell the story. The watershed with code 07060004 intersects eight counties, so it comes back as eight rows, each carrying the identical watershed geometry and one county’s nitrogen figure. Then the summarise gives you a mean per watershed. Notice that this treats all eight counties as equal, which is the assumption the next tab attacks. For now the mechanics are what matter: join, then group, then summarise, exactly the same three steps as the previous section. The assumption buried in that mean is what the next tab is about. In the st-join call, the huc-i-a polygons are the target because they are first, and the i-a-nitrogen polygons are the source because they are second. The result is saved as huc-joined-with-acres. Filtering where HUC-code equals the quoted code isolates the eight matching rows, and the surrounding parentheses print them for inspection. The summary pipeline then deliberately calls st-drop-geometry before grouping, because this output is a table of values and does not need an expensive geometry union. Group-by on HUC-code defines one watershed at a time, and mean of nitrogen-rate creates the simple average named average-nitrogen-rate. Move to But to see why that computationally valid mean is substantively weak.</p>
 </details>
 <p>Let’s join the two:</p>
 <div id="qwebr-insertion-location-19"></div>
@@ -3372,7 +3427,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The catch, and it is a serious one. The join told you that eight counties intersect this watershed and nothing whatsoever about how much of each. A county contributing ninety percent of the area and one clipping a corner both count once in that mean. Look at the map: the sizes of the overlaps are obviously wildly different. So a simple average of the eight is not a defensible number for a regression. The fix is area weighting, which needs a different function, and that is the final section of the deck.</p>
+<p>The catch, and it is a serious one. The join told you that eight counties intersect this watershed and nothing whatsoever about how much of each. A county contributing ninety percent of the area and one clipping a corner both count once in that mean. Look at the map: the sizes of the overlaps are obviously wildly different. So a simple average of the eight is not a defensible number for a regression. The fix is area weighting, which needs a different function, and that is the final section of the deck. The important callout states the limitation precisely: the joined rows record the existence of an intersection, not its shape or size. In the plotting code, the filter uses the percent-in-percent operator to keep county FIPS codes found in huc-zero-seven-zero-six-zero-zero-zero-four, so only the eight matched counties are filled red. Their alpha of zero-point-five lets the HUC boundary remain visible, and the second layer draws that repeated HUC geometry on top. The picture shows why a binary match cannot supply weights. Follow the link to Cropping Join later in the deck, where the overlap geometry itself is returned and can be measured.</p>
 </details>
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -3403,22 +3458,22 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Intersects is the default relation but not the only one. The join argument takes a little function of two arguments describing whichever relation you want. Read the callout carefully, because the mistake it describes is easy to make: anything the relation needs, like a distance, goes inside the function you write, not next to it. Passing dist to st_join directly is an error, since st_join has no such argument to receive it. The syntax looks fussy the first time you write it, but it buys you every relation sf offers, and the next few slides put it to work on a problem that intersects cannot solve at all.</p>
+<p>Intersects is the default relation but not the only one. The join argument takes a function describing whichever relation you want. Additional arguments that relation needs, such as a distance, can be supplied directly to st_join, which forwards them to the relation. For example, st_join with join set to st_is_within_distance and dist set to five is valid. Wrapping the relation and its distance in a little function is optional. The next few slides put the distance relation to work on a problem that intersects cannot solve at all.</p>
 </details>
 <p>Spatial join with <code>st_join()</code> uses <code>st_intersects()</code> as the default topological relationship for joining. You can pick a different one with the <code>join</code> argument.</p>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="fu">st_join</span>(sf_1, sf_2, <span class="at">join =</span> \(x, y) st_<span class="sc">*</span>(x, y, ...))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="fu">st_join</span>(sf_1, sf_2, <span class="at">join =</span> st_<span class="sc">*</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>where <code>st_*</code> is the function that determines the topological relationship between <code>sf_1</code> and <code>sf_2</code>.</p>
-<div title="Extra arguments go *inside* the function">
+<p>where <code>st_*</code> determines the topological relationship between <code>sf_1</code> and <code>sf_2</code>, and <code>...</code> supplies any additional arguments that function needs.</p>
+<div title="Extra arguments are forwarded to the relation">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
-<p><strong>Extra arguments go <em>inside</em> the function</strong></p>
+<p><strong>Extra arguments are forwarded to the relation</strong></p>
 </div>
 <div class="callout-content">
-<p>Anything the relation needs, such as <code>dist</code>, belongs inside the little function you write, not alongside it. <code>st_join(..., dist = 5)</code> is an error — <code>unused argument (dist = 5)</code> — because <code>st_join()</code> has no <code>dist</code> argument of its own to receive it.</p>
+<p><code>st_join(sf_1, sf_2, join = st_is_within_distance, dist = 5)</code> is valid because <code>st_join()</code> forwards <code>dist</code> to the join function. Writing <code>join = \(x, y) st_is_within_distance(x, y, dist = 5)</code> is also valid, but optional.</p>
 </div>
 </div>
 </div>
@@ -3429,7 +3484,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Two point layers from an on-farm experiment: soybean yield measured by the combine, and seed rate recorded by the planter. Both are dense clouds of GPS readings over the same field. The reason this needs a distance relation rather than intersects is worth pausing on. These are two machines making separate passes over the same ground, so no yield point ever sits exactly on a seed rate point. Intersects would match nothing whatsoever, and you would get a dataset of missing values with no error to tell you why. Proximity is the only relation that can work here.</p>
+<p>Two point layers from an on-farm experiment: soybean yield measured by the combine, and seed rate recorded by the planter. Both are dense clouds of GPS readings over the same field. The reason this needs a distance relation rather than intersects is worth pausing on. These are two machines making separate passes over the same ground, so no yield point ever sits exactly on a seed rate point. Intersects would match nothing whatsoever, and you would get a dataset of missing values with no error to tell you why. Proximity is the only relation that can work here. The two data calls load soy-yield and as-applied-s-rate from the course data package into the working session. Both arrive as s-f point objects in the same projected coordinate reference system, whose distance unit is metres. That shared projected C-R-S is why the distance threshold used later can be interpreted directly in metres rather than degrees. The next tab supplies the research objective and lets you see how the two point clouds relate.</p>
 </details>
 <p>We use soy bean yield (points) data and as-applied seed rate (points) data.</p>
 <div id="qwebr-insertion-location-23"></div>
@@ -3440,7 +3495,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The economic question is whether planting more seed raises yield, and answering it means having both numbers on the same row. Look at the plot of red and blue points and you can see they interleave without ever coinciding. So the rule becomes: for each yield point, take the seed rate points within ten metres. That threshold is a judgement call about how far apart two readings can be and still describe the same patch of ground, and it is the sort of choice you should be prepared to defend.</p>
+<p>The economic question is whether planting more seed raises yield, and answering it means having both numbers on the same row. Look at the plot of red and blue points and you can see they interleave without ever coinciding. So the rule becomes: for each yield point, take the seed rate points within ten metres. That threshold is a judgement call about how far apart two readings can be and still describe the same patch of ground, and it is the sort of choice you should be prepared to defend. The empty ggplot call starts a layered map. The first geom-s-f draws soy-yield as small red points, with size set to zero-point-four so the dense readings do not obscure one another. The second uses the same size for as-applied-s-rate but colours those points blue, making the two machines’ tracks distinguishable. Theme-void removes the axes and leaves the spatial pattern. The plot justifies the proximity rule visually; the Demonstration tab turns that rule into the join argument.</p>
 </details>
 <p>You have run an on-farm field experiment to understand the impact of seed rate on soybean yield. Both are available as points data.</p>
 <div id="qwebr-insertion-location-24"></div>
@@ -3453,7 +3508,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The join with a distance relation, written as a small anonymous function with the ten metre threshold inside it. Then the summarise, because this is one-to-many again and a yield point may match several seed rate points. Note the commented-out line dropping the geometry, which is the same performance point from earlier and applies just as much here. The result is one average seed rate per yield point, which is the dataset you would actually run a regression on. Everything before this was getting the two machines’ readings onto the same rows.</p>
+<p>The join with a distance relation, written as a small anonymous function with the ten metre threshold inside it. Then the summarise, because this is one-to-many again and a yield point may match several seed rate points. Note the commented-out line dropping the geometry, which is the same performance point from earlier and applies just as much here. The result is one average seed rate per yield point, which is the dataset you would actually run a regression on. Everything before this was getting the two machines’ readings onto the same rows. Read the call carefully. Soy-yield is first, so each yield observation is a target; as-applied-s-rate is second, so seed attributes are the source. The anonymous function receives the two geometry sets as x and y and returns the matches from st-is-within-distance; dist equals ten in the layers’ metre-based C-R-S. The joined one-to-many rows are saved as soy-seed. In the next pipeline, group-by on yield-i-d gathers all matches for each original yield reading, and mean of seed-rate names their average average-seed-rate. An unmatched yield point still produces a missing average. Uncommenting st-drop-geometry is appropriate when the regression table no longer needs point geometry. Move to Inspect and verify before trusting the threshold.</p>
 </details>
 <p>Let’s join using <code>st_join()</code>:</p>
 <div id="qwebr-insertion-location-25"></div>
@@ -3468,7 +3523,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The verification, and this is the tab worth spending time on. The first yield point matched nothing, so its seed rate is missing, which happens whenever nothing lies within the threshold. The second matched two points. Rather than take that on trust, the code draws it: the yield point in red, a ten metre circle around it, and the nearby seed rate points labelled with their identifiers. Count what falls inside the circle. This is the same verify-by-picture habit from the first join, and it is how you catch a wrong threshold or a wrong CRS.</p>
+<p>The verification, and this is the tab worth spending time on. The first yield point matched nothing, so its seed rate is missing, which happens whenever nothing lies within the threshold. The second matched two points. Rather than take that on trust, the code draws it: the yield point in red, a ten metre circle around it, and the nearby seed rate points labelled with their identifiers. Count what falls inside the circle. This is the same verify-by-picture habit from the first join, and it is how you catch a wrong threshold or a wrong CRS. Printing soy-seed exposes the repeated matches and missing values directly. For the picture, the spatial subset uses a 20-metre buffer around row two of soy-yield only to collect enough nearby seed points to label; it does not change the join’s 10-metre rule. The plot draws that second yield point in red, then draws the actual 10-metre buffer as an unfilled blue boundary. Geom-s-f-text places each nearby point’s seed-i-d at its location with size six, and theme-void removes distractions. IDs one and five-five-eight fall inside the blue circle, so the visual check agrees with the two rows produced by the join.</p>
 </details>
 <div id="qwebr-insertion-location-27"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3515,7 +3570,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The one-liner, and then the reason to be careful with it. Look at the output: the well identifier has been averaged along with the extraction figures, giving a meaningless number in a column that looks perfectly respectable. That is what applying one function to every column gets you. The fix is on the same slide, selecting the column you actually want before aggregating. The general lesson is worth keeping: an operation that quietly does something to every column will do it to the columns you were not thinking about.</p>
+<p>The one-liner, and then the reason to be careful with it. Look at the output: the well identifier has been averaged along with the extraction figures, giving a meaningless number in a column that looks perfectly respectable. That is what applying one function to every column gets you. The fix is on the same slide, selecting the column you actually want before aggregating. The general lesson is worth keeping: an operation that quietly does something to every column will do it to the columns you were not thinking about. In the first call, wells-ne supplies the values to aggregate, ne-counties supplies one output geometry per county, and FUN equals mean tells aggregate how to combine every matched source column. The second call wraps the first argument in d-plyr select, keeping g-w-extraction as the only attribute to average. Because this is an s-f object, its geometry is retained even though it is not named in select, so aggregate can still find which wells intersect each county. The resulting county layer now contains a meaningful mean extraction column without the meaningless mean well identifier.</p>
 </details>
 <div id="qwebr-insertion-location-29"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3529,7 +3584,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The same shortcut applied to the soybean example, which shows that aggregate is not limited to intersects — the join argument works here exactly as it did with st_join. Note the warning in the bullets about argument order, because the code looks almost identical to the earlier version while meaning something different. Also be aware that this cell overwrites the soy_seed object you built a few slides ago with a different result, so if you go back and re-read that tab, you will not be looking at what it made.</p>
+<p>The same shortcut applied to the soybean example, which shows that aggregate is not limited to intersects — the join argument works here exactly as it did with st_join. Note the warning in the bullets about argument order, because the code looks almost identical to the earlier version while meaning something different. Also be aware that this cell overwrites the soy_seed object you built a few slides ago with a different result, so if you go back and re-read that tab, you will not be looking at what it made. Here as-applied-s-rate comes first because its columns are being averaged, while soy-yield comes second because each yield-point geometry defines an output group. FUN equals mean applies that average, and the anonymous join function passes x, y, and a 10-metre dist to st-is-within-distance. The outer parentheses print the newly assigned result. It has one geometry for each yield point, including missing source values where nothing matched. It also averages seed-i-d as well as seed-rate, so the warning from the preceding tab still applies: select only the source attributes whose means have a sensible interpretation.</p>
 </details>
 <p><code>aggregate()</code> is a fairly general procedure of spatial joining and summarization, and you can use it for many other cases including our example of soybean yield and seed rate (go <a href="#/sec-point-point-distance">here</a> for the example).</p>
 <p>Here is the code:</p>
@@ -3579,7 +3634,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Back to the small made-up data from last deck, because with three polygons and two lines you can check the answer by eye. Intersecting the lines with the polygons gives you the line segments that fall inside each polygon, and every segment is one row labelled with which line and which polygon produced it. Compare the two figures side by side: on the left the full lines running out past the polygon edges, on the right only the parts inside, cut cleanly at the boundary. That cutting is the whole difference from subsetting.</p>
+<p>Back to the small made-up data from last deck, because with three polygons and two lines you can check the answer by eye. Intersecting the lines with the polygons gives you the line segments that fall inside each polygon, and every segment is one row labelled with which line and which polygon produced it. Compare the two figures side by side: on the left the full lines running out past the polygon edges, on the right only the parts inside, cut cleanly at the boundary. That cutting is the whole difference from subsetting. The setup code constructs each geometry from coordinates. St-point makes the three individual points. Each st-linestring turns a matrix of endpoint coordinates into a line. Each polygon is a closed coordinate ring whose final coordinate repeats the first, wrapped in a list for st-polygon. For each collection, list gathers the geometries, st-s-f-c makes a simple-feature geometry column, st-as-s-f makes an s-f object, and mutate adds readable point, line, or polygon names. The points are part of the reusable toy setup even though this particular comparison uses only lines and polygons. The active operation is st-intersection of lines and polygons, so it returns every portion of a line that lies within a polygon and carries both layers’ name attributes. The pipe adds int-name by using paste-zero to join the line name, a hyphen, and the polygon name; the surrounding parentheses both save and print intersections-l-p.&nbsp;In the left plot, polygon name controls fill with alpha zero-point-three, line name controls colour, and the two discrete scales give the legends the titles Polygons and Lines. In the right plot, int-name controls the clipped segments’ colours, the translucent polygons provide context, and theme-void keeps both maps focused on geometry. The next tab repeats the operation with polygon targets and sources.</p>
 </details>
 <div id="qwebr-insertion-location-32"></div>
 <noscript>Please enable JavaScript to experience the dynamic code cell content on this page.</noscript>
@@ -3603,7 +3658,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>The same operation with polygons, which is the case we actually need. Intersecting polygons one and three with polygon two returns the overlapping regions as new polygons, one row each, with attributes from both parents. Look at the figure: the original polygons are filled and faint, and the intersections are outlined in heavy colour, sitting exactly where the shapes overlap. Those outlined pieces are new geometries that existed in neither input. Those outlined pieces are new geometries that existed in neither input, and crucially they have areas you can measure. That is what we came for, and the next tab applies it to the watersheds.</p>
+<p>The same operation with polygons, which is the case we actually need. Intersecting polygons one and three with polygon two returns one row for each overlap, with attributes from both parents. Polygon one is clipped into a new geometry, while polygon three remains unchanged because it lies wholly inside polygon two. Look at the figure: the original polygons are filled and faint, and the intersections are outlined in heavy colour, sitting exactly where the shapes overlap. Crucially, those outlined pieces have areas you can measure. That is what we came for, and the next tab applies it to the watersheds. The c of one and three row subscript selects polygons one and three as the first input, while the row-two subscript selects polygon two as the second. St-intersection cuts each first-input geometry to its overlap with the second and combines their attributes. Because both inputs contain a column called polygon-name, s-f keeps the first name unchanged and gives the second one the suffix dot-one. Paste-zero combines those two columns with a hyphen to form int-name, and the outer parentheses save and print intersections-p-p. The verification plot first maps every original polygon name to fill and uses alpha zero-point-three so overlaps remain visible. A second geom-s-f draws the returned pieces, mapping int-name to outline colour, increasing line-width to one-point-five, and setting alpha to zero so the new fill does not hide the originals. Theme-void removes the coordinate furniture. The coloured outlines are therefore the measurable geometries returned by st-intersection, not merely a highlight applied to the originals.</p>
 </details>
 <p>The following code gets the intersection of polygon 1 and polygon 3 with polygon 2. Each instance of the intersections of polygons 1 and 3 against polygon 2 becomes an observation (<code>polygon 1-polygon 2</code> and <code>polygon 3-polygon 2</code>).</p>
 <div id="qwebr-insertion-location-36"></div>
@@ -3618,7 +3673,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>And here it is applied to the real problem. Intersecting the watersheds with the counties gives one row per watershed-county pair, each with the geometry of that specific overlap. Take the area of each piece, multiply each county’s nitrogen rate by its area, add those up and divide by the total area, and you have a properly weighted average in which a county contributing ninety percent of the watershed counts ninety times as much as one contributing one percent. The map at the end shows the pieces one watershed is made of.</p>
+<p>And here it is applied to the real problem. Intersecting the watersheds with the counties gives one row per watershed-county pair, each with the geometry of that specific overlap. Take the area of each piece, multiply each county’s nitrogen rate by its area, add those up and divide by the total area, and you have a properly weighted average in which a county contributing ninety percent of the watershed counts ninety times as much as one contributing one percent. The map at the end shows the pieces one watershed is made of. In the first pipeline, st-intersection with huc-i-a first and i-a-nitrogen second cuts each HUC by every county it overlaps and carries the HUC and nitrogen attributes onto each returned piece. Mutate then creates huc-county by concatenating HUC-code, a hyphen, and county-f-p, giving each pair a useful label. The surrounding parentheses save the object as HUC-intersections and print it. Unlike st-join, its repeated HUC rows no longer carry identical whole-watershed geometries. Each row now contains only one HUC-county overlap. The final pipeline filters to the quoted HUC code zero-seven-zero-six-zero-zero-zero-four, passes those eight pieces into ggplot, and maps huc-county to fill so each county contribution has a different colour. Theme-void removes the axes. This tab prepares and displays the pieces but does not yet calculate their areas. The Exercise tab gives you the exact st-area, multiplication, sum, and division pattern needed to finish that calculation.</p>
 </details>
 <p>Let’s now get back to the example of HUC units and county-level nitrogen use data. We would like to find <span style="color: blue;"> area-weighted </span> average of nitrogen use instead of the simple average.</p>
 <p>Using <code>st_intersection()</code>, for each of the HUC polygons, we can find the intersecting counties, and then divide it into parts based on the boundary of the intersecting polygons.</p>
@@ -3635,7 +3690,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Your turn, on a deliberately simple layout: four unit squares in a grid with values one to four, and one square sitting over the middle of all four. Because it is centred, each quadrant contributes the same area, so you can work out the weighted answer in your head before writing any code. That is the point of the setup. Do problem one to get the intersection, then problem two to weight by area, and check your result against the number you predicted. If they disagree, the code is wrong, not your arithmetic.</p>
+<p>Your turn, on a deliberately simple layout: four equal two-by-two squares in a grid with values one to four, and another two-by-two square sitting over the middle of all four. Because it is centred, each overlap is one unit square, so you can work out the weighted answer in your head before writing any code. That is the point of the setup. Do problem one to get the intersection, then problem two to weight by area, and check your result against the number you predicted. If they disagree, the code is wrong, not your arithmetic. Start in Data Preparation. Each st-polygon receives a list containing a closed matrix of corner coordinates, and st-s-f-c combines the four adjacent squares into one geometry column. St-s-f with geometry equal to dot turns that column into an s-f object, and mutate with value equal to one through four assigns the four values in row order. The second construction uses the same steps for the single red square from coordinates one-one to three-three. Printing both objects lets you inspect attributes and geometry before plotting. In the map, factor of value makes fill a four-category legend rather than a continuous scale, alpha zero-point-five lets the layers show through one another, and theme-void leaves only the geometry. For Problem 1, fill in the editable st-intersection call with the two objects. The folded answer uses polygon-two first and polygon-one second, then saves the four one-by-one overlap pieces as intersection. For Problem 2, st-area of geometry measures each returned piece. As-numeric removes the units wrapper so those areas can be used in the arithmetic shown. Mutate stores the result as area, and summarize computes the weighted mean as the sum of value times area divided by the sum of area. Here every area is one, so the expression returns two-point-five, the ordinary mean of one, two, three, and four. In a real watershed, unequal overlap areas are exactly what make this formula different from a simple mean.</p>
 </details>
 <div class="panel-tabset">
 <ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Data Preparation</a></li><li><a href="#tabset-8-2">Problem 1</a></li><li><a href="#tabset-8-3">Problem 2</a></li></ul>

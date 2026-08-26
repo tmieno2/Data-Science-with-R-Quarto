@@ -44,8 +44,8 @@ The learning objective on screen is therefore quite focused: learn to create map
 </details>
 
 ```{r}
-#| include: false 
-#| cache: false 
+#| include: false
+#| cache: false
 
 #--- CHANGED: dropped patchwork, tigris, mapview, lubridate and RStoolbox.   ---#
 #--- None of them is called anywhere in this deck, but each had to be         ---#
@@ -307,7 +307,7 @@ When you want to print labels on a map, you can use `geom_sf_text()`. `geom_sf()
 
 **Syntax**
 ```{r, eval = FALSE}
-geom_sf_text(aes(label = var_name)) 
+geom_sf_text(aes(label = var_name))
 ```
 
 + `var_name`: name of the label variable
@@ -483,7 +483,7 @@ Here are some of the aesthetic variables for polygons:
 ```{webr-r}
 ggplot() +
   geom_sf(
-    data  = ne_counties,
+    data = ne_counties,
     linewidth = 0.4,
     color = "red",
     fill = "darkgreen"
@@ -498,7 +498,7 @@ ggplot() +
 ```{webr-r}
 ggplot() +
   geom_sf(
-    data  = ne_counties,
+    data = ne_counties,
     aes(color = name),
     fill = "darkgreen"
   )
@@ -512,7 +512,7 @@ ggplot() +
 ```{webr-r}
 ggplot() +
   geom_sf(
-    data  = ne_counties,
+    data = ne_counties,
     aes(fill = countyfp),
     color = "red"
   )
@@ -597,8 +597,8 @@ Follow the Instruction callout literally. In each cell, add a plus sign after li
 ```{webr-r}
 #| out-width: 100%
 ggplot(data = ne_counties) +
-  geom_sf() 
-  # geom_sf(fill = "red")
+  geom_sf()
+# geom_sf(fill = "red")
 ```
 :::
 
@@ -607,7 +607,7 @@ ggplot(data = ne_counties) +
 #| out-width: 100%
 ggplot() +
   geom_sf(data = ne_counties)
-  # geom_sf(fill = "red")
+# geom_sf(fill = "red")
 ```
 :::
 
@@ -635,7 +635,7 @@ Here is the whole idea in one block: three geom_sf calls, one per dataset, added
 ggplot() +
   #--- county ---#
   geom_sf(
-    data = ne_counties 
+    data = ne_counties
   ) +
   #--- railroads ---#
   geom_sf(
@@ -647,7 +647,6 @@ ggplot() +
     data = wells_ne_sf,
     size = 0.2
   )
-
 ```
 
 ### Order matters
@@ -668,7 +667,7 @@ Layers are drawn in the order you add them, so later layers paint over earlier o
 Wells are hidden beneath the county layer:
 
 ```{webr-r}
-ggplot()  +
+ggplot() +
   #--- wells ---#
   geom_sf(
     data = wells_ne_sf,
@@ -676,7 +675,7 @@ ggplot()  +
   ) +
   #--- county ---#
   geom_sf(
-    data = ne_counties 
+    data = ne_counties
   ) +
   #--- railroads ---#
   geom_sf(
@@ -694,7 +693,7 @@ Hide the railroads beneath the county layer.
 <br>
 
 ```{webr-r}
-ggplot()  +
+ggplot() +
   #--- wells ---#
   geom_sf(
     data = wells_ne_sf,
@@ -702,7 +701,7 @@ ggplot()  +
   ) +
   #--- county ---#
   geom_sf(
-    data = ne_counties 
+    data = ne_counties
   ) +
   #--- railroads ---#
   geom_sf(
@@ -739,10 +738,10 @@ st_crs(ne_counties)
 <br>
 
 ```{webr-r}
-ggplot()  +
+ggplot() +
   #--- county ---#
   geom_sf(
-    data = ne_counties 
+    data = ne_counties
   )
 ```
 
@@ -763,10 +762,10 @@ ne_counties_projected <- st_transform(ne_counties, 32614)
 + X-Y labels are still in longitude and latitude (we will see how we change this)
 
 ```{webr-r}
-ggplot()  +
+ggplot() +
   #--- county ---#
   geom_sf(
-    data = ne_counties_projected 
+    data = ne_counties_projected
   )
 ```
 :::
@@ -886,17 +885,16 @@ The two columns hold the comparison constant: both layers draw ne-counties with 
 ::: {.column}
 ```{webr-r}
 #| autorun: true
-#| out-width: 100% 
+#| out-width: 100%
 ggplot() +
   geom_sf(data = ne_counties)
-
 ```
 :::
 
 ::: {.column}
 ```{webr-r}
 #| autorun: true
-#| out-width: 100% 
+#| out-width: 100%
 ggplot() +
   geom_sf(data = ne_counties) +
   theme_void()
@@ -932,10 +930,10 @@ The `ggspatial` package lets you put a north arrow and scale bar on a map using 
 library(ggspatial)
 
 #--- create a map to work with ---#
-g_county <- 
+g_county <-
   ggplot() +
-    geom_sf(data = ne_counties) +
-    theme_void()
+  geom_sf(data = ne_counties) +
+  theme_void()
 ```
 
 
@@ -1045,7 +1043,7 @@ Create a map like this using `ne_counties` with the `ggmapinset` package.
 
 three_counties <- dplyr::filter(ne_counties, name %in% c("Perkins", "Chase", "Dundy"))
 
-inset_config <- 
+inset_config <-
   configure_inset(
     shape = shape_circle(st_centroid(st_union(three_counties)), 80),
     translation = c(300, -250),
@@ -1054,8 +1052,8 @@ inset_config <-
   )
 
 (
-g_inset_example <- 
-  ggplot() +
+  g_inset_example <-
+    ggplot() +
     #--- base map ---#
     geom_sf(data = ne_counties, fill = "blue", alpha = 0.4) +
     #--- additional layers ---#
@@ -1068,7 +1066,6 @@ g_inset_example <-
     coord_sf_inset(inset = inset_config) +
     theme_void()
 )
-
 ```
 
 :::{.callout-note}
@@ -1103,16 +1100,16 @@ We now create the base map. You use `geom_sf()` to create base map layers.
 ```{webr-r}
 #| code-track: 0.4
 (
-g_base <- 
-  ggplot() +
+  g_base <-
+    ggplot() +
     geom_sf(
-      data = ne_counties, 
-      fill = "blue", 
+      data = ne_counties,
+      fill = "blue",
       alpha = 0.4
     ) +
     geom_sf(
-      data = three_counties, 
-      fill = "red", 
+      data = three_counties,
+      fill = "red",
       alpha = 0.4
     ) +
     theme_void()
@@ -1141,7 +1138,7 @@ We now configure (specify) the inset using `configure_inset()`. Here is the list
 
 ```{webr-r}
 (
-  inset_config <- 
+  inset_config <-
     configure_inset(
       #--- centroid of the three counties as the center, and the radius ---#
       shape = shape_circle(st_centroid(st_union(three_counties)), 80),
@@ -1152,7 +1149,7 @@ We now configure (specify) the inset using `configure_inset()`. Here is the list
       scale = 2,
       units = "km"
     )
-  )
+)
 ```
 
 ### Add an inset
@@ -1224,10 +1221,10 @@ Comment out line 2 and comment in line 3 to see what happens.
 
 ```{webr-r}
 #| context: setup
-library(stars) 
+library(stars)
 data(NIR)
 NIR <- terra::rast(NIR)
-data(RED) 
+data(RED)
 RED <- terra::rast(RED)
 ```
 
@@ -1336,7 +1333,7 @@ When you want to create maps for individual attributes at the same time, you can
 ```{webr-r}
 ggplot() +
   geom_spatraster(data = nir_red) +
-  facet_wrap( ~ lyr)
+  facet_wrap(~lyr)
 ```
 
 :::{.callout-note}
@@ -1363,7 +1360,7 @@ It is very easy to achieve this. You just use `geom_sf()` for `sf` and `geom_spa
 
 ```{webr-r}
 #| context: setup
- 
+
 data(prism_2012_aug)
 prism_2012_aug <- terra::rast(prism_2012_aug)
 ```
@@ -1381,5 +1378,4 @@ ggplot() +
   scale_fill_viridis(name = "Precipitation (mm)") +
   theme_void() +
   theme(legend.position = "bottom")
-
 ```

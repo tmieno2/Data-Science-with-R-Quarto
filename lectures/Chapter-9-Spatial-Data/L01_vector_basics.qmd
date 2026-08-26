@@ -612,13 +612,13 @@ You supply a list of lists of matrices to the `st_multipolygon()` function to ma
 
 ```{webr-r}
 (
-a_multipolygon <-
-  st_multipolygon(
-    list(
-      list(p1, p2), # the polygon with a hole
-      list(p3) # the new polygon created above
+  a_multipolygon <-
+    st_multipolygon(
+      list(
+        list(p1, p2), # the polygon with a hole
+        list(p3) # the new polygon created above
+      )
     )
-  )
 )
 ```
 
@@ -663,7 +663,7 @@ Your turn, and these three are deliberately unguided. Build a POINT, a LINESTRIN
 
 
 ```{webr-r}
- 
+
 ```
 
 
@@ -698,14 +698,14 @@ To make a simple feature geometry list-column (`sfc`), you can simply supply a l
 #| code-track: 0.5
 #--- create an sfc ---#
 (
-sfc_ex <- sf::st_sfc(
-  list(
-    a_point,
-    a_linestring,
-    a_polygon,
-    a_multipolygon
+  sfc_ex <- sf::st_sfc(
+    list(
+      a_point,
+      a_linestring,
+      a_polygon,
+      a_multipolygon
+    )
   )
-)
 )
 ```
 
@@ -1225,11 +1225,11 @@ Read the nested call from the inside out. St crs of nc extracts the complete tar
 #| code-track: 0.3
 #--- transform ---#
 (
-nc_utm_back_to_original <-
-  st_transform(
-    nc_utm,
-    st_crs(nc)
-  )
+  nc_utm_back_to_original <-
+    st_transform(
+      nc_utm,
+      st_crs(nc)
+    )
 )
 ```
 
@@ -1410,9 +1410,9 @@ We can turn a dataset (e.g., `data.frame`, `tibble`, `data.table`) into an `sf` 
 
 ```{r eval = F}
 sf::st_as_sf(
-  data.frame, 
+  data.frame,
   coords = c(
-    longitude var name, 
+    longitude var name,
     latitude var name
   ),
   crs = crs
@@ -1424,7 +1424,7 @@ sf::st_as_sf(
 #### Example
 
 ```{webr-r}
-#| context: setup 
+#| context: setup
 #--- recognize it as an sf ---#
 wells_ne_sf <- sf::st_as_sf(
   wells_ne,
@@ -1440,17 +1440,16 @@ wells_ne_sf <- sf::st_as_sf(
 #| code-track: 0.4
 #--- recognize it as an sf ---#
 (
-wells_ne_sf <- 
-  sf::st_as_sf(
-    wells_ne,
-    coords = c(
-      "longdd",
-      "latdd"
-    ),
-    crs = 4269
-  )
+  wells_ne_sf <-
+    sf::st_as_sf(
+      wells_ne,
+      coords = c(
+        "longdd",
+        "latdd"
+      ),
+      crs = 4269
+    )
 )
-
 ```
 
 ### Exercise
@@ -1649,8 +1648,8 @@ nc_grouped
 #| code-track: 0.4
 ggplot() +
   geom_sf(
-    data = nc_grouped, 
-    aes(fill = grp), 
+    data = nc_grouped,
+    aes(fill = grp),
     alpha = 0.5
   ) +
   theme_void()
@@ -1731,9 +1730,9 @@ what you get back**.
 
 ```{webr-r}
 #| code-track: 0.5
-county_pop <- 
+county_pop <-
   data.frame(
-    NAME = nc$NAME, 
+    NAME = nc$NAME,
     pop = seq_len(nrow(nc))
   )
 
@@ -1748,10 +1747,10 @@ head(county_pop)
 ```{webr-r}
 #| code-track: 0.5
 (
-  joined_a <- 
+  joined_a <-
     dplyr::left_join(
-      nc, 
-      county_pop, 
+      nc,
+      county_pop,
       by = "NAME"
     )
 )
@@ -1763,9 +1762,9 @@ head(county_pop)
 ```{webr-r}
 #| code-track: 0.5
 (
-  joined_b <- 
+  joined_b <-
     dplyr::left_join(
-      county_pop, nc, 
+      county_pop, nc,
       by = "NAME"
     )
 )
@@ -1859,7 +1858,7 @@ Let's create a buffer of 2000 meter.
 #| warning: true
 (
   nc_buffer <- st_buffer(nc[1, ], dist = 2000)
-) 
+)
 ```
 
 <br>
@@ -1950,7 +1949,7 @@ Units objects support arithmetic with automatic conversion of compatible units. 
 
 ```{webr-r}
 #| code-track: 0.4
-nc <- 
+nc <-
   dplyr::mutate(nc,
     area = st_area(nc) %>% as.numeric(),
   ) %>%
@@ -1983,7 +1982,7 @@ You can use `st_centroid()` to find the centroid of each of all the polygons in 
 #| code-track: 0.4
 (
   nc_centroids <- st_centroid(nc)
-) 
+)
 ```
 
 As you can see, `st_centroid()` returns an `sf` of centroids as points. The centroids look like this:
@@ -2197,13 +2196,13 @@ A "bowtie": the outline crosses itself in the middle
 
 ```{webr-r}
 #| autorun: true
-#| code-track: 0.5 
+#| code-track: 0.5
 bowtie <-
   st_sf(
     name = "bowtie",
     geometry = st_sfc(
       st_polygon(list(rbind(
-        c(0, 0), 
+        c(0, 0),
         c(2, 2),
         c(2, 0),
         c(0, 2),
@@ -2215,8 +2214,8 @@ bowtie <-
 
 ggplot() +
   geom_sf(
-    data = bowtie, 
-    fill = "red", 
+    data = bowtie,
+    fill = "red",
     alpha = 0.3
   ) +
   theme_void()
@@ -2430,8 +2429,8 @@ Transform `fairway_grid` so that its CRS is NAD 83/UTM zone 14N (its EPSG code i
 #### Answer codes
 
 ```{r}
-#| code-fold: true 
-#| eval: false 
+#| code-fold: true
+#| eval: false
 plot(fairway_grid)
 
 fairway_grid_utm <- st_transform(fairway_grid, 26914)
@@ -2459,8 +2458,8 @@ Create buffers around the grid polygons in `fairway_grid_utm` where the radius o
 #### Answer codes
 
 ```{r}
-#| code-fold: true 
-#| eval: false 
+#| code-fold: true
+#| eval: false
 fairway_grid_buffers <- st_buffer(fairway_grid_utm, dist = 10)
 ```
 
@@ -2485,8 +2484,8 @@ Find the centroid of each of the buffer polygons you created in Exercise 2, and 
 #### Answer codes
 
 ```{r}
-#| code-fold: true 
-#| eval: false 
+#| code-fold: true
+#| eval: false
 buffers_centroids <- st_centroid(fairway_grid_buffers)
 ```
 

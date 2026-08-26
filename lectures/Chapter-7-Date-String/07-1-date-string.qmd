@@ -31,10 +31,10 @@ filters:
 ## Tips to make the most of the lecture notes
 
 ```{r}
-#| include: false 
-library(stringr) 
+#| include: false
+library(stringr)
 library(dplyr)
-library(ggplot2) 
+library(ggplot2)
 library(gt)
 
 source(here::here("lectures/_lecture-theme.R"))
@@ -163,7 +163,7 @@ They all represent the same date.
 We can use `as.Date()` to transform dates stored as characters into `Date`s. 
 
 ```{r eval = F}
-#--- NOT RUN ---#  
+#--- NOT RUN ---#
 as.Date(date in character, format)
 ```
 
@@ -183,7 +183,7 @@ In `format` you specify how day, month, and year are represented in the date cha
 ```{webr-r}
 #--- convert from a character to a Date ---#
 (
-a_date <- as.Date("Dec 15 10", format = "%b %d %y")
+  a_date <- as.Date("Dec 15 10", format = "%b %d %y")
 )
 
 #--- check the class ---#
@@ -215,7 +215,7 @@ Instead, you simply use `y` (year), `m` (month), `d` (day) in the order they app
 ymd("2010-12-15")
 mdy("12/15/2010")
 mdy("Dec 15 10")
-dmy("15 December 2010") 
+dmy("15 December 2010")
 ```
 
 ### format for presentation
@@ -236,7 +236,7 @@ While you can use string manipulation functions to reformat dates (which we lear
 <br>
 
 ```{r eval = F}
-#--- NOT RUN ---#  
+#--- NOT RUN ---#
 format(Date, format)
 ```
 
@@ -249,12 +249,12 @@ You can use the same rule for the `format` argument as the one we saw earlier wh
 **Example**
 
 ```{webr-r}
-pizzaplace %>% 
+pizzaplace %>%
   #--- convert to Date ---#
-  mutate(date = ymd(date)) %>% 
+  mutate(date = ymd(date)) %>%
   #--- format ---#
-  mutate(date_txt_f1 = format(date, "%m/%d/%y")) %>% 
-  mutate(date_txt_f2 = format(date, "%m %B %Y")) %>% 
+  mutate(date_txt_f1 = format(date, "%m/%d/%y")) %>%
+  mutate(date_txt_f2 = format(date, "%m %B %Y")) %>%
   select(date_txt_f1, date_txt_f2)
 ```
 
@@ -282,18 +282,18 @@ You can extract components (year, month, day) from a `Date` object using various
 
 ```{webr-r}
 #| autorun: true
-#| code-track: 0.5 
-pizzaplace %>% 
+#| code-track: 0.5
+pizzaplace %>%
   mutate(date = ymd(date)) %>%
-  distinct(date) %>% 
-  filter(month(date) >= 8) %>% 
+  distinct(date) %>%
+  filter(month(date) >= 8) %>%
   mutate(
     year = year(date),
     month = month(date),
     mday = mday(date),
     yday = yday(date),
     wday = wday(date)
-  ) %>% 
+  ) %>%
   select(year, month, mday, yday, wday)
 ```
 
@@ -362,9 +362,9 @@ seq(ymd("2015-05-01"), ymd("2015-05-09"), by = "days")
 <br>
 
 ```{webr-r}
-pizzaplace %>% 
+pizzaplace %>%
   #--- convert to Date ---#
-  mutate(date = ymd(date)) %>%  
+  mutate(date = ymd(date)) %>%
   filter(date >= as.Date("2015-05-01"))
 ```
 
@@ -402,7 +402,7 @@ For string (character) manipulation, we use the `stringr` package, which is part
 `stringr` is loaded automatically when you load `tidyverse`. So, just load `tidyverse`.
 
 ```{r eval = F}
-library(tidyverse)  
+library(tidyverse)
 ```
 
 <br>
@@ -614,11 +614,11 @@ For example suppose you have files that are named following this convention: "co
 You have such csv files starting from 2000 to 2020. Then,
 
 ```{r }
-file_names <- stringr::str_c("corn_yield_", 2000:2020, ".csv")  
+file_names <- stringr::str_c("corn_yield_", 2000:2020, ".csv")
 ```
 
 ```{r }
-head(file_names) 
+head(file_names)
 ```
 
 Now, you can easily read each of them iteratively using a loop.
@@ -655,8 +655,8 @@ But, if you are splitting a variable into two variables, `tidyr::separate()` is 
 <br>
 
 ```{webr-r}
-pizzaplace %>% 
-  tidyr::separate(type_size, c("type_2", "size_2"), "-") %>% 
+pizzaplace %>%
+  tidyr::separate(type_size, c("type_2", "size_2"), "-") %>%
   dplyr::select(id, type, type_2, size, size_2)
 ```
 
@@ -697,7 +697,7 @@ stringr::str_replace(string, pattern, replacement)
 **Example**
 
 ```{webr-r}
-strings_vec <- c("I think R rocks, but some think it does not rock", "Python also rocks, but Julia does not rock")  
+strings_vec <- c("I think R rocks, but some think it does not rock", "Python also rocks, but Julia does not rock")
 
 stringr::str_replace(strings_vec, "rock", "rock big time")
 ```
@@ -709,7 +709,7 @@ Note that only the first occurrence of "rock" in each of the string vector eleme
 You need to use `stringr::str_replace_all()` to replace all the occurrences. 
 
 ```{webr-r}
-stringr::str_replace_all(strings_vec, "rock", "rock big time") 
+stringr::str_replace_all(strings_vec, "rock", "rock big time")
 ```
 
 #### Use case
@@ -722,9 +722,9 @@ Pretend that `date_text` is the variable that indicates date and it looks like t
 
 ```{webr-r}
 #| autorun: true
-pizzaplace_for_plot <- 
-  mutate(pizzaplace, date_text = ymd(date) %>% 
-  format("%m/%d/%Y")) 
+pizzaplace_for_plot <-
+  mutate(pizzaplace, date_text = ymd(date) %>%
+    format("%m/%d/%Y"))
 
 pizzaplace_for_plot$date_text %>% head()
 ```
@@ -773,12 +773,13 @@ Which is why, for a job like this, you should not be manipulating the text at al
 <br>
 
 ```{webr-r}
-pizzaplace %>% 
+pizzaplace %>%
   mutate(
     date = ymd(date),
     date = format(date, "%m/%d/%y")
-  ) %>% 
-  .$date %>% head()
+  ) %>%
+  .$date %>%
+  head()
 ```
 
 :::
@@ -834,7 +835,7 @@ You want to read only the soy files.
 First, let's get the name of the whole list of files in the working directory:
 
 ```{r}
-all_files <- 
+all_files <-
   list.files(
     here::here("supplementary-material/data/data-for-loop-demo"),
     full.names = TRUE
@@ -849,7 +850,7 @@ tail(all_files, 2)
 Now use `stringr::str_detect()` to find which elements of `all_files` include "soy."
 
 ```{r }
-is_soy <- stringr::str_detect(all_files, "soy")  
+is_soy <- stringr::str_detect(all_files, "soy")
 ```
 
 <br>
@@ -872,9 +873,9 @@ very next line. -->
 
 ```{r}
 (
-soy_data <-
-  lapply(all_files[is_soy], \(x) readRDS(x)) %>%
-  bind_rows()
+  soy_data <-
+    lapply(all_files[is_soy], \(x) readRDS(x)) %>%
+    bind_rows()
 )
 ```
 
@@ -888,13 +889,13 @@ Consider the following dataset of plant genes.
 
 ```{r }
 gene_data <- expand.grid(
-  id = c("Zm_1", "Zm_2"), 
+  id = c("Zm_1", "Zm_2"),
   gene = c("20_WW_BL_TP1", "20_WW_BL_TP", "20_WW_ML_TP1", "20_WW_ML_TP", "20_WW_TL_TP1", "20_WW_TL_TP3")
-) 
+)
 ```
 
 ```{r echo = F}
-gene_data 
+gene_data
 ```
 
 <br>
@@ -902,7 +903,7 @@ gene_data
 There are three different types of genes: those that have `_BL_`,`_ML_`, and `_TL_`. The objective here is to make a variable that indicates gene group from the `gene` variable.
 
 ```{r }
-gene_data %>% 
+gene_data %>%
   mutate(gene_group = case_when(
     stringr::str_detect(gene, "_BL_") ~ "BL",
     stringr::str_detect(gene, "_ML_") ~ "ML",
@@ -934,7 +935,7 @@ Here is the collection of functions that let you change the letter case of strin
 **To upper case**
 
 ```{webr-r}
-pizzaplace %>% 
+pizzaplace %>%
   mutate(name = stringr::str_to_upper(name))
 ```
 
@@ -943,7 +944,7 @@ pizzaplace %>%
 **To lower case**
 
 ```{webr-r}
-pizzaplace %>% 
+pizzaplace %>%
   mutate(size = stringr::str_to_lower(size))
 ```
 
@@ -952,8 +953,8 @@ pizzaplace %>%
 **Only the first letter is capitalized**
 
 ```{webr-r}
-pizzaplace %>%  
-  mutate(type = stringr::str_to_title(type)) 
+pizzaplace %>%
+  mutate(type = stringr::str_to_title(type))
 ```
 
 ### padding
@@ -980,21 +981,21 @@ stringr::str_pad(strings, string length, side, padding symbol)
 
 ```{webr-r}
 #| code-track: 0.6
-stringr::str_pad("I am sick of R", 20, side = "left", pad = "?") 
+stringr::str_pad("I am sick of R", 20, side = "left", pad = "?")
 ```
 
 <br>
 
 ```{webr-r}
 #| code-track: 0.6
-stringr::str_pad("I am sick of R", 30, side = "both", pad = "?") 
+stringr::str_pad("I am sick of R", 30, side = "both", pad = "?")
 ```
 
 <br>
 
 ```{webr-r}
 #| code-track: 0.6
-stringr::str_pad("I am sick of R", 20, side = "right", pad = "-") 
+stringr::str_pad("I am sick of R", 20, side = "right", pad = "-")
 ```
 
 :::

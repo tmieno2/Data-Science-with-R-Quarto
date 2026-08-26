@@ -207,13 +207,11 @@ The following function takes numeric numbers, square them, and return the square
 ```{webr-r}
 #| autorun: true
 square_it <- function(a) {
-
-  #--- 1. do something on x ---# 
+  #--- 1. do something on x ---#
   squared_a <- a^2
 
-  #--- 2. return the results ---# 
+  #--- 2. return the results ---#
   return(squared_a)
-
 }
 ```
 
@@ -222,7 +220,7 @@ square_it <- function(a) {
 Try the function:
 
 ```{webr-r}
-ten_squared <- square_it(10) 
+ten_squared <- square_it(10)
 
 ten_squared
 ```
@@ -245,15 +243,13 @@ For example, `squared_a` and `original_a` are defined only internally, and are n
 ```{webr-r}
 #| autorun: true
 square_and_sqrt_it <- function(a) {
-
-  #--- 1. do something on x ---# 
+  #--- 1. do something on x ---#
   squared_a <- a^2
   original_a <- sqrt(squared_a)
 
-  #--- 2. return the results ---# 
+  #--- 2. return the results ---#
   return(original_a)
-
-} 
+}
 ```
 
 <br>
@@ -283,15 +279,13 @@ When R sees objects that are not provided explicitly as arguments to the functio
 
 ```{webr-r}
 square_multiply_it <- function(a) {
-
-  #--- 1. do something on a ---# 
+  #--- 1. do something on a ---#
   squared_a <- a^2
   z <- multiplier * squared_a
 
-  #--- 2. return the results ---# 
+  #--- 2. return the results ---#
   return(z)
-
-} 
+}
 ```
 
 <br>
@@ -306,7 +300,7 @@ Here, `multiplier` is [not]{style="color: red;"} provided as an argument to the 
 Try this:
 
 ```{webr-r}
-square_multiply_it(10) 
+square_multiply_it(10)
 ```
 
 <br>
@@ -334,14 +328,12 @@ You can set default values for function arguments by `argument = value` like bel
 ```{webr-r}
 #| autorun: true
 square_it <- function(a = 5) {
-
-  #--- 1. do something on a ---# 
+  #--- 1. do something on a ---#
   squared_a <- a^2
 
-  #--- 2. return the results ---# 
+  #--- 2. return the results ---#
   return(squared_a)
-
-} 
+}
 ```
 
 <br>
@@ -369,14 +361,12 @@ It is easy to create a function with multiple arguments. You just simply add mor
 #| autorun: true
 #--- define a function with two arguments ---#
 square_them_add <- function(a = 5, b = 2) {
-
-  #--- 1. do something on a ---# 
+  #--- 1. do something on a ---#
   squared_and_summed <- a^2 + b^2
 
-  #--- 2. return the results ---# 
+  #--- 2. return the results ---#
   return(squared_and_summed)
-
-} 
+}
 
 #--- run it ---#
 square_them_add(4, 3)
@@ -392,7 +382,7 @@ As you are likely to have noticed, the order of input arguments is assumed to be
 You can mess with the order of input arguments if you want if you name the input arguments as follows:
 
 ```{webr-r}
-square_them_add(b = 3, a = 4) 
+square_them_add(b = 3, a = 4)
 ```
 
 ### Exercises
@@ -519,11 +509,11 @@ Here is the case for loops. Squaring the numbers one through five by hand is fiv
 + For example, suppose you are interested in knowing the square of 1 through 5 with a step of 1 ([1,2,3,4,5]). The following code certainly works:
 
 ```{r eval = F}
-1^2 
-2^2 
-3^2 
-4^2 
-5^2 
+1^2
+2^2
+3^2
+4^2
+5^2
 ```
 
 + However, imagine you have to do this for 1000 integers. 
@@ -553,7 +543,7 @@ Strip a loop down and it has exactly two parts: the thing you do, which stays th
 #--- NOT RUN ---#
 for (x in a_list_of_values){
   you do what you want to do with x
-} 
+}
 ```
 
 ### Example
@@ -568,9 +558,9 @@ In each header, one colon five supplies the integers one through five in order. 
 </details>
 
 ```{webr-r}
-for (x in 1:5){
+for (x in 1:5) {
   print(x^2)
-}  
+}
 ```
 
 <br>
@@ -578,9 +568,9 @@ for (x in 1:5){
 This does the same:
 
 ```{webr-r}
-for (bluh_bluh_bluh in 1:5){
+for (bluh_bluh_bluh in 1:5) {
   print(bluh_bluh_bluh^2)
-}  
+}
 ```
 
 ### Exercise
@@ -613,7 +603,7 @@ example a few tabs earlier correctly uses print(). -->
 **Answer**
 ```{r, eval = FALSE}
 #| code-fold: true
-for (i in seq(5, 50, by = 5)){
+for (i in seq(5, 50, by = 5)) {
   print(i^3)
 }
 ```
@@ -645,8 +635,8 @@ Instead of using a `for` loop, we can use the `lapply()` function from the base 
 **Syntax**
 
 ```{r lapply-s, eval = F}
-#--- NOT RUN ---#  
-lapply(A, B) 
+#--- NOT RUN ---#
+lapply(A, B)
 ```
 
 + `A` is the list of values 
@@ -676,7 +666,9 @@ Read the whole call from left to right: one colon five is the input, the anonymo
 This does the same thing as the for loop example we looked at earlier:
 
 ```{webr-r}
-lapply(1:5, \(x){x^2})
+lapply(1:5, \(x){
+  x^2
+})
 ```
 
 + `\(x)`: shorthand for `function(x)`
@@ -704,9 +696,9 @@ For example, for the loop of squaring numbers, you can first define a function t
 
 ```{webr-r}
 #| autorun: true
-square_it <- function(x){
+square_it <- function(x) {
   return(x^2)
-} 
+}
 ```
 
 <br>
@@ -735,12 +727,10 @@ For example, you would like to fix the value of `b` at 5 while trying different 
 ```{webr-r}
 #| autorun: true
 square_them_add <- function(a, b) {
-
   squared_and_summed <- a^2 + b^2
 
   return(squared_and_summed)
-
-} 
+}
 ```
 
 <br>
@@ -748,7 +738,7 @@ square_them_add <- function(a, b) {
 Then you can do this:
 
 ```{webr-r}
-lapply(1:10, \(x) square_them_add(x, b = 5)) 
+lapply(1:10, \(x) square_them_add(x, b = 5))
 ```
 
 <br>
@@ -785,7 +775,7 @@ Use `lapply()` to cube each element of a sequence starting at 5, increasing by 5
 **Answer**
 ```{r, eval = FALSE}
 #| code-fold: true
-lapply(seq(5, 50, by = 5), \(x) x^3) 
+lapply(seq(5, 50, by = 5), \(x) x^3)
 ```
 
 
@@ -919,7 +909,7 @@ Get a sequence of values for corn price and nitrogen rate:
 corn_price_vec <- seq(3, 5, by = 1)
 
 #--- nitrogen vector ---#
-nitrogen_vec <- seq(0, 300, by = 100) 
+nitrogen_vec <- seq(0, 300, by = 100)
 ```
 
 <br>
@@ -930,10 +920,9 @@ We then create a complete combination of the values using the `expand.grid()` fu
 #| autorun: true
 #--- crate a data.frame that holds parameter sets to loop over ---#
 (
-parameters_data <- 
-  expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)
+  parameters_data <-
+    expand.grid(corn_price = corn_price_vec, nitrogen = nitrogen_vec)
 )
-
 ```
 
 #### Step 2
@@ -947,15 +936,14 @@ Define a function that
 ```{webr-r}
 #| autorun: true
 gen_rev_corn <- function(i) {
-
   #--- define corn price ---#
-  corn_price <- parameters_data[i,'corn_price']
+  corn_price <- parameters_data[i, "corn_price"]
   #--- define nitrogen  ---#
-  nitrogen <- parameters_data[i,'nitrogen']
+  nitrogen <- parameters_data[i, "nitrogen"]
   #--- calculate yield ---#
   yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
   #--- calculate revenue ---#
-  revenue <- corn_price * yield 
+  revenue <- corn_price * yield
   #--- combine all the information you would like to have  ---#
   data_to_return <- data.frame(
     corn_price = corn_price,
@@ -964,7 +952,7 @@ gen_rev_corn <- function(i) {
   )
 
   return(data_to_return)
-} 
+}
 ```
 
 <br>
@@ -995,7 +983,7 @@ Combine the list of `data.frame`s into a single `data.frame` using `bind_rows()`
 
 ```{webr-r}
 (
-final_results <- bind_rows(rev_data)
+  final_results <- bind_rows(rev_data)
 )
 ```
 
@@ -1019,16 +1007,16 @@ We will work on a specific value of `i`. Here it is `i = 1`.
 
 ```{webr-r}
 #--- define corn price ---#
-corn_price <- parameters_data[1, 'corn_price']
+corn_price <- parameters_data[1, "corn_price"]
 
 #--- define nitrogen  ---#
-nitrogen <- parameters_data[1, 'nitrogen']
+nitrogen <- parameters_data[1, "nitrogen"]
 
 #--- calculate yield ---#
 yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
 
 #--- calculate revenue ---#
-revenue <- corn_price * yield 
+revenue <- corn_price * yield
 
 #--- combine all the information you would like to have  ---#
 data_to_return <- data.frame(
@@ -1079,11 +1067,6 @@ $$
 
 ```{webr-r}
 #--- work here ---#
-
-
-
-
-
 ```
 
 **Answer**
@@ -1095,9 +1078,9 @@ corn_price_vec <- seq(2.5, 4.0, by = 0.05)
 #--- CHANGED: was by = 0.02, but the instruction asks for by = 0.01 ---#
 n_price_vec <- seq(0.2, 0.6, by = 0.01)
 
-cases_data <- 
+cases_data <-
   expand.grid(
-    corn_price = corn_price_vec, 
+    corn_price = corn_price_vec,
     n_price = n_price_vec
   )
 
@@ -1114,7 +1097,7 @@ get_profit <- function(i) {
       n_price = n_price,
       profit = profit
     )
-    
+
   return(data_to_return)
 }
 
@@ -1188,7 +1171,7 @@ z_vec <- x + y
 **Non-vectorized (loop)** 
 
 ```{webr-r}
-z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>%  unlist()
+z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>% unlist()
 ```
 
 <br>
@@ -1197,7 +1180,7 @@ z_la <- lapply(1:1000, function(i) x[i] + y[i]) %>%  unlist()
 
 ```{webr-r}
 #--- check if identical with z_vec ---#
-all.equal(z_la, z_vec) 
+all.equal(z_la, z_vec)
 ```
 
 Both produce the same results. However, R is written in a way that is much better at doing vectorized operations. 
@@ -1220,12 +1203,16 @@ Here, we do not `unlist()` after `lapply()` to just focus on the multiplication 
 ```{webr-r}
 microbenchmark(
   #--- vectorized ---#
-  "vectorized" = { x + y }, 
+  "vectorized" = {
+    x + y
+  },
   #--- not vectorized ---#
-  "not vectorized" = { lapply(1:1000, function(i) x[i] + y[i])},
-  times = 100, 
+  "not vectorized" = {
+    lapply(1:1000, function(i) x[i] + y[i])
+  },
+  times = 100,
   unit = "ms"
-) 
+)
 ```
 
 <br>
@@ -1274,15 +1261,14 @@ Here is the vectorized version of the revenue sensitivity analysis:
 ```{webr-r}
 #| autorun: true
 gen_rev_corn_short <- function(corn_price, nitrogen) {
-
   #--- calculate yield ---#
   yield <- 240 * (1 - exp(0.4 - 0.02 * nitrogen))
 
   #--- calculate revenue ---#
-  revenue <- corn_price * yield 
+  revenue <- corn_price * yield
 
   return(revenue)
-} 
+}
 ```
 
 <br>
@@ -1290,7 +1276,7 @@ gen_rev_corn_short <- function(corn_price, nitrogen) {
 Then use the function to calculate revenue and assign it to a new variable in the parameters_data data.
 
 ```{webr-r}
-rev_data_2 <- 
+rev_data_2 <-
   mutate(
     parameters_data,
     revenue = gen_rev_corn_short(corn_price, nitrogen)
@@ -1314,14 +1300,17 @@ Let’s compare the vectorized and non-vectorized version:
 microbenchmark(
 
   #--- vectorized ---#
-  "vectorized" = { rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen)) },
+  "vectorized" = {
+    rev_data <- mutate(parameters_data, revenue = gen_rev_corn_short(corn_price, nitrogen))
+  },
 
   #--- not vectorized ---#
-  "not vectorized" = { rev_data <- bind_rows(lapply(seq_len(nrow(parameters_data)), gen_rev_corn)) },
-  times = 100, 
+  "not vectorized" = {
+    rev_data <- bind_rows(lapply(seq_len(nrow(parameters_data)), gen_rev_corn))
+  },
+  times = 100,
   unit = "ms"
-
-) 
+)
 ```
 
 :::
@@ -1373,7 +1362,7 @@ The installation line is a one-time setup that downloads future dot apply; libra
 
 ```{r eval = F}
 #--- install the package ---#
-install.packages("future.apply") 
+install.packages("future.apply")
 
 #--- load packages ---#
 library(future.apply)
@@ -1397,10 +1386,10 @@ You can simply replace `lapply()` with `future_lapply()`!
 
 ```{r eval = F}
 #--- not parallelized ---#
-sq_ls <- lapply(1:1000, function(x) x^2) 
+sq_ls <- lapply(1:1000, function(x) x^2)
 
 #--- parallelized ---#
-sq_ls_par <- future_lapply(1:1000, function(x) x^2) 
+sq_ls_par <- future_lapply(1:1000, function(x) x^2)
 ```
 
 ### Preparation
@@ -1511,14 +1500,17 @@ The benchmark gives both expressions the same one thousand inputs and the same a
 microbenchmark(
 
   #--- parallelized ---#
-  "parallelized" = { sq_ls <- future_lapply(1:1000, function(x) x^2) }, 
+  "parallelized" = {
+    sq_ls <- future_lapply(1:1000, function(x) x^2)
+  },
 
   #--- non-parallelized ---#
-  "not parallelized" = { sq_ls <- lapply(1:1000, function(x) x^2) },
-  times = 100, 
+  "not parallelized" = {
+    sq_ls <- lapply(1:1000, function(x) x^2)
+  },
+  times = 100,
   unit = "ms"
-
-) 
+)
 ```
 
 ### What just happened?
@@ -1599,8 +1591,7 @@ Here is a function that implements steps 1 and 2 for one repetition. The later a
 
 ```{r}
 #--- one repetition of steps 1 and 2 ---#
-MC_sim <- function(i){
-
+MC_sim <- function(i) {
   N <- 50000 # sample size
 
   #--- steps 1 and 2:  ---#
@@ -1610,12 +1601,12 @@ MC_sim <- function(i){
   y <- 1 + x + v # dependent variable
   data <- data.table(y = y, x = x)
 
-  #--- OLS ---# 
-  reg <- lm(y~x, data = data) # OLS
+  #--- OLS ---#
+  reg <- lm(y ~ x, data = data) # OLS
 
   #--- return the coef ---#
-  return(reg$coef['x'])
-}  
+  return(reg$coef["x"])
+}
 ```
 
 ### performance
@@ -1643,7 +1634,7 @@ toc()
 #| cache: true
 tic()
 MC_results <- lapply(1:1000, MC_sim)
-toc() 
+toc()
 ```
 
 **Parallelized**:
@@ -1652,7 +1643,7 @@ toc()
 #| cache: true
 tic()
 MC_results <- future_lapply(1:1000, MC_sim, future.seed = TRUE)
-toc() 
+toc()
 ```
 
 ### Mac/Linux
@@ -1745,9 +1736,9 @@ Grid search basically evaluates the objective function (profit here) at many lev
 
 ```{webr-r}
 #| context: output
-data.table(N = seq(0.1, 300, by = 0.1)) %>% 
-  mutate(yield = 120 + 25 * log(N)) %>% 
-  mutate(profit = 3.5 * yield - 0.4 * N)  
+data.table(N = seq(0.1, 300, by = 0.1)) %>%
+  mutate(yield = 120 + 25 * log(N)) %>%
+  mutate(profit = 3.5 * yield - 0.4 * N)
 ```
 
 ### Example
@@ -1766,11 +1757,9 @@ Let's define a function that takes `N`, `P_C`, and `P_N` values and returns prof
 ```{webr-r}
 #| autorun: true
 get_profit <- function(N, P_C, P_N) {
-
-  yield <- 120 + 25 * log(N) 
+  yield <- 120 + 25 * log(N)
   profit <- P_C * yield - P_N * N
   return(profit)
-
 }
 ```
 
@@ -1780,10 +1769,10 @@ Let's create a sequence of `N` values and then calculate profit at each level of
 
 ```{webr-r}
 #| autorun: true
-( 
-data_main <- 
-  tibble(N = seq(0.1, 300, by = 0.1)) %>% 
-  mutate(profit = get_profit(N, 3.5, 0.4))
+(
+  data_main <-
+    tibble(N = seq(0.1, 300, by = 0.1)) %>%
+    mutate(profit = get_profit(N, 3.5, 0.4))
 )
 ```
 
@@ -1807,7 +1796,7 @@ opt_N <- filter(data_main, profit == max(profit))$N
 ggplot(data_main) +
   geom_line(aes(y = profit, x = N)) +
   geom_vline(xintercept = opt_N, linetype = 2, color = "red") +
-  annotate('text', x = opt_N - 40, y = 450, label = "Optimal N rate", size = 3)
+  annotate("text", x = opt_N - 40, y = 450, label = "Optimal N rate", size = 3)
 ```
 
 ### Best N
@@ -1834,7 +1823,7 @@ Alternatively, you can sort the data by profit in the ascending order (default) 
 
 ```{webr-r}
 #| code-track: 0.5
-dplyr::arrange(data_main, profit) %>% 
+dplyr::arrange(data_main, profit) %>%
   dplyr::slice(n())
 ```
 
@@ -1908,9 +1897,9 @@ P_C_seq <- seq(2.5, 4.5, by = 1)
 P_N_seq <- seq(0.2, 0.6, by = 0.2)
 
 (
-price_parameters <-
-  expand.grid(P_C = P_C_seq, P_N = P_N_seq) %>%
-  tibble()
+  price_parameters <-
+    expand.grid(P_C = P_C_seq, P_N = P_N_seq) %>%
+    tibble()
 )
 ```
 
@@ -1931,19 +1920,17 @@ Now, we will define a function that extract a combination of corn and nitrogen p
 ```{webr-r}
 #| autorun: true
 get_opt_N <- function(i) {
-
   P_C <- price_parameters[i, ]$P_C
   P_N <- price_parameters[i, ]$P_N
 
   N_data <- tibble(N = seq(0.1, 300, by = 0.1))
 
-  opt_N <- mutate(N_data, profit = get_profit(N, P_C, P_N)) %>% 
-    filter(profit == max(profit)) %>% 
-    mutate(P_C = P_C) %>% 
+  opt_N <- mutate(N_data, profit = get_profit(N, P_C, P_N)) %>%
+    filter(profit == max(profit)) %>%
+    mutate(P_C = P_C) %>%
     mutate(P_N = P_N)
 
   return(opt_N)
-
 }
 ```
 
@@ -1986,7 +1973,7 @@ Copy this onto your own computer, call `plan(multisession, workers = ...)` first
 <br>
 
 ```{webr-r}
-opt_N_all_ls[[1]] 
+opt_N_all_ls[[1]]
 ```
 
 <br>
@@ -1995,7 +1982,7 @@ Combine the list of `data.frame`s into a single `data.frame` using `bind_rows()`
 
 ```{webr-r}
 (
-opt_N_all <- bind_rows(opt_N_all_ls)
+  opt_N_all <- bind_rows(opt_N_all_ls)
 )
 ```
 
@@ -2043,10 +2030,10 @@ N_seq <- seq(0.1, 300, by = 0.1)
 
 #--- CHANGED: was also called `price_parameters`, colliding with Strategy 1's ---#
 (
-eval_parameters <-
-  expand.grid(P_C = P_C_seq, P_N = P_N_seq, N = N_seq) %>%
-  tibble() %>%
-  arrange(P_C, P_N)
+  eval_parameters <-
+    expand.grid(P_C = P_C_seq, P_N = P_N_seq, N = N_seq) %>%
+    tibble() %>%
+    arrange(P_C, P_N)
 )
 ```
 
@@ -2065,7 +2052,7 @@ Now, we will calculate profit for all the rows in `eval_parameters`.
 
 ```{webr-r}
 (
-profit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))
+  profit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))
 )
 ```
 
@@ -2074,9 +2061,9 @@ profit_data <- mutate(eval_parameters, profit = get_profit(N, P_C, P_N))
 Now, we can identify the optimal N rate at each of the corn and nitrogen combinations:
 
 ```{webr-r}
-profit_data %>% 
-  group_by(P_C, P_N) %>% 
-  arrange(profit) %>% 
+profit_data %>%
+  group_by(P_C, P_N) %>%
+  arrange(profit) %>%
   slice(n())
 ```
 
@@ -2166,7 +2153,7 @@ Consider a 2-plot field like below for the sake of tractability:
 ```{webr-r}
 #| autorun: true
 (
-field_data <- data.frame(plot_id = c(1, 2), slope = c(0, 0.2), ec = c(40, 30))
+  field_data <- data.frame(plot_id = c(1, 2), slope = c(0, 0.2), ec = c(40, 30))
 )
 ```
 
@@ -2192,7 +2179,7 @@ You can expand on all the variables, nitrogen rate (decision variable), slope an
 ```{webr-r}
 #| autorun: true
 (
-eval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_seq)
+  eval_data_1 <- expand.grid(slope = field_data$slope, ec = field_data$ec, N = N_seq)
 )
 ```
 

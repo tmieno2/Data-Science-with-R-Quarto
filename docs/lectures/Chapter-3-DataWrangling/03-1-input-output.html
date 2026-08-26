@@ -94,7 +94,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-0047b8fdbe97f860f7b290fccbba71a2.css">
+  <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto-5cbf9ce0bec82c5b0c7629bb4ee56cc4.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -776,7 +776,7 @@ Transcript
 </div>
 <p>Two fixes, both fine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>)    <span class="co"># forward slashes</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>) <span class="co"># forward slashes</span></span>
 <span id="cb19-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
@@ -1166,9 +1166,10 @@ $b
 <div class="cell">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">data.frame</span>(</span>
 <span id="cb44-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
-<span id="cb44-3"><a></a>  <span class="at">KiB  =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
-<span id="cb44-4"><a></a>           <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
-<span id="cb44-5"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb44-3"><a></a>  <span class="at">KiB =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
+<span id="cb44-4"><a></a>    <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)</span>
+<span id="cb44-5"><a></a>  ) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
+<span id="cb44-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>             file  KiB
 1 corn_yields.csv 14.7
