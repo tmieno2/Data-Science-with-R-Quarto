@@ -28,6 +28,9 @@ project:
   # judging its layout on the code alone.
   resources:
     - "lectures/**/*.webr-output.js"
+    # The AI appendix is unpublished, so nothing from it belongs in docs/.
+    # Without this the glob above copies its measurement file into the site.
+    - "!lectures/Appendix-2-AI/**"
 
 website:
   title: "Data Science with R (AECN 896-05)"

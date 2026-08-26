@@ -89,24 +89,24 @@ You do not have to run an entire live cell. Highlight just the lines you want, t
 #| label: taste-flextable
 #| cache: false
 #| include: false
-head(mtcars, 20) %>% # BREAK
-  dplyr::select(am, carb, gear, mpg, drat) %>% # BREAK
-  flextable() %>% # BREAK
-  theme_vanilla() %>% # BREAK
-  set_header_labels(mpg = "miles per gallon") %>% # BREAK
-  autofit() %>% # BREAK
-  merge_v(j = c("am", "carb")) %>% # BREAK
-  italic(j = 1) %>% # BREAK
-  bg(bg = "#C90000", part = "header") %>% # BREAK
-  color(color = "blue", j = 5) %>% # BREAK
-  color(color = "red", i = 5:10, j = 2) %>% # BREAK
-  color(color = "white", part = "header") %>% # BREAK
-  bold(~ drat > 3.2, ~gear, bold = TRUE) %>% # BREAK
-  align(j = 1) %>% # BREAK
-  fontsize(i = 12:18, size = 8) %>% # BREAK
-  add_footer_row(values = "blah blah", colwidths = 5) %>% # BREAK
-  border_outer(fp_border(color = "red", width = 2)) %>% # BREAK
-  line_spacing(space = 1.5) %>% # BREAK
+head(mtcars, 20) %>% #BREAK
+  dplyr::select(am, carb, gear, mpg, drat) %>% #BREAK
+  flextable() %>% #BREAK
+  theme_vanilla() %>% #BREAK
+  set_header_labels(mpg = "miles per gallon") %>% #BREAK
+  autofit() %>% #BREAK
+  merge_v(j = c("am", "carb")) %>% #BREAK
+  italic(j = 1) %>% #BREAK
+  bg(bg = "#C90000", part = "header") %>% #BREAK
+  color(color = "blue", j = 5) %>% #BREAK
+  color(color = "red", i = 5:10, j = 2) %>% #BREAK
+  color(color = "white", part = "header") %>% #BREAK
+  bold(~ drat > 3.2, ~gear, bold = TRUE) %>% #BREAK
+  align(j = 1) %>% #BREAK
+  fontsize(i = 12:18, size = 8) %>% #BREAK
+  add_footer_row(values = "blah blah", colwidths = 5) %>% #BREAK
+  border_outer(fp_border(color = "red", width = 2)) %>% #BREAK
+  line_spacing(space = 1.5) %>% #BREAK
   theme_tron()
 ```
 
@@ -896,24 +896,24 @@ ft %>%
 <!--end of panel-->
 
 ```{r format-flip, cache = F, include = F}
-tab_data %>% # BREAK
+tab_data %>% #BREAK
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- text color ---#
-  color(i = 1, j = 2, "#fcba03") %>% # BREAK
+  color(i = 1, j = 2, "#fcba03") %>% #BREAK
   #--- background ---#
-  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>% # BREAK
+  bg(i = ~ y_2005 < 2e5, j = c("region"), bg = "grey") %>% #BREAK
   #--- font type ---#
-  font(i = 5, j = ~ country_name + y_2005, fontname = "Times") %>% # BREAK
+  font(i = 5, j = ~ country_name + y_2005, fontname = "Times") %>% #BREAK
   #--- font size ---#
-  fontsize(i = 7, size = 16) %>% # BREAK
+  fontsize(i = 7, size = 16) %>% #BREAK
   #--- italicize ---#
-  italic(j = 2) %>% # BREAK
+  italic(j = 2) %>% #BREAK
   #--- bold ---#
-  bold(j = 4) %>% # BREAK
+  bold(j = 4) %>% #BREAK
   #--- vertical text alignment ---#
-  valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% # BREAK
+  valign(i = ~ region == "Australasia", j = 4, valign = "top") %>% #BREAK
   #--- text direction ---#
   rotate(i = 1, j = 2, rotation = "tbrl")
 ```
@@ -1056,24 +1056,24 @@ ft %>%
 ```{r borders-f}
 #| cache: false
 #| include: false
-tab_data %>% # BREAK
+tab_data %>% #BREAK
   flextable(
     col_keys = c("country_name", "region", "y_1995", "y_2005")
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- remove all borders ---#
-  border_remove() %>% # BREAK
+  border_remove() %>% #BREAK
   #--- horizontal lines ---#
-  hline(i = 3, j = 1:3, border = fp_border(color = "red")) %>% # BREAK
+  hline(i = 3, j = 1:3, border = fp_border(color = "red")) %>% #BREAK
   #--- horizontal line at the bottom ---#
-  hline_bottom(j = 3:4, border = fp_border(color = "green")) %>% # BREAK
+  hline_bottom(j = 3:4, border = fp_border(color = "green")) %>% #BREAK
   #--- horizontal line at the top ---#
-  hline_top(j = 1:3, border = fp_border(color = "orange")) %>% # BREAK
+  hline_top(j = 1:3, border = fp_border(color = "orange")) %>% #BREAK
   #--- vertical lines ---#
-  vline(border = fp_border(color = "orange")) %>% # BREAK
+  vline(border = fp_border(color = "orange")) %>% #BREAK
   #--- vertical on the left edge  ---#
-  vline_left(border = fp_border(color = "grey", width = 2)) %>% # BREAK
+  vline_left(border = fp_border(color = "grey", width = 2)) %>% #BREAK
   #--- vertical on the right edge  ---#
-  vline_right(border = fp_border(color = "red", width = 2)) %>% # BREAK
+  vline_right(border = fp_border(color = "red", width = 2)) %>% #BREAK
   #--- borders of individual cells ---#
   border(
     i = 4, j = 2,
@@ -1081,12 +1081,12 @@ tab_data %>% # BREAK
     border.left = fp_border(color = "green", width = 3),
     border.right = fp_border(color = "black", width = 3),
     border.bottom = fp_border(color = "pink", width = 3)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- horizontal lines (inner) ---#
-  border_inner_h(border = fp_border(color = "black")) %>% # BREAK
+  border_inner_h(border = fp_border(color = "black")) %>% #BREAK
   #--- vertical lines (inner) ---#
-  border_inner_v(border = fp_border(color = "black")) %>% # BREAK
-  border_remove() %>% # BREAK
+  border_inner_v(border = fp_border(color = "black")) %>% #BREAK
+  border_remove() %>% #BREAK
   #--- the outer lines ---#
   border_outer(border = fp_border(color = "red", width = 4))
 ```

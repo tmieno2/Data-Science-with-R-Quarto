@@ -774,24 +774,24 @@ share_data %>%
 rpie <- 1 # pie radius
 rlabel <- 0.6 * rpie # radius of the labels
 
-county_yield %>% # BREAK
-  dplyr::select(state_name, corn_yield) %>% # BREAK
-  group_by(state_name) %>% # BREAK
-  summarize(yield = mean(corn_yield, na.rm = T)) %>% # BREAK
-  mutate(yield_ratio = yield / sum(yield)) %>% # BREAK
+county_yield %>% #BREAK
+  dplyr::select(state_name, corn_yield) %>% #BREAK
+  group_by(state_name) %>% #BREAK
+  summarize(yield = mean(corn_yield, na.rm = T)) %>% #BREAK
+  mutate(yield_ratio = yield / sum(yield)) %>% #BREAK
   mutate(
     end_angle = 2 * pi * cumsum(yield_ratio),
     start_angle = lag(end_angle, default = 0),
     mid_angle = (end_angle + start_angle) / 2
-  ) %>% # BREAK
-  ggplot(data = .) + # BREAK
+  ) %>% #BREAK
+  ggplot(data = .) + #BREAK
   geom_arc_bar(
     aes(
       x0 = 0, y0 = 0, r0 = 0, r = rpie,
       start = start_angle, end = end_angle,
       fill = state_name
     )
-  ) + # BREAK
+  ) + #BREAK
   geom_text(
     aes(
       x = rlabel * sin(mid_angle),
@@ -799,9 +799,9 @@ county_yield %>% # BREAK
       label = state_name
     ),
     hjust = 0.5, vjust = 0.5
-  ) + # BREAK
-  coord_fixed() + # BREAK
-  theme_void() + # BREAK
+  ) + #BREAK
+  coord_fixed() + #BREAK
+  theme_void() + #BREAK
   scale_fill_viridis_d("State")
 ```
 
@@ -950,33 +950,33 @@ county_yield %>%
 ---
 
 ```{r divergin-plot, cache = F, include = F}
-county_yield %>% # BREAK
+county_yield %>% #BREAK
   filter(state_name == "Nebraska") %>%
   filter(!is.na(corn_yield)) %>%
   group_by(county_code) %>%
-  summarize(corn_yield = mean(corn_yield)) %>% # BREAK
+  summarize(corn_yield = mean(corn_yield)) %>% #BREAK
   mutate(
     yield_norm = (corn_yield - mean(corn_yield)) / sd(corn_yield),
     below_above = ifelse(yield_norm < 0, "below", "above")
-  ) %>% # BREAK
-  head(20) %>% # BREAK
-  arrange(yield_norm) %>% # BREAK
+  ) %>% #BREAK
+  head(20) %>% #BREAK
+  arrange(yield_norm) %>% #BREAK
   mutate(
     county_code_f = factor(county_code, levels = .$county_code)
-  ) %>% # BREAK
-  ggplot(data = .) + # BREAK
+  ) %>% #BREAK
+  ggplot(data = .) + #BREAK
   geom_bar(
     aes(fill = below_above, x = county_code_f, y = yield_norm, label = county_code_f),
     stat = "identity",
     width = 0.5
-  ) + # BREAK
+  ) + #BREAK
   scale_fill_manual(
     name = "Productivity",
     labels = c("Above Average", "Below Average"),
     values = c("above" = "#00ba38", "below" = "#f8766d")
-  ) + # BREAK
-  coord_flip() + # BREAK
-  labs(x = "Normalized Yield", y = "County Code") + # BREAK
+  ) + #BREAK
+  coord_flip() + #BREAK
+  labs(x = "Normalized Yield", y = "County Code") + #BREAK
   theme(
     legend.position = "bottom",
     axis.text.y = element_text(size = 6)
@@ -1042,11 +1042,11 @@ county_yield %>%
 
 
 ```{r area-chart-flip, cache = F, include = F}
-county_yield %>% # BREAK
-  filter(!is.na(corn_yield)) %>% # BREAK
-  group_by(state_name, year) %>% # BREAK
-  summarize(corn_yield = mean(corn_yield)) %>% # BREAK
-  ggplot(data = .) + # BREAK
+county_yield %>% #BREAK
+  filter(!is.na(corn_yield)) %>% #BREAK
+  group_by(state_name, year) %>% #BREAK
+  summarize(corn_yield = mean(corn_yield)) %>% #BREAK
+  ggplot(data = .) + #BREAK
   geom_area(
     aes(
       y = corn_yield,
@@ -1054,10 +1054,10 @@ county_yield %>% # BREAK
       fill = state_name
     ),
     stat = "identity"
-  ) + # BREAK
-  labs(x = "Year", y = "Corn Yield") + # BREAK
-  scale_fill_viridis_d(name = "State") + # BREAK
-  theme_bw() + # BREAK
+  ) + #BREAK
+  labs(x = "Year", y = "Corn Yield") + #BREAK
+  scale_fill_viridis_d(name = "State") + #BREAK
+  theme_bw() + #BREAK
   theme(legend.position = "bottom")
 ```
 
@@ -1093,16 +1093,16 @@ For each group, you need to supply the mean of the variable and the upper and lo
 data(Salaries, package = "carData")
 
 tibble(Salaries) %>%
-  group_by(rank) %>% # BREAK
+  group_by(rank) %>% #BREAK
   summarize(
     n = n(),
     mean_salary = mean(salary),
     sd = sd(salary),
     se = sd / sqrt(n)
-  ) %>% # BREAK
-  ggplot(data = .) + # BREAK
-  aes(x = rank, y = mean_salary) + # BREAK
-  geom_point(size = 3) + # BREAK
+  ) %>% #BREAK
+  ggplot(data = .) + #BREAK
+  aes(x = rank, y = mean_salary) + #BREAK
+  geom_point(size = 3) + #BREAK
   geom_errorbar( #>>
     aes( #>>
       ymin = mean_salary - 1.96 * se, #>>
@@ -1121,17 +1121,17 @@ tibble(Salaries) %>%
 ```{r mean-se-flip, cache = F, include = F}
 data(Salaries, package = "carData")
 
-Salaries %>% # BREAK
+Salaries %>% #BREAK
   group_by(rank) %>%
   summarize(
     n = n(),
     mean_salary = mean(salary),
     sd = sd(salary),
     se = sd / sqrt(n)
-  ) %>% # BREAK
-  ggplot(data = .) + # BREAK
-  aes(x = rank, y = mean_salary) + # BREAK
-  geom_point(size = 3) + # BREAK
+  ) %>% #BREAK
+  ggplot(data = .) + #BREAK
+  aes(x = rank, y = mean_salary) + #BREAK
+  geom_point(size = 3) + #BREAK
   geom_errorbar(
     aes(
       ymin = mean_salary - 1.96 * se,
@@ -1202,11 +1202,11 @@ gene_data %>%
 
 
 ```{r heatmap, cache = F, include = F}
-gene_data %>% # BREAK
-  ggplot(.) + # BREAK
-  geom_tile(aes(gene_txt, x, fill = value)) + # BREAK
-  scale_fill_distiller(palette = "YlOrRd") + # BREAK
-  facet_grid(. ~ group) + # BREAK
+gene_data %>% #BREAK
+  ggplot(.) + #BREAK
+  geom_tile(aes(gene_txt, x, fill = value)) + #BREAK
+  scale_fill_distiller(palette = "YlOrRd") + #BREAK
+  facet_grid(. ~ group) + #BREAK
   theme(
     axis.ticks.y = element_blank(),
     axis.title = element_blank(),

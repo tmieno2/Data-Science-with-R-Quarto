@@ -91,35 +91,35 @@ If you do use a live blue code area, selecting only part of the code and pressin
 #| label: taste-gt
 #| cache: false
 #| include: false
-tab_data %>% # BREAK
-  dplyr::select(country_name, region, y_1995, y_2005, pop_ratio_05_15) %>% # BREAK
-  gt(rowname_col = "country_name", groupname_col = "region") %>% # BREAK
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005, pop_ratio_05_15) %>% #BREAK
+  gt(rowname_col = "country_name", groupname_col = "region") %>% #BREAK
   tab_header(
     title = md("**Population of selected Pacific countries**"),
     subtitle = "1995 and 2005"
-  ) %>% # BREAK
-  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% # BREAK
-  fmt_percent(columns = pop_ratio_05_15, decimals = 0) %>% # BREAK
+  ) %>% #BREAK
+  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% #BREAK
+  fmt_percent(columns = pop_ratio_05_15, decimals = 0) %>% #BREAK
   cols_label(
     y_1995 = "1995",
     y_2005 = "2005",
     pop_ratio_05_15 = "2015 vs 2005"
-  ) %>% # BREAK
-  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% # BREAK
+  ) %>% #BREAK
+  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% #BREAK
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
-  ) %>% # BREAK
+  ) %>% #BREAK
   tab_style(
     style = cell_fill(color = "#fdf1d8"),
     locations = cells_body(rows = y_2005 > 2e5)
-  ) %>% # BREAK
-  data_color(columns = pop_ratio_05_15, palette = c("white", "#C90000")) %>% # BREAK
+  ) %>% #BREAK
+  data_color(columns = pop_ratio_05_15, palette = c("white", "#C90000")) %>% #BREAK
   tab_footnote(
     footnote = "2015 population divided by 2005 population.",
     locations = cells_column_labels(columns = pop_ratio_05_15)
-  ) %>% # BREAK
-  tab_source_note(source_note = md("Source: `countrypops` in the **gt** package.")) %>% # BREAK
+  ) %>% #BREAK
+  tab_source_note(source_note = md("Source: `countrypops` in the **gt** package.")) %>% #BREAK
   opt_row_striping()
 ```
 
@@ -1013,49 +1013,49 @@ gt_tbl %>%
 <!--end of panel-->
 
 ```{r style-flip, cache = F, include = F}
-tab_data %>% # BREAK
-  dplyr::select(country_name, region, y_1995, y_2005) %>% # BREAK
-  gt() %>% # BREAK
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005) %>% #BREAK
+  gt() %>% #BREAK
   #--- text color ---#
   tab_style(
     style = cell_text(color = "#fcba03"),
     locations = cells_body(columns = region, rows = 1)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- background ---#
   tab_style(
     style = cell_fill(color = "grey"),
     locations = cells_body(columns = region, rows = y_2005 < 2e5)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- font type ---#
   tab_style(
     style = cell_text(font = "Times New Roman"),
     locations = cells_body(columns = c(country_name, y_2005), rows = 5)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- font size ---#
   tab_style(
     style = cell_text(size = px(20)),
     locations = cells_body(rows = 7)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- italicize ---#
   tab_style(
     style = cell_text(style = "italic"),
     locations = cells_body(columns = region)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- bold ---#
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(columns = y_2005)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- vertical alignment ---#
   tab_style(
     style = cell_text(v_align = "top"),
     locations = cells_body(columns = y_2005, rows = region == "Australasia")
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- borders ---#
   tab_style(
     style = cell_borders(sides = "all", color = "black", weight = px(1)),
     locations = cells_body()
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- the column labels ---#
   tab_style(
     style = list(cell_fill(color = "#C90000"), cell_text(color = "white")),
@@ -1985,30 +1985,30 @@ Argument names are **part** `.` **property**: `table.font.size`, `column_labels.
 <!--end of panel-->
 
 ```{r options-flip, cache = F, include = F}
-tab_data %>% # BREAK
-  dplyr::select(country_name, region, y_1995, y_2005) %>% # BREAK
-  gt(rowname_col = "country_name", groupname_col = "region") %>% # BREAK
+tab_data %>% #BREAK
+  dplyr::select(country_name, region, y_1995, y_2005) %>% #BREAK
+  gt(rowname_col = "country_name", groupname_col = "region") %>% #BREAK
   #--- format the numbers ---#
-  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% # BREAK
+  fmt_number(columns = c(y_1995, y_2005), decimals = 0) %>% #BREAK
   #--- rename the labels ---#
-  cols_label(y_1995 = "1995", y_2005 = "2005") %>% # BREAK
+  cols_label(y_1995 = "1995", y_2005 = "2005") %>% #BREAK
   #--- a label above both year columns ---#
-  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% # BREAK
+  tab_spanner(label = "Population", columns = c(y_1995, y_2005)) %>% #BREAK
   #--- a total per region ---#
   summary_rows(
     fns = list(Total = ~ sum(.)),
     fmt = ~ fmt_number(., decimals = 0)
-  ) %>% # BREAK
+  ) %>% #BREAK
   #--- a ready-made look ---#
-  opt_stylize(style = 5, color = "gray") %>% # BREAK
+  opt_stylize(style = 5, color = "gray") %>% #BREAK
   #--- alternate row shading ---#
-  opt_row_striping() %>% # BREAK
+  opt_row_striping() %>% #BREAK
   #--- tighten the rows ---#
-  tab_options(data_row.padding = px(2)) %>% # BREAK
+  tab_options(data_row.padding = px(2)) %>% #BREAK
   #--- shrink the type ---#
-  tab_options(table.font.size = px(14)) %>% # BREAK
+  tab_options(table.font.size = px(14)) %>% #BREAK
   #--- a title ---#
-  tab_header(title = md("**Population of selected Pacific countries**")) %>% # BREAK
+  tab_header(title = md("**Population of selected Pacific countries**")) %>% #BREAK
   #--- and where it came from ---#
   tab_source_note(source_note = md("Source: `countrypops` in the **gt** package."))
 ```
