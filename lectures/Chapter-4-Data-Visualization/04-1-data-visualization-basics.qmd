@@ -186,14 +186,14 @@ We also use the derivative of `county_yield`, which records average corn yield b
 
 ```{webr-r}
 #| autorun: true
-( 
-mean_yield <-
-  county_yield %>%
-  group_by(year) %>%
-  summarize(
-    corn_yield = mean(corn_yield, na.rm = TRUE)
-  ) %>%
-  filter(!is.na(year))
+(
+  mean_yield <-
+    county_yield %>%
+    group_by(year) %>%
+    summarize(
+      corn_yield = mean(corn_yield, na.rm = TRUE)
+    ) %>%
+    filter(!is.na(year))
 )
 ```
 
@@ -649,7 +649,7 @@ In this code, factor of year again creates one group per year and corn_yield sup
 
 ```{webr-r}
 #| autorun: true
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_boxplot(
     aes(x = factor(year), y = corn_yield),
     color = "red",
@@ -872,11 +872,11 @@ The comments in the code label the two pieces of the equation. In this particula
 g_fig_scatter +
   geom_abline(
     #--- a ---#
-    intercept = 50, 
+    intercept = 50,
     #--- b ---#
     slope = 4,
     color = "blue"
-  ) 
+  )
 ```
 
 :::
@@ -905,7 +905,7 @@ The layer is added to g_fig_scatter, so the original points remain visible under
 g_fig_scatter +
   geom_smooth(
     aes(
-      y = corn_yield, 
+      y = corn_yield,
       x = d3_5_9
     )
   )
@@ -934,7 +934,7 @@ In the code, x equals d3_5_9 tells the ribbon where to extend along the horizont
 g_fig_scatter +
   geom_ribbon(
     aes(
-      x = d3_5_9, 
+      x = d3_5_9,
       ymin = 100,
       ymax = 200
     ),
@@ -1001,10 +1001,10 @@ The first argument, text, chooses a text annotation. X equals ten and y equals f
 #| out-width: 100%
 g_fig_scatter +
   annotate(
-    'text',
+    "text",
     x = 10,
     y = 50,
-    label = 'Drought hurts \n a lot!!',
+    label = "Drought hurts \n a lot!!",
     size = 3,
     color = "red"
   )

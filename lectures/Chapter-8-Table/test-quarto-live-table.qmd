@@ -18,8 +18,8 @@ filters:
 ```{webr-r}
 #| context: setup
 # define a method for objects of the class data.frame
-knit_print.data.frame = function(x, ...) {
-  res = paste(c('', '', kable(x)), collapse = '\n')
+knit_print.data.frame <- function(x, ...) {
+  res <- paste(c("", "", kable(x)), collapse = "\n")
   asis_output(res)
 }
 # register the method
@@ -30,8 +30,8 @@ registerS3method("knit_print", "data.frame", knit_print.data.frame)
 #| eval: false
 # define a method for objects of the class data.frame
 library("knitr")
-knit_print.data.frame = function(x, ...) {
-  res = paste(c('', '', kable(x)), collapse = '\n')
+knit_print.data.frame <- function(x, ...) {
+  res <- paste(c("", "", kable(x)), collapse = "\n")
   asis_output(res)
 }
 # register the method

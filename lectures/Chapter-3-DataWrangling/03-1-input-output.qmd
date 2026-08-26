@@ -438,7 +438,7 @@ Two fixes, both fine:
 
 ```{r}
 #| eval: false
-read_csv("C:/Users/taro/data/corn_yields.csv")    # forward slashes
+read_csv("C:/Users/taro/data/corn_yields.csv") # forward slashes
 read_csv("C:\\Users\\taro\\data\\corn_yields.csv") # doubled backslashes
 ```
 
@@ -856,8 +856,9 @@ A list goes in, and a list comes back out, with every column type intact.
 #| label: file-size-compare
 data.frame(
   file = c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds"),
-  KiB  = round(file.size(
-           c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds")) / 1024, 1)
+  KiB = round(file.size(
+    c("corn_yields.csv", "corn_yields.dta", "corn_yields.rds")
+  ) / 1024, 1)
 )
 ```
 

@@ -64,7 +64,7 @@ source(here::here("lectures/_lecture-theme.R"))
 The `patchwork` package allows you to combine and arrange multiple figures (and even tables and texts) like the figure to the right:
 
 ```{r eval = F}
-install.packages("patchwork")  
+install.packages("patchwork")
 
 library("patchwork")
 ```
@@ -88,19 +88,19 @@ g_fig_scatter | g_box
 We are going to use following figures:
 
 ```{r gen-ggs}
-g_1 <- ggplot(data = county_yield) + 
+g_1 <- ggplot(data = county_yield) +
   geom_histogram(aes(x = corn_yield)) +
-  ggtitle("g_1") 
+  ggtitle("g_1")
 
-g_2 <- ggplot(data = county_yield) + 
+g_2 <- ggplot(data = county_yield) +
   geom_boxplot(aes(x = factor(year), y = corn_yield)) +
   ggtitle("g_2")
 
-g_3 <- ggplot(data = county_yield) + 
+g_3 <- ggplot(data = county_yield) +
   geom_density(aes(x = corn_yield)) +
   ggtitle("g_3")
 
-g_4 <- ggplot(data = mean_yield) + 
+g_4 <- ggplot(data = mean_yield) +
   geom_line(aes(x = year, y = corn_yield)) +
   ggtitle("g_4")
 ```
@@ -114,7 +114,7 @@ Note: `mean_yield` for `g_4` is created in the **Line Plot** tab in slide 9.
 .panel[.panel-name[+]
 
 ```{r plus-1, out.width = "75%", fig.dim = c(8, 5), dependson = "gen-ggs"}
-g_1 + g_2 
+g_1 + g_2
 ```
 
   ] <!-- panel ends here -->
@@ -122,7 +122,7 @@ g_1 + g_2
 .panel[.panel-name[++]
 
 ```{r pp-1, out.width = "75%", fig.dim = c(8, 5), dependson = "gen-ggs"}
-g_1 + g_2 + g_3 + g_4 
+g_1 + g_2 + g_3 + g_4
 ```
 
   ] <!-- panel ends here -->
@@ -213,18 +213,18 @@ name: tips
 Create a dataset for this section:
 
 ```{r }
-county_yield_f <- county_yield %>% 
-  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>% 
-  filter(year %in% c(2005, 2006))  
+county_yield_f <- county_yield %>%
+  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>%
+  filter(year %in% c(2005, 2006))
 ```
 
 Create a faceted figure we will work on:
 
 ```{r eval = F}
-g_f <- ggplot(data = county_yield_f) + 
+g_f <- ggplot(data = county_yield_f) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(
-    state_name ~ year, 
+    state_name ~ year,
     scales = "free_x"
   )
 ```
@@ -242,7 +242,7 @@ g_f <- ggplot(data = county_yield_f) +
 + But, by default, `ggplot2` orders panels in alphabetical order
 
 ```{r problem-f, echo = F, fig.dim = c(8, 4), out.width = "70%"}
-g_f 
+g_f
 ```
 
   ]
@@ -254,11 +254,10 @@ g_f
 You can turn `state_name` into a factor with the preferred order of state names.
 
 ```{r }
-county_yield_f <- county_yield_f %>% 
+county_yield_f <- county_yield_f %>%
   mutate(
-    state_name_f = factor(state_name, level = c("Nebraska", "Kansas", "Colorado")
+    state_name_f = factor(state_name, level = c("Nebraska", "Kansas", "Colorado"))
   )
-) 
 ```  
 
 ```{r }
@@ -273,16 +272,16 @@ county_yield_f$state_name_f %>% head()
 
 .left-code[
 ```{r factor, echo = F, eval = F}
-ggplot(data = county_yield_f) + 
+ggplot(data = county_yield_f) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(
-    state_name_f ~ year, 
+    state_name_f ~ year,
     scales = "free_x"
   )
 ```
 
 ```{r echo = F}
-decorate("factor", eval = F) %>% 
+decorate("factor", eval = F) %>%
   flair("state_name_f") %>%
   knit_print.with_flair()
 ```
@@ -310,24 +309,24 @@ decorate("factor", eval = F) %>%
 .left-code[
 
 ```{r}
-county_yield_s_b2010 <- county_yield %>% 
+county_yield_s_b2010 <- county_yield %>%
   filter(year >= 2005, year <= 2010)
 ```
 
 ```{r box-disc, eval = F, echo = F}
-ggplot(data = county_yield_s_b2010) + 
+ggplot(data = county_yield_s_b2010) +
   geom_boxplot(
     aes(
-      x = factor(year), 
-      y = corn_yield, 
+      x = factor(year),
+      y = corn_yield,
       fill = state_name
     )
-  ) 
+  )
 ```
 
 ```{r echo = F}
-decorate("box-disc", eval = F) %>% 
-  flair('factor(year)') %>%
+decorate("box-disc", eval = F) %>%
+  flair("factor(year)") %>%
   knit_print.with_flair()
 ```
 
@@ -348,24 +347,24 @@ decorate("box-disc", eval = F) %>%
 .left-code[
 
 ```{r}
-county_yield_s_b2010 <- county_yield %>% 
+county_yield_s_b2010 <- county_yield %>%
   filter(year >= 2005, year <= 2010)
 ```
 
 ```{r box-num, eval = F, echo = F}
-ggplot(data = county_yield_s_b2010) + 
+ggplot(data = county_yield_s_b2010) +
   geom_boxplot(
     aes(
-      x = year, 
-      y = corn_yield, 
+      x = year,
+      y = corn_yield,
       fill = state_name
     )
-  ) 
+  )
 ```
 
 ```{r echo = F}
-decorate("box-num", eval = F) %>% 
-  flair('x = year') %>%
+decorate("box-num", eval = F) %>%
+  flair("x = year") %>%
   knit_print.with_flair()
 ```
 
@@ -386,24 +385,24 @@ decorate("box-num", eval = F) %>%
 .left-code[
 
 ```{r}
-county_yield_s_b2010 <- county_yield %>% 
+county_yield_s_b2010 <- county_yield %>%
   filter(year >= 2005, year <= 2010)
 ```
 
 ```{r box-char, eval = F, echo = F}
-ggplot(data = county_yield_s_b2010) + 
+ggplot(data = county_yield_s_b2010) +
   geom_boxplot(
     aes(
-      x = as.character(year), 
-      y = corn_yield, 
+      x = as.character(year),
+      y = corn_yield,
       fill = state_name
     )
-  ) 
+  )
 ```
 
 ```{r echo = F}
-decorate("box-char", eval = F) %>% 
-  flair('x = as.character(year)') %>%
+decorate("box-char", eval = F) %>%
+  flair("x = as.character(year)") %>%
   knit_print.with_flair()
 ```
 
@@ -430,7 +429,7 @@ decorate("box-char", eval = F) %>%
 Load the `nycflights13` package to get access to the `weather` dataset.
 
 ```{r }
-library(nycflights13)  
+library(nycflights13)
 ```
 
 Create a box plot of temperature by month:
@@ -438,15 +437,15 @@ Create a box plot of temperature by month:
 ggplot(data = weather) +
   geom_boxplot(
     aes(
-      y = temp, 
+      y = temp,
       x = as.character(month)
     )
   )
 ```
 
 ```{r echo = F}
-decorate("weather", eval = F) %>% 
-  flair('x = as.character(month)') %>%
+decorate("weather", eval = F) %>%
+  flair("x = as.character(month)") %>%
   knit_print.with_flair()
 ```
 
@@ -472,7 +471,7 @@ decorate("weather", eval = F) %>%
 Load the `nycflights13` package to get access to the `weather` dataset.
 
 ```{r }
-library(nycflights13)  
+library(nycflights13)
 ```
 
 Create a box plot of temperature by month:
@@ -480,7 +479,7 @@ Create a box plot of temperature by month:
 ggplot(data = weather) +
   geom_boxplot(
     aes(
-      y = temp, 
+      y = temp,
       x = factor(month) #<<
     )
   )
@@ -509,12 +508,12 @@ When a factor object is created using `factor()`, the order of its levels are se
 Create the following data:
 
 ```{r }
-mean_yield_sy <- county_yield %>% 
-  filter(year >= 2010) %>% 
-  group_by(state_name, year) %>% 
+mean_yield_sy <- county_yield %>%
+  filter(year >= 2010) %>%
+  group_by(state_name, year) %>%
   summarize(
     corn_yield = mean(corn_yield, na.rm = TRUE)
-  ) %>% 
+  ) %>%
   filter(!is.na(year))
 ```
 
@@ -533,12 +532,12 @@ mean_yield_sy
 By default `geom_bar()` creates a bar plot where the height of the bars are proportional to the number of observations in each value of x, meaning you do not need to supply `y` in `aes()`.
 
 ```{r bar-1, out.width = "80%"}
-ggplot(data = mean_yield_sy) + 
+ggplot(data = mean_yield_sy) +
   geom_bar(
     aes(
       x = year
     )
-  ) 
+  )
 ```
 
 ]
@@ -548,14 +547,14 @@ ggplot(data = mean_yield_sy) +
 You can make the height of bars to be the value of a variable by adding `y = variable` to `aes()` and add `stat = "identity"` option.
 
 ```{r bar-2, out.width = "80%"}
-ggplot(data = mean_yield_sy) + 
+ggplot(data = mean_yield_sy) +
   geom_bar(
     aes(
       x = year,
       y = corn_yield #<<
     ),
     stat = "identity"
-  ) 
+  )
 ```
 
 ]
@@ -572,13 +571,13 @@ If you would like the height of bars to be the value of a variable, it is better
 
 .left-code[
 ```{r bar-col, eval = F}
-ggplot(data = mean_yield_sy) + 
+ggplot(data = mean_yield_sy) +
   geom_col( #<<
     aes(
       x = year,
-      y = corn_yield 
+      y = corn_yield
     )
-  ) 
+  )
 ```
 ]
 
@@ -601,13 +600,13 @@ You might have wondered why `con_yield` is really high. That's because the value
 No action:
 
 ```{r position-1, out.width = "70%"}
-ggplot(data = mean_yield_sy) + 
-  geom_col( 
+ggplot(data = mean_yield_sy) +
+  geom_col(
     aes(
       x = year,
-      y = corn_yield 
+      y = corn_yield
     )
-  )   
+  )
 ```
 
 ]
@@ -617,14 +616,14 @@ ggplot(data = mean_yield_sy) +
 Fill-color differentiated by `state_name`:
 
 ```{r position-2, out.width = "70%"}
-ggplot(data = mean_yield_sy) + 
-  geom_col( 
+ggplot(data = mean_yield_sy) +
+  geom_col(
     aes(
       x = year,
       y = corn_yield,
       fill = state_name #<<
     )
-  )   
+  )
 ```
 
 ]
@@ -640,10 +639,10 @@ ggplot(data = mean_yield_sy) +
 By default, bars are stacked (`position = "stack"`): 
 
 ```{r position-s, out.width = "70%"}
-ggplot(data = mean_yield_sy) + 
-  geom_col( 
+ggplot(data = mean_yield_sy) +
+  geom_col(
     aes(x = year, y = corn_yield, fill = state_name)
-  )   
+  )
 ```
 
 ]
@@ -653,11 +652,11 @@ ggplot(data = mean_yield_sy) +
 You can add `position = "dodge"` to not stack bars vertically:
 
 ```{r position-d, out.width = "70%"}
-ggplot(data = mean_yield_sy) + 
-  geom_col( 
-    aes(x = year, y = corn_yield, fill = state_name), 
+ggplot(data = mean_yield_sy) +
+  geom_col(
+    aes(x = year, y = corn_yield, fill = state_name),
     position = "dodge" #<<
-  )   
+  )
 ```
 
 ]
@@ -726,44 +725,44 @@ Note: You can use the following code as a template to create a pie chart. Replac
 .right5[
 
 ```{r pie-chart, echo = F}  
-share_data <- county_yield %>% 
-  dplyr::select(state_name, corn_yield) %>% 
-  group_by(state_name) %>% 
-  summarize(yield = mean(corn_yield, na.rm = T)) %>% 
-  mutate(yield_ratio = yield/sum(yield)) %>% 
+share_data <- county_yield %>%
+  dplyr::select(state_name, corn_yield) %>%
+  group_by(state_name) %>%
+  summarize(yield = mean(corn_yield, na.rm = T)) %>%
+  mutate(yield_ratio = yield / sum(yield)) %>%
   mutate(
-    end_angle = 2*pi*cumsum(yield_ratio),
+    end_angle = 2 * pi * cumsum(yield_ratio),
     start_angle = lag(end_angle, default = 0),
-    mid_angle = (end_angle + start_angle)/2
+    mid_angle = (end_angle + start_angle) / 2
   )
 
 #--- define two parameters ---#
-rpie = 1 # pie radius
-rlabel = 0.6 * rpie # radius of the labels
+rpie <- 1 # pie radius
+rlabel <- 0.6 * rpie # radius of the labels
 
 #--- create a pie chart ---#
-share_data %>% 
-  ggplot(data = .) + 
-    geom_arc_bar(
-      aes(x0 = 0, y0 = 0, r0 = 0, r = rpie, # fixed values
-        start = start_angle, 
-        end = end_angle, 
-        fill = state_name
-      )
-    ) +
-    geom_text(
-      aes(
-        x = rlabel * sin(mid_angle), 
-        y = rlabel * cos(mid_angle), 
-        label = state_name
-      ), 
-      hjust = 0.5, 
-      vjust = 0.5
-    ) +
-    coord_fixed() +
-    theme_void() +
-    scale_fill_viridis_d("State")
-
+share_data %>%
+  ggplot(data = .) +
+  geom_arc_bar(
+    aes(
+      x0 = 0, y0 = 0, r0 = 0, r = rpie, # fixed values
+      start = start_angle,
+      end = end_angle,
+      fill = state_name
+    )
+  ) +
+  geom_text(
+    aes(
+      x = rlabel * sin(mid_angle),
+      y = rlabel * cos(mid_angle),
+      label = state_name
+    ),
+    hjust = 0.5,
+    vjust = 0.5
+  ) +
+  coord_fixed() +
+  theme_void() +
+  scale_fill_viridis_d("State")
 ```
 ]
 
@@ -772,38 +771,38 @@ share_data %>%
 
 ```{r pie-chart-flip, cache = F, include = F}
 #--- define two parameters ---#
-rpie = 1 # pie radius
-rlabel = 0.6 * rpie # radius of the labels
+rpie <- 1 # pie radius
+rlabel <- 0.6 * rpie # radius of the labels
 
-county_yield %>% #BREAK
-  dplyr::select(state_name, corn_yield) %>% #BREAK
-  group_by(state_name) %>% #BREAK
-  summarize(yield = mean(corn_yield, na.rm = T)) %>% #BREAK
-  mutate(yield_ratio = yield/sum(yield)) %>% #BREAK
+county_yield %>% # BREAK
+  dplyr::select(state_name, corn_yield) %>% # BREAK
+  group_by(state_name) %>% # BREAK
+  summarize(yield = mean(corn_yield, na.rm = T)) %>% # BREAK
+  mutate(yield_ratio = yield / sum(yield)) %>% # BREAK
   mutate(
-    end_angle = 2*pi*cumsum(yield_ratio),
+    end_angle = 2 * pi * cumsum(yield_ratio),
     start_angle = lag(end_angle, default = 0),
-    mid_angle = (end_angle + start_angle)/2
-  ) %>% #BREAK
-  ggplot(data = .) + #BREAK 
-    geom_arc_bar(
-      aes(
-        x0 = 0, y0 = 0, r0 = 0, r = rpie, 
-        start = start_angle, end = end_angle, 
-        fill = state_name
-      )
-    ) + #BREAK
-    geom_text(
-      aes(
-        x = rlabel * sin(mid_angle), 
-        y = rlabel * cos(mid_angle), 
-        label = state_name
-      ), hjust = 0.5, vjust = 0.5
-    ) + #BREAK
-    coord_fixed() + #BREAK
-    theme_void() + #BREAK
-    scale_fill_viridis_d("State")
-
+    mid_angle = (end_angle + start_angle) / 2
+  ) %>% # BREAK
+  ggplot(data = .) + # BREAK
+  geom_arc_bar(
+    aes(
+      x0 = 0, y0 = 0, r0 = 0, r = rpie,
+      start = start_angle, end = end_angle,
+      fill = state_name
+    )
+  ) + # BREAK
+  geom_text(
+    aes(
+      x = rlabel * sin(mid_angle),
+      y = rlabel * cos(mid_angle),
+      label = state_name
+    ),
+    hjust = 0.5, vjust = 0.5
+  ) + # BREAK
+  coord_fixed() + # BREAK
+  theme_void() + # BREAK
+  scale_fill_viridis_d("State")
 ```
 
 `r chunk_reveal(
@@ -857,20 +856,19 @@ library(ggcorrplot)
 
 .left4[
 ```{r cor-plot, eval = F}  
-weather %>% 
-  na.omit() %>% 
-  dplyr::select(where(is.numeric)) %>% 
-  dplyr::select(- year) %>% 
+weather %>%
+  na.omit() %>%
+  dplyr::select(where(is.numeric)) %>%
+  dplyr::select(-year) %>%
   cor() %>% # create a cor matrix
   #--- create a cor plot ---#
-  ggcorrplot(., 
-    type = "lower", 
+  ggcorrplot(.,
+    type = "lower",
     hc.order = TRUE
   ) +
   theme(
     legend.position = "bottom"
-  ) 
-
+  )
 ```
 
 + You can add `lab = TRUE` in `ggcorrplot()` to display the correlation coefficient numbers in the squares as well
@@ -910,41 +908,40 @@ You can use `geom_bar()` with `coord_flip()`. See the next slide for a demonstra
 .right6[
 
 ```{r diverging2, echo = F, out.width = "90%"}  
-county_yield %>% 
-  filter(state_name == "Nebraska") %>% 
-  filter(!is.na(corn_yield)) %>% 
-  group_by(county_code) %>% 
-  summarize(corn_yield = mean(corn_yield)) %>% 
+county_yield %>%
+  filter(state_name == "Nebraska") %>%
+  filter(!is.na(corn_yield)) %>%
+  group_by(county_code) %>%
+  summarize(corn_yield = mean(corn_yield)) %>%
   mutate(
-    yield_norm = (corn_yield - mean(corn_yield))/sd(corn_yield),
+    yield_norm = (corn_yield - mean(corn_yield)) / sd(corn_yield),
     below_above = ifelse(yield_norm < 0, "below", "above")
-  ) %>% 
-  head(20) %>% 
-  arrange(yield_norm) %>% 
+  ) %>%
+  head(20) %>%
+  arrange(yield_norm) %>%
   mutate(
     county_code_f = factor(county_code, levels = .$county_code)
-  ) %>% 
+  ) %>%
   ggplot(data = .) +
   geom_bar(
     aes(
-      fill = below_above, x = county_code_f, 
+      fill = below_above, x = county_code_f,
       y = yield_norm, label = county_code_f
-    ), 
-    stat = 'identity', 
+    ),
+    stat = "identity",
     width = 0.5
-  )  +
+  ) +
   scale_fill_manual(
-    name = "Productivity", 
-    labels = c("Above Average", "Below Average"), 
+    name = "Productivity",
+    labels = c("Above Average", "Below Average"),
     values = c("above" = "#00ba38", "below" = "#f8766d")
-  ) + 
+  ) +
   coord_flip() +
   labs(x = "Normalized Yield", y = "County Code") +
   theme(
     legend.position = "bottom",
     axis.text.y = element_text(size = 6)
   )
-
 ```
 ]
 
@@ -953,33 +950,33 @@ county_yield %>%
 ---
 
 ```{r divergin-plot, cache = F, include = F}
-county_yield %>% #BREAK
-  filter(state_name == "Nebraska") %>% 
-  filter(!is.na(corn_yield)) %>% 
-  group_by(county_code) %>% 
-  summarize(corn_yield = mean(corn_yield)) %>% #BREAK 
+county_yield %>% # BREAK
+  filter(state_name == "Nebraska") %>%
+  filter(!is.na(corn_yield)) %>%
+  group_by(county_code) %>%
+  summarize(corn_yield = mean(corn_yield)) %>% # BREAK
   mutate(
-    yield_norm = (corn_yield - mean(corn_yield))/sd(corn_yield),
+    yield_norm = (corn_yield - mean(corn_yield)) / sd(corn_yield),
     below_above = ifelse(yield_norm < 0, "below", "above")
-  ) %>% #BREAK
-  head(20) %>% #BREAK 
-  arrange(yield_norm) %>% #BREAK
+  ) %>% # BREAK
+  head(20) %>% # BREAK
+  arrange(yield_norm) %>% # BREAK
   mutate(
     county_code_f = factor(county_code, levels = .$county_code)
-  ) %>% #BREAK
-  ggplot(data = .) + #BREAK
+  ) %>% # BREAK
+  ggplot(data = .) + # BREAK
   geom_bar(
-    aes(fill = below_above, x = county_code_f, y = yield_norm, label = county_code_f), 
-    stat = 'identity', 
+    aes(fill = below_above, x = county_code_f, y = yield_norm, label = county_code_f),
+    stat = "identity",
     width = 0.5
-  )  + #BREAK
+  ) + # BREAK
   scale_fill_manual(
-    name = "Productivity", 
-    labels = c("Above Average", "Below Average"), 
+    name = "Productivity",
+    labels = c("Above Average", "Below Average"),
     values = c("above" = "#00ba38", "below" = "#f8766d")
-  ) + #BREAK
-  coord_flip() + #BREAK
-  labs(x = "Normalized Yield", y = "County Code") + #BREAK
+  ) + # BREAK
+  coord_flip() + # BREAK
+  labs(x = "Normalized Yield", y = "County Code") + # BREAK
   theme(
     legend.position = "bottom",
     axis.text.y = element_text(size = 6)
@@ -1020,24 +1017,23 @@ You do not have to calculate the height (`y` value) yourself. `geom_area()` will
 .right6[
 
 ```{r area-chart, echo = F, out.width = "90%"}  
-county_yield %>% 
-  filter(!is.na(corn_yield)) %>% 
-  group_by(state_name, year) %>% 
-  summarize(corn_yield = mean(corn_yield)) %>% 
-  ggplot(data = .) + 
+county_yield %>%
+  filter(!is.na(corn_yield)) %>%
+  group_by(state_name, year) %>%
+  summarize(corn_yield = mean(corn_yield)) %>%
+  ggplot(data = .) +
   geom_area(
     aes(
-      y = corn_yield, 
-      x = year, 
+      y = corn_yield,
+      x = year,
       fill = state_name
-    ), 
+    ),
     stat = "identity"
-  ) + 
+  ) +
   labs(x = "Year", y = "Corn Yield") +
-  scale_fill_viridis_d(name = "State") +  
+  scale_fill_viridis_d(name = "State") +
   theme_bw() +
   theme(legend.position = "bottom")
-
 ```
 
 ]
@@ -1046,22 +1042,22 @@ county_yield %>%
 
 
 ```{r area-chart-flip, cache = F, include = F}
-county_yield %>% #BREAK
-  filter(!is.na(corn_yield)) %>% #BREAK 
-  group_by(state_name, year) %>% #BREAK
-  summarize(corn_yield = mean(corn_yield)) %>% #BREAK 
-  ggplot(data = .) + #BREAK
+county_yield %>% # BREAK
+  filter(!is.na(corn_yield)) %>% # BREAK
+  group_by(state_name, year) %>% # BREAK
+  summarize(corn_yield = mean(corn_yield)) %>% # BREAK
+  ggplot(data = .) + # BREAK
   geom_area(
     aes(
-      y = corn_yield, 
-      x = year, 
+      y = corn_yield,
+      x = year,
       fill = state_name
-    ), 
+    ),
     stat = "identity"
-  ) + #BREAK
-  labs(x = "Year", y = "Corn Yield") + #BREAK
-  scale_fill_viridis_d(name = "State") + #BREAK 
-  theme_bw() + #BREAK
+  ) + # BREAK
+  labs(x = "Year", y = "Corn Yield") + # BREAK
+  scale_fill_viridis_d(name = "State") + # BREAK
+  theme_bw() + # BREAK
   theme(legend.position = "bottom")
 ```
 
@@ -1094,27 +1090,26 @@ For each group, you need to supply the mean of the variable and the upper and lo
 .right6[
 
 ```{r mean-se, echo = F, out.width = "90%"}
-data(Salaries, package="carData")
+data(Salaries, package = "carData")
 
 tibble(Salaries) %>%
-  group_by(rank) %>% #BREAK
+  group_by(rank) %>% # BREAK
   summarize(
     n = n(),
     mean_salary = mean(salary),
     sd = sd(salary),
     se = sd / sqrt(n)
-  ) %>% #BREAK
-  ggplot(data = .) + #BREAK
-  aes(x = rank, y = mean_salary) + #BREAK
-  geom_point(size = 3) + #BREAK
+  ) %>% # BREAK
+  ggplot(data = .) + # BREAK
+  aes(x = rank, y = mean_salary) + # BREAK
+  geom_point(size = 3) + # BREAK
   geom_errorbar( #>>
     aes( #>>
       ymin = mean_salary - 1.96 * se, #>>
       ymax = mean_salary + 1.96 * se #>>
-      ), #>>
+    ), #>>
     width = .1 #>>
   ) #>>
-
 ```
 
 ]
@@ -1124,27 +1119,26 @@ tibble(Salaries) %>%
 
 
 ```{r mean-se-flip, cache = F, include = F}
-data(Salaries, package="carData")
+data(Salaries, package = "carData")
 
-Salaries %>% #BREAK
-  group_by(rank) %>% 
+Salaries %>% # BREAK
+  group_by(rank) %>%
   summarize(
     n = n(),
     mean_salary = mean(salary),
     sd = sd(salary),
     se = sd / sqrt(n)
-  ) %>% #BREAK
-  ggplot(data = .) + #BREAK
-  aes(x = rank, y = mean_salary) + #BREAK
-  geom_point(size = 3) + #BREAK
-  geom_errorbar( 
-    aes( 
-      ymin = mean_salary - 1.96 * se, 
-      ymax = mean_salary + 1.96 * se 
-      ), 
-    width = .1 
-  ) 
-
+  ) %>% # BREAK
+  ggplot(data = .) + # BREAK
+  aes(x = rank, y = mean_salary) + # BREAK
+  geom_point(size = 3) + # BREAK
+  geom_errorbar(
+    aes(
+      ymin = mean_salary - 1.96 * se,
+      ymax = mean_salary + 1.96 * se
+    ),
+    width = .1
+  )
 ```
 
 `r chunk_reveal(
@@ -1188,18 +1182,18 @@ gene_data <- readRDS("gene.rds")
 .right5[
 
 ```{r echo = F}
-gene_data %>% 
-  ggplot(.) + 
-    geom_tile(aes(gene_txt, x, fill= value)) +
-    scale_fill_distiller(palette = "YlOrRd") +
-    facet_grid(. ~ group) +
-    theme(
-      axis.ticks.y = element_blank(),
-      axis.title = element_blank(),
-      axis.text.y = element_blank(),
-      axis.text.x = element_text(angle = 90),
-      legend.position = "bottom"
-    )
+gene_data %>%
+  ggplot(.) +
+  geom_tile(aes(gene_txt, x, fill = value)) +
+  scale_fill_distiller(palette = "YlOrRd") +
+  facet_grid(. ~ group) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  )
 ```
 
 ]
@@ -1208,18 +1202,18 @@ gene_data %>%
 
 
 ```{r heatmap, cache = F, include = F}
-gene_data %>% #BREAK
-  ggplot(.) + #BREAK
-    geom_tile(aes(gene_txt, x, fill= value)) + #BREAK
-    scale_fill_distiller(palette = "YlOrRd") + #BREAK
-    facet_grid(. ~ group) + #BREAK
-    theme(
-      axis.ticks.y = element_blank(),
-      axis.title = element_blank(),
-      axis.text.y = element_blank(),
-      axis.text.x = element_text(angle = 90),
-      legend.position = "bottom"
-    )
+gene_data %>% # BREAK
+  ggplot(.) + # BREAK
+  geom_tile(aes(gene_txt, x, fill = value)) + # BREAK
+  scale_fill_distiller(palette = "YlOrRd") + # BREAK
+  facet_grid(. ~ group) + # BREAK
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.title = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  )
 ```
 
 `r chunk_reveal(
@@ -1247,10 +1241,10 @@ Create a dataset first:
 ```{r cache = F}
 library(ggalt)
 
-yield_group <- county_yield %>% 
-  filter(state_name %in% c("Colorado", "Nebraska")) %>% 
-  filter(!(state_name == "Colorado" & corn_yield > 130)) %>% 
-  filter(!(state_name == "Nebraska" & corn_yield > 150))  
+yield_group <- county_yield %>%
+  filter(state_name %in% c("Colorado", "Nebraska")) %>%
+  filter(!(state_name == "Colorado" & corn_yield > 130)) %>%
+  filter(!(state_name == "Nebraska" & corn_yield > 150))
 ```  
 
 Create a figure:
@@ -1263,7 +1257,6 @@ ggplot(data = yield_group) +
   geom_encircle( #<<
     aes(y = corn_yield, x = d3_5_9, color = state_name) #<<
   ) #<<
-
 ```
 + Can be useful for illustrating clusters
 
@@ -1289,7 +1282,7 @@ ggplot(data = yield_group) +
   geom_segment( #<<
     x = 10, #<<
     y = 50, #<<
-    xend = 18.8, #<< 
+    xend = 18.8, #<<
     yend = 88, #<<
     arrow = arrow(length = unit(0.5, "cm")) #<<
   ) #<<
@@ -1315,7 +1308,7 @@ ggplot(data = yield_group) +
   geom_curve( #<<
     x = 10, #<<
     y = 50, #<<
-    xend = 18.8, #<< 
+    xend = 18.8, #<<
     yend = 88, #<<
     curvature = 0.2, #<<
     arrow = arrow(length = unit(0.5, "cm")) #<<
@@ -1362,14 +1355,14 @@ name: animated
 + Install the `gganimate` package:
 
 ```{r eval = F}
-install.packages(gganimate)   
+install.packages(gganimate)
 ``` 
 
 + Install the `png` and `gifski` packages as well:
 
 ```{r eval = F}
-install.packages(png)   
-install.packages(gifski)   
+install.packages(png)
+install.packages(gifski)
 ``` 
 
 + You need to library only the `gganimate` package
@@ -1404,11 +1397,11 @@ library(gganimate)
 .left-code[
 
 ```{r animate, eval = F}  
-weather %>% 
+weather %>%
   ggplot(data = .) +
   geom_boxplot(
     aes(y = temp, x = origin, fill = origin)
-  ) + 
+  ) +
   transition_states(month) #<<
 ```
 + `weather` is from the the `nycflights13` package has daily weather information at three airports in NY.
@@ -1427,13 +1420,13 @@ weather %>%
 
 .left-code[
 ```{r animate-2, eval = F}  
-weather %>% 
-  filter(month == 8) %>% 
-  filter(day <= 10) %>% 
+weather %>%
+  filter(month == 8) %>%
+  filter(day <= 10) %>%
   ggplot(data = .) +
   geom_boxplot(
     aes(y = temp, x = factor(day), fill = origin)
-  ) + 
+  ) +
   transition_reveal(day) #<<
 ```
 ]
@@ -1464,7 +1457,7 @@ suppressMessages(library(plotly))
 ```
 
 ```{r eval = F}
-install.packages(plotly)  
+install.packages(plotly)
 
 library(plotly)
 ```
@@ -1495,12 +1488,12 @@ library(plotly)
 
 ```{r eval = F}
 #--- create a ggplot object ---#
-g_box <- county_yield %>% 
-  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>% 
-  ggplot(data = .) + 
+g_box <- county_yield %>%
+  filter(state_name %in% c("Nebraska", "Colorado", "Kansas")) %>%
+  ggplot(data = .) +
   geom_boxplot(
     aes(
-      y = corn_yield, 
+      y = corn_yield,
       x = state_name,
       #--- add frame ---#
       frame = year #<<
@@ -1509,10 +1502,9 @@ g_box <- county_yield %>%
   labs(x = "State", y = "Corn Yield (bu/acre)")
 
 #--- apply ggplotly() to the ggplot object ---#
-ggplotly(g_box, width = 800, height = 400) %>% #<< 
+ggplotly(g_box, width = 800, height = 400) %>% #<<
   #--- save as html file ---#
   htmltools::save_html(file = "g_box.html") #<<
-
 ```
 
 Then, add this in your Rmd file:
@@ -1528,10 +1520,10 @@ Then, add this in your Rmd file:
 .panel[.panel-name[time-series box plot]
 
 ```{r echo = F, eval = F}
-g_box <- ggplot(data = county_yield) + 
+g_box <- ggplot(data = county_yield) +
   geom_boxplot(
     aes(
-      y = corn_yield, 
+      y = corn_yield,
       x = state_name,
       frame = year
     )
@@ -1539,7 +1531,6 @@ g_box <- ggplot(data = county_yield) +
   labs(x = "State", y = "Corn Yield (bu/acre)")
 
 htmltools::save_html(ggplotly(g_box, width = 800, height = 400), file = "g_box.html")
-
 ```
 
 <iframe src="g_box.html" width="1000" height="550" scrolling="yes" seamless="seamless" frameBorder="0"> </iframe>
@@ -1553,10 +1544,9 @@ library(gapminder)
 
 test <- ggplot(gapminder, aes(gdpPercap, lifeExp, color = continent)) +
   geom_point(aes(size = pop, frame = year, ids = country)) +
-  scale_x_log10()  
+  scale_x_log10()
 
 htmltools::save_html(ggplotly(test, width = 800, height = 400), file = "fig.html")
-
 ```
 
 <iframe src="fig.html" width="900" height="500" scrolling="yes" seamless="seamless" frameBorder="0"> </iframe>  
@@ -1604,7 +1594,7 @@ ggsave(file name, ggplot object)
 ## Example
 
 ```{r }
-ggsave("ex_boxplot.pdf", g_box)  
+ggsave("ex_boxplot.pdf", g_box)
 ```
 
 This will save `g_box` as **ex_boxplot.pdf** in the working directory.
@@ -1642,7 +1632,7 @@ This will save `g_box` as **ex_boxplot.pdf** in the working directory.
 + You can control the width and height of the output image using the `width` and `height` options (the default unit is inch.):
 
 ```{r }
-ggsave("ex_boxplot.pdf", g_box, height = 5, width = 7)   
+ggsave("ex_boxplot.pdf", g_box, height = 5, width = 7)
 ```
 
 ## Image resolution

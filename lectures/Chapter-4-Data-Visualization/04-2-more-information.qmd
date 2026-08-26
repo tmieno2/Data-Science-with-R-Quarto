@@ -95,9 +95,9 @@ mean_yield <-
   ) %>%
   filter(!is.na(year))
 
-county_yield_mean <- 
-  county_yield %>% 
-  group_by(state_name, year) %>% 
+county_yield_mean <-
+  county_yield %>%
+  group_by(state_name, year) %>%
   summarize(corn_yield = mean(corn_yield, na.rm = TRUE))
 
 # WebR draws its canvas at 72 dpi whatever `dpi` says, so on the 216-dpi canvas
@@ -149,7 +149,7 @@ For example, suppose you are interested in comparing the history of corn yield b
 ggplot(data = county_yield_mean) +
   geom_line(
     aes(y = corn_yield, x = year, color = state_name)
-  )  
+  )
 ```
 
 :::
@@ -176,7 +176,7 @@ Here is an example:
 ggplot(data = county_yield_mean) +
   geom_line(
     aes(y = corn_yield, x = year, color = state_name)
-  )   
+  )
 ```
 
 :::
@@ -205,11 +205,11 @@ Create a data set of corn yield by state-year first:
 
 ```{webr-r}
 #| autorun: true
-( 
-county_yield_mean <- 
-  county_yield %>% 
-  group_by(state_name, year) %>% 
-  summarize(corn_yield = mean(corn_yield, na.rm = TRUE))
+(
+  county_yield_mean <-
+    county_yield %>%
+    group_by(state_name, year) %>%
+    summarize(corn_yield = mean(corn_yield, na.rm = TRUE))
 )
 ```
 
@@ -222,9 +222,9 @@ county_yield_mean <-
 ggplot(data = county_yield_mean) +
   geom_line(
     aes(
-      y = corn_yield, 
-      x = year, 
-      color = state_name 
+      y = corn_yield,
+      x = year,
+      color = state_name
     )
   )
 ```
@@ -237,11 +237,11 @@ ggplot(data = county_yield_mean) +
 
 ```{webr-r}
 #| code-track: 0.5
-ggplot(data = county_yield_mean) + 
+ggplot(data = county_yield_mean) +
   geom_density(
     aes(
-      x = corn_yield, 
-      fill = state_name 
+      x = corn_yield,
+      fill = state_name
     ),
     alpha = 0.3
   )
@@ -255,17 +255,16 @@ ggplot(data = county_yield_mean) +
 
 ```{webr-r}
 #| code-track: 0.5
-county_yield %>% 
-  filter(state_name %in% c("Nebraska", "Kansas")) %>% 
-  ggplot(data = .) + 
+county_yield %>%
+  filter(state_name %in% c("Nebraska", "Kansas")) %>%
+  ggplot(data = .) +
   geom_boxplot(
     aes(
-      x = factor(year), 
+      x = factor(year),
       y = corn_yield,
       fill = state_name
     )
   )
-
 ```
 
 :::
@@ -276,7 +275,7 @@ county_yield %>%
 
 ```{webr-r}
 #| code-track: 0.5
-county_yield %>% 
+county_yield %>%
   filter(state_name %in% c("Nebraska", "Kansas")) %>%
   ggplot(data = .) +
   geom_point(
@@ -288,7 +287,6 @@ county_yield %>%
     ),
     size = 0.7
   )
-
 ```
 
 :::
@@ -401,11 +399,11 @@ Too much information in one panel?
 ```{webr-r}
 #| context: output
 #| out-width: 100%
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_boxplot(
     aes(
-      x = factor(year), 
-      y = corn_yield, 
+      x = factor(year),
+      y = corn_yield,
       fill = state_name
     )
   )
@@ -422,14 +420,14 @@ On separate panels (faceting)?
 ```{webr-r}  
 #| context: output
 #| out-width: 100%
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_boxplot(
     aes(
-      x = factor(year), 
-      y = corn_yield 
+      x = factor(year),
+      y = corn_yield
     )
   ) +
-  facet_wrap(~ state_name, nrow = 3)
+  facet_wrap(~state_name, nrow = 3)
 ```
 
 :::
@@ -455,11 +453,11 @@ Here is an example:
 ::: {.side-out}
 
 ```{webr-r}
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_boxplot(
     aes(x = factor(year), y = corn_yield)
   ) +
-  facet_wrap(~ state_name)
+  facet_wrap(~state_name)
 ```
 
 :::
@@ -508,7 +506,7 @@ Two-way faceting will
 ::: {.side-out}
 
 ```{webr-r}
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_histogram(
     aes(x = corn_yield)
   ) +
@@ -523,8 +521,8 @@ Filter `county_yield` to those in 2017 and 2018.
 
 ```{webr-r}
 #| autorun: true
-county_yield_s <- 
-  county_yield %>% 
+county_yield_s <-
+  county_yield %>%
   filter(year %in% c(2017, 2018))
 ```
 
@@ -533,11 +531,11 @@ Create faceted histograms.
 ::: {.side-out}
 
 ```{webr-r}  
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(
     aes(x = corn_yield)
   ) +
-  facet_wrap(state_name ~ year)  
+  facet_wrap(state_name ~ year)
 ```
 
 :::
@@ -572,7 +570,7 @@ The Scale tabs control a separate decision. Facet_grid uses fixed x and y scales
 #| out-width: 100%
 ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
-  facet_wrap(state_name ~ year)  
+  facet_wrap(state_name ~ year)
 ```
 
 :::
@@ -586,10 +584,10 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 100% 
-ggplot(data = county_yield_s) + 
+#| out-width: 100%
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
-  facet_grid(state_name ~ year)  
+  facet_grid(state_name ~ year)
 ```
 
 :::
@@ -604,7 +602,7 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(state_name ~ year)
 ```
@@ -630,8 +628,8 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-#| out-width: 100% 
-ggplot(data = county_yield_s) + 
+#| out-width: 100%
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(state_name ~ year)
 ```
@@ -645,9 +643,9 @@ ggplot(data = county_yield_s) +
 ```{webr-r}
 #| autorun: true
 #| out-width: 100%
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
-  facet_grid(year ~ state_name) 
+  facet_grid(year ~ state_name)
 ```
 
 :::
@@ -676,10 +674,10 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}  
 #| autorun: true
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(
-    state_name ~ year, 
+    state_name ~ year,
     scales = "free_x"
   )
 ```
@@ -692,10 +690,10 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(
-    state_name ~ year, 
+    state_name ~ year,
     scales = "free_y"
   )
 ```
@@ -708,10 +706,10 @@ ggplot(data = county_yield_s) +
 
 ```{webr-r}
 #| autorun: true
-ggplot(data = county_yield_s) + 
+ggplot(data = county_yield_s) +
   geom_histogram(aes(x = corn_yield)) +
   facet_grid(
-    state_name ~ year, 
+    state_name ~ year,
     scales = "free"
   )
 ```
@@ -739,15 +737,15 @@ Create a variable that has the values you want to use as labels and use it as a 
 ::: {.side-out}
 
 ```{webr-r}  
-county_yield_s %>% 
+county_yield_s %>%
   mutate(
     year_text = paste0("Year = ", year)
   ) %>%
   ggplot(data = .) +
-    geom_histogram(aes(x = corn_yield)) +
-    facet_grid(
-      state_name ~ year_text
-    )
+  geom_histogram(aes(x = corn_yield)) +
+  facet_grid(
+    state_name ~ year_text
+  )
 ```
 
 :::
@@ -795,9 +793,6 @@ ggplot(data = premium) +
 
 ```{webr-r}
 #--- write your code here ---#
-
-
-
 ```
 
 ##### Answer
@@ -846,10 +841,6 @@ ggplot(data = premium) +
 ##### Work here
 ```{webr-r}
 #--- write your code here ---#
-
-
-
-
 ```
 
 ##### Answer
@@ -910,9 +901,9 @@ For example consider the following dataset in a wide format:
 
 ```{webr-r}
 #| context: output
-data.table(county_yield)[, .(county_code, corn_yield, year, state_name)] %>% 
-  filter(year %in% c(2000, 2001)) %>% 
-  dcast(county_code + state_name ~ year, value.var = "corn_yield")  
+data.table(county_yield)[, .(county_code, corn_yield, year, state_name)] %>%
+  filter(year %in% c(2000, 2001)) %>%
+  dcast(county_code + state_name ~ year, value.var = "corn_yield")
 ```
 
 <br> 
@@ -965,7 +956,7 @@ This works with `county_yield` used in both `geom_point()` and `geom_smooth()`.
 ```{webr-r}
 #| autorun: true
 #| code-track: 0.45
-ggplot(data = county_yield) + 
+ggplot(data = county_yield) +
   geom_point(aes(y = corn_yield, x = d3_5_9)) +
   geom_smooth(aes(y = corn_yield, x = d3_5_9))
 ```
@@ -986,7 +977,7 @@ This does not work because no global dataset is set inside `ggplot()` and no dat
 
 ```{webr-r}
 #| autorun: true
-#| layout: stacked 
+#| layout: stacked
 ggplot() +
   geom_point(data = county_yield, aes(y = corn_yield, x = d3_5_9)) +
   geom_smooth(aes(y = corn_yield, x = d3_5_9))
@@ -1011,11 +1002,11 @@ To use multiple datasets inside a single `ggplot` object (or a figure), you just
 #| code-track: 0.45
 ggplot() +
   geom_point(
-    data = county_yield, 
+    data = county_yield,
     aes(y = corn_yield, x = year)
   ) +
   geom_line(
-    data = mean_yield, 
+    data = mean_yield,
     aes(y = corn_yield, x = year)
   )
 ```

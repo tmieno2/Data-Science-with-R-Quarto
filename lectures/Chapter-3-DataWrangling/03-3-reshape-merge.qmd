@@ -73,13 +73,13 @@ A single column representing a single variable
 ```{webr-r}
 #| context: output
 (
-yield_data_long <-
-  data.frame(
-    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-    year = c(2019, 2020) %>% rep(4),
-    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+  yield_data_long <-
+    data.frame(
+      state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+      year = c(2019, 2020) %>% rep(4),
+      yield = c(200, 240, 210, 220, 220, 230, 190, 150)
     )
-  ) %>%
+) %>%
   as_tibble()
 ```
 :::
@@ -131,13 +131,13 @@ data.frame(
   state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
   year = c(2019, 2020) %>% rep(4),
   yield = c(200, 240, 210, 220, 220, 230, 190, 150)
-  ) %>% 
-  .[rep(1:nrow(.), each = 5), ] %>% 
+) %>%
+  .[rep(1:nrow(.), each = 5), ] %>%
   mutate(
     month = rep(c("May", "June", "July", "August", "September"), 8),
-    rainfall = 20*runif(40)
-  ) %>% 
-  tidyr::pivot_wider(names_from  = month, values_from = rainfall, names_prefix = "R_")
+    rainfall = 20 * runif(40)
+  ) %>%
+  tidyr::pivot_wider(names_from = month, values_from = rainfall, names_prefix = "R_")
 ```
 
 ### too long
@@ -158,12 +158,12 @@ data.frame(
   state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
   year = c(2019, 2020) %>% rep(4),
   yield = c(200, 240, 210, 220, 220, 230, 190, 150)
-  ) %>% 
-  .[rep(1:nrow(.), each = 5), ] %>% 
+) %>%
+  .[rep(1:nrow(.), each = 5), ] %>%
   mutate(
     month = rep(c("May", "June", "July", "August", "September"), 8),
-    rainfall = 20*runif(40)
-  ) %>% 
+    rainfall = 20 * runif(40)
+  ) %>%
   head(15)
 ```
 
@@ -193,12 +193,12 @@ Create the following dataset in long format:
 
 ```{webr-r}
 (
-yield_data_long <- 
-  data.frame(
-    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-    year = c(2019, 2020) %>% rep(4),
-    yield = c(200, 240, 210, 220, 220, 230, 190, 150)
-  )
+  yield_data_long <-
+    data.frame(
+      state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+      year = c(2019, 2020) %>% rep(4),
+      yield = c(200, 240, 210, 220, 220, 230, 190, 150)
+    )
 )
 ```
 
@@ -240,12 +240,12 @@ tidyr::pivot_wider(
 ```{webr-r}
 #| autorun: true
 (
-yield_data_wide <- 
-  tidyr::pivot_wider(
-    yield_data_long, 
-    names_from = year, 
-    values_from = yield
-  )
+  yield_data_wide <-
+    tidyr::pivot_wider(
+      yield_data_long,
+      names_from = year,
+      values_from = yield
+    )
 )
 ```
 
@@ -298,13 +298,13 @@ Create the following data in long format:
 ```{webr-r}
 #| autorun: true
 (
-yield_data_long <- 
-  data.frame(
-    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-    year = c(2019, 2020) %>% rep(4),
-    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
-    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
-  )
+  yield_data_long <-
+    data.frame(
+      state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+      year = c(2019, 2020) %>% rep(4),
+      yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+      rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+    )
 )
 ```
 
@@ -314,11 +314,11 @@ You can simply supply multiple variables to be made wide like this:
 
 ```{webr-r}
 #| autorun: true
-yield_data_long %>%  
+yield_data_long %>%
   tidyr::pivot_wider(
     names_from = "year",
     values_from = c("yield", "rainfall")
-  )  
+  )
 ```
 :::
 
@@ -350,10 +350,10 @@ To convert a wide-formatted `data.frame` into a long-formatted `data.frame`, you
 #| eval: false
 #--- NOT RUN ---#
 tidyr::pivot_longer(
-  data, 
+  data,
   cols = x,
-  names_to = y, 
-  values_to = z 
+  names_to = y,
+  values_to = z
 )
 ```
 
@@ -368,10 +368,10 @@ tidyr::pivot_longer(
 **Example**
 
 ```{webr-r}
-yield_data_wide %>% 
+yield_data_wide %>%
   tidyr::pivot_longer(
-    - state, 
-    names_to = "year", 
+    -state,
+    names_to = "year",
     values_to = "yield"
   )
 ```
@@ -399,9 +399,9 @@ The minus state selection leaves state in place as the identifier and pivots eve
 You do not want `yield_` in front of the year numbers in the new `year` variable? You can use the `names_prefix` option as follows:
 
 ```{webr-r}
-yield_data_wide %>%  
+yield_data_wide %>%
   tidyr::pivot_longer(
-    - state,
+    -state,
     #--- let R know what the prefix is ---#
     names_prefix = "yield_",
     names_to = "year",
@@ -436,13 +436,13 @@ Create the following dataset in the long format:
 ```{webr-r}
 #| autorun: true
 (
-yield_data_long <- 
-  data.frame(
-    state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
-    year = c(2019, 2020) %>% rep(4),
-    yield = c(200, 240, 210, 220, 220, 230, 190, 150),
-    rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
-  )
+  yield_data_long <-
+    data.frame(
+      state = c("Kansas", "Nebraska", "Iowa", "Illinois") %>% rep(each = 2),
+      year = c(2019, 2020) %>% rep(4),
+      yield = c(200, 240, 210, 220, 220, 230, 190, 150),
+      rainfall = c(14, 15, 15, 16, 20, 21, 24, 15)
+    )
 )
 ```
 :::
@@ -457,12 +457,12 @@ Convert the long dataset into the wide format:
 ```{webr-r}
 #| autorun: true
 (
-yield_data_wide <- 
-  yield_data_long %>% 
-  tidyr::pivot_wider(
-    names_from = year, 
-    values_from = c(yield, rainfall)
-  )
+  yield_data_wide <-
+    yield_data_long %>%
+    tidyr::pivot_wider(
+      names_from = year,
+      values_from = c(yield, rainfall)
+    )
 )
 ```
 
@@ -479,9 +479,9 @@ yield_data_wide <-
 You can revert it in one `pivot_longer()` call using the `.value` sentinel, although this deck demonstrates a more explicit three-step method.
 
 ```{webr-r}
-yield_data_wide %>% 
+yield_data_wide %>%
   tidyr::pivot_longer(
-    - state,
+    -state,
     names_to = "year",
     values_to = "yield"
   )
@@ -503,13 +503,13 @@ Before separation:
 
 ```{webr-r}
 #| autorun: true
-yield_data_wide %>% 
+yield_data_wide %>%
   #--- pivot every column except state into long format ---#
   tidyr::pivot_longer(
-    - state,
+    -state,
     names_to = "type_year",
     values_to = "value"
-  ) 
+  )
 ```
 :::
 
@@ -520,10 +520,10 @@ After separation:
 
 ```{webr-r}
 #| autorun: true
-yield_data_wide %>% 
+yield_data_wide %>%
   #--- pivot every column except state into long format ---#
   tidyr::pivot_longer(
-    - state,
+    -state,
     names_to = "type_year",
     values_to = "value"
   ) %>% separate(type_year, c("type", "year"), sep = "_") #<<
@@ -540,14 +540,14 @@ yield_data_wide %>%
 After separating `type_year` to `type` and `year`, all you have to do is to apply `tidyr::pivot_wider()` to have the desired long-formatted data.
 
 ```{webr-r}
-yield_data_wide %>% 
+yield_data_wide %>%
   #--- pivot every column except state into long format ---#
   tidyr::pivot_longer(
-    - state,
+    -state,
     names_to = "type_year",
     values_to = "value"
-  ) %>% 
-  separate(type_year, c("type", "year"), sep = "_") %>% 
+  ) %>%
+  separate(type_year, c("type", "year"), sep = "_") %>%
   tidyr::pivot_wider(
     names_from = "type",
     values_from = "value"
@@ -608,9 +608,9 @@ Using `flights` data, calculate the total number of flights by carrier-month, wh
 #| code-fold: true
 #| eval: false
 num_flights <-
-  flights %>% 
-  group_by(carrier, month) %>% 
-  summarize(num_obs = n()) 
+  flights %>%
+  group_by(carrier, month) %>%
+  summarize(num_obs = n())
 ```
 
 Here is the output you are supposed to get if done correctly:
@@ -618,10 +618,10 @@ Here is the output you are supposed to get if done correctly:
 ```{webr-r}
 #| context: output
 (
-num_flights <- 
-  flights %>% 
-  group_by(carrier, month) %>% 
-  summarize(num_obs = n())
+  num_flights <-
+    flights %>%
+    group_by(carrier, month) %>%
+    summarize(num_obs = n())
 )
 ```
 
@@ -652,12 +652,12 @@ Reshape the `num_flights` data into a wide format with the number of flights per
 ```{r}
 #| code-fold: true
 #| eval: false
-num_flights %>% 
+num_flights %>%
   tidyr::pivot_wider(
     names_from = month,
     names_prefix = "month_",
     values_from = num_obs
-  ) 
+  )
 ```
 
 Here is the output you are supposed to get if done correctly:
@@ -665,13 +665,13 @@ Here is the output you are supposed to get if done correctly:
 ```{webr-r}
 #| context: output
 (
-num_flights_wide <- 
-  num_flights %>% 
-  tidyr::pivot_wider(
-    names_from = month,
-    names_prefix = "month_",
-    values_from = num_obs
-  ) 
+  num_flights_wide <-
+    num_flights %>%
+    tidyr::pivot_wider(
+      names_from = month,
+      names_prefix = "month_",
+      values_from = num_obs
+    )
 )
 ```
 
@@ -702,7 +702,7 @@ Reshape the data (`num_flights_wide`) back into the long format so that a single
 ```{r}
 #| code-fold: true
 #| eval: false
-num_flights_wide %>% 
+num_flights_wide %>%
   tidyr::pivot_longer(
     starts_with("month_"),
     names_to = "month",
@@ -721,7 +721,7 @@ num_flights_wide %>%
     names_to = "month",
     names_prefix = "month_",
     values_to = "num_flights"
-  ) 
+  )
 ```
 :::
 
@@ -747,15 +747,15 @@ set.seed(582374)
 
 price_data <- data.frame(
   price = runif(N * T, min = 2, max = 6),
-  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  county = c(rep("Lancaster", 2), rep("Douglas", 2)),
   year = c(2015, 2016, 2015, 2016)
-  )
+)
 
 yield_data <- data.frame(
   yield = runif(N * T, min = 180, max = 280),
-  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  county = c("Lancaster", "Douglas", "Lancaster", "Douglas"),
   year = c(2015, 2015, 2016, 2016)
-  )
+)
 ```
 
 ## Merging multiple datasets
@@ -947,7 +947,7 @@ The syntax is two datasets and the keys, but the three rules underneath are what
 ```{r}
 #| eval: false
 #--- Syntax (NOT RUN) ---#
-left_join(data_x, data_y, by = keys)  
+left_join(data_x, data_y, by = keys)
 ```
 
 <br>
@@ -989,15 +989,15 @@ set.seed(582374)
 
 price_data <- data.frame(
   price = runif(N * T, min = 2, max = 6),
-  county = c(rep('Lancaster',2),rep('Douglas',2)),
+  county = c(rep("Lancaster", 2), rep("Douglas", 2)),
   year = c(2015, 2016, 2015, 2016)
-  )
+)
 
 yield_data <- data.frame(
   yield = runif(N * T, min = 180, max = 280),
-  county = c('Lancaster','Douglas','Lancaster','Douglas'),
+  county = c("Lancaster", "Douglas", "Lancaster", "Douglas"),
   year = c(2015, 2015, 2016, 2016)
-  )
+)
 ```
 
 ::::: columns
@@ -1033,7 +1033,7 @@ What are the keys?
 The keys are `county` and `year`, so
 
 ```{webr-r}
-left_join(yield_data, price_data, by = c("county", "year"))  
+left_join(yield_data, price_data, by = c("county", "year"))
 ```
 
 <br>
@@ -1041,7 +1041,7 @@ left_join(yield_data, price_data, by = c("county", "year"))
 Switching the two?
 
 ```{webr-r}
-left_join(price_data, yield_data, by = c("county", "year"))  
+left_join(price_data, yield_data, by = c("county", "year"))
 ```
 
 <br>
@@ -1057,12 +1057,12 @@ Let's expand the `yield_data` as follows:
 ```{webr-r}
 #| autorun: true
 (
-yield_data_with_chase <- 
-  data.frame(
-    yield = runif(6, min = 180, max = 280),
-    county = c("Lancaster", "Douglas", "Chase", "Lancaster", "Douglas", "Chase"),
-    year = c(2015, 2015, 2015, 2016, 2016, 2016)
-  )
+  yield_data_with_chase <-
+    data.frame(
+      yield = runif(6, min = 180, max = 280),
+      county = c("Lancaster", "Douglas", "Chase", "Lancaster", "Douglas", "Chase"),
+      year = c(2015, 2015, 2015, 2016, 2016, 2016)
+    )
 )
 ```
 
@@ -1071,7 +1071,7 @@ yield_data_with_chase <-
 **`yield_data_with_chase` on the right**:
 
 ```{webr-r}
-left_join(price_data, yield_data_with_chase, by = c("county", "year"))  
+left_join(price_data, yield_data_with_chase, by = c("county", "year"))
 ```
 
 <br>
@@ -1079,7 +1079,7 @@ left_join(price_data, yield_data_with_chase, by = c("county", "year"))
 **`yield_data_with_chase` on the left**:
 
 ```{webr-r}
-left_join(yield_data_with_chase, price_data, by = c("county", "year"))  
+left_join(yield_data_with_chase, price_data, by = c("county", "year"))
 ```
 
 <br>
@@ -1097,7 +1097,7 @@ If you would like to keep unmatched rows in `data_y`, you can use `full_join()`.
 
 ```{webr-r}
 #| echo: true
-full_join(price_data, yield_data_with_chase, by = c("county", "year"))  
+full_join(price_data, yield_data_with_chase, by = c("county", "year"))
 ```
 :::::::::
 
@@ -1121,14 +1121,14 @@ Let's create a weather dataset where you have more than one observation per coun
 ```{webr-r}
 #| autorun: true
 #| code-track: 0.65
-( 
-weather_data <- 
-  data.frame(
-    rainfall = 20 * runif(12),
-    county = rep(c("Lancaster", "Douglas", "Chase"), each = 4),
-    year = rep(c(2015, 2016), each = 2) %>% rep(3),
-    month = rep(c(4, 5), 6)
-  ) 
+(
+  weather_data <-
+    data.frame(
+      rainfall = 20 * runif(12),
+      county = rep(c("Lancaster", "Douglas", "Chase"), each = 4),
+      year = rep(c(2015, 2016), each = 2) %>% rep(3),
+      month = rep(c(4, 5), 6)
+    )
 )
 ```
 
@@ -1163,10 +1163,10 @@ Let's create an expanded crop yield dataset for multiple crops:
 
 ```{webr-r}
 #| autorun: true
-yield_data <- 
+yield_data <-
   data.frame(
     yield = c(runif(4, min = 180, max = 280), runif(4, min = 40, max = 80)),
-    county = rep(c('Lancaster','Douglas','Lancaster','Douglas'), 2),
+    county = rep(c("Lancaster", "Douglas", "Lancaster", "Douglas"), 2),
     year = rep(c(2015, 2015, 2016, 2016), 2),
     crop = c(rep("Corn", 4), rep("Soybean", 4))
   )
@@ -1207,9 +1207,9 @@ Create the following datasets and take a look at them to understand what's in th
 ```{webr-r}
 #| autorun: true
 (
-  flights_Jan <- 
-    flights %>% 
-    filter(month == 1) %>% 
+  flights_Jan <-
+    flights %>%
+    filter(month == 1) %>%
     select(month, day, dep_delay, origin)
 )
 ```
@@ -1219,10 +1219,10 @@ Create the following datasets and take a look at them to understand what's in th
 ```{webr-r}
 #| autorun: true
 (
-  daily_temp_Jan <- 
-    weather %>% 
-    filter(month == 1) %>% 
-    group_by(origin, month, day) %>% 
+  daily_temp_Jan <-
+    weather %>%
+    filter(month == 1) %>%
+    group_by(origin, month, day) %>%
     summarize(temp = mean(temp))
 )
 ```
@@ -1232,10 +1232,10 @@ Create the following datasets and take a look at them to understand what's in th
 ```{webr-r}
 #| autorun: true
 (
-  hourly_temp_Jan <- 
-    weather %>% 
-    filter(month == 1) %>% 
-    select(origin, month, day, hour, temp) 
+  hourly_temp_Jan <-
+    weather %>%
+    filter(month == 1) %>%
+    select(origin, month, day, hour, temp)
 )
 ```
 
@@ -1356,8 +1356,8 @@ This tab introduces a new exact-hour equality join: match each flight to the tem
 #| autorun: true
 matched <- left_join(jan_flights, jan_weather, join_by(origin, dep_time == obs_time))
 
-nrow(matched)              # every flight is still here
-sum(is.na(matched$temp))   # ...but how many have no temperature?
+nrow(matched) # every flight is still here
+sum(is.na(matched$temp)) # ...but how many have no temperature?
 ```
 
 <br>
@@ -1468,8 +1468,8 @@ These two are [identical]{style="color: blue;"}:
 ```{r}
 #| eval: false
 #--- Syntax (NOT RUN) ---#
-left_join(x, y, by = c("county", "year"))   # what we have been writing
-left_join(x, y, join_by(county, year))      # the same, unquoted
+left_join(x, y, by = c("county", "year")) # what we have been writing
+left_join(x, y, join_by(county, year)) # the same, unquoted
 ```
 
 <br>
@@ -1560,8 +1560,8 @@ Now fix the join we started with. Same data, same question, one word different:
 #| autorun: true
 rolled <- left_join(jan_flights, jan_weather, join_by(origin, closest(dep_time >= obs_time)))
 
-nrow(rolled)              # same number of flights
-sum(is.na(rolled$temp))   # ...and now?
+nrow(rolled) # same number of flights
+sum(is.na(rolled$temp)) # ...and now?
 ```
 
 <br>
@@ -1682,7 +1682,7 @@ An irrigation on 05-10 sits exactly 5 days from a reading on 05-05 and 5 days fr
 ```{webr-r}
 #| autorun: true
 tie_irrig <- data.frame(field = "A", irrig_date = as.Date("2024-05-10"), inches = 1)
-tie_read  <- data.frame(
+tie_read <- data.frame(
   field     = "A",
   read_date = as.Date(c("2024-05-05", "2024-05-15")),
   moisture  = c(24, 31)

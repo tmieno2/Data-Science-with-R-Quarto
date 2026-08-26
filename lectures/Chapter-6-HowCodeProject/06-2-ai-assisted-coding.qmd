@@ -1,0 +1,874 @@
+---
+title: "06-2: Using AI to Write Code"
+abstract: "Chapter 6: Reproducibility"
+format: 
+  revealjs:
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/"
+    include-in-header:
+      - ../transcript-support.html
+      - ../webr-layout.html
+      - ../katex-amd-fix.html
+    footer: "[back to the lecture slides on the course website](https://tmieno2.github.io/Data-Science-with-R-Quarto/lectures/)" 
+    theme: [default, ../custom.scss, ../notebook.scss]
+    fontsize: 1.2em
+    callout-icon: false
+    scrollable: true
+    echo: true
+webr:
+  packages: ['dplyr']
+  cell-options:
+    editor-font-scale: 0.7
+    dpi: 216
+    fig-width: 10
+    fig-height: 6
+    out-width: 100%
+filters:
+  - webr
+---
+
+## Tips to make the most of the lecture notes
+
+::: {.panel-tabset}
+
+### Interactive navigation tools
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The usual two navigation tricks first. The three stacked lines in the bottom left corner give you a table of contents, and the letter o gives you a panel view of every slide at once. This deck is one you will come back to, because the four checks in the middle of it are meant to be used at the moment you are about to paste something into your own project, which is not going to be during class. So it is worth being able to jump straight to the check you need.
+
+</details>
+
++ Click on the three horizontally stacked lines at the bottom left corner of the slide, then you will see table of contents, and you can jump to the section you want
+
++ Hit letter "o" on your keyboard and you will have a panel view of all the slides
+
+### Running and writing codes
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The code boxes are live. The blue area is an editor, the Run Code button runs everything in it, and you can run part of it by highlighting the part you want and pressing Command Enter, or Control Enter on Windows. The copy button takes the code to your own machine and the reload button puts the cell back the way it started. One thing that is specific to this deck: several cells contain code that is wrong on purpose. It is not wrong in a way that produces an error, it is wrong in a way that produces a number. That is the whole subject of the lecture, so when a cell gives you an answer, do not assume the answer is right just because R printed it without complaining.
+
+</details>
+
++ The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
++ Hit the "Run Code" button to execute all the code inside the code area.
++ You can evaluate (run) code selectively by highlighting the parts you want to run and hitting Command + Enter for Mac (Ctrl + Enter for Windows).
++ If you want to run the codes on your computer, you can first click on the icon with two sheets of paper stacked on top of each other (top right corner of the code chunk), which copies the code in the code area. You can then paste it onto your computer.
++ You can click on the reload button (top right corner of the code chunk, left to the copy button) to revert back to the original code.
+
+:::
+<!--end of panel-->
+
+## Learning objectives
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four objectives. The first is just vocabulary: there are three different kinds of AI coding tool, they behave very differently, and knowing which one you are holding tells you how careful to be. The second and third are the real content. These tools fail in particular ways, and the ways that matter for research code are not the ways you would expect from using them for anything else. The fourth is about data rather than code, and it is the one that can get you into actual trouble rather than merely into a wrong number.
+
+I want to be clear about what this lecture is not. It is not a lecture telling you to avoid these tools. You are all using them already, and they genuinely make some parts of this work faster. It is a lecture about the fact that nobody has taught you how to check the output, and that in research, unlike in most programming, an unchecked wrong answer can survive all the way into a published paper without anything ever crashing.
+
+</details>
+
++ Know what the three kinds of AI coding tools do, and which one fits which task
++ Know how these tools fail, in the specific ways that matter for research code
++ Be able to check AI-written code before you keep it
++ Know what you must not paste into a chat window
+
+## Why learn to do this yourself?
+
+::: {.panel-tabset}
+
+### The fair version of the question
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Let us deal with this before anything else, because it is what most of you are thinking, and because if I do not answer it now you will spend the rest of the hour half listening.
+
+The question is a good one and part of it is simply correct, so I will concede that part first. For routine code, these tools work. That is not in dispute and I am not going to pretend otherwise. Nobody in this room should be graded on remembering regular expression syntax, or on knowing which of the fifteen theme arguments moves a legend to the bottom of a plot. That kind of recall has genuinely lost most of its value in the last few years, and a course that defended it would be defending a job rather than teaching a subject.
+
+So here is the honest version of what changed. Producing code got very cheap. Deciding what to produce, and knowing whether what came back is right, did not get cheap at all. Those are two different activities and only one of them has been automated.
+
+Which brings you to the line at the bottom, and it is the sentence I would like you to hold on to. In research, the typing was never the hard part. If typing had been the bottleneck, a fast typist would have been a great economist, and that has never been true.
+
+</details>
+
++ For routine code, these tools work. That is not in dispute.
++ Nobody should be graded on remembering regular expression syntax, or which `theme()` argument moves the legend.
++ What got cheap is **producing** code. What did not get cheap is deciding what to produce, and knowing whether the result is right.
+
+::: {.callout-note}
+In research, the typing was never the hard part.
+:::
+
+### You cannot check work you could not have done
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Now the part of the answer that actually matters, and it is the reason this lecture is built the way it is.
+
+Look at the first two lines. Every single check in this lecture is useless to somebody who does not already know the material. Count your rows after every join is excellent advice, and it means absolutely nothing to a person who does not know that a join can duplicate rows. Look at what n a dot r m removed is good advice, and it is empty to somebody who has not thought about what an average is an average of. The checking skill sits on top of the doing skill. There is no route to being a competent supervisor of code that skips being able, at least in outline, to write it.
+
+Then read the callout, because that is the difference between your situation and a software engineer's, and it is the single most important thing on this slide.
+
+In most programming, wrong code tells you. The application crashes, a test goes red, a user files a complaint. The environment does a large part of your checking for you, which is why a software engineer can accept a suggestion, run it, and find out. In research there is no such signal. Wrong code returns a number of roughly the right size in roughly the right units, and nothing anywhere objects. There is no test suite for whether your county average meant what you thought it meant. The only thing standing between that number and your paper is a person who understands what the number should have been, and in almost every case that person is you, on your own, six months from now.
+
+</details>
+
++ Every check in this lecture is useless to someone who does not already know the material.
++ "Count your rows after every join" means nothing if you do not know that a join can duplicate rows.
++ The checking skill sits on top of the doing skill.
+
+::: {.callout-important}
+## Research code has no error signal
+Elsewhere, wrong code crashes, a test fails, or a user complains. Here it returns a number of about the right size and nothing objects. The only thing between that number and your paper is somebody who knows what it should have been.
+:::
+
+### Where the tools are weakest is where your work is
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two more reasons, and this first one explains why your experience of these tools so far has been misleading.
+
+They are strongest on problems that are common, well documented, and already solved many times over, because that is what they learned from. The further your problem sits from that, the worse they get. Now think about what a dissertation is. It is, by definition, a problem that has not been solved before, usually on a dataset nobody else has. So the place these tools are weakest is precisely the place your own work is going to live. The reason they feel close to omniscient to you right now is that coursework, including mine, is drawn from the well covered middle. That impression does not survive first contact with your own data.
+
+The second reason is quieter and I think it is the more important one in the long run. You can only think of analyses you have some fluency in. A person who knows what group by does looks at a dataset and thinks, I could split that by county and see whether the pattern holds. A person who would have to go and ask thinks of fewer things, and thinks of them later, and some of them never occur to them at all. Your programming fluency does not just determine what you can carry out. It determines which questions cross your mind in the first place, and that is upstream of every line of code either you or an assistant ever writes.
+
+</details>
+
++ They are strongest on problems that are common, well documented, and already solved.
++ Your thesis is, by definition, not one of those.
++ They feel omniscient right now because coursework is drawn from the well covered middle.
++ **You can only think of analyses you have some fluency in.** Someone who knows what `group_by()` does looks at a dataset and sees a question. Someone who has to go and ask thinks of fewer things, and thinks of them later.
+
+### So what is worth learning
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+To finish the answer properly, I should say what I think actually changed, because it is not nothing and the answer is not learn everything exactly as before.
+
+What is worth less than it was: recall. Syntax, idiom, argument names, the exact spelling of things. Look them up, or ask. I do.
+
+What is worth more than it was: knowing what is actually in your data, knowing what a method assumes, and knowing what a wrong answer would look like before you see one. That last one is the whole skill. It is what lets you glance at a county average of one hundred and eighty six and think, wait, from how many fields.
+
+And the third line is what this course is doing, so I may as well be open about it. When I make you write the join yourself, the point is not that I expect you to write joins from memory for the rest of your career. The point is that after you have written thirty of them and been bitten by two, matching and duplicates and missing values become things you think about automatically, and that habit is the thing that survives.
+
+The last line is the whole lecture compressed. These tools remove the typing, not the thinking. What they genuinely change is how fast you can now produce a wrong answer that nobody catches, and that is exactly why the checking half of this deck exists.
+
+</details>
+
++ **Worth less than it was:** recall of syntax, idiom, and argument names. Look them up, or ask.
++ **Worth more than it was:** knowing what is in your data, what a method assumes, and what a wrong answer would look like.
++ This course uses the first to train the second. The point of writing thirty joins yourself is that duplicates and missing values become things you think about without being reminded.
+
+::: {.callout-important}
+These tools remove the typing, not the thinking. What they change is how fast you can produce a wrong answer that nobody catches.
+:::
+
+:::
+<!--end of panel-->
+
+## Data used in this lecture
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Two small datasets that we use for the checks later on. Run the cell and look at both of them now, because the whole point of the exercises is that you can see the right answer with your own eyes, and then watch code produce a different one.
+
+Yield d f has eight fields, identified by field i d, with a yield in bushels per acre and a county. Two of the yields are missing. Soil d f has organic matter percentage for seven rows. Look carefully at its field i d column and compare it with the one above: soil d f is missing two of the fields entirely, and it has C one twice. Both of those are completely ordinary things to find in real data. Somebody sampled one field twice, and two fields never got sampled at all. Neither is an error, and neither will produce an error. Keep both in mind.
+
+</details>
+
+```{webr-r}
+#| context: setup
+yield_df <- data.frame(
+  field_id = c("A1", "A2", "B1", "B2", "C1", "C2", "D1", "D2"),
+  yield_bu = c(182, 171, 205, 168, NA, 194, NA, 177),
+  county = c(rep("Saunders", 4), rep("Butler", 4))
+)
+
+soil_df <- data.frame(
+  field_id = c("A1", "A2", "B1", "B2", "C1", "C1", "D1"),
+  om_pct = c(2.8, 3.1, 2.2, 2.6, 3.4, 3.6, 2.9)
+)
+```
+
+```{webr-r}
+#| autorun: true
+yield_df
+```
+
+```{webr-r}
+#| autorun: true
+soil_df
+```
+
+# What these tools are
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Three shapes of the same thing
+
+::: {.panel-tabset}
+
+### A chat window
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first shape is the one you already know: a chat window in a browser. You paste in some code and a question, it answers, and you copy what you want back into RStudio. Nothing on your computer changes unless you change it yourself.
+
+That last sentence is why this is the safest of the three to start with. Every line that ends up in your project passed through your hands on the way, so there is a natural moment where you look at it. That moment is exactly the check we are going to spend the middle of the lecture on, and it is the moment the other two shapes take away from you.
+
+What it is good at is anything you can state in words: explain this error message, write me a function that does the following, turn this Stata code into R. What it is bad at is anything that depends on your actual data, because it cannot see your data. It only knows what you typed into the box.
+
+</details>
+
++ You paste code and a question, it answers, you copy back what you want.
++ Nothing on your computer changes unless you change it.
++ Good for: explaining an error, drafting a function from a description, translating Stata or SAS code into R.
++ It cannot see your data, your files, or your R session. It only knows what you typed.
+
+### Inside your editor
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The second shape lives inside RStudio or Positron or V S Code. You start typing and a grey suggestion appears ahead of your cursor, and one key accepts the whole thing. GitHub Copilot is the one most of you will meet, because RStudio can turn it on in the global options, and Positron has its own assistant built in. The names change every few months. The shape does not.
+
+This one is the most useful of the three for repetitive work and the most dangerous for everything else, and both come from the same property: accepting is one keystroke. When you are writing the fifth nearly identical mutate line, that is wonderful. When you are writing something you have not fully thought through, a plausible completion arrives before you have finished thinking, and it is very easy to take it and move on. You did not decide, you agreed.
+
+My advice is to use it for lines whose correct form you could have written yourself, and to turn it off while you are working out what you want the analysis to do.
+
+</details>
+
++ A greyed-out suggestion appears as you type. One key accepts it.
++ GitHub Copilot in RStudio, the assistant built into Positron, and similar tools in VS Code.
++ Good for: repetitive lines whose correct form you already know.
++ Dangerous because accepting is one keystroke, which arrives before you have finished thinking.
+
+### An agent in the terminal
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third shape runs in a terminal inside your project folder and it does things rather than suggesting them. It reads your files, writes to them, runs R, reads the error, and tries again. Give it a task in a sentence and it will work for several minutes and then tell you what it changed.
+
+This is genuinely powerful for the kind of job that touches eight files at once, renaming a variable across a whole project, or reorganising a folder into the structure we covered in the previous lecture. It is also the one where code can enter your project without you ever having read it, which is the exact thing the rest of this lecture is about preventing.
+
+There is one non-negotiable requirement here, and it is the reason this lecture sits in this chapter rather than somewhere else. Do not run an agent in a project that is not under version control. With Git you can look at the diff and see every line it changed, and undo all of it with one command. Without Git you have no record of what your project looked like before, and no way to separate its work from yours.
+
+</details>
+
++ Runs in a terminal inside your project folder. It reads and writes your files and runs R itself.
++ Good for: changes that touch many files at once.
++ Code can enter your project without you ever having read it.
+
+::: {.callout-important}
+## Requirement
+Do not run an agent in a project that is not under version control. Git is what lets you read every line it changed and undo all of them.
+:::
+
+:::
+<!--end of panel-->
+
+## What it is actually doing
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+It is worth being precise about the machinery, because every failure later in this lecture follows from it. The model produces the most plausible continuation of the text you gave it. It has read an enormous amount of R code, so plausible R code is what comes out, and it is often correct, because correct code is common in the material it learned from.
+
+Now read the four consequences, because they are not obvious and they are the whole lecture in miniature.
+
+Plausible and correct are different properties, and nothing in the machinery prefers the second. When they come apart, which is exactly when your problem is unusual, you get something that looks right.
+
+It cannot see your data. When it writes a join for you, it is guessing what your columns contain from their names. Your column called field i d and your colleague's column called field i d may not mean the same thing, and the model has no way to know.
+
+It does not run the code. It has no idea whether what it just wrote works, because it never tried. A terminal agent is the partial exception, since it does run things, but it only checks that the code runs, not that the answer is right.
+
+And it rarely tells you it is unsure. A human collaborator who half remembered a function would say so. This will produce the half remembered function with exactly the same confidence as a function it knows perfectly well.
+
+</details>
+
+It produces the most plausible continuation of the text you gave it.
+
++ **Plausible is not correct.** They come apart exactly when your problem is unusual.
++ **It cannot see your data.** It is guessing what your columns contain from their names.
++ **It does not run the code.** It has no idea whether what it wrote works.
++ **It rarely says it is unsure.** A wrong answer arrives with the same confidence as a right one.
+
+# Where it helps, and where it costs you
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Where it genuinely helps
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+I want to be even handed, so here is the honest list of where these tools are good. Notice what the items have in common: for every one of them, you can tell immediately whether the answer is right.
+
+Fine tuning a ggplot is the clearest case. You know what you want the legend to look like, you cannot remember which of the fifteen theme arguments controls it, and when the plot appears you can simply see whether it worked. Regular expressions are the same. You know which strings should match; you run it and look.
+
+Translating code from Stata or S A S is the one that saves graduate students the most time, in my experience. You are not asking it to design anything, you are asking it to say the same thing in a different language, and you already know what the result should be because you have seen the Stata output.
+
+Explaining an error message deserves a special mention. When you are new to R, half the errors you hit are messages you have never seen and cannot parse. Pasting one in and asking what it means is genuinely one of the best uses of these tools, because you are asking for an explanation rather than for code, and you can then go and check the explanation against what your code actually does.
+
+And the last one, a first draft of a function from a clear description, works as long as you keep the words first draft in mind. A draft is something you then check, which is where we are going next.
+
+</details>
+
++ Fine tuning a `ggplot`: axis labels, legend position, facet arrangement.
++ Regular expressions, which almost nobody remembers the syntax for.
++ Reshaping between long and wide.
++ Translating Stata, SAS, or a sequence of Excel steps into R.
++ Writing documentation for a function you have already written.
++ Explaining an error message you have never seen before.
++ A first draft of a function from a clear description.
+
+::: {.callout-note}
+## What these have in common
+You can tell immediately whether the answer is right.
+:::
+
+## Where it costs you
+
+::: {.panel-tabset}
+
+### Functions that do not exist
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The first failure is the famous one, and it is the least of your worries. The model invents a function, or invents an argument to a real function, that sounds exactly like something that ought to exist. Read the examples. They are not silly. If R had a summarise underscore all it would probably work like that, and complete cases equals TRUE would be a perfectly sensible argument for mean to have. It does not have it.
+
+The reason this is the least of your worries is in the callout at the bottom. R stops. You get an error, you read it, you fix it, and no wrong number ever enters your work. This failure is loud, and loud failures are cheap.
+
+</details>
+
+The model invents a function, or an argument, that sounds like it ought to exist.
+
+```r
+summarise_all_numeric(data, mean)     # not a function
+mean(x, complete.cases = TRUE)        # not an argument of mean()
+read_csv(file, colClasses = "character")  # that argument belongs to read.csv()
+```
+
+::: {.callout-note}
+## This one is cheap
+R stops with an error. You read it, you fix it, and no wrong number reaches your paper.
+:::
+
+### Code that runs and is wrong
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the one that matters, and it is the reason this lecture exists.
+
+The code is valid R. It runs without a warning. It produces a number of about the right size, in about the right units, and you write that number into a table. Nothing anywhere in the process tells you that anything went wrong, because from R's point of view nothing did. You asked it to compute something, and it computed exactly what you asked, which was not what you meant.
+
+Look at the three examples. A join in the wrong direction quietly discards the observations that did not match. A missing value handled the convenient way changes what your average is an average of. A group by with one variable too many gives you a mean of means, which is not the mean.
+
+Every one of those produces a number. None of them produces a complaint. This class of error has always existed in research code, and you can make all three of these mistakes with no assistance whatsoever. What is new is the rate. You can now generate twenty lines of plausible analysis in four seconds, which is far faster than you can check them, and the gap between those two speeds is the whole problem.
+
+</details>
+
+Valid R. No warning. A number of about the right size. It is the wrong number.
+
++ A join in the wrong direction, which quietly drops the rows that did not match.
++ A missing value handled the convenient way, which changes what the average is an average of.
++ A `group_by()` with one variable too many, which gives you a mean of means.
+
+::: {.callout-important}
+## Why this is the dangerous one
+You can make all three mistakes without any assistance. What is new is that you can now generate twenty lines of plausible analysis far faster than you can check them.
+:::
+
+### Advice for a package that has changed
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The third failure is that R packages change, and the model learned from everything ever written about them, including everything written five years ago. So you get code that was correct in twenty nineteen.
+
+You will meet this most often with the tidyverse, which has deprecated a lot of things over the years, and with s f, which changed function names when it replaced s p. If you are lucky you get a deprecation warning, which is a signal, and you should read your warnings rather than scrolling past them. If you are unlucky the old function still exists and still works and simply does something slightly different from what its replacement would have done.
+
+</details>
+
+Packages change. The model learned from everything ever written about them, including what was written five years ago.
+
++ `tidyverse` functions that were deprecated several versions back.
++ `sf` code written for `sp`, which used different function names.
+
+If you are lucky, you get a deprecation warning. Read your warnings.
+
+### Statistics that sound right
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+The fourth failure is the one that will follow you into your thesis, and it is different in kind from the other three, because here the code is not the problem. The code is fine. The advice is wrong.
+
+Ask one of these tools how to deal with a problem in your regression and it will give you a fluent, confident answer that reads like a methods section. Cluster your standard errors at the county level. Add county fixed effects. Add controls for the variables you are worried about. Every one of those is sometimes right and often wrong, and which it is depends on your design, your data, and the question you are asking, none of which the model knows.
+
+The reason this is worse than an invented function is that you cannot check it by running it. The regression runs. The standard errors appear. There is no output you can look at that tells you whether clustering at the county level was the right choice. That question is answered by your econometrics course, not by your console. You will do the whole of Applied Econometrics next semester in order to be able to answer it, and there is no shortcut.
+
+</details>
+
+Ask about a statistical problem and you get a fluent, confident answer that reads like a methods section.
+
++ "Cluster your standard errors at the county level."
++ "Add county fixed effects."
++ "Add controls for the variables you are worried about."
+
+::: {.callout-important}
+## You cannot check this by running it
+The regression runs either way. Whether the choice was right is answered by your econometrics course, not by your console.
+:::
+
+:::
+<!--end of panel-->
+
+# Four checks
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## The four checks
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the practical part of the lecture. Four checks, and you should do them every time, on AI code and on your own code equally, because your own code fails in exactly the same ways.
+
+Read it before you keep it. Run it on a case whose answer you already know. Count your rows after every join. And look at what got dropped rather than only at what came out.
+
+We will do the middle two in the code cells on the next few slides, because they are much more convincing when you watch them happen than when I describe them.
+
+The sentence in the callout is the one I would like you to remember when you have forgotten everything else on this deck. The code is yours the moment you keep it. Not the model's, not the tool vendor's. Yours. It goes in your repository, it produces the numbers in your table, and it is your name on the paper.
+
+</details>
+
+1. **Read it before you keep it.**
+2. **Run it on a case whose answer you already know.**
+3. **Count your rows after every join.**
+4. **Look at what got dropped, not only at what came out.**
+
+::: {.callout-important}
+## The rule underneath all four
+The code is yours the moment you keep it. Not the model's. Yours.
+:::
+
+## Check 2: run it on a case whose answer you know
+
+::: {.panel-tabset}
+
+### What came back
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is a real request. You have corn yields in bushels per acre and a journal that wants kilograms per hectare, so you ask for a conversion function, and this is what comes back. Run the cell.
+
+The code is completely fine as code. It multiplies by a bushel weight in pounds, converts pounds to kilograms, and divides by the number of hectares in an acre. The structure is right, the units cancel correctly, and one hundred bushels per acre becomes about six thousand seven hundred and twenty five kilograms per hectare, which is a believable corn yield. Nothing about that output looks wrong.
+
+Now go to the check tab.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+# asked for: convert corn yield from bushels per acre to kg per hectare
+bu_ac_to_kg_ha <- function(bu_ac) {
+  bu_ac * 60 * 0.453592 / 0.404686
+}
+
+bu_ac_to_kg_ha(100)
+```
+
+### The check
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+A bushel is not a unit of weight, it is a unit of volume, so the pounds in a bushel depend on what is in it. Corn is fifty six pounds, soybeans and wheat are sixty. The function used sixty. So this is a soybean conversion applied to corn, and the answer is about seven percent too high. Seven percent is a large error in a yield paper and it is nowhere near large enough to look wrong.
+
+The check that catches it takes one line. You know that one hundred bushels of corn per acre is about six thousand two hundred and seventy seven kilograms per hectare, or you get it from a table you trust, and you compare. That is the whole method: run the thing on an input whose output you can verify independently, before you run it on your five thousand real observations.
+
+And notice what the model did not do. It did not ask which crop. It cannot, because it cannot see your data, and a bushel weight is exactly the kind of thing that is not in your column names.
+
+</details>
+
+```{webr-r}
+bu_ac_to_kg_ha(100)                # what the function gives
+
+100 * 56 * 0.453592 / 0.404686     # a bushel of corn is 56 lb, not 60
+```
+
+A bushel is a volume, so its weight depends on the crop. Corn is 56 lb, soybeans and wheat are 60 lb. The answer is about 7% too high, which is far too small to look wrong.
+
+The model did not ask which crop, because it cannot see your data.
+
+:::
+<!--end of panel-->
+
+## Check 3: count your rows after every join
+
+::: {.panel-tabset}
+
+### The join
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You ask for the yield data joined to the soil data, and you get a left join, which is a perfectly reasonable thing to write and is very likely what you wanted. Run the cell and look at the two row counts underneath it.
+
+Eight rows went in. Nine came out. You gained a field.
+
+That is the duplicate we noticed at the start. C one appears twice in the soil data, because somebody sampled that field twice, so the join produced one row for each match and C one is now two observations rather than one. If you go on to compute a county average, that field votes twice. Nothing warned you. The join did exactly what a left join is defined to do.
+
+The direction to be careful in is either one. A join can lose rows, when yours do not match, and it can gain rows, when theirs match more than once, and gaining is the one people never think to look for. So the check is: count before, count after, and if the number changed, find out why before going any further. Write the two n row calls in the same edit as the join, rather than telling yourself you will check later.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+combined <- left_join(yield_df, soil_df, by = "field_id")
+
+nrow(yield_df)
+nrow(combined)
+```
+
+### Why it grew
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is how you find out why, in two lines. Count by field i d in the soil data and keep the ones that appear more than once, and there is C one. Then anti join gives you the rows of the yield data that found no match at all, which is C two and D two, the two fields nobody sampled. Those two are still in your combined data, but with a missing organic matter value, so every calculation involving organic matter is now quietly running on six fields rather than eight.
+
+Learn both of these calls. Count with a filter tells you whether the join will duplicate, and anti join tells you what will not match. Running both before a join, rather than after being surprised by one, is the professional habit here.
+
+</details>
+
+```{webr-r}
+count(soil_df, field_id) |> filter(n > 1)
+```
+
+```{webr-r}
+anti_join(yield_df, soil_df, by = "field_id")
+```
+
+:::
+<!--end of panel-->
+
+## Check 4: look at what got dropped
+
+::: {.panel-tabset}
+
+### The NA
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This is the one I see in real student work most often.
+
+You ask for average yield by county, you get the obvious code, and you get an N A for Butler. Run the cell and you will see it. Butler has two fields with no yield recorded, and the average of anything with a missing value in it is missing, which is R telling you the truth rather than R being difficult.
+
+Now go to the next tab, which is what everyone does about it.
+
+</details>
+
+```{webr-r}
+#| autorun: true
+yield_df |>
+  group_by(county) |>
+  summarise(mean_yield = mean(yield_bu))
+```
+
+### The usual fix
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+You go back and say, I am getting an N A, and the answer, instantaneously and universally, is to add n a dot r m equals TRUE. Run this cell and the N A is gone. Both counties have a number. Problem solved, apparently.
+
+Nothing is wrong with the code. It is one argument, it is a real argument, and it does exactly what it says. Go to the last tab for what it did.
+
+</details>
+
+```{webr-r}
+yield_df |>
+  group_by(county) |>
+  summarise(mean_yield = mean(yield_bu, na.rm = TRUE))
+```
+
+### What it did
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Same calculation, with two extra columns counting how many fields each average actually used. Saunders is about one hundred eighty two, from four fields. Butler is about one hundred eighty six, from two fields out of four. Butler now looks like the better county, and that comparison is between an average of four things and an average of two things.
+
+N a dot r m equals TRUE is not wrong. Sometimes it is exactly right. But it is not a fix for missing data, it is a decision about missing data, made silently and in passing, and it changed what the number means. The question you actually needed to ask is why C one and D one have no yield. If the sampling crew ran out of time, dropping them is fine. If those two fields flooded, then dropping them means you are reporting Butler's average yield among the fields that did not flood, and calling it Butler's average yield.
+
+So whenever you remove something, count what you removed and put the count next to the result. If a number came from two fields, your reader should be able to see that it came from two fields.
+
+</details>
+
+```{webr-r}
+yield_df |>
+  group_by(county) |>
+  summarise(
+    mean_yield = mean(yield_bu, na.rm = TRUE),
+    n_used = sum(!is.na(yield_bu)),
+    n_fields = n()
+  )
+```
+
+Butler now looks like the better county. That comparison is between an average of four fields and an average of two.
+
+`na.rm = TRUE` is not a fix for missing data. It is a decision about missing data, made silently.
+
+:::
+<!--end of panel-->
+
+## Check 1: read it before you keep it
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+I have left the first check for last, because now you know what you are reading for.
+
+The rule is simple and absolute. If you cannot say what a line does, it does not go in your project. Not that you could work it out if you had to. That you can say it now.
+
+The reason is not purity, it is arithmetic. You will be running this code again in six months when a reviewer asks a question, and at that point you will be the only person on earth who can explain it, and the version of you who accepted it without reading will have left the version of you facing the reviewer with nothing.
+
+The three habits underneath are how you keep that from happening. Take the code in pieces you can check rather than in one block of twenty lines. When something in it is unfamiliar, ask for an explanation of that piece before you accept it, which is the single best use of these tools and I recommend it constantly. And write a one line comment in your own words above anything non-obvious. If you cannot write the comment, you have found something you do not understand, which is precisely the thing you needed to find.
+
+</details>
+
+If you cannot say what a line does, it does not go in your project.
+
++ Take the code in pieces you can check, not in blocks of twenty lines.
++ When something is unfamiliar, ask for an explanation of that piece before you accept it.
++ Write a one line comment in your own words above anything non-obvious.
+
+::: {.callout-note}
+## Why
+You will run this code again in six months, when a reviewer asks a question. You will be the only person who can explain it.
+:::
+
+::: {.callout-tip}
+## If you cannot write the comment
+You have just found the thing you did not understand.
+:::
+
+# How to ask
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## A vague ask and a useful ask
+
+::: {.panel-tabset}
+
+### Vague
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is what most people type. Merge my yield data with my soil data.
+
+The model cannot see your data, so it has to invent everything the sentence left out. It invents your column names, it invents which one is the key, it picks a join type, and it silently assumes that neither table has duplicates. Four guesses, none of them stated, in one line of code. That is exactly how you end up with the nine rows we just looked at.
+
+</details>
+
+```default
+Merge my yield data with my soil data.
+```
+
+The model then has to invent your column names, your key, the join type, and whether either table has duplicates. Four guesses, none of them stated.
+
+### Useful
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the same request with the four guesses removed. Read it and notice that none of it is clever prompting, it is just the information the first version left out.
+
+The structure of both tables, which you get by typing str or glimpse and pasting the output. That is the single highest value thing you can put in a prompt, because it is the thing the model cannot see and cannot guess.
+
+The fact that one of them has duplicates, which you know because you checked. Now the answer will address it rather than silently multiplying your rows.
+
+What you want done with the non matching rows, which is a decision only you can make.
+
+And the constraint about which package to use, because you have a course full of dplyr and you do not want an answer in data dot table.
+
+Then read the last line, and treat it as a template. Ask it to tell you what could go wrong. These tools are much better at criticising code than at being careful the first time, and asking that question turns a one shot answer into something closer to a conversation with a competent colleague.
+
+</details>
+
+```default
+I have two data frames.
+
+yield_df: field_id (character), yield_bu (numeric, has NAs), county (character), 8 rows
+soil_df:  field_id (character), om_pct (numeric), 7 rows
+
+soil_df has field_id "C1" twice, and two field_ids in yield_df do not
+appear in soil_df at all.
+
+I want one row per field in yield_df, with the soil value attached.
+Use dplyr.
+
+Tell me what could go wrong with the code you write.
+```
+
+:::
+<!--end of panel-->
+
+## Working in steps
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four working habits, and each has a reason.
+
+Ask for one step at a time. If you ask for the whole pipeline you get the whole pipeline, and now you have twenty lines to verify at once, which nobody does. Ask for the join, check the join, then ask for the summary.
+
+Paste the real error text, all of it, not your paraphrase of it. R error messages contain the function that failed and often the argument that failed, and when you retype it as "it says something about an unused argument" you have thrown away the useful part.
+
+Show the structure of your data with str or glimpse. Say what the columns are and what the units are, because units are the check two failure and they are never in the column names.
+
+And when you are learning something rather than producing something, ask for the explanation rather than the code. What does across do here, why is this a left join rather than an inner join. You get more out of it and you finish the semester able to write it yourself, which is the actual point of this course.
+
+</details>
+
++ **Ask for one step at a time.** Twenty lines at once is twenty lines nobody verifies.
++ **Paste the real error text, all of it.** It names the function and often the argument. Your paraphrase does not.
++ **Show the structure of your data.** `str()` or `glimpse()`, plus what the units are.
++ **When you are learning, ask for the explanation, not the code.**
+
+# Rules that are not about code quality
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## What you must not paste into a chat window
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+This slide is the one with actual consequences, so please read the list rather than skimming it.
+
+When you paste something into a chat window you have sent it to a company's servers. Depending on the product and the account, it may be stored, and it may be used to train future models. That is fine for a toy data frame and it is not fine for several kinds of data that many of you are holding right now.
+
+Data you hold under a use agreement. Several of the agricultural datasets used in this department come with a contract that says where the data may go, and a chat window is not on the list. Read your agreement rather than guessing.
+
+Human subjects data under an I R B protocol. Your protocol says what you may do with those records, and sending them to a third party is not covered by a protocol that does not mention it.
+
+Somebody else's unpublished data, which is the case that catches students most often, because a collaborator sent it to you informally and there was no paperwork to remind you. It is still not yours to send on.
+
+A manuscript you are reviewing, which is confidential to the journal.
+
+And any credential: A P I keys, database passwords, tokens. That is not a policy point, that is a security point, and it applies to your code as much as your chat, which is why the deck you are reading has a rule about not putting an A P I key in a webR setup chunk.
+
+The workaround is in the callout and it is easy. Send the shape of the data, not the data. Column names, types, a few made up rows. That is all the model needed anyway, because everything it does with your prompt is about structure. It has never needed your actual observations.
+
+</details>
+
+Pasting into a chat window sends it to a company's servers. It may be stored, and it may be used to train future models.
+
++ Data you hold under a **data use agreement**. Read the agreement.
++ **Human subjects data** under an IRB protocol.
++ Somebody else's **unpublished data**, including a collaborator's.
++ A **manuscript you are reviewing**, which is confidential to the journal.
++ Any **credential**: API keys, database passwords, tokens.
+
+::: {.callout-tip}
+## The workaround is easy
+Send the shape of the data, not the data. Column names, types, and a few made up rows. That is all the model needed anyway.
+:::
+
+## Your name is on it
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Three points to finish the section.
+
+The first is responsibility, and it is not complicated. A wrong number in your paper is your wrong number. There is no version of the sentence "the assistant wrote that part" that helps you, in a seminar, in a referee report, or in a correction notice. This is the same standard that has always applied to a co-author's contribution or to a research assistant's code: if it goes out under your name, you are answerable for it.
+
+The second is disclosure. Many journals now ask authors to say whether generative A I was used in preparing the work, and essentially all of them say that an A I cannot be an author, because authorship requires accountability and software cannot be accountable. The policies differ between journals and they are being revised often, so check the one you are submitting to rather than assuming. Your advisor may also have a view, and asking early is much easier than explaining late.
+
+The third connects this lecture back to the last one. Reproducibility means somebody can run your materials and get your results. Your materials are the code and the data. The conversation you had on the way to the code is not part of them and does not need to be preserved. What must be preserved is a script that runs from raw data to final table with no manual steps in between, which is exactly what we spent the last lecture on. How each line was typed does not matter. Whether the whole thing runs does.
+
+</details>
+
++ **A wrong number in your paper is your wrong number.** "The assistant wrote that part" is not a sentence that helps you in a seminar or a referee report.
++ **Disclosure.** Many journals now ask whether generative AI was used, and essentially all say an AI cannot be an author, because authorship requires accountability. Check the journal you are submitting to, and ask your advisor early.
++ **Reproducibility is unchanged.** What must run is a script from raw data to final table with no manual steps. How each line was typed does not matter.
+
+# Exercise
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=1200px></html>
+
+## Exercise: audit an answer
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the exercise, and you will notice it is not what you might expect. I am not asking you to get an A I tool to write something. I am asking you to check something it wrote.
+
+The question asked was: what is the average soil organic matter across the fields in each county. Note the words across the fields, because they are what makes this checkable. The code on the slide is the answer that came back. Run it. You will get a number for each county, no errors, no warnings, and it looks completely fine.
+
+Three tasks. First, work out by hand what the Butler average should be, one value per field, using the soil data we printed at the start of the lecture. It is a small enough table to do in your head, and there are only two Butler fields in it. Second, run the code and compare. Third, and this is the part I care about, write one sentence explaining the difference, and one more sentence saying which of the four checks would have caught it.
+
+Then a suggestion for after you have done it yourself. Take the same code to whichever tool you use, ask it what is wrong, and see what you get. Sometimes it finds it immediately. What I want you to notice is your own position in that conversation: you are now checking its answer against something you already worked out, rather than accepting an answer you have no way to evaluate. That difference is the entire skill this lecture is trying to teach, and it is a difference in what you did before you asked, not in how you asked.
+
+</details>
+
+Asked: *what is the average soil organic matter across the fields in each county?* This is the answer that came back. It runs. It produces a number for each county.
+
+```{webr-r}
+left_join(soil_df, yield_df, by = "field_id") |>
+  group_by(county) |>
+  summarise(mean_om = mean(om_pct))
+```
+
+1. Work out by hand what Butler's average should be, one value per field, from the `soil_df` printed at the start of the lecture.
+2. Run the code and compare.
+3. Write one sentence explaining the difference, and one naming which of the four checks would have caught it.
+
+::: {.callout-tip}
+## Then
+Take the same code to whichever tool you use and ask what is wrong with it. Notice that you are now checking its answer against something you already know, rather than accepting an answer you cannot evaluate.
+:::
+
+## What to take away
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Four sentences to end on.
+
+Use these tools. They are useful, you are already using them, and pretending otherwise would be a strange thing for a data science course to do.
+
+The failure that matters is not the one that errors. Anything that stops with an error costs you five minutes. Anything that runs and returns the wrong number can cost you a chapter.
+
+Every check on this deck is a check you should be running on your own code too. None of them is about A I. They are about research code, and they were good practice long before any of this existed. What has changed is only how fast wrong code can now arrive.
+
+And the last one is the one to keep. The code is yours the moment you keep it.
+
+</details>
+
++ Use these tools. They are useful, and you are already using them.
++ The failure that matters is not the one that errors. It is the one that returns a number.
++ Every check here is a check you should run on your own code too. None of them is about AI.
++ **The code is yours the moment you keep it.**
