@@ -60,6 +60,8 @@ The same two navigation tricks, and you will want them here because this is the 
 
 And the same live code areas, running R in your browser. Run Code executes the box, highlighting a portion and pressing command-enter runs just that part, the two-sheets icon copies the code for your own session, and the reload button restores the original. In this lecture in particular, change the numbers and rerun. Almost every slide here is one option with one value, and the fastest way to understand what it controls is to make it absurdly large and see what moves.
 
+The callout explains an important difference between this browser and your own RStudio session. The browser has already attached every package listed there, but copied code does not carry that setup with it. In RStudio, load ggplot2 for plotting, dplyr for data manipulation, ggthemes for the extra theme functions, RColorBrewer for its palette display, patchwork for combining plots, and nycflights13 for the flights and weather data. Otherwise a copied example can fail with a could-not-find-function or missing-object error even though it ran here.
+
 </details>
 
 + The box area with a hint of blue as the background color is where you can write code (hereafter referred to as the "code area").
@@ -192,6 +194,8 @@ The content itself does not change when theme is altered.
 
 This is content-altering, side by side with the original. On the right we have given the axes proper titles and changed the fill colours to a different scheme. Notice what changed: the words on the axes and the meaning of the colours. Notice what did not: the font, the sizes, the grey background, the grid lines. Everything about the styling is untouched, because we only altered content. Keep this comparison in mind as you look at the next tab, which does exactly the opposite.
 
+The setup code first keeps years 2005 through 2010, including both endpoints. The plot maps factor of year to the x axis, corn yield to the y axis, and state name to fill, so year is treated as a set of categories and each state receives its own box colour. The altered version then adds xlab Year, ylab Corn Yield in bushels per acre, and scale fill viridis d. The d matters because state name is discrete. Those three additions change labels and the state-to-colour mapping without changing the observations or the theme.
+
 </details>
 
 ```{webr-r}
@@ -246,6 +250,8 @@ g_box +
 <summary>Transcript</summary>
 
 And now theme-altering, from the same starting figure. One line, setting the axis title size to twenty. The titles get bigger. Their text is identical, the data is identical, the colours are identical. Only the appearance changed. Put this next to the previous tab and the distinction should be clear: content is what the figure communicates, theme is how it is dressed. Once you can classify a change as one or the other, you know which function to reach for, which is most of the battle.
+
+Read the nesting on screen from the outside in. You add theme to g_box, identify axis.title as the element for both axis titles, and pass element_text with size equal to twenty because the element is text. That hierarchy is the general syntax you will use throughout the theme sections.
 
 </details>
 
@@ -309,6 +315,8 @@ A caveat and a rule of thumb to close the section. The distinction is not always
 <summary>Transcript</summary>
 
 We are going to build one figure up through this whole section, so start here. This is a boxplot of corn yield by year, filled by state, over a six-year window. Run it and get it into your session as g_box, because every tab from here refers back to it. Notice that it is deliberately unpolished: no proper axis titles, default colours, everything at default size. That is the raw material we are about to make presentable.
+
+The first pipeline filters county_yield to years greater than or equal to 2005 and less than or equal to 2010. Inside aes, factor of year makes the x variable discrete, corn_yield supplies the numeric y values used to compute each boxplot, and state_name maps the box fill to state. The parentheses around the assignment make R both save the plot as g_box and display it now, so you can confirm the object was created.
 
 </details>
 
@@ -482,6 +490,8 @@ If you supply `labels` as a plain vector, it must have exactly as many elements 
 
 Now you do it. The instruction tab builds a line plot of mean arrival delay by month for the three New York airports, and then the exercise asks you to fix up both axes: titles, limits, and breaks. Everything you need is in the four tabs you just worked through. Note that the x variable here is month, which is numeric, so this is scale_x_continuous rather than the discrete version we used on the boxplot. That choice is the first thing to get right.
 
+In the preparation pipeline, group_by origin and month defines one airport-month group at a time. Summarize calculates mean_arr_delay from arr_delay, and na.rm equal to true prevents missing delays from turning a group mean into N A. Geom_line maps month to x, the mean to y, and origin to colour, so each airport becomes a separate line. In your answer, set the x name to Month, limits to four through eight, and breaks to the integer sequence four through eight. Set the y name to Average Arrival Delay in minutes and its limits to zero through twenty-five. The output and folded Answer tabs show that complete target, while Work here is the live area for your attempt.
+
 </details>
 
 ::: {.panel-tabset}
@@ -589,6 +599,8 @@ gg_delay +
 <summary>Transcript</summary>
 
 Next section, legends, and we build on the figure we just finished styling. g_axis is the boxplot with its axes sorted out, so run this first. A word on why legends get their own section: a legend is not decoration, it is the key that makes a colour-coded figure readable at all. If your reader cannot tell which box is Nebraska, the colour is worse than useless. So the things we change here, its title, its colours, its layout, are all about making that key do its job.
+
+The code creates g_axis by adding two scales to g_box. The discrete x scale names the axis Year and applies the label function that removes 20 from the displayed years. The continuous y scale supplies the yield title, limits the displayed scale to 100 through 200, and requests ticks every ten units with seq. The surrounding parentheses save the finished plot and print it, giving every later legend tab the same controlled starting point.
 
 </details>
 
@@ -725,6 +737,8 @@ g_axis +
 <summary>Transcript</summary>
 
 An exercise on legends, and note the twist in the instruction: you have to work out for yourself what goes in the star of scale-star-brewer. Think about which aesthetic the legend is explaining. In this figure the airports are distinguished by line colour, not by fill, so it is the colour version you need. That single decision is the thing being tested; the rest is filling in the arguments you have just seen. Getting fill and colour confused here is extremely common, and the symptom is that your code runs and nothing changes.
+
+The preparation repeats the airport-by-month calculation: group the flights by origin and month, average arrival delay while removing missing values, and map origin to line colour. The complete scale is scale_color_brewer. Name gives the reader-facing title Airports in NY, palette selects Set2, and guide_legend controls layout. Inside that guide, title.position equal to bottom places the title beneath the keys, while ncol equal to three spreads the three airport entries across three columns. Work here is where you build it, and the folded Answer gives you the exact call to compare after you try.
 
 </details>
 
@@ -911,6 +925,8 @@ g_axis
 
 Two text elements, and notice they use different levels of the naming hierarchy on purpose. axis.title.x, with the suffix, changes only the x axis title, making it small and red. axis.text, with no suffix, changes the tick labels on both axes at once. Both take element_text, because both are made of words. This is the naming rule from two tabs ago doing real work: the suffix is how you choose between changing one axis and changing both.
 
+The exact values make the contrast visible. The x title becomes size eight and red. Both sets of tick labels become size fourteen in the Times family. Because these assignments sit together inside one theme call and are separated by a comma, both modifications are applied to g_axis in the same plot.
+
 </details>
 
 ```{webr-r}
@@ -936,6 +952,8 @@ g_axis +
 <summary>Transcript</summary>
 
 Now a line element. axis.line.y draws the axis line itself, and because it is a line it takes element_line, where you set linewidth and colour. Note that in the default ggplot2 theme there is no visible axis line at all, so this is adding something rather than restyling it. If you want the classic look with a solid line along the bottom and left edges, this is how you get it, and it is one of the things the pre-made themes later in this lecture do for you.
+
+Here linewidth equal to two makes the y-axis line intentionally heavy, and color equal to blue makes the new line unmistakable. The earlier axis.title.x and axis.text assignments remain in this code, so the output combines the red size-eight x title, the size-fourteen Times tick labels, and the new blue y-axis line.
 
 </details>
 
@@ -966,6 +984,8 @@ g_axis +
 <summary>Transcript</summary>
 
 And a measurement. axis.ticks.length.x controls how long the tick marks are, and because it is a length rather than a colour or a font, it takes unit, where you give a number and the units. The two centimetres here is deliberately ridiculous, so you can see exactly which part of the figure moved. That is a good debugging habit generally: when you are not sure what an option controls, set it to an absurd value, find what jumps, then dial it back to something sensible.
+
+The suffix x means only x-axis tick lengths change. Unit takes the numeric amount two and the unit string cm, rather than treating two as an unlabelled theme size. All of the title, tick-label, and y-axis-line settings above it are retained, which lets you see that a theme call can collect several different element types at once.
 
 </details>
 
@@ -1060,6 +1080,8 @@ This is what we will build on:
 
 The single most useful legend theme setting is position. By default the legend goes to the right, which eats horizontal space, and horizontal space is exactly what a wide figure needs. Moving it to the bottom often buys you a noticeably larger plot area for free. You can also use top, left, or the word none to remove the legend entirely, which is what you want when the same key is already explained in a neighbouring panel or in the caption.
 
+There are two different operations in the code. Labs with fill equal to State replaces the fill legend's reader-facing title, which is a content change. Theme with legend.position equal to bottom then moves the whole legend, which is an appearance change. Keeping those in separate functions preserves the content-versus-theme distinction from the start of the lecture.
+
 </details>
 
 ```{webr-r}
@@ -1077,6 +1099,8 @@ g_l +
 <summary>Transcript</summary>
 
 The keys are the little coloured swatches next to each label, and their size is set with legend.key.height and legend.key.width, both taking unit because they are measurements. Widening the keys, as here, is genuinely useful for a bottom-mounted legend: a long flat swatch reads more clearly at a glance than a small square, especially when the colours are close together. Notice also that these two settings are being added to the position setting from the previous tab, so the theme call is accumulating.
+
+The height is set to zero-point-five centimetres and the width to two centimetres, creating the long, low keys you see. Labs still renames the fill legend State, and legend.position remains bottom, so this tab changes key dimensions without losing the title and position work from the preceding tab.
 
 </details>
 
@@ -1130,6 +1154,8 @@ g_l +
 <summary>Transcript</summary>
 
 And the panel behind the legend, which is a box, so it takes element_rect and you set its fill and its border. A light background behind the legend can help when the legend sits on top of a busy plot, and it is unnecessary when the legend has its own space outside the panel. Notice that the theme call has now accumulated six settings across four tabs, all inside one theme function separated by commas. That is how real theme code looks: one call, a list of element assignments.
+
+The new assignment is legend.background equal to element_rect with a lightblue fill and a solid line type. Everything above it is still active: the bottom position, half-centimetre by two-centimetre keys, size-sixteen Times labels, and size-six red Courier title. Labs continues to label the fill legend State. Reading the full call this way helps you distinguish the one new setting from the accumulated context.
 
 </details>
 
@@ -1274,6 +1300,8 @@ g_axis + theme_excel()
 
 This is the technique I would actually recommend, and it combines the last two sections. Start from the pre-made theme closest to what you want, then override the specific parts you do not like by adding a theme call after it. Order matters: the later one wins, so the pre-made theme must come first. The tabs work through an example, taking theme_bw and then removing the minor grid lines, then the vertical major ones, then restyling the horizontal ones. That is a realistic workflow, and it is far less effort than specifying forty elements yourself.
 
+In Preparation, g_axis plus theme_bw is saved as g_axis_bw. The minor-grid tab adds element_blank to panel.grid.minor, removing both horizontal and vertical minor lines. The major-grid tab writes the same construction without the saved shortcut, blanks panel.grid.major.x to remove the vertical major lines, and replaces panel.grid.major.y with blue dotted lines of width one. The link beneath the code is a reference for other accepted line types. The important reading habit is to move through the plus signs in order: establish the base plot, apply the broad theme, and then apply narrow overrides.
+
 </details>
 
 ::: {.panel-tabset}
@@ -1345,6 +1373,8 @@ See [here](http://sape.inf.usi.ch/quick-reference/ggplot2/linetype) for the line
 <summary>Transcript</summary>
 
 And the final step: if you have a combination you like, save it to a name and reuse it. A theme is an ordinary R object, so my_theme can be built once and then added to any figure exactly like a built-in theme. The tabs show it built on theme_economist, compared against the unmodified version, and then the theme_set function, which applies your theme to every figure you draw from then on. For a paper where every figure has to look the same, define the theme once at the top of your script and use theme_set. That consistency is worth more to a reader than any individual styling choice.
+
+The Introduction tab creates my_theme by starting with theme_economist and then blanking axis.title and panel.grid.major. It next maps factor of month to x and temperature to y in the weather data, draws a boxplot, and adds my_theme just as it would add theme_bw. Compare places that result beside the same plot with plain theme_economist, isolating exactly what your two overrides removed. Finally, theme_set with my_theme changes the session-wide default, so later plots inherit it even when you do not add my_theme explicitly. Use that global setting when the whole project should share a design, and add the object plot by plot when only selected figures should use it.
 
 </details>
 
@@ -1464,6 +1494,8 @@ They also have panel-spacing elements such as `panel.spacing`. We learn how to m
 
 The setup for this section, and note that it deliberately cuts the data down to three states and two years. That is not just to keep the example small; it is the lesson from the faceting lecture applied again. A grid of six panels can be read, and a grid of sixty cannot. Then we build the faceted histogram we will restyle. Each year column gets its own x scale, shared by the three state panels in that column.
 
+The two percent-in-percent filters keep Nebraska, Colorado, and Kansas, then 2005 and 2006. Geom_histogram maps corn yield to x, so each panel shows the distribution of county yields. In facet_grid, state_name on the left of the tilde creates the rows and year on the right creates the columns. Scales equal to free_x allows the x scale to vary from one year column to the other while panels within a column still share it. The surrounding parentheses save this plot as g_f and display it for inspection.
+
 </details>
 
 Create a dataset for this section:
@@ -1505,6 +1537,8 @@ Create a faceted figure we will build on:
 <summary>Transcript</summary>
 
 Strip text, and notice it uses the suffix rule from earlier: strip.text.x is the labels across the top, strip.text.y is the labels down the side. They are styled separately here for a reason worth knowing. The labels down the right-hand side are rotated ninety degrees by default, which is hard to read, and setting angle to zero turns them upright. That single change makes a faceted figure noticeably easier to read, and it is probably the most useful thing on this slide.
+
+The top strip labels use size twelve, the Times family, and red. The side strip labels use angle zero, size six, and blue. Both assignments take element_text because they style words, and placing them together inside theme lets the row and column labels have independent treatments.
 
 </details>
 
@@ -1632,6 +1666,8 @@ You could alternatively use the RGB codes, but I do not see any reason to do so 
 
 And here it is in use. A HEX code goes anywhere a colour name goes, in exactly the same position, so nothing about the syntax changes. This matters more than it sounds. If your department or journal has house colours, you can use precisely those colours rather than an approximation, and a figure that uses two or three deliberately chosen colours consistently looks considerably more professional than one built from the default palette. Try one of your own.
 
+The plot uses county_yield, maps d-three-five-nine to x and corn yield to y, and draws one point per row. Color is outside aes, so hash eight-two-four-two-eight-three is a single constant colour applied to every point. If color were mapped inside aes, ggplot would interpret it as a data mapping and construct a scale and legend instead. The Try callout asks you to replace that code with a HEX colour you chose and rerun the cell.
+
 </details>
 
 You can use HEX color codes for any color-related elements in a figure.
@@ -1681,6 +1717,8 @@ We use `scale_A_B()` functions for color specification:
 <summary>Transcript</summary>
 
 Here is the pattern applied. In this code the aesthetic being mapped is colour, so the first blank is colour, and that already halves the list. Then the second blank is the method, and there are many. Do not try to memorize them. Instead note the single most important thing, which is at the bottom of the slide: some of these are for discrete variables and some for continuous, and you have to know which kind your variable is. Corn yield is numeric, so it needs a continuous scale, and handing it a discrete one is a very common error.
+
+The list labels the choices explicitly. Brewer and viridis d are discrete options, while distiller and viridis c are continuous options. The generic scale_color_continuous and scale_color_discrete functions follow the same split, and scale_color_hue is another discrete scale. In the example, geom_point maps corn yield to y and also to colour, with d-three-five-nine on x. Since that colour variable is numeric, scale_color_viridis_c or another continuous choice is valid, while a function labelled discrete is not.
 
 </details>
 
@@ -1749,6 +1787,8 @@ These color schemes are color-blind safe.
 
 Four of the palettes shown together on the same data so you can compare them fairly. Magma and inferno run through black and red into yellow, plasma is purple to yellow, and viridis, the default, runs blue through green to yellow. They all share the property that matters: brightness increases steadily from one end to the other, so the ordering survives even if the colour information is lost. Pick whichever suits your subject; the technical properties are the same.
 
+The code loads the geyser data from MASS, puts eruption duration on x and waiting time on y, and restricts the visible ranges to zero-point-five through six and forty through one hundred ten. Stat_density2d computes density levels, maps the computed level to fill with after_stat, and draws filled polygons. Theme_bw supplies the base appearance, then panel.grid equal to element_blank removes the grid. The rightward assignment saves that common plot as gg so every comparison starts identically. Patchwork's vertical bar places two plots beside each other, and its slash stacks the two rows. Each copy adds viridis option A, B, C, or D and uses labs to put the palette name on x while removing the y title. That construction is why you can compare only the palette rather than accidentally comparing different data or themes.
+
 </details>
 
 ```{webr-r}
@@ -1775,6 +1815,8 @@ ggplot(geyser, aes(x = duration, y = waiting)) +
 <summary>Transcript</summary>
 
 A continuous example, using the default viridis palette. Notice which function is used, scale colour viridis c, and take the two parts of the name apart: colour because we mapped the colour aesthetic, and c because corn yield is a continuous variable. If you take one thing from this section, make it the habit of reading those function names as a specification rather than as a word to memorize.
+
+The filter keeps observations with corn yield above fifty. Geom_point maps d-three-five-nine to x, corn yield to y, and that same numeric corn-yield variable to point colour. Adding scale_color_viridis_c replaces ggplot's default continuous colour scale while leaving the data, point geometry, and mappings unchanged.
 
 </details>
 
@@ -1841,6 +1883,8 @@ ggplot(data = filter(county_yield, corn_yield > 50)) +
 
 The other colour system worth knowing is ColorBrewer, and its real contribution is the three-way classification at the top of this tab, which is a genuinely useful way to think. Sequential palettes are for variables that run from low to high, like temperature. Diverging palettes have a meaningful midpoint with two directions away from it, which is exactly right for something like change, where negative and positive mean opposite things. And qualitative palettes are for categories with no order at all, like state names. Then two functions, brewer for discrete variables and distiller for continuous.
 
+In scale_A_brewer and scale_A_distiller, A is the aesthetic you are controlling, either color for lines and point outlines or fill for interiors. Choose that part from the geometry's mapping, then choose brewer when the mapped variable is discrete or distiller when it is continuous. The palette family is a separate decision based on whether the values are ordered, centred around a meaningful reference, or simply categorical.
+
 </details>
 
 `RColorBrewer` package provides a number of color palettes of three types:
@@ -1860,6 +1904,8 @@ We use two types of scale functions for the palettes:
 <summary>Transcript</summary>
 
 These three tabs display every palette in each family, and they are worth spending a moment with. Look at the sequential ones and see the brightness climb steadily. Look at the diverging ones and see the pale midpoint with colour intensifying in both directions. Then look at the qualitative ones and notice that they primarily distinguish categories by hue rather than a steady lightness progression. Their colours are not equally bright, and palettes such as Paired and Accent vary substantially in lightness. Matching the family to the kind of variable you have is most of what good colour choice consists of.
+
+Each tab calls display.brewer.all with a different type abbreviation: seq for sequential, div for diverging, and qual for qualitative. The function displays the palette names together with their swatches, so you can choose a valid palette name for a later brewer or distiller scale rather than guessing from memory.
 
 </details>
 
@@ -1908,6 +1954,8 @@ display.brewer.all(type = "qual")
 
 A discrete example: state is a category with no natural ordering, so this is a qualitative palette applied with scale fill brewer. brewer because the variable is discrete, fill because we are colouring the interiors of boxes. Set2 is a good default for this kind of thing, being distinguishable without being garish. Follow the naming apart again: aesthetic, then method, and both halves determined by facts about your data rather than by preference.
 
+The preparation first filters county_yield to the inclusive period from 2005 through 2010 and saves it as county_yield_s_b2010. The plot then puts factor of year on x, corn yield on y, and state name on fill. Factor makes the years discrete groups for the boxplots, while the fill mapping creates the state legend. Palette equal to Set2 selects that qualitative ColorBrewer set without changing which state is mapped to which legend entry.
+
 </details>
 
 Generate a dataset for visualization:
@@ -1938,6 +1986,8 @@ ggplot(data = county_yield_s_b2010) +
 
 And a continuous example, which is where the distiller function comes in. Same palette family, but corn yield is numeric, so the palette has to be interpolated into a smooth gradient rather than used as a handful of discrete swatches, and distiller is what does that. The palette here, red-yellow-green, is a diverging one, so pause on whether it is really appropriate: diverging palettes imply a meaningful middle, and if yield has no natural centre point, a sequential palette would represent the data more honestly.
 
+The filter removes yields at or below fifty. Geom_point maps d-three-five-nine to x, corn yield to y, and corn yield again to colour, so the legend is a continuous colour bar for the same variable plotted vertically. Scale_color_distiller selects the colour aesthetic, handles its numeric values continuously, and uses the RdYlGn palette named in the palette argument.
+
 </details>
 
 ```{webr-r}
@@ -1962,6 +2012,8 @@ ggplot(data = filter(county_yield, corn_yield > 50)) +
 <summary>Transcript</summary>
 
 Sometimes none of the ready-made palettes is what you want, and you simply need specific colours for specific groups. That is what the manual scales are for. The mechanism is a named vector: each group name paired with the colour it should get. Two things worth noticing. You can mix colour names and HEX codes freely in the same vector. And because the mapping is by name rather than by position, it does not matter what order the groups happen to appear in your data, and the colours stay attached to the right groups even if the data changes.
+
+In the Instruction tab, cols assigns red to Colorado, blue to Nebraska, and hash-f-f-zero-zero-eight-zero to Kansas. Scale_fill_manual receives that vector through values because the box interiors, not point or line colours, are being controlled. The Example tab creates the same vector, then maps factor of year to x, corn yield to y, and state name to fill in the 2005 through 2010 data. Adding the manual fill scale makes ggplot look up each state by its name and use the corresponding value from cols.
 
 </details>
 
@@ -2024,6 +2076,8 @@ ggplot(data = county_yield_s_b2010) +
 <summary>Transcript</summary>
 
 And the continuous counterpart, gradientn, where you build a smooth scale from your own colours. You give it a vector of colours and a matching vector of positions between zero and one, and the two must be the same length, because each colour is placed at its position and ggplot blends between neighbours. That is the key idea: the positions do not carve the bar into blocks, they are pins that the gradient is stretched between. Colours pinned close together give a fast transition, colours far apart a long gradual one, which is exactly what the example demonstrates.
+
+The star in scale-star-gradientn is again the aesthetic, so the example uses scale_color_gradientn because corn yield is mapped to point colour. County yield is the data, d-one-five-nine is x, corn yield is y and colour, and size equal to zero-point-three sits outside aes to give every point the same small size. The four colour-position pairs are red at zero, orange at zero-point-two, green at zero-point-nine, and blue at one. Limits equal to 100 and 250 define the data values at the ends of the scale. Within that span, zero-point-two corresponds to 130 bushels per acre and zero-point-nine to 235. That leaves a long orange-to-green transition from 130 to 235 and compresses the green-to-blue transition into the top tenth, exactly as the callout's position rule predicts.
 
 </details>
 

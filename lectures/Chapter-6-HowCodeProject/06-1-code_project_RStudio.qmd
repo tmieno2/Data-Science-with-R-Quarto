@@ -37,7 +37,7 @@ Two navigation tricks before we start. The three stacked lines in the bottom lef
 <details class="transcript">
 <summary>Transcript</summary>
 
-The code boxes in this chapter are static examples. You can use the copy button in the top right corner to put the code on your clipboard and paste it into RStudio, but you cannot edit or run code within these slides. In RStudio, you can run part of an example by highlighting it and pressing Command Enter, or Control Enter on Windows.
+The code boxes in this chapter are static examples. You can use the copy button in the top right corner to put the code on your clipboard and paste it into RStudio, but you cannot edit or run code within these slides. In RStudio, you can run part of an example by highlighting it and pressing Command Enter, or Control Enter on Windows. The hint of blue is how you recognize one of these static code boxes, and the copy control is the icon that looks like two sheets of paper stacked together. Once you paste the example into RStudio, make any changes there before you run it.
 
 </details>
 
@@ -148,7 +148,7 @@ Thorough documentation—including details on data, methods, and reproduction st
 <details class="transcript">
 <summary>Transcript</summary>
 
-Who actually benefits, and the letters in brackets are the point. Scientific integrity benefits the community. Educational value benefits your team and the community. But look at the last three. Repeatability, transferability and reducing errors all carry Y and M, meaning you and your team. That is the argument worth internalising. Reproducibility is often presented as a duty you owe the profession, which makes it sound like unpaid overhead. Most of the payoff is actually yours. You are the one who will need to rerun this with one variable changed, hand it to a coauthor, or find the error before a referee does.
+Who actually benefits, and the letters in brackets are the point. Scientific integrity benefits the community. Educational value benefits your team and the community. But look at the last three. Repeatability, transferability and reducing errors all carry Y and M, meaning you and your team. That is the argument worth internalising. Reproducibility is often presented as a duty you owe the profession, which makes it sound like unpaid overhead. Most of the payoff is actually yours. You are the one who will need to rerun this with one variable changed, hand it to a coauthor, or find the error before a referee does. Scientific integrity means the community can inspect the path from evidence to result. Educational value means teammates and other researchers can learn from that path instead of seeing only the final answer. Repeatability lets you regenerate the work after an input or specification changes, transferability lets someone else on the team take it over, and a transparent sequence makes mistakes easier to locate. Read Y, M, and S as a quick map of who receives each payoff, not as part of the benefit's name.
 
 </details>
 
@@ -173,7 +173,7 @@ Here are some of the benefits of high-quality reproducible research with their b
 <details class="transcript">
 <summary>Transcript</summary>
 
-A checklist to run against your own work, and I would genuinely use it. Six items: organized folders, documented data, everything programmed rather than done by hand, code that is annotated and organized, an instruction saying what to run and in what order, and no junk files lying around. That fifth one is the most commonly missed. People produce beautiful code and never write down which script runs first, which leaves the next person guessing. And the sixth matters more than it sounds, because a folder full of abandoned experiments makes it impossible to tell what is actually part of the project.
+A checklist to run against your own work, and I would genuinely use it. Six items: organized folders, documented data, everything programmed rather than done by hand, code that is annotated and organized, an instruction saying what to run and in what order, and no junk files lying around. That fifth one is the most commonly missed. People produce beautiful code and never write down which script runs first, which leaves the next person guessing. And the sixth matters more than it sounds, because a folder full of abandoned experiments makes it impossible to tell what is actually part of the project. Notice that this checklist asks for a higher-quality workflow than the minimum definition on the earlier tab. A recorded manual Excel edit can still meet the minimum for reproducibility, but programming data processing, analysis, figures, and tables makes the action exact, repeatable, and much easier to audit. Data documentation should tell the next person what the variables and source files mean, while the folder system should also give code, manuscripts, and supporting articles an obvious home.
 
 </details>
 
@@ -215,7 +215,7 @@ You should have a single dedicated folder for a research project. This will avoi
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the mechanics, in three steps in the nested tabs. Work through them, but understand what you are creating. An RStudio project is really just a folder with a dot Rproj file in it. What that file buys you is that opening it starts a fresh R session whose working directory is that folder. So your paths become relative to the project rather than to wherever your machine happens to be pointing, which means the whole thing can be moved, zipped, or handed to somebody else and still work. That is the entire value, and it is a large one.
+Now the mechanics, in three steps in the nested tabs. Work through them, but understand what you are creating. An RStudio project is really just a folder with a dot Rproj file in it. What that file buys you is that opening it starts a fresh R session whose working directory is that folder. So your paths become relative to the project rather than to wherever your machine happens to be pointing, which means the whole thing can be moved, zipped, or handed to somebody else and still work. That is the entire value, and it is a large one. In Step 1, use the project control at the top right of RStudio and follow New Project, New Directory, then New Project, as the screenshot shows. In Step 2, enter the new directory's name, choose the parent directory where it should be created, and click Create Project. Step 3 shows the result: RStudio takes you into a new session for that project, and the new folder contains a file such as test dot Rproj. That file stores project information, but you do not edit it. You normally open it to return to the project.
 
 </details>
 
@@ -294,7 +294,7 @@ In this folder you just created, you have a single file named **<directory-name>
 <details class="transcript">
 <summary>Transcript</summary>
 
-A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data and other source materials must be preserved because rerunning your scripts cannot regenerate them. Processed data and generated results should be rebuildable by rerunning your scripts.
+A recommended layout, and the note at the top matters: modify it as you see fit. There is nothing sacred about these particular names. What is worth copying is the principle. Code is separated from data, and within data, raw is separated from processed. Within code, data preparation is separated from analysis. Results and writing get their own places. The reason to split raw from processed is the one that will save you one day. Raw data and other source materials must be preserved because rerunning your scripts cannot regenerate them. Processed data and generated results should be rebuildable by rerunning your scripts. The Literature folder gives journal articles and other reference documents a predictable home. Results holds generated regression output, figures, and tables, while Writing holds the qmd, Word, or LaTeX files that turn those results into a paper or report. The folder-tree image on the right shows the same hierarchy as the list on the left, with DataPrep and Analysis nested under Code, and Raw and Processed nested under Data.
 
 </details>
 
@@ -334,7 +334,7 @@ Here is a recommended folder organization. You should modify/add folders as you 
 <details class="transcript">
 <summary>Transcript</summary>
 
-A recommendation you may find surprising: write your analysis code in a qmd file rather than a plain R script. The reasons are on screen. Commenting is far easier, because prose between chunks is just prose rather than a wall of hash marks. Headers give you real structure. And the two practical ones at the bottom are what win people over. Run All Chunks Above rescues you when R crashes partway through, without rerunning everything by hand. And the navigator at the bottom of the source pane lets you jump between sections, which matters enormously once a file gets long.
+A recommendation you may find surprising: write your analysis code in a qmd file rather than a plain R script. The reasons are on screen. Commenting is far easier, because prose between chunks is just prose rather than a wall of hash marks. Headers give you real structure. And the two practical ones at the bottom are what win people over. Run All Chunks Above rescues you when R crashes partway through, without rerunning everything by hand. And the navigator at the bottom of the source pane lets you jump between sections, which matters enormously once a file gets long. You can open Run All Chunks Above from the triangle beside the Run button. On a Mac, option-shift-command-P is the keyboard route shown here for running the preceding R Markdown code. The screenshot points to the navigator in the lower corner of the source pane; because it reads your section and subsection headers, meaningful headers give you both organization on the page and a usable menu for moving through the file.
 
 </details>
 
@@ -355,7 +355,7 @@ Use a **qmd** file instead of an **R** file whenever you write codes
 <details class="transcript">
 <summary>Transcript</summary>
 
-A recommended structure for the inside of a file, and it is worth adopting as a habit. Start with an objective statement saying what this file does, what it takes in and what it produces. Then setup: working directory, packages, functions. Then the actions, in order. The objective statement is the part people skip and the part that pays. When you come back in six months, the first thing you need to know is what this file is for and what it depends on. And read the note at the bottom: keep it current, because inputs and outputs drift as a project evolves.
+A recommended structure for the inside of a file, and it is worth adopting as a habit. Start with an objective statement saying what this file does, what it takes in and what it produces. Then setup: working directory, packages, functions. Then the actions, in order. The objective statement is the part people skip and the part that pays. When you come back in six months, the first thing you need to know is what this file is for and what it depends on. And read the note at the bottom: keep it current, because inputs and outputs drift as a project evolves. In the setup section, set a working directory only if it is necessary, then load the packages and functions the actions depend on. The Action 1 through Action n outline is intentionally generic: replace it with headers that describe the real sequence in this particular file. The image on the right lets you see what this outline looks like in an actual qmd source file, so the written objective, setup, and action sections remain visible alongside the code they organize.
 
 </details>
 
@@ -397,7 +397,7 @@ Dynamically edit the "Objective statement" as its objectives, input, and output 
 <details class="transcript">
 <summary>Transcript</summary>
 
-Style, in two nested tabs. The honest position is in the first sentence: you can write R however you like, and R will not care. The argument for a style guide is entirely about other people reading your code, and again, that includes you later. The two guides linked here are the common ones, with tidyverse the more widely used in this ecosystem. Then the second tab covers styler, which automates part of it. Do click through the linked examples on naming, spacing and piping rather than just noting that guides exist. Those four pages are most of what you actually need.
+Style, in two nested tabs. The honest position is in the first sentence: you can write R however you like, and R will not care. The argument for a style guide is entirely about other people reading your code, and again, that includes you later. The two guides linked here are the common ones, with tidyverse the more widely used in this ecosystem. Then the second tab covers styler, which automates part of it. Do click through the linked examples on naming, spacing and piping rather than just noting that guides exist. Those four pages are most of what you actually need. The long-lines example is also part of that short practical list, because consistent line breaks keep code readable without horizontal hunting. On the styler tab, highlight the lines you want to change, open Addins, and choose Style selection. The package helps with part of the tidyverse style, so you still need judgment about names and organization. The callout warns that this addin has no keyboard shortcut by default. If you want one, go through Tools, Modify Keyboard Shortcuts, search for Style selection, and assign your own. Do not treat command-shift-A on a Mac, or control-shift-A on Windows, as the styler shortcut. That invokes RStudio's built-in Reformat Code command, works without styler, and does not apply the tidyverse style guide.
 
 </details>
 
@@ -447,7 +447,7 @@ Do not confuse this with `cmd` + `shift` + `A` (`ctrl` + `shift` + `A` on Window
 <details class="transcript">
 <summary>Transcript</summary>
 
-Four sets of rules, and if you remember only one thing, make it the first. Raw data goes in Data slash Raw, and you never overwrite it. You read from it, you never write to it. Everything else in your project can be regenerated by rerunning code. Raw data cannot, and if you overwrite it you have destroyed the one irreplaceable thing you had. The rest follows the same logic. Processing code in Code slash DataPrep writing to Data slash Processed, analysis code in Code slash Analysis writing to Results, and writing that refers to Results rather than keeping its own copies.
+Four sets of rules, and if you remember only one thing, make it the first. Raw data goes in Data slash Raw, and you never overwrite it. You read from it, you never write to it. Everything else in your project can be regenerated by rerunning code. Raw data cannot, and if you overwrite it you have destroyed the one irreplaceable thing you had. The rest follows the same logic. Processing code in Code slash DataPrep writing to Data slash Processed, analysis code in Code slash Analysis writing to Results, and writing that refers to Results rather than keeping its own copies. Rule 1 also says the designated raw-data folder contains raw datasets and nothing else, which makes the read-only boundary unambiguous. Rule 2 keeps transformation and merging programs apart from the intermediate R objects or datasets they create, so do not mix code and data in one folder. Rule 3 sends regression tables, figures, and other tables to Results. Rule 4 puts qmd and Word writing files in Writing, then links them to the figures and tables in Results. That avoids duplicate output files quietly drifting apart.
 
 </details>
 
@@ -478,7 +478,7 @@ Four sets of rules, and if you remember only one thing, make it the first. Raw d
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two recommendations about naming, and the second is the useful one. Name files for what they do, and put numbers in front to encode the order they should be run in. Look at the example: zero one dash one download weather data, zero one dash two download boundary data, and so on, with data preparation numbered zero one and analysis numbered zero two. That numbering is doing real work. It is the instruction on how to reproduce your project, embedded in the filenames themselves, so anybody sorting the folder alphabetically sees the correct order to run things in.
+Two recommendations about naming, and the second is the useful one. Name files for what they do, and put numbers in front to encode the order they should be run in. Look at the example: zero one dash one download weather data, zero one dash two download boundary data, and so on, with data preparation numbered zero one and analysis numbered zero two. That numbering is doing real work. It is the instruction on how to reproduce your project, embedded in the filenames themselves, so anybody sorting the folder alphabetically sees the correct order to run things in. The rest of the first sequence makes the dependency explicit: zero one dash three summarizes the data, and zero one dash four merges it. Only then does the zero-two analysis sequence begin, first with regression analysis and then with generation of figures and tables. The descriptive words tell you each file's purpose, while the two-part numeric prefix tells you both its broad phase and its position within that phase.
 
 </details>
 
@@ -525,7 +525,7 @@ Let's take a look at an example project that is designed to be reproducible. Fir
 <details class="transcript">
 <summary>Transcript</summary>
 
-Snippets are text expansion inside RStudio. You type a short trigger and select the matching snippet from the completion list, or press shift tab to insert it immediately, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. Every line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work.
+Snippets are text expansion inside RStudio. You type a short trigger and select the matching snippet from the completion list, or press shift tab to insert it immediately, and RStudio replaces it with something longer. That is the whole idea, and it is worth five minutes of setup, because the things you type most often in R are awkward to type. The pipe and the assignment arrow both need several keystrokes and a reach. Look at the syntax block, and then read the callout, because it is the thing that catches everybody. Every line you want printed must be indented with an actual tab character. Spaces will not do, and the snippet then silently fails to work. In that syntax block, the keyword snippet begins the definition, the combination of letters after it is the trigger you type, and the next line is the longer text RStudio inserts. The indentation is structural, not decorative: it tells RStudio that the line belongs to that snippet definition.
 
 </details>
 
@@ -610,7 +610,7 @@ snippet as
 <details class="transcript">
 <summary>Transcript</summary>
 
-Something that confuses people the first time. A qmd file has two contexts. Inside an R chunk you are in R, and outside one you are in Markdown. Snippets are stored per context, so a snippet defined on the R tab only fires inside chunks, and a Markdown one only fires outside them. Look at the example in the second nested tab. A snippet that creates a whole R chunk necessarily belongs in the Markdown list, because you are outside a chunk at the moment you want to make one. And note it is invoked with shift tab there, rather than plain tab.
+Something that confuses people the first time. A qmd file has two contexts. Inside an R chunk you are in R, and outside one you are in Markdown. Snippets are stored per context, so a snippet defined on the R tab only fires inside chunks, and a Markdown one only fires outside them. Look at the example in the second nested tab. A snippet that creates a whole R chunk necessarily belongs in the Markdown list, because you are outside a chunk at the moment you want to make one. And note it is invoked with shift tab there, rather than plain tab. The definition names its trigger r-m-c. Its two tab-indented output lines insert the opening fence for an R code chunk and the matching closing fence, leaving you a ready-made empty chunk. Put this definition on the Markdown tab, type r-m-c outside a chunk, and press shift-tab. The final instruction asks you to try the same trigger inside an R chunk and confirm that it does not expand there. That failed expansion is the demonstration of context-specificity, not an error in the snippet.
 
 </details>
 
@@ -645,7 +645,7 @@ Confirm that this snippet does not work in the R environment.
 <details class="transcript">
 <summary>Transcript</summary>
 
-This is what makes snippets genuinely powerful rather than just shorter to type. The dollar sign with a number and a label marks a placeholder. Expand this one and your cursor lands in the chunk title; press tab and it jumps to the chunk contents. So a snippet is not simply fixed text, it is a small fill-in-the-blanks form that walks you through the parts you have to supply, in order. Once you see that, the useful snippets to write become obvious. Any structure you type repeatedly where only two or three pieces change each time is a candidate.
+This is what makes snippets genuinely powerful rather than just shorter to type. The dollar sign with a number and a label marks a placeholder. Expand this one and your cursor lands in the chunk title; press tab and it jumps to the chunk contents. So a snippet is not simply fixed text, it is a small fill-in-the-blanks form that walks you through the parts you have to supply, in order. Once you see that, the useful snippets to write become obvious. Any structure you type repeatedly where only two or three pieces change each time is a candidate. In the code on screen, dollar-one with the chunk-title label sits inside the opening R chunk fence, while dollar-two with the chunk-content label sits in the body. The numbers define the cursor order, and the labels give you visible prompts for what to type at each stop. After you replace the first prompt, tab advances to the second one.
 
 </details>
 
@@ -663,7 +663,7 @@ snippet rmc
 <details class="transcript">
 <summary>Transcript</summary>
 
-Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and select the snippet from completion, or press shift tab, and you get a line plot skeleton with your cursor waiting on the dataset name, then the y variable, then x. Do the same with g d and you get a density plot. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester.
+Two more to finish, both ggplot skeletons, and they show the placeholder idea doing real work. Type g l and select the snippet from completion, or press shift tab, and you get a line plot skeleton with your cursor waiting on the dataset name, then the y variable, then x. Do the same with g d and you get a density plot. This is where snippets pay off most, because plotting code is highly repetitive in shape and entirely variable in content. Take these as templates rather than as the final word. The right snippets for you are whatever you catch yourself typing over and over this semester. In the g-l definition, ggplot's data argument is placeholder one, so you choose the dataset first. The plus sign adds geom-line, and aes maps placeholder two to y and placeholder three to x. In the g-d definition, the data argument is again the first stop, then geom-density needs an x mapping as the second stop. The different trigger, geometry, and placeholder count reflect the plot you are building, while the repeated ggplot structure is exactly the typing the snippet saves.
 
 </details>
 

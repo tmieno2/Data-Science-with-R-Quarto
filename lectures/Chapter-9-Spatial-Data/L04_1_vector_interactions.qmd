@@ -52,6 +52,8 @@ library(data.table)
 
 Up to now every deck has handled one spatial object at a time. This one is about what happens when two of them meet, which is where spatial analysis actually starts. The questions are ordinary: which wells fall inside this aquifer, which railroads cross this county, which weather station is nearest to this field. Three tools answer nearly all of them. Topological relations tell you what touches what. Spatial subsetting keeps the features that satisfy a relation. Cropping cuts geometries down to a rectangle. Everything in the next deck, on spatial joins, is built on the first of those, so it is worth getting comfortable here.
 
+Use the table of contents on the left as the route through those three sections. Topological Relations gives you the test, Spatial Subsetting uses a test to keep complete features, and Spatial Cropping changes geometry at a rectangular edge. The two links on the right are there because the examples assume you can already build a ggplot and manipulate rows and columns with dplyr. If either part of the code feels unfamiliar, review the corresponding primer before you try to diagnose the spatial operation itself. By the end, you should be able to explain the relation between two sf objects and use one object to narrow another one down.
+
 </details>
 
 <br>
@@ -161,6 +163,8 @@ ggplot2::theme_set(theme_lecture)
 
 The usual arrangement. One thing specific to this deck: it leans on small made-up datasets, three points, two lines and three polygons, drawn on a single picture you will see over and over. That is deliberate. With real data you cannot check the answer by eye, and every function here returns a list of numbers that means nothing unless you can verify it against a picture. So when a result appears, go back to the figure and count. Later, once the pattern is clear, we switch to real Nebraska data where checking by eye is no longer possible.
 
+The controls on screen let you review this as an interactive set of notes rather than a fixed screenshot. Click the three horizontal lines at bottom left to open the menu and jump by section, or press the letter o to see the overview of all slides. In a pale-blue code area, edit the code and use Run Code to execute the whole cell. To run only part of a cell, highlight that part and press Command plus Enter on a Mac or Control plus Enter on Windows. The two-sheets icon copies the cell so you can paste it into R on your own computer. The reload icon beside it restores the original cell after you experiment. That reset is useful here because later tabs reuse objects made earlier, so an accidental edit can otherwise change every downstream result.
+
 </details>
 
 <br>
@@ -223,6 +227,12 @@ You can run `?geos_binary_pred` to find all the topological relations you can us
 <summary>Transcript</summary>
 
 This is the workhorse, and the tabs walk through all three combinations: points against polygons, lines against polygons, polygons against polygons. Start with the Visualized Data tab and keep that picture in mind, because every result that follows can be checked against it by eye. The output takes a moment to get used to. It is a list, one element per feature in the first object, holding the indices of everything in the second object that it intersects. So the first element tells you what point one touches, and so on. Add sparse equals FALSE if you would rather have a matrix of TRUE and FALSE.
+
+Begin in Data Preparation by printing points, lines, and polygons. Each is an sf object with a name column and a geometry column. The folded code shows where they came from. St point turns one x-y pair into a point. St linestring takes coordinate rows joined by r bind and connects them in order. St polygon takes a list containing a closed coordinate ring, so the last coordinate repeats the first. For each geometry type, a list collects the separate features, st s-f-c turns that list into a geometry column, st as sf makes the feature table, and mutate adds readable names. The folded code is marked eval false because the packaged versions are already loaded; it is reference code, not a second setup that needs to run.
+
+In Visualized Data, the parentheses make the assignment to g all print as it is stored. The polygon layer maps fill to polygon name and uses alpha zero point three so overlapping areas remain visible. The line layer maps colour to line name, and the point layer maps shape to point name with size three. The three scale calls give the legends the headings Polygons, Lines, and Points, while theme void removes axes and grid lines that do not help with this diagram. Autorun creates g all without waiting for you because every comparison tab needs it. The output-context cells simply redisplay that saved figure, and out-width one hundred twenty percent enlarges it within the narrow left column. Those are display choices, not changes to the spatial test.
+
+Now read each result in the direction written in the call. For points against polygons, row one of the sparse list says point one intersects polygons one, two, and three. The FALSE-sparse version represents the same relation as a matrix, with points in rows, polygons in columns, and TRUE wherever the pair intersects. For lines against polygons, there is one list element per line. For polygons against themselves, each polygon intersects itself, and touching at even one boundary point counts, which is why polygons one and three qualify. Keep the order rule fixed in your mind: features of the first argument determine the list elements or matrix rows, and features of the second argument supply the reported indices or matrix columns. Then move to the distance tabs, where the output orientation stays the same but the definition of a match changes.
 
 </details>
 
@@ -413,6 +423,12 @@ For polygons vs polygons interaction, `st_intersects()` identifies any polygons 
 
 The first of the two distance-based relations. Rather than asking whether two things touch, it asks whether anything in the second object lies within a given distance of each feature in the first. Note that the distance argument is required and carries no default. A numeric distance uses metres for geographic coordinates and coordinate units for projected or CRS-free data. That catches people constantly. Work through the tabs in order: the expected outcome tab draws buffers of the right radius around each red point, so you can read the answer off the picture before you run the function.
 
+The Syntax tab names the three working arguments. Sf one determines whose answers you are asking for, sf two contains the possible matches, and dist supplies the threshold. Data Preparation makes both inputs reproducible. Set seed fixes the random-number stream, then l apply repeats the point-making function five times. Runif two supplies each point's two coordinates, st s-f-c collects the five points, st as sf makes an sf object, and mutate assigns IDs from one through the number of rows. The x inside the anonymous function is only the repetition counter here; the coordinates themselves come from runif. Autorun matters because the later tabs depend on these two objects.
+
+The first map uses geom sf text rather than ordinary point symbols, mapping label to id so each coordinate is shown as its number. Red labels belong to points set one and blue labels to points set two. In Expected Outcomes, st buffer draws a radius of zero point two around every red point and stores those geometries as buffer one. Because these examples have no CRS, zero point two means zero point two in their coordinate units. Fill equals N A leaves each buffer transparent, and the red border lets you count which blue labels fall inside. The buffers are a visual checking device; st is within distance does not need you to construct them first.
+
+In Apply the function, the same picture is drawn again beside the actual call. The returned sparse list has one element for each red point, and each element contains the positions of blue points no farther than zero point two away. An empty element means that red point has no blue match within the threshold. Out-width one hundred percent uses the available output width. Each code-track value of zero point four leaves forty percent of the live cell for the editor and the rest for its result, without changing the R calculation. Compare the list to the circles before moving on. The next tab asks for one nearest feature instead of every feature inside a threshold.
+
 </details>
 
 ::: {.panel-tabset}
@@ -542,6 +558,8 @@ Confirm that your visual inspection results are consistent with the outcome of t
 
 The second distance relation, and a simpler one. For each feature in the first object it returns the single closest feature in the second, always exactly one, no threshold involved. That difference matters: within-distance can return several matches or none at all, while nearest-feature always returns precisely one answer per feature. Which you want depends on the question. If you are attaching the nearest weather station to each field, this is the function. If you want every station within twenty kilometres, it is the previous one. Check the result against the same picture of red and blue points.
 
+Read the integer vector in the same direction as before. Its first value is the row position in points set two nearest to the first feature in points set one, its second value belongs to the second feature in points set one, and so on. These are positions in the second object, not distances and not the blue id values by definition, even though the IDs on this slide happen to follow row order. The example redraws buffer one only to help your eye compare the same red and blue labels used on the previous tab. The buffer is not passed to st nearest feature and the zero-point-two radius does not limit the search. Fill N A keeps those reference circles hollow. The code-track value of zero point four only sets the editor-to-output width in the live plot cell. Once the returned positions agree with your visual inspection, move to Exercises to use the intersects relation on data too dense to check point by point.
+
 </details>
 
 ::: {.panel-tabset}
@@ -592,6 +610,10 @@ Confirm that your visual inspection results are consistent with the outcome of t
 <summary>Transcript</summary>
 
 Now the same function on real data, where you cannot check the answer by eye. The mower sensor dataset is a dense cloud of GPS readings from a fairway, and the fairway grid is a set of polygons over the same area. Notice the first cell builds an sf from plain longitude and latitude columns with st_as_sf, taking its CRS from the grid so the two objects match — a step you will repeat often with real data. Then run st_intersects and accept that the output is a long unhelpful list. Filtering spatially, which is what you actually want, is the next section.
+
+In Data Preparation, the two data calls request the named packaged datasets. St as sf uses the LNG and LAT columns as point coordinates, and crs equals st crs of fairway grid assigns the grid's coordinate reference system to the new point geometry. That CRS argument describes how those numbers should be interpreted; it does not move the points. On the map, the fairway polygons are drawn first with red borders and the sensor points are drawn on top. Col is the colour argument here, and code-track zero point four gives the code forty percent of the live cell.
+
+In the st intersects exercise, mower sensor sf is the first argument, so the answer has one list element per sensor reading. Fairway grid is second, so any numbers inside an element are row positions of grid polygons intersected by that sensor point. An empty element means that reading intersects none of the grid polygons. Type the call in the blank live cell and run it. The folded Answer codes cell contains the same call with eval false, so it reveals the solution without executing a duplicate during rendering. Code-fold keeps that answer out of sight until you choose to open it. The long sparse list is correct but not yet an analysis-ready table, which is exactly why the next section turns a spatial relation into spatial subsetting.
 
 </details>
 
@@ -676,6 +698,8 @@ Spatial subsetting refers to operations that narrow down the geographic scope of
 
 Four real Nebraska datasets for this section. County boundaries as polygons, irrigation wells as points, railroads as lines, and the High Plains aquifer boundary, which is the thing we will keep subsetting against. Print each one and look at the columns before going further, because you will be referring to them by name shortly. Note that the wells arrive as a plain table of longitude and latitude and get converted into an sf object with st_as_sf, using the North American Datum as the CRS. That conversion is one of the most common first steps in any real spatial workflow.
 
+The first live cell prints ne counties, wells N E, railroads N E, and h p boundary so you can identify their attribute names and geometry types before the examples start. In the setup-context cell, data loads each packaged object. The package argument makes the source of ne counties, railroads N E, and h p boundary explicit. Wells N E starts as an ordinary table, so coords names long-d-d and lat-d-d as its x and y columns, and crs four two six nine assigns EPSG 4269 when st as sf creates the point geometry. Assigning that CRS records what the existing coordinates mean; it is not a transformation. The setup context makes these objects available to the later tabs, where county-f-p, well-i-d, name, and LINEAR-I-D become the identifiers used for flagging.
+
 </details>
 
 Here are the datasets we will use here. Inspect them to familiarize yourself with the datasets.
@@ -725,6 +749,14 @@ data(hp_boundary, package = "r.spatial.workshop.datasets")
 <summary>Transcript</summary>
 
 Here is the syntax, and it is deliberately familiar: square brackets, with another sf object where you would normally put row numbers. That is the whole thing. What you get back are the counties that intersect the aquifer boundary, because intersects is the default relation. Read the note about how loose that is: a county touching the aquifer by a sliver survives. The last two tabs are the more interesting ones. Flagging keeps every row and adds a zero or one instead of dropping anything, which is usually what you want for regression. And the op argument lets you demand containment rather than mere contact.
+
+Use the Goal tab to fix the question visually. The first geom sf draws all Nebraska counties. The second draws the High Plains aquifer with blue fill at alpha zero point four, so you can still see county boundaries through it, and theme void removes nonessential axes. In How, compare ordinary data-frame indexing with sf indexing. The object before the brackets is the object being reduced. The object inside the brackets supplies the spatial test, and the comma leaves the column position open so all attributes are retained. Both schematic chunks have eval false because they are syntax examples with placeholders, not runnable objects.
+
+In Demonstration, ne counties open-bracket h p boundary comma close-bracket uses st intersects as its default operation and stores the surviving whole county features as ne counties in h p. Autorun creates that object for the plot and for later tabs. The comparison map draws the subset first and the translucent blue aquifer second. Study counties along the edge: even a very small intersection is enough, and none of the selected county geometries is clipped.
+
+Create a flag variable when you need the nonintersecting counties to remain in the data. Dollar county-f-p extracts the identifiers from the subset into county-f-p intersected list. Mutate then adds in h p to the full ne counties object. Percent-in-percent asks whether each county-f-p appears in that list, and ifelse converts the answer to one for a match and zero otherwise. The outer parentheses print the updated sf object while assigning it. Autorun on both cells ensures the identifier list exists before mutate and ensures the updated object is ready downstream.
+
+Finally, Other topological relations shows where to replace the default. The second comma still preserves every column, and op equals a topological relation type tells sf which predicate function to use. In the concrete call, op equals st within keeps a county only when its geometry is completely within the aquifer geometry. Pass the function name itself, not a quoted label. The final map checks that stricter result against the translucent aquifer. Layout stacked changes how that live cell places code and output; it does not change which counties are selected. Then move to points versus polygons and reuse the same bracket pattern.
 
 </details>
  
@@ -865,6 +897,10 @@ ggplot() +
 
 Exactly the same syntax, now with points. Wells inside the aquifer boundary, in one line of brackets. There is a parenthetical worth noticing: for points, intersects and within give the same answer only when none of the points lies on the polygon boundary. A point on the boundary intersects the polygon but is not within it. The flagging tab repeats the pattern from before, pulling out the well identifiers that survived and marking every well as in or out. That flagged version, rather than the subset, is what you would carry into an analysis where you want to compare the two groups.
 
+The Goal map puts the aquifer down first with blue fill, alpha zero point three, and a very thin boundary, then draws every well as a small point. Theme void removes the axes so the spatial pattern is the focus. Those size settings make a dense point layer readable and do not participate in the spatial relation. In Demonstration, wells N E open-bracket h p boundary comma close-bracket keeps each complete well feature that intersects any aquifer polygon and stores the result as wells N E in h p. Autorun makes that subset available to the next plot. The plot repeats the aquifer styling but replaces all wells with the subset, so the difference between the Goal and Demonstration tabs is the set of points supplied to the second geom sf layer.
+
+For Flagging, dollar well-i-d extracts the identifiers of the wells that survived. Percent-in-percent compares every original well-i-d with well-i-d list, ifelse turns membership into one and nonmembership into zero, and dplyr mutate adds the result as in h p while retaining all wells and their geometries. The parentheses both assign and print the updated wells N E object. The two autorun cells execute in dependency order, which is useful because the identifier list must exist before the flag can be calculated. Carry the distinction forward: the subset answers which wells qualify, while the flag supports comparisons between qualifying and nonqualifying wells.
+
 </details>
  
 ::: {.panel-tabset}
@@ -944,6 +980,12 @@ wells_ne <- dplyr::mutate(wells_ne, in_hpa = ifelse(wellid %in% wellid_list, 1, 
 <summary>Transcript</summary>
 
 The third combination, and by now it should feel routine: railroads intersecting Lancaster county, using the same brackets as before. What is worth pausing on is what intersects actually means for a line. A railroad that merely clips the corner of the county is kept in full, not trimmed at the boundary. The whole line survives because subsetting selects features and never modifies their geometry. If what you want is the piece inside the county rather than the whole line, use st_intersection to clip it to the county boundary. The st_crop function, covered in the next section, clips only to a rectangular bounding box. The flagging tab closes the section by marking every railroad as in or out of Lancaster.
+
+In Goal, dplyr filter selects the row of ne counties whose name equals Lancaster and stores that one-county sf object. Autorun is important because both the map and the subset call reuse it. The first map draws every county with a red outline, transparent fill, and thin boundary. The Lancaster layer adds translucent blue fill, and the railroad layer draws all lines thinly on top. Fill N A is what lets the other layers remain visible through the statewide county layer, and theme void removes the axes. Code-track zero point three leaves thirty percent of each live plotting cell for code and seventy percent for output.
+
+In Demonstration, railroads N E open-bracket Lancaster county comma close-bracket applies the default intersects relation and saves the qualifying whole features as railroads Lancaster. The next plot keeps the county and Lancaster layers fixed but switches its railroad data from all railroads N E to railroads Lancaster. That controlled change is how you check the subset visually. Notice again that a retained line may continue outside the blue county because the brackets select rows, not line segments.
+
+Flagging follows the same identifier pattern as the two earlier examples. Dollar LINEAR-I-D pulls the retained railroad IDs into railroads id list. Percent-in-percent tests every LINEAR-I-D in the original object against that list, ifelse encodes the result as one or zero, and mutate adds in Lancaster without dropping any railroad. The outer parentheses print the updated railroads N E object as it is assigned. Autorun creates each dependency for later work. With all three geometry combinations complete, move to Spatial Cropping and watch what changes when the goal is to cut geometry rather than keep complete features.
 
 </details>
  
@@ -1051,6 +1093,8 @@ railroads_ne <- dplyr::mutate(railroads_ne, in_lancaster = ifelse(LINEARID %in% 
 
 Cropping is the operation that does change geometry. You give it a spatial object and a bounding box, and it cuts everything down to that rectangle, chopping features at the edge rather than keeping or dropping them whole. Notice the word rectangle: st_crop works to a bounding box, the minimum and maximum x and y that enclose an object, not to the shape of the object itself. That surprises people who expect to be cropping to the outline of the aquifer. The next tab builds the bounding box explicitly so you can see it.
 
+The word extent on screen is another name for that rectangular range. St bbox retrieves its x minimum, y minimum, x maximum, and y maximum. Separating that retrieval from st crop is useful for review because it lets you inspect the exact rectangle before any geometry is cut. Move to Bounding box to create and draw it, then to Crop to use it.
+
 </details>
 
 + We can use `st_crop()` to crop spatial objects to a spatial bounding box (extent) of a spatial object. 
@@ -1066,6 +1110,10 @@ Cropping is the operation that does change geometry. You give it a spatial objec
 <summary>Transcript</summary>
 
 st_bbox gives you four numbers, the minimum and maximum of x and y. Check its class and you will find it is a bbox object, not an sf, and that matters because you cannot plot it or use it in most spatial operations directly. st_as_sfc converts it into a geometry you can actually draw, which is what the red rectangle on this slide is. Look at how much larger that rectangle is than the aquifer itself, because that gap is exactly what makes cropping different from subsetting, and it is the point of the last tab.
+
+The first cell passes h p boundary to st bbox and assigns the result to h p bbox. Autorun creates it for every later cell, while the parentheses are not needed because the next cell explicitly calls class to inspect the object type. St as s-f-c then converts those four limits into an s-f-c polygon named h p bbox s-f-c, and its autorun option makes that drawable geometry available to the plot and the Crop tab. This conversion changes the representation from four named limits to a spatial geometry; it does not change the rectangle's extent.
+
+In the final map, the first geom sf layer draws the aquifer. The second draws h p bbox s-f-c with fill N A so its interior stays transparent and colour red so only the rectangular outline stands out. The code-track value of zero point four gives the code forty percent of each live cell and leaves the larger share for the printed result or figure. With the gap between the aquifer outline and the red rectangle visible, move to Crop and predict which county pieces the rectangle will retain.
 
 </details>
 
@@ -1114,6 +1162,10 @@ ggplot() +
 <summary>Transcript</summary>
 
 The crop itself is one line. Note the remark that passing the aquifer object and passing its bounding box give the same result: st_crop takes the bounding box of whatever you hand it, so there is no need to convert first. The figure at the end is the one to study. The blue outline is the aquifer, the red rectangle its bounding box, and the orange shapes the cropped counties. Counties are sliced along the rectangle edge, mid-county, which no amount of subsetting would ever do. Some of those orange pieces are nowhere near the aquifer.
+
+Read the first argument of st crop as the geometry to cut and the second as the source of the rectangular extent. Ne counties is therefore modified geometrically, while h p boundary supplies only its bounding box. The outer parentheses make the newly assigned ne counties cropped to h p object print immediately, so you can inspect the result without a separate line. The following call passes h p bbox s-f-c instead and demonstrates the stated equivalence. It prints a result but does not replace the saved object.
+
+The layered figure explains every role. H p boundary gets a blue border with linewidth one. The original ne counties layer has fill N A, so it contributes outlines without hiding anything beneath it. H p bbox s-f-c is another hollow layer, this time with a red border. The saved cropped counties are filled orange at alpha zero point four, allowing the outlines below to remain visible. Code-track zero point four is only the live-cell width split. Compare the orange geometry with the red rectangle, not with the curved aquifer boundary, and then use the final tab to contrast that result with spatial subsetting.
 
 </details>
 
@@ -1164,6 +1216,10 @@ ggplot() +
 <summary>Transcript</summary>
 
 The summary slide, and worth a moment because the two operations are easy to confuse. Subsetting keeps whole features that satisfy a relation and never touches their shape. Cropping cuts every feature to a rectangle and will happily leave you with half a county. The figure overlays the green subset and the blue cropped version so the difference is visible directly. Which you want depends on the question: use subsetting when the unit of analysis is the county and you need it intact, and cropping when you want a study area of a particular extent regardless of what it cuts through.
+
+The first geom sf layer uses ne counties in h p, the earlier bracket subset, with green fill and alpha zero point three. The second uses ne counties cropped to h p, the st crop result, with blue fill at the same transparency. Because both layers remain partly visible, their nonmatching edges show where whole intersecting counties extend beyond the rectangular crop and where the crop has sliced them. Code-track zero point four again affects only the editor-to-output width.
+
+The three commented lines at the bottom are an optional third layer. As written, the hash marks keep the plus sign, the label, and the geom sf call from running. If you uncomment them together, the plus attaches another layer that draws h p boundary with no fill and a red outline. That reference can make the aquifer shape easier to compare, but it is deliberately off in the displayed result so the green-versus-blue distinction remains the focus.
 
 </details>
 

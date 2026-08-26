@@ -80,6 +80,8 @@ The code boxes are live. Blue area is an editor, Run Code runs it, and you can h
 
 One dataset for the whole lecture. Pizzaplace comes from the gt package, and it is a year of pizza orders from twenty fifteen, with a date, a name, a size and a type. It is a good teaching dataset here for two reasons. The date column arrives as text rather than as a proper Date, which is exactly the problem the first half of this lecture solves. And the name, size and type columns are all strings with regular structure, which gives the second half something realistic to work on. Run the cell and have a look before we start.
 
+The data call names pizzaplace and uses package equals g t, so R loads this built-in dataset directly from g t without requiring you to attach the whole package. Autorun true makes the cell run when the deck opens, which matters because every later tab expects the pizzaplace object to exist. The bare object name on the last line prints it for inspection. You get forty-nine thousand five hundred and seventy-four order-line records and seven columns: an identifier, the date, the time, the pizza name, its size and type, and its price. Keep the distinction between an order-line record and a calendar date in mind, because many rows can share one date.
+
 </details>
 
 We use the `pizzaplace` dataset, which is available in the `gt` package.
@@ -104,6 +106,8 @@ pizzaplace
 <summary>Transcript</summary>
 
 The point of this tab is that these two things look identical and are not. Run both cells. The first gives you character, the second gives you Date. On screen they may print much the same way, but R treats them completely differently. The three benefits underneath are why you should care. You can do calendar arithmetic, but month and year arithmetic needs invalid-date handling. Ordinary plus months can return N A, while percent m plus percent can roll back to the last day of the month. You can filter chronologically, so later than a given date actually means later rather than alphabetically after. And reformatting becomes one function call. Text that merely looks like a date gives you none of that.
+
+In the first cell, the quoted value is assigned to a-date, and class inspects how R stored it rather than how it looks. Because quoted input is text, the answer is character. In the second cell, as Date parses that text and assigns the result to a-date-as-Date, so class now reports Date. The comment is only a label for you as a reader. Code-track zero-point-four gives the editor forty percent of the side-by-side cell and leaves the remaining sixty percent for its output, so you can compare the expression with the class it returns. The conversion is what gives R the calendar meaning needed by the three benefits on screen.
 
 </details>
 
@@ -142,6 +146,8 @@ Recording dates as a `Date` object instead of a string has several benefits:
 <summary>Transcript</summary>
 
 Dates arrive in whatever format somebody felt like using, and the four examples at the top are all the same day. as.Date needs you to describe the format you have, using the percent codes listed. Lowercase d is day, lowercase m is numeric month, lowercase b is the abbreviated month name, uppercase B is the full name, lowercase y is a two-digit year and uppercase Y is four digits. Look at the example: Dec fifteen ten, with format percent b percent d percent y. You are not telling R what the date is. You are telling it how to read what you have.
+
+The syntax box is marked not run because “date in character” is a spoken placeholder, not an object you could evaluate. In a real call, the first argument is the character value or vector you want to parse, and the format argument describes the order, separators, and representation already present in that text. Spaces in percent b space percent d space percent y matter because the input also has spaces. The parentheses around the assignment in the working example make R both save the result as a-date and print it, so you can see twenty-ten dash twelve dash fifteen. The final class call verifies that the result is a Date rather than text that happens to print in an ISO-style form. On the next tab, lubridate removes the need to write that format string yourself.
 
 </details>
 
@@ -191,6 +197,8 @@ class(a_date)
 
 And here is the easier way. With lubridate you do not describe the format at all. You pick the function whose name matches the order the pieces appear in. Year month day for the first, month day year for the second and third, day month year for the fourth. Look carefully at the third one, though. Month day year handles Dec fifteen ten perfectly well, even though that is a month name and a two-digit year, with no format string anywhere. That is the whole appeal. lubridate works out the details, as long as you tell it the order.
 
+All four calls return the same Date, twenty-ten dash twelve dash fifteen. The function name describes the semantic order, not the punctuation, so slashes, dashes, spaces, an abbreviated month name, and a full month name can all be handled here. That convenience is for parsing input into a proper Date. Once the value has that class, the next tab shows the separate task of choosing how it should be displayed.
+
 </details>
 
 Alternatively, you can use the `lubridate` package to easily convert dates recorded in characters into `Date`s.
@@ -216,6 +224,8 @@ dmy("15 December 2010")
 <summary>Transcript</summary>
 
 Converting text into a Date is one direction. This is the other. You have a proper Date and you want it to appear a particular way in a figure or a table. The format function takes the same percent codes you have just learned and runs them backwards, turning a Date into text of your choosing. Look at the two examples and see how differently the same date can be presented. And note the sentence above the code, because it matters for the second half of this lecture. You can reformat dates with string manipulation, and later we watch somebody try, but format is the right tool.
+
+The syntax box is illustrative and does not run: the first argument stands for a Date value, and the second is the presentation pattern you want. In the working pipeline, pizzaplace enters the first mutate, y m d converts its text date column into Date values, and the next two mutates create new character columns without discarding that Date column. Date-text-f-one uses percent m slash percent d slash percent y, so it shows a two-digit numeric month, a two-digit day, and a two-digit year. Date-text-f-two uses percent m space percent uppercase B space percent uppercase Y, so it combines the numeric month, the full month name, and the four-digit year. Select keeps just those two new columns so the contrast is easy to inspect. Format returns character text for display, which is why you normally keep the underlying Date as well and format only where presentation requires it.
 
 </details>
   
@@ -255,6 +265,8 @@ pizzaplace %>%
 
 Often you do not want the whole date, you want a piece of it. The year for grouping, the month for a seasonal comparison, the day of week to see whether Fridays are busier. The lubridate helpers on the left pull each piece out. Note the two people forget exist. yday gives day of year, one through three hundred and sixty five in common years and through three hundred and sixty six in leap years, which is what you want for anything seasonal. And wday gives day of week. Run the example and look at the columns side by side for the same dates, because seeing mday and yday next to each other makes the distinction obvious.
 
+Autorun true prepares this result as soon as the deck opens, and code-track zero-point-five gives equal side-by-side space to the code and output. The pipeline first parses date with y m d. Distinct date then reduces the many pizza-order rows to one row per observed calendar date, preventing busy days from being repeated simply because they had more orders. Filter month date greater than or equal to eight limits the display to August onward. Inside mutate, each helper receives the same Date vector: year returns the four-digit year, month returns the month number, mday returns the day within that month, yday counts from January first, and wday returns the weekday number, with Sunday as one by default. The final select chooses and orders only those five extracted components, so the original date does not distract from their comparison. These components are useful because you can group, filter, or plot by calendar features without trying to slice characters out of a date string.
+
 </details>
 
 
@@ -292,6 +304,12 @@ pizzaplace %>%
 <summary>Transcript</summary>
 
 This is the tab that justifies the whole first half of the lecture. Three nested tabs. You can add and subtract periods, so plus years three does the sensible thing across leap years without you thinking about it. You can build sequences with seq, stepping by days, weeks or years, which is how you make a complete calendar to join other data onto. And you can compare dates inside filter and get chronological order rather than alphabetical. Addition and date sequences require proper Date objects, while comparisons against a Date can automatically convert parseable character values. Storing proper Dates keeps the type and intent explicit.
+
+On addition and subtraction, each y m d call first parses May first, twenty fifteen. Years three creates a three-year calendar period, so adding it returns May first, twenty eighteen. Subtracting months three returns February first, twenty fifteen, and adding days one returns May second. The plural helper names describe the unit, while the number inside each helper says how many units to add or subtract. This is preferable to guessing how many days make three months or three years, since calendar units do not all have fixed lengths.
+
+On sequence of dates, seq receives a starting Date, an ending Date, and the by argument. By equals years returns annual dates through May first, twenty twenty. By equals weeks advances seven days at a time and stops before the next step would pass June first. By equals days produces every date from May first through May ninth, including both endpoints. A complete sequence is especially useful when your observed data omit quiet dates, because joining observations to a calendar makes those gaps visible instead of silently absent.
+
+On filter, the pipeline converts the pizzaplace date column with y m d before comparing it with May first, twenty fifteen. Greater than or equal to keeps that date itself as well as every later order. As Date constructs the comparison value explicitly, making it clear that this is a chronological cutoff. Read the three nested tabs as one progression: calendar periods change dates, seq generates dates, and filter uses their order. With those reasons established, we can move from dates to the string tools used in the second half.
 
 </details>
 
@@ -371,6 +389,8 @@ pizzaplace %>%
 
 Now the second half. For strings we use stringr, which comes with tidyverse, so if you have loaded tidyverse you already have it. The right column lists what we cover, grouped by what you are trying to do: join and split, mutate, detect, and manage lengths. That grouping is worth internalising, because the function names then almost write themselves, and almost everything is str underscore something. And do bookmark the cheatsheet linked on the left. String functions are the sort of thing you look up every time rather than memorise, and one page beats searching the internet.
 
+The library tidyverse line is marked not to run in this deck, but it shows what you would put in your own script to attach stringr along with the other core tidyverse packages. You can also call a function with the stringr double-colon prefix, as the list on the right does, when you want to make its package explicit. Str underscore c joins, str underscore split breaks a string apart, and tidyr separate is the data-frame-oriented alternative for splitting a column. Str underscore replace changes matching text, str underscore detect returns logical matches, and str underscore pad manages minimum widths. The package website linked on the left gives the full reference when the one-page cheatsheet is not enough. We will start with concatenation, then work through the list in that same practical order.
+
 </details>
 ::: {.columns}
 
@@ -419,6 +439,18 @@ Here are the select functions we learn in this lecture:
 <summary>Transcript</summary>
 
 Joining strings together, with str underscore c. Read the sentence at the top carefully, because it has been corrected. str underscore c is close to paste, but not the same, and the difference shows up on the join three tab. Work through the four nested tabs in order. Join one is the basics, with a separator. Join two introduces recycling a single string against a vector. Join three is where it gets interesting: one cell fails deliberately, followed by a corrected all-combinations cell that succeeds. And use cases shows the two things you will actually do with this: building a combined variable, and generating file names.
+
+On join one, the first call places R and rocks next to each other using the default empty separator, so the result is Rrocks. Reversing the two input arguments produces rocksR, which demonstrates that concatenation preserves the order you provide. Sep equals plus inserts a plus sign between R and rocks. The fourth call shows that you can supply more than two inputs. Its separator is explicitly empty, while spaces and punctuation are already included inside the pieces, so they combine as R rocks, right question mark. The separator goes between inputs; it does not rewrite the text inside them.
+
+On join two, verbs is a three-element vector containing sucks, rocks, and is just okay. The single R has length one, so str underscore c recycles it once for each verb. Sep equals plus is applied within each pair, giving three output strings. The next call first makes that same three-element result and then uses collapse equals percent to reduce the whole vector to one string with percent signs between its elements. Sep controls joining inputs element by element, while collapse controls joining the completed output elements. Keeping those two stages separate helps you choose whether you want a vector or one combined label.
+
+On join three, software-types and verbs each initially have three elements. Str underscore c therefore pairs the first software with the first verb, the second with the second, and the third with the third; it does not create every combination. The next cell expands software-types to five elements while verbs remains length three, and the error is intentional. As the callout says, modern str underscore c recycles only a length-one input. Five and three are incompatible sizes, so it stops instead of silently repeating values. Paste would recycle them and return a pattern that can look plausible even when it is not what you meant. That strict failure protects you from an unnoticed alignment bug.
+
+If you really want all pairings, expand dot grid makes that intent explicit. Its software argument receives the five software values, its verb argument receives the three verbs, and strings-as-factors false keeps the generated columns as character values. The result has five times three, or fifteen, rows. Combos dollar software and combos dollar verb therefore have equal length, so str underscore c can pair them row by row with a space between them. The successful result contains every requested software-and-verb combination rather than an accidental recycling pattern.
+
+The first use case takes that vectorised behavior into a dataset. Mutate creates type-size by joining each row's type and size with a dash, and the assignment stores the changed table back into pizzaplace. Autorun true is doing important setup work here: it creates type-size when the deck opens so the later Split tab can use that column even if you did not manually visit this nested tab first. Printing pizzaplace lets you inspect the new combined variable. A single label can be useful for faceting when the type-size combination is the category you actually want to compare.
+
+The file-name use case supplies a length-one prefix, the year vector from two thousand through twenty twenty, and a length-one dot-c-s-v suffix. With the default empty separator, str underscore c recycles the prefix and suffix across all twenty-one years and creates names such as corn-yield-underscore-two-thousand-dot-c-s-v. Head displays the first six so you can check the pattern before using it. The point is not merely to save typing. A regular vector of file names can be passed to a loop, so the years you intend to process are visible and reproducible. With concatenation covered, the next outer tab reverses the operation by splitting strings apart.
 
 </details>
 
@@ -604,6 +636,8 @@ Now, you can easily read each of them iteratively using a loop.
 
 The reverse operation. str underscore split takes a string and a pattern, and breaks the string apart wherever the pattern occurs. Run the first cell and look at what comes back, because it is a list, one element per input string, each holding the pieces. That is often awkward to work with. So read the sentence underneath. If what you actually want is to turn one column into two columns of a data frame, separate from tidyr is the better tool, because it hands you a data frame rather than a list you then have to unpack. Same operation, output shaped for where it is going.
 
+The first call takes the type-size column created on the Concatenate tab and uses a dash as the split pattern. The dollar sign extracts that column as a vector, str underscore split returns one character vector of pieces for every row, and the pipe into head limits the displayed list to its first six elements. The second cell keeps the operation inside the data frame. Separate receives the combined column, the two new names type-two and size-two, and the same dash separator. It removes type-size and places its two pieces into those new columns. The final select puts id, the original type, the recovered type, the original size, and the recovered size next to one another, so you can verify that the split reconstructed the source variables. This is why output shape should guide your choice: use str underscore split when a list is useful, and separate when the pieces should immediately become columns. Next we will mutate the text itself with replacement.
+
 </details>
 
 `stringr::str_split()` splits a string based on a pattern you provide:
@@ -632,6 +666,14 @@ pizzaplace %>%
 <summary>Transcript</summary>
 
 Replacing part of a string, and this tab has a genuine trap in it. The introduction is straightforward. str underscore replace swaps the first match, str underscore replace all swaps every match. Then the use case tries to turn a four-digit year into two digits by deleting the characters two and zero. Read the red callout, because that approach quietly breaks. On the twentieth of any month the first two-zero it finds is the day, not the year, so you get a mangled date and no warning whatsoever. Twelve days a year. The tool worked. The pattern was simply not specific enough.
+
+The syntax box is not run because string, pattern, and replacement stand for the three arguments you must supply. String is the character vector to change, pattern says what to match, and replacement says what matching text should become. The introduction creates strings-vec with two sentences, then asks for the literal substring rock. Str underscore replace changes only the first rock in each sentence. Because the pattern can occur inside a longer word, the rock in rocks also matches, producing the deliberately awkward phrase rock big times. Str underscore replace all changes every occurrence in each sentence. That contrast is visible in the output and is the reason you choose between the two functions.
+
+On the use-case tab, the autorun cell first builds pizzaplace-for-plot. Inside mutate, y m d parses the original date, the inner pipe passes that Date to format, and percent m slash percent d slash percent uppercase Y creates month, day, and a four-digit year as date-text. Head shows the first values so you can confirm the starting form before replacement. The next pipeline replaces the first literal two-zero with an empty string and selects id, date-text, size, and type for inspection. It returns a demonstration table; because there is no assignment, it does not overwrite pizzaplace-for-plot.
+
+The important callout tests the assumption against January twentieth. In zero-one slash two-zero slash two-zero-one-five, the day's two-zero comes before the century's two-zero, so first-match behavior yields zero-one slash slash two-zero-one-five. The example is valuable precisely because most rows look correct and no error is raised. A text operation cannot infer that you meant the year unless the pattern expresses that location.
+
+The final cell shows the safer solution. The first mutate makes date a genuine Date with y m d. The second applies format with percent m slash percent d slash percent y, where lowercase y requests the two-digit year directly. Dot dollar date then extracts that one column from the piped data frame, and head limits the display to its first six values. You get the requested presentation without making a fragile claim about which two-zero occurs first. The next tab uses pattern matching for a job where a TRUE-or-FALSE answer is exactly what we need.
 
 </details>
 
@@ -748,6 +790,14 @@ pizzaplace %>%
 <summary>Transcript</summary>
 
 Detecting whether a pattern appears. str underscore detect takes strings and a pattern and gives you back TRUE and FALSE, which makes it the natural thing to feed into filter, or to use for subsetting. The two use cases are both realistic. The first picks out just the soy files from a folder that also holds corn files, and notice the loop reads all files bracket is soy, not all files, because the entire point was to exclude the corn. The second builds a grouping variable with case when, which is the pattern you will use constantly for messy category labels.
+
+In the introduction, fruit has four elements. Str underscore detect checks the pattern apple inside each one and returns TRUE, FALSE, FALSE, TRUE. Pineapple is TRUE because detection asks whether the pattern occurs anywhere inside the string, not whether the whole string equals apple. The returned logical vector lines up element for element with the input, which is what makes it suitable for brackets, filter, and case when.
+
+In the file example, here double-colon here builds the folder path from the project root, and list dot files lists its contents. Full-names true returns complete paths rather than bare file names, because read R D S will need usable locations. Head and tail show two paths from each end of all-files as a quick inspection. Str underscore detect then checks every path for soy and stores the logical result as is-soy. Indexing all-files with square bracket is-soy keeps only positions whose value is TRUE.
+
+The lapply call iterates over that soy-only vector. Its anonymous function takes one path as x and reads the corresponding R D S file, so lapply returns a list of data frames. The pipe into bind-rows stacks those frames into one soy-data table, and the outer parentheses both assign and print it. The note asks you to check the result against the design: thirty soy files, not all sixty files. If you used all-files instead of the logical subset, the code would still run, which is why checking the row count and contents is part of the operation rather than an optional extra.
+
+The grouping example begins with expand dot grid. It combines two id values with six gene labels, producing every id-and-gene pairing in gene-data. The following hidden-code chunk prints that table without repeating the construction code. In the final pipeline, mutate creates gene-group with case-when. Each condition detects the distinctive underscore B L underscore, underscore M L underscore, or underscore T L underscore marker in gene, and the value to the right of the tilde supplies the corresponding short group label. Every displayed gene contains one of those markers, so each row receives B L, M L, or T L. This turns embedded naming structure into an explicit variable you can group or summarize. The next tab handles a different source of inconsistent labels: letter case.
 
 </details>
 
@@ -873,6 +923,8 @@ gene_data %>%
 
 Three small functions for changing case. To upper, to lower, and to title, which capitalises the first letter of each word. They look trivial, and individually each one is. What makes them worth a slide is that inconsistent capitalisation is one of the most common reasons a join silently fails. If one dataset says Lancaster and another says LANCASTER, those are different strings as far as R is concerned, so they do not match. Whether the unmatched rows are dropped or retained depends on the join you use. Forcing everything to one case before you join is a cheap habit that prevents a category of bug that is genuinely hard to spot afterwards.
 
+Each example starts with pizzaplace and uses mutate to replace one column in the returned table. Str-to-upper acts element by element on name, so pizza names are shown in uppercase. Str-to-lower does the same to size, and str-to-title changes type so each word begins with a capital letter. None of these pipelines is assigned back to pizzaplace, so they demonstrate the transformed result without changing the shared object used by later tabs. In real cleaning work, choose one convention and assign the result when you want that normalization to persist. Case conversion is useful not only before joins, but also before counting categories, because values that differ only in capitalization would otherwise be counted separately.
+
 </details>
 
 Here is the collection of functions that let you change the letter case of strings.
@@ -910,6 +962,8 @@ pizzaplace %>%
 <summary>Transcript</summary>
 
 Padding extends strings shorter than a requested minimum width by adding a character until they reach it, but it does not truncate longer strings. The examples pad with question marks and dashes, which is deliberately silly, but the real use is almost always the same one: padding numbers with leading zeros. If you have identifiers one through one hundred and you pad them to three characters with zeros, they sort correctly as text, and they match identifiers in other datasets that were stored that way. Note the side argument, which controls whether padding goes left, right or both. Left is what you want for leading zeros.
+
+The syntax box is not run because its labels describe the arguments rather than valid object names. The first argument supplies the string or vector, the second supplies the minimum width, side chooses where added characters go, and pad supplies the character to add. “I am sick of R” is fourteen characters including spaces. A width of twenty with side left therefore adds six question marks before it. A width of thirty with side both adds sixteen question marks, split evenly as eight on each side. A width of twenty with side right adds six dashes after it. The code-track value of zero-point-six gives the editor sixty percent of each side-by-side cell and the output forty percent, leaving room to see the padding clearly. Width is a minimum, so an input already at least that wide is returned intact rather than cut down. That completes the string toolbox and leads into exercises that combine the date and string ideas.
 
 </details>
 
@@ -957,6 +1011,8 @@ stringr::str_pad("I am sick of R", 20, side = "right", pad = "-")
 
 A small dataset built for the exercises, and it is worth seeing how it was made. We take every date from the first of April to the thirtieth of September in twenty twelve, pull out the year, month, day and day of year from each, and then throw the actual date column away. So you have the pieces of a date but not the date itself. That is the situation the two exercises put you in, and it is a realistic one. Plenty of datasets record year and day of year in separate columns and leave you to reassemble what they mean.
 
+The inner y m d calls make the two endpoints proper Dates, and seq uses by equals days to include every calendar day from the starting endpoint through the ending endpoint. Tibble places that one hundred and eighty-three-value sequence in a date column. Mutate then uses year, month, mday, and yday on that column to create the four component columns shown. Select minus date deliberately removes the source Date, leaving only year, month, day, and day-of-year for you to work from. The outer parentheses make the code both assign the result to date-data and print it. Autorun true is essential setup, since it guarantees that both following exercise tabs can use date-data without asking you to run this cell first.
+
 </details>
 
 We will work with the following data:
@@ -986,6 +1042,8 @@ We will work with the following data:
 <summary>Transcript</summary>
 
 The first exercise goes the string route. You have year, month and day as separate numbers, and you want a Date. So join them into one piece of text with str underscore c and a separator, then hand that text to lubridate. Think about which lubridate function you want, given the order you have chosen to put the pieces in. One thing you may notice when you run it: the intermediate text does not always look tidy, because month four prints as four rather than zero four. Try it anyway, and see whether lubridate actually minds.
+
+In the answer, the first mutate calls str underscore c row by row on year, month, and day, using a dash between the pieces, and stores the result as date-as-str. Because the pieces are in year-month-day order, the second mutate uses y m d and stores the parsed result as date-as-Date. Lubridate accepts values such as twenty-twelve dash four dash one even though the month and day are not padded with leading zeros. The final select displays only date-as-Date so you can focus on the reconstructed value. Code-fold true keeps the answer compact until you choose to reveal it, and eval false means the static answer is shown as code rather than executed for you. Use the empty Work here cell to build and run your own pipeline first. Exercise two reconstructs the same dates without making an intermediate date string from all three components.
 
 </details>
 
@@ -1019,6 +1077,8 @@ date_data %>%
 <summary>Transcript</summary>
 
 The second exercise takes the other route, and it is the more interesting one, because it uses date arithmetic rather than string work. You have the year and the day of year, so you can build the first of January for that year and then add the day of year to it. Watch the off-by-one, though. The first of January is day one, not day zero, so adding the day of year directly overshoots by exactly one day. That minus one at the end of the answer is not a fudge. It is the difference between counting days and counting offsets.
+
+In the first mutate, str underscore c combines each year with the length-one text zero-one dash zero-one. Its default separator is empty, so a value such as twenty-twelve becomes text representing January first of that year, and y m d parses it as a Date. Mutate stores that anchor in first-day-of-year. The second mutate adds the numeric day-of-year and then subtracts one to create date. For April first, twenty twelve, day-of-year is ninety-two; moving ninety-one days from January first lands on April first. The pipeline keeps the original component columns and the new anchor as well as date, which lets you inspect the arithmetic rather than seeing only the final answer. As in exercise one, code-fold true hides the answer until requested and eval false leaves execution to you after you have tried the blank Work here cell.
 
 </details>
 

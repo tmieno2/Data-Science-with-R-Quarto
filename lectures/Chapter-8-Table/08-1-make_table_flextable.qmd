@@ -68,6 +68,7 @@ The usual two navigation tricks: the stacked lines bottom left for a table of co
 <summary>Transcript</summary>
 
 The code boxes work as usual: blue area is an editor, Run Code runs it, copy button takes it to your machine. One thing particular to this deck, though. Almost every table you see here was built when the slides were rendered, on my machine, rather than in your browser. flextable produces rich output that does not travel well through browser R. So treat the code here as something to copy into RStudio rather than something to run in place. The handful of genuinely live cells on this deck are mostly help pages.
+You do not have to run an entire live cell. Highlight just the lines you want, then press Command plus Enter on a Mac or Control plus Enter on Windows to evaluate that selection. The two-sheets button copies the code currently in the cell, and the circular reload button beside it restores the cell after your experiments. Those controls let you test an idea here without losing the example you started from.
 
 </details>
 
@@ -127,6 +128,7 @@ head(mtcars, 20) %>% #BREAK
 <summary>Transcript</summary>
 
 Two packages to install before anything else. flextable is the one that makes tables. officer is the one that describes formatting, and it matters more than it looks, because the fp underscore functions you will use all afternoon to specify text, paragraph and cell properties live in officer rather than in flextable. That split catches people out. You will be halfway through a flextable pipeline and reaching for an officer function. Install and load both, and do not be surprised when the help page for something you are using turns out to belong to the other package.
+The two install dot packages calls download the packages to your computer, so you normally run those only once. The two library calls attach them for the current R session, so those belong in the analysis script you run each time. The chunk is marked eval false because a lecture slide should not reinstall software whenever the deck renders. Copy these lines to your own R session and run the installation lines only if the packages are missing.
 
 </details>
 
@@ -149,6 +151,8 @@ library(officer)
 <summary>Transcript</summary>
 
 The dataset for the rest of the lecture. It comes from countrypops in the gt package, filtered to ten Pacific and Australasian countries and three years, then pivoted so each year becomes its own column. Ten rows, deliberately small enough that you can see the whole table on a slide and check that your formatting did what you expected. Note the region column built with case when, because we use it repeatedly for row selection later. And the ratio column at the bottom has been renamed: it divides twenty fifteen by twenty oh five, so oh five to fifteen is the honest name.
+Read the preparation from the top. The first three character vectors collect the two-letter country codes for Australasia, Melanesia and Polynesia. Loading gt makes countrypops available. The assignment to tab data is wrapped in parentheses so R both stores the finished data and prints it for inspection.
+The first filter keeps codes appearing in any of those three vectors, and the second keeps nineteen ninety-five, two thousand five and two thousand fifteen. Case when then tests membership in each regional vector and writes the matching region label. Pivot wider takes population as the cell values, turns year into separate columns, and adds the y underscore prefix, giving columns such as y underscore nineteen ninety-five. Arrange sorts regions alphabetically and, within each region, puts the largest two thousand fifteen population first. Select minus starts with country underscore code removes both country-code fields. The final mutate adds the verified two thousand fifteen divided by two thousand five ratio and a common date string. This careful preparation is why later formatting examples can select meaningful groups and display a compact table without repeating data-wrangling code.
 
 </details>
 
@@ -195,6 +199,7 @@ tab_data <-
 <summary>Transcript</summary>
 
 Turning a data frame into a flextable is one function call. The interesting argument is col keys, which does two jobs at once. It selects which columns appear, and it sets the order they appear in, so you do not need a separate select step beforehand. Then look at the odd string in the example, the one that is clearly not a column name. Naming something that does not exist does not throw an error. It creates a blank column, deliberately, and blank columns are how you put visual gaps between groups of columns in a finished table.
+Here the table starts from tab data and requests country name, the nonexistent lufhierh key, region, y underscore nineteen ninety-five and y underscore two thousand five in exactly that order. In the How tab, eval false shows the syntax without executing it. In Example, the left chunk is likewise code-only, while echo false on the right hides the repeated source and displays the resulting table. Compare the two sides and locate the empty column between country name and region. That visible gap is the practical reason col keys accepts a name that is absent from the data.
 
 </details>
 
@@ -294,6 +299,7 @@ You can use any combinations of the reference methods for `i` and `j`.
 <summary>Transcript</summary>
 
 This creates ft, the table object we build on for most of the rest of the lecture. Four columns, ten rows, no formatting yet. Worth pausing on the fact that it is stored in a variable at all. A flextable is just an object, so you can build it once and pipe it into different formatting experiments without rebuilding it each time. Every example from here starts from ft and adds one thing, which makes it easy to see what each function actually did. Run it and look at the plain version, so you have a baseline to compare against.
+The pipe sends tab data into flextable, and col keys keeps country name, region, y underscore nineteen ninety-five and y underscore two thousand five in that order. The assignment itself does not print the object, so the right-hand chunk evaluates ft on its own. Echo false hides that one-line printing command and leaves only the baseline table visible. Keeping the setup on the left and the result on the right lets you connect the object-building code to the object you will format in the following tabs.
 
 </details>
 
@@ -334,6 +340,7 @@ ft
 <summary>Transcript</summary>
 
 The formula form, and it is the one worth defaulting to. For rows you write a tilde and then a condition using the column names directly, so tilde y two thousand five greater than two hundred thousand selects exactly the rows where that holds. For columns you write a tilde and then the column names joined with plus signs. That plus is not addition, it is just formula syntax for listing several things. The appeal is that the selection describes itself. Somebody reading the code later sees which rows and why, rather than numbers they have to work out.
+The generic syntax at the top separates i, the row condition, from j, the column list. In the concrete call, two e five is scientific notation for two hundred thousand. Color then makes the country name and region text red only in rows above that population threshold. Eval false keeps the left chunk as the readable recipe, while echo false hides the duplicate code on the right and shows the formatted table. Use the output to verify both dimensions of the selection: only qualifying rows change, and only those two named columns turn red.
 
 </details>
 
@@ -388,6 +395,7 @@ ft %>%
 <summary>Transcript</summary>
 
 The same job with plain numbers and plain names. Row numbers as a vector, column names as strings. This works, and sometimes it is the clearest thing to write, particularly when you genuinely do mean the fourth row rather than a row satisfying some condition. The note at the top prefers formulas for columns, and its reason is mostly typing, since a formula avoids the quotes. But there is a stronger argument it does not make. Hard-coded row numbers break silently when your data changes. A formula that says which rows you meant keeps working.
+In this example, c of two comma four colon nine selects row two and the continuous range from row four through row nine. The character vector selects country name and y underscore nineteen ninety-five, and color makes the text in that rectangular selection red. The left chunk is marked eval false so you can study the call, and the right one uses echo false so the formatted result occupies the output side. Check that row three and row ten stay unchanged. That is the easiest visual confirmation that the integer selector did exactly what the code says.
 
 </details>
 
@@ -428,6 +436,7 @@ ft %>%
 <summary>Transcript</summary>
 
 And the third form: a logical vector for rows, column numbers for columns. The logical vector has to be exactly as long as the table has rows, which is why the example builds ten TRUEs and FALSEs for a ten-row table. Get that length wrong and you get an error. This form is most useful when you have computed the condition somewhere else and are carrying it around as a variable. If you are writing the condition inline, the formula version reads better.
+Rep of true comma false, each equals five produces five TRUE values followed by five FALSE values. That selects the first five body rows. The column vector c of one comma three selects the first and third columns, and color makes their selected text red. The left code is not evaluated on the slide, while the right copy hides its source and shows the result. Look for red only in the upper half of country name and y underscore nineteen ninety-five. This tab completes the selector combinations before we add the part of the table as another dimension.
 
 </details>
 
@@ -467,6 +476,7 @@ ft %>%
 <summary>Transcript</summary>
 
 A table is not one thing, it is three: a header, a body and a footer. The part argument says which you are formatting, and forgetting it is the single most common reason a formatting call appears to do nothing at all. Note that all really does mean all, footer included; this slide previously said otherwise. Then read the last line carefully, because it is a genuine trap. Different functions default to different parts. So when a change does not appear where you expected it, check the default before concluding the function is broken.
+The four choices on screen are header for column labels, body for data cells, footer for any rows added below, and all for every one of those parts. In the example, tab data first becomes a four-column flextable using the familiar col keys. Color then sets part equal to header and color equal to red, so only the label text changes. The left chunk shows the unevaluated recipe and the right chunk suppresses the repeated code while displaying its output. Compare the red header with the unchanged body to see that i and j locate rows and columns within the part that you choose.
 
 </details>
 
@@ -527,6 +537,7 @@ Different functions have different default values for `part`.
 <summary>Transcript</summary>
 
 The style function is the general-purpose way to format a table, and its structure tells you how flextable thinks. You select where with i, j and part, then say what to change using one of three property arguments. pr underscore t for text, pr underscore p for paragraphs, pr underscore c for cells. Each takes a matching function from officer: fp underscore text, fp underscore par, fp underscore cell. The pr stands for property. Hold on to that pairing and the next several tabs are simply working through what each of the three can control.
+In the syntax, x is the flextable entering the function. The defaults of NULL for i and j mean no narrower row or column selection, and the NULL property defaults mean that property layer is left alone. Part defaults to body, so an otherwise unqualified style call formats data cells rather than the header. The three property objects can be supplied together in one call, which is useful when the same selection needs coordinated text, paragraph and cell formatting. The next tabs separate them so you can see which layer owns each effect.
 
 </details>
 
@@ -561,6 +572,7 @@ We can use `fp_*()` functions from the `officer` package to specify the style of
 <summary>Transcript</summary>
 
 The first of the three, and the one you will use most. fp underscore text controls anything about the characters themselves: colour, size, bold, italic, underline, the font. The nested Introduction tab points you at the help page rather than listing every option, which is the right instinct, because there are a lot of them and you will look them up every time regardless. Then the example applies red, bold and underlined to three rows of one column at once. Notice that where and what stay separate, which is exactly the separation the selector tabs set up.
+The live help cell runs question mark fp underscore text so you can inspect the current package documentation. In Example, i equals four colon six selects body rows four through six, and j equals tilde country underscore name limits the change to that column. Pr underscore t receives the fp text object whose color is red, bold is TRUE and underlined is TRUE. The code-only left chunk uses eval false, and the result-only right chunk uses echo false. Compare the output with ft and you will see that all three character properties land on the same selected text without changing its cell or paragraph.
 
 </details>
 
@@ -628,6 +640,7 @@ ft %>%
 <summary>Transcript</summary>
 
 This distinction confuses everybody at first, so look at what the example draws. Inside every cell there is a paragraph, and inside the paragraph there is text. Three nested boxes. So a bottom border on the paragraph and a bottom border on the cell are different lines in different places, which is precisely what the blue and red borders show you. As a rule of thumb: if you are positioning text within its box, that is the paragraph. If you are changing the box itself, its background or its borders, that is the cell.
+The style call supplies both property objects and leaves i and j unspecified, so the default body part is formatted throughout. Pr underscore p receives an fp par with a two-unit blue bottom border, while pr underscore c receives an fp cell with a two-unit red bottom border. Each border is itself described by fp underscore border. Eval false keeps the full nested construction visible on the left, and echo false lets the right side concentrate on the result. The separation between the two colored lines is the visual evidence that paragraph and cell borders belong to different rectangles.
 
 </details>
 
@@ -676,6 +689,7 @@ ft %>%
 <summary>Transcript</summary>
 
 The paragraph properties. This is where text alignment lives, along with shading, paragraph-level borders and spacing. The example sets alignment to left and adds grey shading to three cells in one column. Worth noting that alignment is a paragraph property rather than a text property, which is not obvious until you think about the nesting from the previous tab. Alignment is about where text sits inside its box, so it belongs to the box immediately containing it, and that is the paragraph. If you go looking for alignment in fp underscore text, you will not find it.
+Use the live help cell, which runs question mark fp underscore par, when you need the complete argument list. In Example, i equals four colon six chooses three body rows and j equals tilde country underscore name chooses one column. The fp par object sets text dot align to left and shading dot color to grey, and pr underscore p hands that paragraph description to style. The left side is an unevaluated code example; the right hides the same code and shows the selected paragraphs. Their text moves left and their paragraph shading changes, while the rest of the table remains the baseline.
 
 </details>
 
@@ -739,6 +753,7 @@ ft %>%
 <summary>Transcript</summary>
 
 The third of the three, controlling the cell itself: background colour, margins, vertical alignment, and cell borders. The example sets three of those at once on a small selection. Note that background colour lives here even though shading appeared under paragraphs, which is the sort of overlap that sends you to the help page. In practice you will rarely write the full style call with fp underscore cell, because the convenience functions on the next slide do the common jobs in a single line. Learn this one so you understand what those shortcuts are doing underneath.
+The Introduction help cell runs question mark fp underscore cell. In Example, i equals four colon six and j equals tilde country underscore name select the same three cells used in the preceding tab. Pr underscore c takes an fp cell object with margin equal to two, vertical dot align equal to top and background dot color equal to red. The left chunk preserves that recipe without evaluating it, and the right chunk hides the duplicate source while showing the formatted cells. This makes the contrast with fp par direct: the selection is unchanged, but the property layer is now the outer cell box.
 
 </details>
 
@@ -810,6 +825,7 @@ ft %>%
 <summary>Transcript</summary>
 
 Everything you have just learned with style and the fp functions has a shortcut. Rather than building a property object, you call a function named after the thing you want: bg for background, color for text colour, bold, italic, fontsize, align, and so on. The full list is on screen. They all take the same i, j and part selectors, so there is nothing new to learn about where. This is what you will actually write day to day. The style route matters when you want several properties at once, or when no convenience function exists for what you need.
+Read the list by task. Align sets alignment for a selection, while align text col and align nottext col quickly apply the conventional left alignment for text columns and right alignment for nontext columns. Bg changes the cell background. Font chooses a font family, fontsize changes its size, italic and bold switch those faces on or off, and color changes the characters. Padding controls the space around paragraph content, valign moves content vertically within cells, and rotate changes text direction. Empty blanks collapses deliberately blank spacer columns and makes them transparent. Each shortcut still returns a flextable, which is why you can pipe several of them together in the next tab.
 
 </details>
 
@@ -834,6 +850,7 @@ Everything you have just learned with style and the fp functions has a shortcut.
 <summary>Transcript</summary>
 
 Three convenience functions chained together, and this is what real formatting code looks like. One call colours a single cell, one shades a column conditionally on a value, one bumps the font size of a row. Read them and notice each specifies its own where. That is the pattern: a pipeline of small independent instructions, each saying which cells it applies to. And because they are just functions in a pipe, you can comment one out to see what it was doing, which is much the easiest way to debug a table that has come out looking wrong.
+The first call uses i equal to one and j equal to two, so only the second cell of the first body row gets the gold text color hash f c b a zero three. Because that color is the unnamed third argument, it fills the function's color parameter. The bg call selects rows where y underscore two thousand five is below two hundred thousand, limits the change to region, and fills those cells grey. Fontsize selects row seven and, because no j is supplied, applies size sixteen across all its columns. Eval false leaves the pipeline visible on the left; echo false hides the repeated source on the right. Use the output to trace each independent change back to its selector.
 
 </details>
 
@@ -919,6 +936,7 @@ tab_data %>% #BREAK
 <summary>Transcript</summary>
 
 Borders get their own family of functions, and the list looks longer than it is. There are really three groups. hline and vline draw lines wherever you select. The top, bottom, left and right variants are shortcuts for the edges. And the inner and outer functions treat the table as a whole. Then two odd ones worth remembering. border remove strips everything, which is often the right first step when you want full control. And fix border issues exists because merging cells can leave the borders in a mess, and this puts them right.
+More specifically, hline draws horizontal borders at selected body positions, with hline top and hline bottom targeting the table part's outer horizontal edges. Vline draws vertical separators, and vline left and vline right target the corresponding vertical edges. Border can set the top, bottom, left and right sides of selected individual cells. Border inner applies both internal directions, while border inner h and border inner v let you choose only horizontal or only vertical internal lines. Border outer frames the selected table part. The following tabs show that all of these placement functions take a border description rather than forcing you to repeat line aesthetics in several arguments.
 
 </details>
 
@@ -944,6 +962,7 @@ Here is a list of convenience functions that you can use to draw border lines on
 <summary>Transcript</summary>
 
 Two things to combine here. The selector syntax you already know says where the border goes. Then the border argument, taking fp underscore border from officer, says what it looks like: colour, style, width. Note that fp underscore border is another officer function, like fp underscore text and fp underscore cell earlier. That is the consistent division across this package. flextable decides which cells, officer describes the appearance. Keep that split in mind and you will usually guess correctly which of the two packages a function you half remember belongs to.
+In the example, hline is the placement function. I equals three targets row three and j equals one colon three limits the line to the first three columns. Its border argument receives an fp border object with red color, dotted style and width four. The flextable object itself is omitted from this isolated syntax because, in a real pipeline, it arrives as the first argument from the pipe. The next tab puts ft in front of this same call and shows the result.
 
 </details>
 
@@ -1089,6 +1108,7 @@ tab_data %>% #BREAK
 <summary>Transcript</summary>
 
 Adding rows above or below the table, and the useful part is colwidths. You give it the values you want, then say how many columns each value spans, so three and one puts a label across the first three columns and another across the last. That is how you build the grouped headers you see in published tables. Then read the callout, because it points you somewhere better for footnotes. add footer row will put text at the bottom, but the footnote function does that and manages the reference symbols for you, which is almost always what you actually want.
+The star in add star row is a spoken placeholder for either header or footer. Values supplies the text entries, and colwidths supplies a matching span for each entry, so those widths should account for all four columns here. In the rendered example, ft receives the three-column and one-column header, then align centers every header paragraph. Autofit recalculates the dimensions after the longer labels are added. Finally, add footer row supplies one long value with colwidths equal to four, making that footer span the table's full width. The callout points to the next tab because a spanning footer row is useful for general text, but a true footnote also needs managed reference marks.
 
 </details>
 
@@ -1156,6 +1176,7 @@ ft %>%
 <summary>Transcript</summary>
 
 And here is that better way. footnote attaches a note to specific cells, and it places the reference symbol both at the cell and beside the note, so the linkage is maintained for you rather than being something you type by hand and then have to keep consistent. Read the two bullets at the bottom, because they are the fiddly parts. The nth value pairs with the nth reference symbol, so order matters. And the values must be wrapped in as paragraph, which is easy to forget and produces an error that does not obviously point at the cause.
+The example sets i equal to one, j equal to one colon two and part equal to header, so the references attach to the first two header cells rather than to body data. As paragraph wraps the two note strings in the rich paragraph form that flextable expects. The first note pairs with the spoken plus-plus symbol and the second with star-star because both vectors use the same order. Eval false keeps the call readable on the left, while echo false shows only the result on the right. Check both the header marks and the note list to see that footnote built the connection in both places.
 
 </details>
 
@@ -1230,6 +1251,7 @@ ft %>%
 <summary>Transcript</summary>
 
 Column headers default to your variable names, which are usually written for typing rather than for reading. This renames them. You pass a list where the name on the left is the existing column and the string on the right is what gets displayed. Note that this changes only what is shown. The underlying column keys stay the same, so any later formatting call still refers to country underscore name, not to Country Name. That trips people up when they rename first and then try to select by the new label. Rename late, or keep selecting by the original key.
+In the example's named list, country underscore name becomes the displayed label Country Name and region becomes Region. Autofit follows the relabeling so widths are recalculated for the more readable text. Eval false makes the left side code-only, and echo false makes the right side result-only. Compare those labels with the unchanged data underneath, then remember that a later j formula would still use tilde country underscore name plus region. The display can be polished without coupling the rest of your formatting code to presentation wording.
 
 </details>
 
@@ -1291,6 +1313,7 @@ ft %>%
 <summary>Transcript</summary>
 
 Deleting the header entirely, which you want more often than you might think, particularly when a table is going into a document that supplies its own column labels. The default part is the header, so calling it with no arguments does exactly that. Then read the Note tab, because it makes the same point the previous tab did, from the other direction. Even with the header gone, you still select columns by their original names. The header was only ever a display layer. The keys underneath it are what the selectors use, and deleting the display does not remove them.
+The syntax shows that you can supply another part explicitly, but the bare delete part in How removes the header from ft. The code-only left chunk uses eval false, and the right chunk uses echo false to display the headerless result. In Note, tab data is rebuilt with four named col keys, the header is deleted, and hline still accepts j equal to tilde country underscore name plus region. I equal to three places a red, dotted, width-four line at row three across those two columns. That successful output demonstrates why column selectors use data keys rather than whatever labels happen to be visible.
 
 </details>
 
@@ -1365,6 +1388,7 @@ tab_data %>%
 <summary>Transcript</summary>
 
 Layout is about the geometry of a table rather than its appearance: which cells are merged, how wide columns are, how tall rows are. The full list is on screen, but we work through four, which are the four you will actually use. Merging vertically, autofitting, fitting to a maximum width, and setting an explicit width. Read the callout at the bottom too. Horizontal merging exists and is rarely wanted, and the honest admission that the instructor has never needed it is more useful to you than a complete tour of functions you will never reach for.
+The merge functions differ in scope. Merge at combines a selected block into one cell. Merge h joins cells across a row, merge h range limits that operation to a chosen run of columns, and merge v joins equal adjacent values down a column. Height and height all set row heights, while width sets column widths. Hrule controls the rule flextable uses to determine row height. Autofit derives dimensions from content; fit to width reduces the result until it falls below a maximum total width. As grouped data prepares grouped structure when your source data has grouping columns. All of these operate on the table object, and most reuse the selector grammar you already know. The callout explains why the worked tabs concentrate on the four operations you are most likely to need.
 
 </details>
 
@@ -1430,6 +1454,7 @@ ft %>%  merge_v(j = ~ region)
 <summary>Transcript</summary>
 
 Autofit adjusts column widths to suit the content. The example makes the point by putting an absurdly long country name into the first column and showing before and after. Before, the text wraps badly. After, the column has widened so more fits on a single line. Read the last sentence carefully though, because it corrects something this slide used to get wrong. Autofit does not stop the table from running off the page. It sizes each column to its content and lets the total go wherever it goes, so one long value can push the table far wider than the paper. The function that caps the total width is fit to width, and it is on the next tab.
+Both sides begin with tab data. Mutate uses ifelse to replace Australia with the deliberately overlong string while leaving every other country name unchanged. Flextable then keeps country name, region and the two year columns, and merge v groups adjacent region labels. The Before pipeline stops there. The After pipeline adds autofit, so its output isolates the effect of that one call. The warning is the key interpretation: more text fits in a row because the first column expands, not because autofit respects a page boundary. Carry that distinction directly into the fit to width comparison next.
 
 </details>
 
@@ -1478,6 +1503,7 @@ It adjusted the width of the 1st column so that more texts are displayed in a si
 <summary>Transcript</summary>
 
 This is the one that does what people expect autofit to do. You give it a maximum width in inches and it reduces the font size one point at a time, running autofit again after each reduction until the table fits inside the limit. Same overlong country name as the previous tab, same autofit call, then a ceiling of six inches on top. The text stays on one line, but the type and recomputed column widths get smaller. Reach for this when a table is going into a document with a fixed page width and you would rather use smaller type than let the table run off the edge.
+The two columns deliberately repeat the same setup so the final function is the only difference. Mutate replaces just Australia with the long test label, and flextable retains country name, region and the two year columns. The left result stops after autofit and can remain wider than a page. The right pipes that result into fit to width with max width equal to six, meaning six inches. Compare the overall table and text size, not merely the wrapping. This function meets the ceiling by repeatedly shrinking type and recomputing widths, so it trades readability for fitting the requested limit.
 
 </details>
 
@@ -1521,6 +1547,7 @@ tab_data %>%
 <summary>Transcript</summary>
 
 When autofit does not give you what you want, set the width yourself. This sets one column to a specific width in inches. Notice the example calls autofit first and then overrides a single column, which is the practical pattern. Let the automatic layout do the bulk of the work, then correct the one or two columns it got wrong. Setting every width by hand is tedious and tends to break as soon as your content changes. Setting one, after autofit, usually fixes the specific problem you were actually looking at.
+The Before side is ft after autofit. The After side starts identically, then width uses j equal to tilde country underscore name to select that column and width equal to one to make it one inch wide. Compare the first column across the two outputs and watch the country text reflow into the narrower space while the other columns retain their automatically chosen widths. The selector is important: without j, you would be imposing that width more broadly instead of correcting the single problem column.
 
 </details>
 
@@ -1564,6 +1591,7 @@ ft %>%
 <summary>Transcript</summary>
 
 Everything so far produces a table object. This section is about getting it out of R and into whatever you are actually writing. Three destinations: Word, PowerPoint, and an image file. Word matters most for this audience, because a flextable saved to docx arrives as a real editable Word table rather than a picture, which means a coauthor can adjust it and a journal can typeset it. That is the main practical argument for building tables this way at all. The cell here just builds a plain table to demonstrate with.
+Those are the three destinations demonstrated in the following tabs. The list also shows save as html for a web page and save as r t f for Rich Text Format. For images, the supported file types shown here are P N G and S V G. The setup assigns table temp by piping tab data into flextable and retaining country name, region, y underscore nineteen ninety-five and y underscore two thousand five. Saving the same object several ways makes the output choice independent of all the formatting work that created it.
 
 </details>
 
@@ -1589,6 +1617,7 @@ table_temp <-
 <summary>Transcript</summary>
 
 Two functions, one line each. Save as docx for Word, save as pptx for PowerPoint. There is little to say about the syntax, so let me say the important thing instead. What arrives at the other end is a native table, not an image. You can click into a cell in Word and edit the text. You can restyle it with Word's own tools. That is the whole reason to build tables this way rather than exporting a picture, and it is what makes the workflow survive contact with a coauthor who does not use R.
+Each function receives table temp as the table to export and path as the destination filename. The Word call writes temp underscore table dot d o c x, and the PowerPoint call writes temp underscore table dot p p t x. Both chunks use eval false because rendering the lecture should not create files on the instructor's machine every time. When you copy the code, choose a path you can find and keep the matching extension so the function writes the intended document type.
 
 </details>
 

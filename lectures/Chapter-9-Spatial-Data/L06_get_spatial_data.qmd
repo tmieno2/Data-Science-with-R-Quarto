@@ -61,6 +61,8 @@ nass_api_key <- Sys.getenv("NASS_API_KEY")
 
 The last deck in the course, and a practical one. Everything so far assumed the data was already sitting on your machine. This is about getting it, without a browser and without clicking through a download form, which matters for two reasons. Downloading by hand does not scale past a few files, and it is not reproducible, so nobody can rerun your work and get your dataset. We cover four sources that between them cover a great deal of applied agricultural economics: administrative boundaries, USDA survey statistics, weather, and satellite-derived land cover.
 
+The learning objective on screen is therefore deliberately direct: you should leave knowing how to download public agriculture-related data from inside R. The numbered table of contents previews the four workflows and each item is a link you can use to jump straight to that section. Before you start, make sure the ggplot2 and dplyr material in the prerequisite links is familiar. We will repeatedly filter downloaded objects, pipe operations together, and turn spatial results into maps, so those two skills are the foundation underneath the new download functions.
+
 </details>
 
 <br>
@@ -127,6 +129,8 @@ prism_us <- terra::rast(prism_us)
 
 One important difference on this deck. Most of the code here is shown but not run, because it downloads from servers that will not answer a request coming from inside your browser, and some of it needs an API key that is yours rather than mine. So this deck is closer to a reference you will come back to than a set of cells to click through. Read the syntax, then try it in RStudio on your own machine, where it genuinely works. The pieces that do run in the browser are marked by having a Run button that does something.
 
+For navigation, use the three-line menu at the bottom left to open the table of contents, or press the letter o to see an overview of all slides and jump visually. In a runnable cell, the pale blue area is the code area and Run Code evaluates everything in it. To run only part, highlight that part and press Command Enter on a Mac or Control Enter on Windows. The two-sheet icon copies the cell so you can paste it into RStudio, and the reload icon beside it restores the original code after you experiment. Those controls let you test examples without permanently changing the lecture notes.
+
 </details>
 
 <br>
@@ -174,6 +178,8 @@ County and state boundaries are the most reused spatial data in applied economic
 
 One function call. But look closely at the cb argument, because it matters more than it looks. Without it you get the full-detail boundary, which is very large and slow to draw, since it traces every inlet and river bend. With cb set to TRUE you get a generalised version, and for almost any map you will make, that is the right choice. Full detail is worth its cost only if you are doing precise spatial operations near a coastline. Note also progress bar set to FALSE, which just quiets the output.
 
+The namespace in tigris colon-colon states means you can call the function without attaching the whole package. The assignment saves the returned sf object as states underscore s-f, so it contains state attributes together with the geometry needed for mapping. The second code block passes that object to ggplot, geom s-f draws its state polygons, and theme void removes axes and background decoration that do not help on a boundary map. The result beneath the code is your quick visual check that the download succeeded and the generalized state shapes are ready to use.
+
 </details>
 
 + You can use `tigris::states()` to download the state boundary data as an `sf` object.
@@ -203,7 +209,9 @@ ggplot(states_sf) +
 <details class="transcript">
 <summary>Transcript</summary>
 
-The counties function works the same way, with a state argument that takes abbreviations or names and accepts several at once. The map at the end is worth a moment: county boundaries drawn underneath, then the two state outlines over the top in blue and thicker. That is the layering from the mapping deck used for something practical, checking that two datasets you downloaded separately actually line up. If the state outlines had not sat exactly on the county edges, you would know something was wrong immediately — usually a mismatched vintage or a mismatched projection.
+The counties function works the same way, with a state argument that takes abbreviations or names and accepts several at once. The map at the end is worth a moment: county boundaries drawn underneath, then the two state outlines over the top in blue and thicker. That is the layering from the mapping deck used for something practical, checking that two datasets you downloaded separately actually line up. If the state outlines had not sat exactly on the county edges, you would know something was wrong immediately, usually because the boundary vintages differ or the CRS metadata is incorrect or missing.
+
+Here the state argument receives a vector containing Illinois and Indiana, cb asks for generalized county boundaries, and progress bar false keeps the download quiet. The result is stored as I-L underscore I-N underscore county. In the map, the empty ggplot call is useful because each geometry layer supplies its own data. The first geom s-f draws every downloaded county. The second filters the earlier state object so the name is Illinois or Indiana, sets fill to N-A so those polygons stay transparent, and uses blue with linewidth one to make only their outer borders prominent. Theme void then removes the non-map furniture.
 
 </details>
 
@@ -212,10 +220,10 @@ The counties function works the same way, with a state argument that takes abbre
 + You can specify states by the `state` option.
 
 ```{r, cache = TRUE}
-IL_IN_county <- 
+IL_IN_county <-
   tigris::counties(
-    state = c("IL", "IN"), 
-    cb = TRUE, 
+    state = c("IL", "IN"),
+    cb = TRUE,
     progress_bar = FALSE
   )
 ```
@@ -265,6 +273,10 @@ Quick Stats is the USDA's statistical warehouse, and it holds a great deal: acre
 
 Three tabs, and the middle one is the reference you will keep coming back to. First, the API key, which you get free from the Quick Stats site. Read the callout about it carefully, because a key is a credential and pasting it into your script publishes it to anyone who sees the file. The third tab solves a real problem: variable names in Quick Stats are long, exact and unguessable, so rather than trying to remember them you search the full list with grep, narrowing by keyword, and copy exactly what you find into your query.
 
+On the API key tab, follow the link, choose Obtain an API key, and save the result somewhere secure because every tidyUSDA request needs it. On Download data, getQuickstat is the central function. Key supplies that credential. Program chooses Survey or Census. Data item is the exact variable label. Geographic level chooses units such as County or State, state and year can each be vectors, and year must be character data. Geometry true asks for an sf result with boundaries; geometry false returns an ordinary data frame. The help callout matters because these are the common arguments, not the complete interface, so question-mark getQuickstat is where you look for less common filters.
+
+On Identify data item, tidyUSDA colon-colon allDataItem supplies the complete name list and head shows a small preview. The pipe then sends that list through three grep calls. Value true returns the matching names themselves, while the dot means use the piped result as the text to search. Keeping names containing CORN, then YIELD, then IRRIGATED progressively narrows the list to the requested irrigated grain-corn yield measure. Copy the exact result into data item rather than retyping it. The next tab uses that complete name in a real query.
+
 </details>
 
 ::: {.panel-tabset}
@@ -287,14 +299,14 @@ You can download data using `tidyUSDA::getQuickstat()`.
 
 ```{r, eval = F}
 getQuickstat(
-    key,
-    program,
-    data_item,
-    geographic_level,
-    state,
-    year,
-    geometry
-  )
+  key,
+  program,
+  data_item,
+  geographic_level,
+  state,
+  year,
+  geometry
+)
 ```
 <br>
 
@@ -352,6 +364,12 @@ You can now copy the first entry of the results and paste it for `data_item` opt
 
 A concrete query, and it reads much like the syntax page: the variable, the geography, the states, the years, and geometry set to TRUE. What comes back has a great many columns, most of which you will never use, so the second tab shows the handful that matter. The one to know is Value, which is where the number you actually asked for lives, whatever variable you requested. That naming is a quirk of the API rather than anything sensible, and it catches everyone exactly once. Select the handful of columns you need straight after downloading.
 
+Start with the important callout. Nass underscore api underscore key is read from outside the document, commonly from NASS_API_KEY in your dot Renviron. The alternative shown is keyring colon-colon key_get. Either approach prevents the credential from being copied into the rendered HTML, committed to git history, or published with the deck.
+
+The query requests the Survey program, the exact irrigated grain-corn yield item, county geography, Illinois and Nebraska, and the years 2000 through 2005. As character converts that numeric sequence to the form the API expects, and geometry true requests county shapes along with the records. The outer parentheses around the assignment make R print the returned object when you run this locally, which lets you inspect it immediately. The displayed copy below the code shows why cleanup follows.
+
+On Select variables, the pipe passes the downloaded object into dplyr select. Year identifies the observation date. County name and county code identify the county, while state name and state FIPS code identify its state. Short description records the requested statistic, and Value holds the measurement. Keeping these fields makes the result easier to inspect and work with while preserving the information needed to identify, map, and interpret each observation.
+
 </details>
 
 ::: {.panel-tabset}
@@ -373,16 +391,16 @@ Both leave nothing quotable in the file you share.
 
 ```{r, eval = F}
 (
-IL_NE_ir_corn_yield <-
-  tidyUSDA::getQuickstat(
-    key = nass_api_key, # from .Renviron — never the key itself
-    program = "SURVEY",
-    data_item = "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
-    geographic_level = "COUNTY",
-    state = c("ILLINOIS", "NEBRASKA"),
-    year = as.character(2000:2005),
-    geometry = TRUE
-  )
+  IL_NE_ir_corn_yield <-
+    tidyUSDA::getQuickstat(
+      key = nass_api_key, # from .Renviron — never the key itself
+      program = "SURVEY",
+      data_item = "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
+      geographic_level = "COUNTY",
+      state = c("ILLINOIS", "NEBRASKA"),
+      year = as.character(2000:2005),
+      geometry = TRUE
+    )
 )
 ```
 
@@ -391,7 +409,7 @@ saveRDS(IL_NE_ir_corn_yield, "Lectures/Data/il_ne_corn_yield.rds")
 ```
 
 ```{r, include = FALSE}
-IL_NE_ir_corn_yield <- readRDS("Data/il_ne_corn_yield.rds") 
+IL_NE_ir_corn_yield <- readRDS("Data/il_ne_corn_yield.rds")
 ```
 ```{r, echo = FALSE}
 IL_NE_ir_corn_yield
@@ -428,6 +446,10 @@ IL_NE_ir_corn_yield %>%
 
 Two ways this API will refuse you, both worth knowing before they happen. The first is a hard limit of fifty thousand rows per query, so a request spanning many states and many years simply fails, and the answer is to break it into smaller pieces. The second is subtler: asking for a combination that exists in general but has no observations for your particular state and year returns an error rather than an empty result. That is why an apparently reasonable query can fail, and it is not your syntax.
 
+In Caveat 1, the broad commodity filter asks for corn rather than one exact data item, at county level, across five states and every year from 1995 through 2018. That combination is intentionally too large. As character again supplies the years in the required form, and geometry true would add county geometry to the result, but the server rejects the request before returning it. The code is displayed without evaluation because you need your own key and there is no useful reason to repeat a known failing request from the slide.
+
+In Caveat 2, keyring retrieves the credential without exposing it in the script. The remaining arguments request one exact Survey item, at county level, only for Illinois in 2018, with geometry. The item is valid, but that state-year combination has no matching observation, so this query also errors. Distinguishing an absent combination from a misspelled item is why it helps to search allDataItem first and then check the state and year coverage separately.
+
 </details>
 
 ::: {.panel-tabset}
@@ -449,7 +471,7 @@ many_states_corn <-
     state = c("ILLINOIS", "COLORADO", "NEBRASKA", "IOWA", "KANSAS"),
     year = as.character(1995:2018),
     geometry = TRUE
-  ) 
+  )
 ```
 
 
@@ -461,14 +483,14 @@ A query returns an error when no observation satisfies your query criteria. For 
 ```{r, eval = F}
 many_states_corn <-
   getQuickstat(
-    key = key_get("usda_nass_qs_api"),
+    key = keyring::key_get("usda_nass_qs_api"),
     program = "SURVEY",
     data_item = "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
     geographic_level = "COUNTY",
     state = "ILLINOIS",
     year = "2018",
     geometry = TRUE
-  ) 
+  )
 ```
 
 :::
@@ -480,6 +502,10 @@ many_states_corn <-
 <summary>Transcript</summary>
 
 The direct consequence of the row limit. If one query is too big, split it along a dimension and run several, then stack the results. Year is the natural choice here, though state would work as well. The code uses lapply over a vector of years, which is Chapter 5 material applied to something real, and then bind_rows to stitch the pieces back into a single sf object. Note that this is also a courtesy to the server: several modest requests are treated far more kindly than one enormous one.
+
+The Motivation tab points back to the fifty-thousand-row caveat so you can see what this pattern solves. On How, as character turns 2015 through 2018 into the character vector required by Quick Stats. The short range keeps the demonstration manageable; you can extend year underscore list for your actual study period.
+
+Lapply takes that vector one element at a time. Inside the anonymous function, x is the current year, while your external API key, the Survey program, broad corn commodity, county geography, five-state vector, and geometry true stay fixed for every request. The result of lapply is therefore a list with one downloaded spatial object per year. The pipe passes that list to dplyr bind_rows, which stacks matching columns into one sf object. You have split only the request, not the final dataset, so the combined result can be handled just like a single successful download. The exercise next gives you a smaller end-to-end query to build yourself.
 
 </details>
 
@@ -515,13 +541,13 @@ lapply(
       commodity = "CORN",
       geographic_level = "COUNTY",
       state = c("ILLINOIS", "COLORADO", "NEBRASKA", "IOWA", "KANSAS"),
-      year = x, # use the year 
+      year = x, # use the year
       geometry = TRUE
     )
   }
 ) %>%
-# combine a list of sf into a single sf
-dplyr::bind_rows() 
+  # combine a list of sf into a single sf
+  dplyr::bind_rows()
 ```
 
 
@@ -535,6 +561,10 @@ dplyr::bind_rows()
 <summary>Transcript</summary>
 
 Three tabs that walk the whole workflow end to end, which is the point of doing them in order. Find the variable name by searching, then download it for two states across five years, then map the result faceted by year. That is the complete arc from not knowing what a thing is called to having a figure. Do run these on your own machine rather than reading the answers, because the searching step in particular feels awkward until you have done it once yourself. After that it is routine, and you will use it every time you touch this API.
+
+In the first answer, allDataItem is piped through grep for SOY and then HARVESTED, with value true so you see the actual candidate names. That leads to SOYBEANS minus ACRES HARVESTED as the exact data item in the next tab. The download uses your external API key, the Survey program, county geography, Kansas and Colorado, character years 1990 through 1994, and geometry true. It immediately selects the year, county and state identifiers, the short description, and Value, leaving you a focused mapping dataset rather than the full API response.
+
+In the final answer, ggplot starts without global data and geom s-f supplies K-S underscore C-O underscore soy h-acres directly. Mapping Value to fill turns the county measurement into color. Facet wrap creates a separate panel for each year, so you can compare the geographic pattern across the five dates, and theme void removes axes and background decoration. The answers are folded on screen so attempt each step first, then open the code to compare the structure and the argument choices with your own.
 
 </details>
 
@@ -552,8 +582,7 @@ You are interested in getting soybean harvested acres data. Search for the `data
 tidyUSDA::allDataItem %>%
   #--- find data items that include SOY ---#
   grep(pattern = "SOY", ., value = TRUE) %>%
-  grep(pattern = "HARVESTED", ., value = TRUE) 
-
+  grep(pattern = "HARVESTED", ., value = TRUE)
 ```
 
 #### Download data
@@ -612,6 +641,8 @@ ggplot() +
 <summary>Transcript</summary>
 
 PRISM is the standard source for United States weather in applied work: daily precipitation and maximum and minimum temperature, modelled onto a four kilometre grid covering the whole country. It is raster data, so everything from the raster deck applies, and the map on this slide is a single day of maximum temperature. If you need weather as a control variable, or you are estimating anything at all about climate and agriculture, this is very likely where your data will come from. It is free, and it covers several decades at daily resolution.
+
+The source description also includes daily mean temperature, alongside precipitation and minimum and maximum temperature. The displayed example reads the BIL raster for maximum temperature on August first, 2012. Geom spatraster draws the grid cells, the continuous viridis fill scale turns their values into an ordered color gradient, and theme void removes axes and background elements so the spatial temperature pattern is the focus. This output is also a reminder that a PRISM download is not a table with one row per county. It is a surface made of cells, which is why you read and process it with terra.
 
 </details>
 
@@ -688,6 +719,8 @@ script, it is the same idea.
 
 This one you genuinely have to run yourself, since it writes files to disk. Five days of precipitation is enough to see the shape of the thing. Pay attention to what you end up with, because it is the reason the next tab exists: one folder per day, each holding several files that share a name and differ only by extension. That is the BIL format from the raster deck, where the values, the header describing the grid, and the projection information all live in separate files that have to stay together in the same folder.
 
+The first block attaches prism and sets lectures slash Data slash PRISM as the download directory. Change that path to a location on your own computer before running it. The second block asks get_prism_dailys for ppt, the package abbreviation for precipitation, from January first through January fifth of 2024. KeepZip false tells prism not to retain the downloaded zip archives after unpacking them, so you keep the usable files without duplicate compressed copies. These chunks have evaluation turned off in the deck because the download needs a normal local R session and a real place to write the folders.
+
 </details>
 
 
@@ -720,7 +753,9 @@ This will create a single folder for each day of the specified date range. Insid
 <details class="transcript">
 <summary>Transcript</summary>
 
-The practical problem: a year of daily data is three hundred and sixty-five folders, and you are not going to type those paths. So list them programmatically. The code recurses through the folder, keeps only the files ending in bil, and drops the auxiliary ones, which would otherwise sneak in. Then terra reads the whole vector in a single call and gives you one multi-layer object with a layer per day. That last step is the one worth remembering: terra's rast function accepts a whole vector of paths, not just a single one, and stacks them for you.
+The practical problem: a year of daily data is three hundred and sixty-five folders, and you are not going to type those paths. So list them programmatically. The code recurses through the folder, uses an end-anchored pattern to keep only paths ending in bil, and drops the auxiliary ones, which would otherwise sneak in. Then terra reads the whole vector in a single call and gives you one multi-layer object with a layer per day. That last step is the one worth remembering: terra's rast function accepts a whole vector of paths, not just a single one, and stacks them for you.
+
+Read the pipeline from left to right. List files starts at Data slash PRISM. Recursive true searches the daily subfolders, and full names true returns complete paths relative to that starting point so rast can locate each file. In the first grep, backslash-dot means a literal period and the dollar sign anchors bil at the end; value true keeps the matching paths instead of their positions. The next line uses grepl to mark names containing aux, the exclamation mark reverses that test, and the bracket keeps only the non-auxiliary files. The parentheses around the assignment print the resulting path vector for inspection. Replace the starting folder with your own, then pass the checked vector to terra colon-colon rast as shown.
 
 </details>
 
@@ -731,12 +766,11 @@ First, the following code gives you the names of all the PRISM files with the **
 
 ```{r}
 (
-prism_files_list <- 
-  list.files("Data/PRISM", recursive = TRUE, full.names = TRUE) %>%
-  .[grep("\\.bil", .)] %>%
-  .[!grepl("aux", .)]
+  prism_files_list <-
+    list.files("Data/PRISM", recursive = TRUE, full.names = TRUE) %>%
+    grep(pattern = "\\.bil$", ., value = TRUE) %>%
+    .[!grepl("aux", .)]
 )
-
 ```
 
 Just replace `"Data/PRISM"` with your folder path to the PRISM files.
@@ -744,7 +778,7 @@ Just replace `"Data/PRISM"` with your folder path to the PRISM files.
 We can now read them using `terra::rast()` like below:
 
 ```{r}
-terra::rast(prism_files_list) 
+terra::rast(prism_files_list)
 ```
 
 ### Exercise
@@ -753,6 +787,10 @@ terra::rast(prism_files_list)
 <summary>Transcript</summary>
 
 The same three-step arc as the NASS exercise, now for weather: download three days of maximum temperature, read them all back with the listing trick, and facet a map by layer. Note the third answer uses facet_wrap on lyr, which is the raster faceting from the mapping deck. Worth noticing how little of this is new. By this point in the course you are combining pieces you already know rather than learning anything fresh, which is roughly the definition of having learned something. That is a fair note to end the course on.
+
+In Download PRISM data, change the folder passed to prism_set_dl_dir, then request type tmax for June first through June third of 2023. KeepZip false discards the archives after extraction. In Read the downloaded files, list files searches that tmax folder recursively and returns full paths, the anchored bil filter keeps the raster data files, and the auxiliary-name filter removes unwanted companions. Terra rast reads the remaining vector into prism underscore max underscore temp, with one layer for each downloaded day.
+
+In Create a map, geom spatraster draws that multi-layer object. Facet wrap with lyr makes a panel for each layer name, so the three daily temperature surfaces appear separately rather than being drawn on top of one another. As in the NASS exercise, the folded answers let you attempt each operation before revealing the working code.
 
 </details>
 
@@ -769,7 +807,7 @@ Download PRISM maximum temperature data from "06-01-2023" to "06-03-2023".
 
 ```{r, eval = FALSE}
 #| code-fold: true
-#--- set the path (you need to change the path) ---# 
+#--- set the path (you need to change the path) ---#
 prism_set_dl_dir("Data/PRISM/tmax")
 
 #--- download ---#
@@ -793,7 +831,7 @@ Read all the maximum temperature data files you just downloaded using `terra::ra
 #| code-fold: true
 prism_files_list <-
   list.files("Data/PRISM/tmax", recursive = TRUE, full.names = TRUE) %>%
-  .[grep("\\.bil", .)] %>%
+  grep(pattern = "\\.bil$", ., value = TRUE) %>%
   .[!grepl("aux", .)]
 
 prism_max_temp <- terra::rast(prism_files_list)
@@ -828,13 +866,15 @@ ggplot() +
 <details class="transcript">
 <summary>Transcript</summary>
 
-The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre resolution, classifying every pixel of the contiguous United States by what crop is growing on it, every year back to the late nineties. For agricultural economics it is close to indispensable, since it tells you what was actually growing on a given field rather than what somebody reported at the county level. CropScape is the interactive front end you may have seen in a browser, and the CropScapeR package talks to exactly the same service from R, which is what we use here.
+The Cropland Data Layer is a remarkable satellite-derived dataset. Coverage began on a limited basis in 1997 and expanded to the entire continental United States in 2008. Its resolution is thirty metres from 2008 through 2023 and ten metres from 2024 onward, classifying pixels by what crop is growing on them. For agricultural economics it is close to indispensable, since it tells you what was actually growing on a given field rather than what somebody reported at the county level. CropScape is the interactive front end you may have seen in a browser, and the CropScapeR package talks to exactly the same service from R, which is what we use here.
+
+The resolution history on screen also includes fifty-six metres in 2006 and 2007, before the move to thirty metres in 2008. This is a georeferenced, crop-specific land-cover product from USDA NASS, so each raster cell records a land-cover class at a known location. That cell-level detail is the reason the dataset supports field-scale and landscape analysis that county summaries cannot. The CropScape link is useful for exploring the product visually, while the package workflow makes the same kind of request reproducible in a script.
 
 </details>
 
 + The Cropland Data Layer (CDL) is a data product produced by the National Agricultural Statistics Service of U.S. Department of Agriculture. 
 
-+ CDL provides geo-referenced, high accuracy, 30 (after 2007) or 56 (in 2006 and 2007) meter resolution, crop-specific cropland land cover information for up to 48 contiguous states in the U.S. from 1997 to the present. 
++ CDL provides geo-referenced, high-accuracy, crop-specific cropland land cover information. Coverage began on a limited basis in 1997 and expanded to the entire continental United States in 2008. Resolution was 56 meters in 2006 and 2007, 30 meters from 2008 through 2023, and 10 meters from 2024 onward.
 
 + This data product has been extensively used in agricultural research. CropScape is an [interactive Web CDL exploring system](https://nassgeodata.gmu.edu/CropScape/), and it was developed to query, visualize, disseminate, and analyze CDL data geospatially through standard geospatial web services in a publicly accessible on-line environment (Han et al., 2012).
 
@@ -846,7 +886,7 @@ The Cropland Data Layer is a remarkable dataset: satellite-derived, thirty metre
 <details class="transcript">
 <summary>Transcript</summary>
 
-The package offers four functions, but one of them does the work. GetCDLData downloads the raw layer, and the other three return it pre-summarised in ways that occasionally match what you want. Learn that one properly and treat the other three as a bonus you may never need. One thing to note before you go looking for it: what comes back is a RasterLayer from the old raster package, not a terra SpatRaster, so you will usually pass it straight through terra's rast function to convert it, exactly as the final exercise does.
+The package offers four functions, but one of them does the work. GetCDLData downloads the raw layer. The other three create preview images, summary statistics, and between-year change comparisons. Learn that one properly and treat the other three as a bonus you may never need. One thing to note before you go looking for it: what comes back is a RasterLayer from the old raster package, not a terra SpatRaster, so you will usually pass it straight through terra's rast function to convert it, exactly as the final exercise does.
 
 </details>
 
@@ -867,6 +907,8 @@ The package offers four functions, but one of them does the work. GetCDLData dow
 <summary>Transcript</summary>
 
 Three arguments, and the fiddly one is type, which tells the service how to interpret the area you gave it. An f means you passed a FIPS code, for a state or a county. A b means a bounding box, and that includes handing it an sf object, since only the box gets used. A p is a single point and ps a polygon of your own coordinates. Read the callout about the class of the returned object too, because forgetting it produces confusing errors two steps later, when some terra function refuses what you hand it.
+
+Aoi is the area you want covered, and year chooses the CDL vintage. Match the type to the form of that area. An sf or s-f-c object uses letter b, as does a bounding box defined by four corner points. A county uses its five-digit FIPS code with letter f, while a state uses its two-digit FIPS code with the same type. A polygon described by at least three coordinates uses p-s, and one coordinate uses p for a point. These are service codes, so choosing the wrong one changes how the server reads the same value. The result is a raster-package RasterLayer, as the callout emphasizes, so convert it before using a workflow that expects terra's SpatRaster class.
 
 </details>
 
@@ -896,6 +938,8 @@ The downloaded raster data is `RasterLayer` defined by the `raster` package, not
 
 A whole state by FIPS code, Nebraska being thirty-one, with type set to f. The warning about time is not a formality. At thirty metre resolution a state contains an enormous number of cells, and the download and the memory it needs are both substantial. This is exactly why cropping matters, and why the next example takes four counties rather than a state. If you only need part of a state, ask for that part rather than downloading everything and throwing most of it away. Your patience and the server will both benefit.
 
+The code stores the request as c-d-l underscore N-E. Aoi thirty-one identifies Nebraska, year is the character value 2018, and letter f tells the service to interpret thirty-one as a FIPS code rather than as a point or a box. Evaluation is turned off on the slide, so there is no displayed raster output and you must run the request locally if you need it. The object returned by this call is the RasterLayer class noted on the previous tab.
+
 </details>
 
 + Suppose you are interested in getting CDL data for the entire Nebraska.
@@ -920,6 +964,10 @@ cdl_NE <-
 <summary>Transcript</summary>
 
 The more typical case, and the more sensible one. Pull county boundaries with tigris, filter to the four you want, and hand that sf object straight to GetCDLData. Note what the service actually does with it, which is explained on the download tab: it uses only the bounding box, not the outlines, so you get a rectangle containing your counties along with the corners of their neighbours. Trimming that rectangle back to the actual county shapes is masking, from the previous deck, and it is one of the things the final exercise asks you to do.
+
+On Area of interest, tigris counties downloads Illinois with generalized boundaries and no progress display. The membership filter keeps Champaign, Vermilion, Ford, and Iroquois in I-L underscore four underscore county. The output map first draws every Illinois county, then overlays those four with light-blue fill; theme void strips away the axes. That picture is a visual check that the filter selected the intended connected area.
+
+On Download, the sf object becomes aoi, the requested year is 2018, and type b tells GetCDLData to use its bounding box. Because the call is not assigned in the shown code, running it displays or returns the download but does not save a named object for later steps. In your own workflow, assign that result if you plan to convert, mask, or map it. The rectangular extent is efficient to request, but remember that it is not the same shape as the four county polygons.
 
 </details>
 
@@ -954,7 +1002,7 @@ ggplot() +
 When you provide `aoi` using an `sf` object, CDL data for the bounding box of the `sf` will be downloaded. So, you should pick `"b"` as the `type`.
 
 ```{r, eval = FALSE}
-GetCDLData(
+CropScapeR::GetCDLData(
   aoi = IL_4_county,
   year = "2018",
   type = "b"
@@ -969,6 +1017,12 @@ GetCDLData(
 <summary>Transcript</summary>
 
 The final exercise of the course, and it pulls in nearly everything. Download a county boundary with tigris, use it to fetch CDL data, convert to a SpatRaster, mask it to the county outline, aggregate it to something a computer can plot, and map the result. That is four decks' worth of material in five steps. One thing to watch in the aggregation: CDL cells hold crop codes rather than quantities, so averaging them is meaningless. Take the most common code in each block instead, with the modal function, exactly as the raster deck warned.
+
+On AOI, tigris counties requests generalized Iowa county boundaries, and the pipe sends them directly to dplyr filter. The exact name test keeps Sioux County and stores the one-feature sf object as sioux underscore county. On Download, that object is the aoi, 2022 is the requested CDL year, and type b requests its bounding box. The pipe immediately passes the returned RasterLayer to terra rast, so sioux underscore c-d-l underscore 2022 is a SpatRaster ready for the remaining terra operations.
+
+On Mask, the county boundary is first transformed to the raster's coordinate reference system. That alignment is necessary because masking compares locations, and coordinates in different systems cannot be compared correctly. Terra mask then keeps cells inside Sioux County and removes cells in the rest of the downloaded rectangle. On Aggregate, fact ten groups the original cells into ten-by-ten blocks. Fun modal assigns each larger cell the most common crop code in its block, preserving the categorical meaning while reducing the number of cells that must be drawn.
+
+Finally, ggplot starts the map and geom spatraster draws sioux underscore aggregated. The code-folded answers are there for checking, so work through the tabs in order before opening them. The object names deliberately carry forward from one answer to the next, which makes this a single reproducible pipeline from an administrative boundary to a manageable county land-cover map.
 
 </details>
 
@@ -998,7 +1052,7 @@ Using the `CropScapeR::GetCDLData()`, download the 2022 CDL data covering the Si
 ```{r, eval = FALSE}
 #| code-fold: true
 sioux_cdl_2022 <-
-  GetCDLData(
+  CropScapeR::GetCDLData(
     aoi = sioux_county,
     year = "2022",
     type = "b"
@@ -1054,4 +1108,3 @@ ggplot() +
 
 :::
 <!--end of panel-->
-

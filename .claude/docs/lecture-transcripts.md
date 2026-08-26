@@ -51,6 +51,13 @@ above the first `##` becomes a blank slide (see `CLAUDE.md`).
   makes the source easy to scan.
 - `<summary>` text is always exactly `Transcript`.
 - Only ever the class `transcript`. The CSS keys off it.
+- **Slides built by `chunk_reveal_quarto()` get no transcripts, by decision.**
+  `08-1` and `08-3` turn a single marked-up code chunk into a run of slides at
+  render time, one per `# BREAK`, 76 markers across the two decks. Those slides
+  do not exist in the `.qmd`, so there is nowhere to attach a transcript without
+  changing `flipbookrq`. They show the code and its output building up step by
+  step, which carries the explanation on its own. A review will report all 76 as
+  missing coverage; that is expected and should be rejected, not fixed.
 
 ## Writing style
 

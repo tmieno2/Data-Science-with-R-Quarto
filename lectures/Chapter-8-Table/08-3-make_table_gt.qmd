@@ -69,6 +69,7 @@ The usual two navigation tricks: the stacked lines bottom left for a table of co
 <summary>Transcript</summary>
 
 The code boxes work as usual: blue area is an editor, Run Code runs it, copy button takes it to your machine. As with the flextable deck, almost every table you see here was built when the slides were rendered, on my machine, rather than in your browser. A gt table is a block of HTML, and that does not come back through browser R as a table. So treat the code here as something to copy into RStudio rather than something to run in place. The genuinely live cells on this deck are the help pages.
+If you do use a live blue code area, selecting only part of the code and pressing Command plus Enter on a Mac, or Control plus Enter on Windows, runs just that selection. The two-sheets icon copies the whole chunk, while the reload icon immediately to its left restores the original code after you experiment. Those controls let you test a small change without losing the worked example you started from.
 
 </details>
 
@@ -140,6 +141,7 @@ tab_data %>% #BREAK
 <summary>Transcript</summary>
 
 One package to install, and no companion package this time. Everything gt needs is inside gt itself, which is one practical difference from flextable, where the fp underscore functions you reach for constantly live in officer. The name stands for grammar of tables, and that is the claim being made: that a table has parts, and that you build one by naming a part and saying what goes there. gt is developed by Posit, the same people who make RStudio and the tidyverse, so the argument conventions will feel familiar.
+The two lines on screen have different jobs. Install packages downloads gt and normally needs to be run only once on a computer. Library gt attaches the installed package for the current R session, so that is the line you run again when you start a new session and want to use functions such as gt and tab style.
 
 </details>
 
@@ -164,6 +166,7 @@ library(gt)
 <summary>Transcript</summary>
 
 The same dataset the flextable deck used, so you can hold the two side by side and compare how each package does the same job. It comes from countrypops in the gt package, filtered to ten Pacific and Australasian countries and three years, then pivoted so each year becomes its own column. Ten rows, small enough to see whole on a slide. The region column built with case when matters here more than it did before, because gt can turn a column like that into row groups, which is something flextable has no direct equivalent for.
+Read the preparation pipeline from top to bottom. The three character vectors collect the two-letter country codes into Australasia, Melanesia, and Polynesia. The first filter keeps codes belonging to any of those vectors, and the second keeps only nineteen ninety-five, two thousand five, and two thousand fifteen. Case when translates each code into its region label. Pivot wider takes population as the cell values, takes year as the new column names, and adds the y underscore prefix, producing y underscore nineteen ninety-five, y underscore two thousand five, and y underscore two thousand fifteen. Arrange then puts regions together and orders countries within each region from the largest two-thousand-fifteen population downward. Select removes every remaining column whose name starts with country code. The final mutate creates the two-thousand-fifteen to two-thousand-five population ratio used in the percentage examples and a date value used later to demonstrate date formatting. The parentheses around the assignment make R both save tab data and print it, so you can inspect the prepared rows immediately.
 
 </details>
 
@@ -206,6 +209,7 @@ tab_data <-
 <summary>Transcript</summary>
 
 Turning a data frame into a gt table is one function call with no arguments needed. Note what is missing compared with flextable: there is no col keys argument, so you cannot pick and order columns in the same call. You select before, with dplyr, or you hide and reorder after, with cols hide and cols move. That is deliberate. gt assumes the data reaching it is already the data you want, and treats column choice as a data question rather than a table question.
+The pipeline on the left first selects country name, region, and the nineteen-ninety-five and two-thousand-five population columns. Gt then converts exactly those four columns into the table shown on the right. The left chunk is displayed as code without being evaluated on the slide, while the right chunk hides its repeated source and shows the evaluated table, so you can compare the recipe directly with its result.
 
 </details>
 
@@ -330,6 +334,7 @@ Stub cells are no longer part of the body, so `cells_stub()` reaches them, not `
 <summary>Transcript</summary>
 
 This is the thing gt does that flextable does not have a direct answer for. Name a column in groupname col and its values become labels that break the body into blocks, with each label on its own row above the rows it covers. In the flextable deck we approximated this with merge v, which collapsed repeated values into one tall cell. This is the other convention, and for grouped rows it is usually the one published tables use. Note that the groups appear in the order the rows are sorted, which is why the data was arranged by region.
+In this example, rowname col still moves country name into the stub, while groupname col removes region from the ordinary data columns and uses it for the three group headings. The two arguments therefore control different levels of labeling: one identifies each row, and the other identifies the block containing that row.
 
 </details>
 
@@ -471,6 +476,7 @@ tab_data %>%
 <summary>Transcript</summary>
 
 This is the one place where gt and flextable really diverge, so slow down here. In flextable you said i for rows and j for columns, and every formatting function took them. In gt you name a location instead, using a cells underscore something function, and hand that to whatever function needs to know where. Cells body is the one you will use most, and it takes columns and rows arguments. The rest of the list names the other parts: the column labels, the stub, the row groups, the title, the summary rows, the footer.
+The names on screen follow the anatomy you just saw. Cells stub selects row names, cells column labels selects the labels above individual columns, cells column spanners selects the labels spanning several columns, and cells row groups selects the group headings inside the body. Cells title uses its groups argument to distinguish the title from the subtitle. Cells summary and cells grand summary reach the per-group and whole-table summary rows. Cells source notes and cells footnotes reach the two footer areas. None of these changes a table by itself. It returns a location description that you pass through a locations argument to a function such as tab style or tab footnote.
 
 </details>
 
@@ -530,6 +536,7 @@ gt_tbl
 <summary>Transcript</summary>
 
 The rows argument accepts a condition written with the column names directly, unquoted, exactly the way you would write it inside dplyr filter. So rows equals y two thousand five greater than two hundred thousand selects the rows where that holds. This is the same idea as the formula form in flextable, and for the same reason it is the one to default to. The condition describes itself, so somebody reading it later sees which rows and why, instead of numbers they have to work out. It also keeps working when the data changes.
+Now connect that condition to the whole example. Tab style is told to make text red. Cells body limits that change to the country name and region columns, and the rows condition limits it again to countries whose two-thousand-five population exceeds two hundred thousand. The population column supplies the test even though it is not one of the columns being colored. That separation is useful whenever one variable determines how another part of the table should look.
 
 </details>
 
@@ -585,6 +592,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 The same job with row numbers, and with a vector of TRUEs and FALSEs. Both work, and the logical vector has to be exactly as long as the table has rows, which is why the example builds ten values for a ten-row table. Hard-coded row numbers are the risky form. They break silently when your data changes, because there will still be a row three, it will just be a different country. Use them when you genuinely mean the third row, and use a condition whenever you mean a row that satisfies something.
+The first tab style call fills the country-name cells in row two and rows four through nine with a light gray background. The second call selects columns one and three by position and italicizes the rows chosen by the logical vector. Rep with each equal to five produces five TRUE values followed by five FALSE values, so only the first half of the table receives that second style. Because the calls are piped one after the other, both sets of formatting remain in the final table, and cells where their selections overlap get both effects.
 
 </details>
 
@@ -638,6 +646,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 The columns argument takes the same selection language dplyr select takes, which is more than flextable's j ever offered. Bare names, c of several names, numbers, and the helpers: starts with, ends with, contains, where, everything. The example uses starts with y underscore to catch both year columns without naming them, which keeps working if you add another year to the data later. That is the argument for the helpers generally. A selection that describes a pattern survives changes to the data, and a list of names does not.
+Here, cell fill supplies the pale cream color and cells body applies it to every body column whose original name begins with y underscore. Country name and region are left alone. Notice that tidyselect belongs in the columns argument, while the rows argument still uses row positions, logical values, or data conditions. Keeping those two selection jobs distinct makes a complicated location easier to read.
 
 </details>
 
@@ -729,6 +738,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 One function does all the styling in gt, and its shape mirrors the style function in flextable closely. You say what to change with the style argument and where with the locations argument. The what comes from one of three functions: cell text for the characters, cell fill for the background, cell borders for the lines. Notice how much smaller this is than the flextable equivalent, which needed fp text, fp par and fp cell from officer, and a paragraph-versus-cell distinction on top. gt has no paragraph layer at all.
+The data argument at the start is normally supplied by the pipe. Cell text can control color, size, weight, italics, alignment, and font; cell fill controls the background; and cell borders controls the lines around the selected cells. If several of those changes belong at the same location, the style argument can take a list of style functions. The locations argument then receives one cells function, or a list of locations when the same style should appear in several table parts.
 
 </details>
 
@@ -760,6 +770,7 @@ There is no paragraph layer here. `flextable` distinguished paragraphs from cell
 <summary>Transcript</summary>
 
 The first of the three, and the one you reach for most. Cell text controls everything about the characters: color, size, weight, italics, alignment, the font itself. Note that alignment lives here, which is a real difference from flextable, where alignment was a paragraph property because text sat inside a paragraph inside a cell. gt has no paragraph, so alignment is simply part of the text. The help page is worth opening once, because there are more arguments than you would guess and you will look them up every time anyway.
+Use the Introduction tab to run the live question-mark cell and inspect those arguments. Then move to Example. There, tab style makes the country names in rows four through six red, bold, and underlined. Color, weight, and decorate each contribute one visible part of that result, while cells body supplies both the country-name column and the three-row range. The output on the right lets you verify that no other rows or columns changed.
 
 </details>
 
@@ -1070,6 +1081,7 @@ tab_data %>% #BREAK
 <summary>Transcript</summary>
 
 This is the part of gt with no real counterpart in what we covered for flextable, and it is the reason many people prefer gt for numbers. The fmt functions change how a value is displayed without changing the value. So after you have formatted a population column with thousands separators, you can still select rows with a condition on the raw number, because the raw number is still there. Formatting is a display layer over the data. That property is what lets you format early in a pipeline and keep working with the real values afterwards.
+The families on screen cover more than ordinary decimals. Number and integer formatting handle separators, decimal places, and suffixes; percent, currency, and scientific formatting add the conventions for those quantities; and date, datetime, and time formatting control temporal displays. Markdown, URL, and image formatting turn stored text into richer table content. Sub missing and sub zero replace an N A or a zero with a more readable display without rewriting the underlying data. Every one of these functions accepts columns and rows, so the same selection ideas from the Locations section let you format only the cells that need it.
 
 </details>
 
@@ -1160,6 +1172,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 Two more, on a table that includes the ratio column and the date column so there is something to format. Fmt percent multiplies by a hundred and appends the sign, so a ratio of one point one three shows as a hundred and thirteen percent. Note that it multiplies, so give it a proportion and not a number that is already a percentage. Fmt date takes a date style, either by name or by number, and there are a lot of them. The help page prints the full list with an example of each, which is quicker than guessing.
+The select call keeps only country name, the population ratio, and date before gt builds the table. In fmt percent, decimals equal to one keeps one digit after the decimal point in the displayed percentage. In fmt date, the w d, m, day, year style turns the stored two-thousand-thirteen hyphen eleven hyphen fourteen value into a label with the abbreviated weekday and month followed by the day and year. Both formatting calls change presentation only, so the stored ratio and date remain available for later conditions or calculations.
 
 </details>
 
@@ -1253,6 +1266,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 Column labels default to your variable names, which are written for typing rather than for reading. Cols label renames them, taking the existing column name on the left and the label you want on the right. The label can be plain text, or you can wrap it in md for markdown, which is how you get bold or italic or a subscript into a header. As in flextable, this changes only what is displayed. Later code still refers to y underscore nineteen ninety five, not to the pretty label, so rename late or keep selecting by the original name.
+The other wrapper named on screen is html, which lets a label contain trusted HTML when the output supports it. In the example, country name becomes Country, region becomes Region, and the two year variables become bold nineteen ninety-five and two thousand five through md. The mapping is existing variable on the left, displayed label on the right. That is why every later selector still uses the original underscored names.
 
 </details>
 
@@ -1297,6 +1311,7 @@ Selectors keep using the original column names, not the new labels.
 <summary>Transcript</summary>
 
 This is where the missing col keys argument comes back. Cols move takes columns and puts them after, or before, another column, and there are cols move to start and cols move to end for the two common cases. Cols hide drops a column from the display while leaving it in the data, which matters more than it sounds, because a hidden column can still be used in a condition. So you can hide the region column and still write rows equals region equals Melanesia. That is not possible in flextable, where a column left out of col keys is simply gone.
+Follow the example in pipeline order. Cols move takes region and places it after y underscore two thousand five, changing the visible order without changing the underlying data. Cols hide then removes y underscore nineteen ninety-five from the display. The output therefore shows country name, y underscore two thousand five, and region, but the hidden nineteen-ninety-five values can still drive a later condition such as greater than one hundred thousand.
 
 </details>
 
@@ -1334,6 +1349,7 @@ A **hidden** column is still in the data, so `rows = y_1995 > 1e5` keeps working
 <summary>Transcript</summary>
 
 Widths and alignment. Cols width uses a two-sided formula, with the columns on the left and the width on the right. Use px for pixels or pct for a percentage of the table to be explicit, although a bare number is accepted and treated as pixels. The everything on the last line catches whatever you did not name, which is a good habit, because a table with some widths set and others not can lay out unpredictably. Cols align is simpler and takes a direction and some columns. Note gt has no autofit. It sizes columns to their content by default and you override only where you need to.
+In this table, country name gets one hundred fifty pixels, region gets one hundred twenty, and everything not already matched gets ninety, which means both year columns. Cols align then centers the displayed values in the two year columns. The widths govern how much horizontal space the cells receive, while alignment governs where their contents sit inside that space, so these are separate operations even when they target the same columns.
 
 </details>
 
@@ -1379,6 +1395,7 @@ There is no `autofit()` in `gt`: columns size to their content unless you say ot
 <summary>Transcript</summary>
 
 Putting two columns into one cell, with a pattern saying how they combine. The numbers in curly braces refer to the columns in the order you listed them, so one space open bracket two close bracket puts the second value in parentheses after the first. The second column then disappears from the display. This is how published tables show an estimate with its standard error underneath or beside it, and it is worth remembering when you get to regression tables, because it is the same idea modelsummary uses.
+The first step formats both year columns with zero decimal places so the strings being merged are readable population counts. Cols merge lists y underscore two thousand five first and y underscore nineteen ninety-five second, so placeholder one is the two-thousand-five value and placeholder two is the nineteen-ninety-five value in parentheses. The merged result keeps the first column's identity, which is why cols label renames y underscore two thousand five to two thousand five open parenthesis nineteen ninety-five close parenthesis. Y underscore nineteen ninety-five is then absent as a separate displayed column.
 
 </details>
 
@@ -1468,6 +1485,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 A shortcut worth knowing if your column names carry structure. Give it a separator, and gt splits every column name on that separator and turns the first piece into a spanner and the second into the label. Our columns are called y underscore nineteen ninety five and y underscore two thousand five, so splitting on the underscore produces a y spanner over labels of nineteen ninety five and two thousand five. This is exactly the shape pivot wider leaves behind when it builds names with a prefix, so the two functions pair well.
+The shortcut applies to every selected name containing the delimiter, not just the year variables. Country underscore name is also split, so the output has a country spanner over a name label as well as the y spanner over the two year labels. That is a reason to inspect the result and, when necessary, rename unrelated columns before calling tab spanner delim or select only names whose shared structure you actually want to expose.
 
 </details>
 
@@ -1553,6 +1571,7 @@ A Quarto chunk caption and a `gt` title are two different things. Using both pri
 <summary>Transcript</summary>
 
 Footnotes attach to a location, and gt places the reference symbol at that location and beside the note at the bottom, so the two stay linked without you typing anything. One call per footnote, and the symbols are numbered in the order the locations appear in the table rather than the order you wrote the calls. Opt footnote marks changes the symbols to letters, or to the standard sequence of asterisk, dagger and double dagger, which is what many journals ask for.
+The first call attaches its note to the country-name column label through cells column labels. The second attaches a different note to the first row of the y underscore two thousand five body column through cells body. Those two location functions are why one marker appears in the header and the other inside the data. The final marks equal to letters option changes the automatically coordinated references and footer marks to letters without changing either note or its target.
 
 </details>
 
@@ -1606,6 +1625,7 @@ Marks are numbered by where the locations sit in the table, not by the order you
 <summary>Transcript</summary>
 
 A source note is a line at the bottom of the table with no reference symbol attached to it, which is where the data source belongs. Call it more than once and you get more than one line, in the order you called them. The distinction from a footnote is worth keeping: a footnote explains something about a particular cell and carries a mark, a source note says where the whole table came from and does not.
+The first source note uses md so the countrypops name is displayed as code and the gt package name is bold. The second is plain text explaining that the populations are mid-year estimates. Because the two tab source note calls are piped in that order, both appear in the footer in that order. No locations argument is needed because a source note belongs to the table as a whole.
 
 </details>
 
@@ -1655,6 +1675,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 Totals and averages per row group, computed by gt rather than by you. It needs row groups for there to be groups to summarise, but if the table does not already have a stub, summary rows creates one for the labels. Fns takes a named list where the name becomes the label and the right-hand side is a formula, with the dot standing for the column being summarised. Fmt says how to display the results, and it is a separate argument because summary rows are not formatted by the fmt calls you applied to the body.
+The setup makes country name the stub and region the grouping column, so each region receives its own Total and Average rows. Sum and mean are applied column by column to the two numeric year columns, with the dot standing for the current column's values. The names Total and Average become the visible stub labels for those calculated rows. The fmt formula then passes each summary result to fmt number with zero decimal places, giving readable whole-population summaries without altering how the body cells are formatted.
 
 </details>
 
@@ -1708,6 +1729,7 @@ Summary rows are **not** covered by the `fmt_*()` calls you applied to the body,
 <summary>Transcript</summary>
 
 The same idea for the table as a whole rather than per group, and it appears at the bottom below everything else. You can use both together, which gives you a total per region and then a total across all regions, which is the standard shape of a published summary table. Note that it works without row groups, so a plain table can have a grand total even with nothing to group by.
+Here the table still uses country name as the stub and region for its row groups, but grand summary rows ignores those group boundaries when it calculates. The named function applies sum to each numeric year column across all ten countries, and the backticked name Grand total becomes the visible label containing a space. As on the previous tab, the separate fmt formula displays those totals with no decimal places because body formatting does not automatically carry into summary areas.
 
 </details>
 
@@ -1761,6 +1783,7 @@ tab_data %>%
 <summary>Transcript</summary>
 
 Shading cells according to their own values, in one call. Give it columns and a palette, and gt works out the range and maps the colors across it. You can name a palette that ships with the package, or give two or more colors and it interpolates between them. Read the caution though. A colored table is easy to make and easy to overdo, and once every column is shaded the reader has no idea which comparison you wanted them to make. One column shaded in a table of six says look here. Six columns shaded says nothing.
+The example limits the mapping to y underscore two thousand five. White represents the low end of that column's observed range, dark red represents the high end, and intermediate values receive interpolated shades. The numbers remain printed in the cells, so color adds a visual comparison rather than replacing the exact values. The callout's point is about purpose: use the encoding to direct attention to a comparison the reader should make, not merely because the function is available.
 
 </details>
 
@@ -1800,6 +1823,7 @@ One shaded column in a table says "look here". Six shaded columns say nothing.
 <summary>Transcript</summary>
 
 By default the palette is stretched across the range of the values present, which means the same color means different things in two tables built from different data. Setting domain fixes the range, so a value maps to the same color regardless of what else is in the column. If you are producing several tables that a reader will compare, this is not optional. Values outside the domain receive the na color, which is gray by default and can be changed explicitly.
+In the example, one shared domain from zero to thirty million is applied to both the nineteen-ninety-five and two-thousand-five columns. White marks the low end and dark red the high end for both, so the colors can be compared across years rather than being rescaled separately around each column's observed values. Choose a domain that has substantive meaning across every table or column you intend readers to compare.
 
 </details>
 
@@ -1847,6 +1871,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 A finished look in one call. Style takes a number from one to six and color takes one of six names, and between them you get thirty-six ready-made appearances. This is the fastest way to make a table look deliberate rather than default, and it is a reasonable starting point that you then adjust. It is the counterpart of the theme functions in flextable, theme vanilla and the rest. Try a few numbers and pick one, rather than reading about what each does.
+The call shown here chooses style six and the blue color family, and the output on the right shows the combined preset. These arguments select a coordinated collection of table-wide choices rather than changing only one cell property. Use the preset to establish an overall visual system, then add more specific functions only where the table's purpose requires them.
 
 </details>
 
@@ -1879,6 +1904,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 Each of these does one thing to the whole table. Row striping shades alternate rows. Table font sets the font everywhere. Align table header moves the title and subtitle. There are more, and they all begin with opt, so autocomplete will show you the list. Reach for these before tab options, because they say what you mean in one argument where tab options would need three.
+The pipeline first adds Population as a table title so the alignment change has a visible target. Opt row striping turns on alternating row backgrounds, opt table font requests Times New Roman across the table, and opt align table header with left moves the title from its default alignment to the left. Each call returns the table for the next step, so the output combines all four choices.
 
 </details>
 
@@ -1915,6 +1941,7 @@ gt_tbl %>%
 <summary>Transcript</summary>
 
 The general version, and it has around two hundred arguments. Do not try to learn them. Learn the naming pattern instead, because the argument names are the part of the table, then a dot, then the property. Table dot font dot size. Column labels dot background dot color. Data row dot padding. Once you see that, you can guess an argument name and let autocomplete confirm it, which is how everyone actually uses this function. The help page lists them all if guessing fails.
+Read the five examples as part then property. Table dot font dot size sets all table type to fourteen pixels. Column labels dot font dot weight makes the labels bold, and column labels dot background dot color gives that header row a light gray fill. Data row dot padding reduces the space inside each body row to two pixels, making the table more compact. Table dot border dot top dot color makes the top rule red. Pixel helpers matter for the two size arguments because the generated HTML needs explicit units.
 
 </details>
 
@@ -2004,6 +2031,7 @@ tab_data %>% #BREAK
 <summary>Transcript</summary>
 
 Everything so far produced a table object. This section is about getting it out of R. One function does all of it, and the file extension you give decides the format, which is a nice piece of design because there is nothing else to remember. The list is on screen. Note that PNG and PDF go through a headless browser, so they need the webshot2 package installed, while DOCX needs rmarkdown. The cell here builds a plain table to demonstrate with.
+HTML and H T M create a self-contained web page, D O C X creates an editable Word document, and R T F creates rich text. T E X and R N W are the LaTeX routes, while P N G and P D F capture the rendered table through webshot two. For the demonstration object, select keeps country name, region, and the two year columns, gt turns them into a table, and the assignment saves that object as table temp. Every gtsave example on the following tabs uses that same object, so only the filename and format-specific options change.
 
 </details>
 
@@ -2030,6 +2058,7 @@ table_temp <-
 <summary>Transcript</summary>
 
 Two lines, and the second is the one that matters for most of you. A gt table saved to docx arrives in Word as a real table, not a picture, so a coauthor can click into a cell and edit it. That is the same argument the flextable deck made, and it is the main practical reason to build tables with code at all. HTML is the format gt was designed around first, so that is the one where everything you have seen on these slides is guaranteed to survive.
+In each call, table temp is the table object and the quoted filename is the destination. Temp table dot H T M L makes the self-contained web version, while temp table dot D O C X makes the editable Word version. Because gtsave reads the extension, there is no separate format argument to keep synchronized with the filename. Change the path when you want the file saved somewhere other than the current working directory.
 
 </details>
 
@@ -2057,6 +2086,7 @@ What arrives in Word is an editable table, not an image.
 <summary>Transcript</summary>
 
 For when you need a picture rather than an editable table, usually for slides. This route needs webshot2, which drives a headless browser to take the screenshot, and it is on CRAN so a plain install packages call is all you need. Look at the two extra arguments in the example. Zoom raises the resolution, which matters if the image is going anywhere near print, and expand adds a margin around the table so it is not cropped tight to the border.
+Install webshot two once before using either image route. In the P N G call, zoom equal to three renders at three times the base scale for a sharper image, and expand equal to ten adds ten pixels around the captured table. The P D F call supplies no extra options, so it uses the defaults. Both are fixed visual outputs rather than editable tables, which is why they are convenient for placing a finished design on a slide but less useful for a coauthor who needs to change a cell.
 
 </details>
 
@@ -2089,6 +2119,7 @@ gtsave(table_temp, "temp_table.pdf")
 <summary>Transcript</summary>
 
 Inside a Quarto document you do not save the table at all. Print it from a chunk and gt works out the right form for whatever you are rendering to, HTML on a website, LaTeX in a PDF. That is the everyday case and it needs no arguments. The as functions below are for when you want the converted object rather than a rendered document, and as raw html is the one that comes up in practice, when you need to paste a table into something that is not Quarto.
+The other conversions match the same idea. As LaTeX returns LaTeX table code, as R T F returns rich text, and as Word returns the Word X M L representation. These functions do not write a destination file the way gtsave does. They hand the converted representation back to R, which is useful when another function or system needs to receive that representation directly.
 
 </details>
 
@@ -2116,6 +2147,7 @@ When you want the converted object rather than a file:
 <summary>Transcript</summary>
 
 Both packages make good tables, so this is not a question with one right answer. The differences that actually decide it are in the table on screen. gt formats numbers far better, has row groups and summary rows built in, and needs no second package. flextable was designed around Word and PowerPoint output first, so a table that has to land in a Word document with a specific look tends to be less work there. If you are writing to a website or a Quarto HTML document, gt is the more natural fit.
+Their location languages also differ. Gt passes cells underscore location functions through locations, while flextable uses i for rows and j for columns. For widths, gt expects you to set explicit values when its content-based sizing is not enough; flextable offers autofit to size from the contents. Those design choices are why the same table can feel much easier in one package even though both can ultimately produce it. Use the final tab to turn these differences into a practical choice.
 
 </details>
 
