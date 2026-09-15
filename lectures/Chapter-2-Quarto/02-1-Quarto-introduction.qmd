@@ -382,6 +382,78 @@ Before you render, do this:
 
 If that works in a fresh session, the document's R code is likely reproducible, but rendering can still fail elsewhere. If it fails, you have found the missing `library()` or missing object before Quarto has to tell you about it.
 :::
+
+:::
+<!--end of panel-->
+
+## Working with a qmd file
+
+::: {.panel-tabset}
+<!-- ADDED (D1): the two tabs below. The deck already taught both halves of this
+     separately -- "Caveat: a fresh R session" (memory) and the Directory
+     section further down (paths) -- but never said they describe the same two
+     moments, so a student could not see that "it works when I run the chunk"
+     and "the render cannot find my file" are one phenomenon. The working
+     directory row is the part that was missing everywhere: code inside a qmd
+     runs in the qmd's folder, NOT the project root, in BOTH the interactive
+     and the rendered case. Only the console prompt sits at the project root.
+     Row 2 is governed by Tools > Global Options > R Markdown > "Evaluate
+     chunks in directory", whose default is Document; the note in the second
+     tab covers a student whose machine is set to Project. -->
+
+### Console vs. render
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Here is the thing that confuses almost everybody in the first few weeks, and it is worth slowing down for, because it explains most of the errors you are going to hit. There is not one R involved when you work with a qmd file. There are two. The one in your Console pane is the session you have been typing into all along, and it holds on to everything you have ever made in it. The other one exists only while you render: it starts up, runs the document from top to bottom, and then exits. The table puts three ways of running the very same line of code side by side, and the three columns are which R session runs it, which folder R treats as the working directory, and whether the objects you made by hand in the console can be seen. Read the first row: typing a line at the console prompt uses your own session, the working directory is the project root, and everything you have made is there. Second row, clicking the green Run button on a chunk: it is still your own session, so your objects are still visible, but look at the middle column, because the working directory has changed to the folder the qmd file sits in. Third row, rendering: a brand new R process, the same qmd folder, and none of your console objects. So the working directory is the qmd's folder in both of the rows where your code is actually inside the document, and it is only the console prompt that sits at the project root. That is the trap. Get-w-d typed at the prompt cheerfully tells you something that is not true of any code in your document. The callout then names the two error messages this produces, so you can recognize them: object not found comes from the third column, and cannot open file comes from the middle one.
+
+</details>
+
+Working with a qmd file involves **two different R sessions**, not one.
+
+| How you run the code | Which R session | Working directory | Your console objects |
+|:---|:---|:---|:---|
+| Typed at the Console prompt | yours | the **project root** | visible |
+| Green **Run** button on a chunk | yours | the **qmd's own folder** | visible |
+| **Render** | a new one, gone afterwards | the **qmd's own folder** | **invisible** |
+
+:::{.callout-important title="The two errors this produces"}
++ `object '...' not found` : the last column. The render cannot see what you made by hand.
++ `cannot open file '...'` : the middle column. You wrote a path that was right at the prompt and wrong inside the document.
+:::
+
+### See it yourself
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+Do not take that table on trust. Run it. The chunk on this slide is genuinely being executed while this deck renders, so the path printed underneath it is the folder this lecture file lives in, and it is not the project root. That is the third row of the table happening in front of you. Get-w-d takes no arguments and returns the folder R is currently treating as the working directory. Now reproduce the other two rows on your own machine by following the Direction. Step one, open an R Project and open a qmd file that lives in one of its subfolders, because a file sitting directly at the project root cannot show you the difference. Step two, type get-w-d with empty parentheses at the console prompt and read the answer. Step three, put that same get-w-d call inside a chunk and click the small green triangle at the right-hand edge of the chunk, and read that answer. Step four, render the file and read the answer printed in the output. Steps three and four agree with each other, and both disagree with step two. The note at the bottom is there in case your step three does not match mine. Which folder the green Run button uses is an RStudio setting, found under Tools, Global Options, R Markdown, labelled evaluate chunks in directory, and it arrives set to Document. If yours is set to Project instead, your step three prints the project root, which sounds more convenient but is actually worse, because now running the chunk and rendering the file disagree with each other and the same path cannot be right for both. The fix for all of this is the same one either way, and it is the here package, which the directory slides later in this lecture come to.
+
+</details>
+
+This chunk ran while the slide was being rendered:
+
+```{r}
+#| label: wd-render-demo
+getwd()
+```
+
+:::{.callout-note title="Direction"}
+Reproduce the other two rows yourself:
+
+1. Open an R Project, and open a qmd file that lives in **a subfolder** of it
+2. Type `getwd()` at the **Console prompt**, and read the answer
+3. Put `getwd()` in a **chunk** and click the green &#9654; button, and read the answer
+4. **Render**, and read the answer in the output
+
+3 and 4 agree with each other. 2 disagrees with both.
+:::
+
+:::{.callout-note title="If your step 3 shows the project root"}
+Which folder the green &#9654; button uses is a setting: **Tools > Global Options > R Markdown > "Evaluate chunks in directory"**, which arrives set to *Document*. Set to *Project*, running a chunk and rendering the file disagree, so no single path can be right for both. The answer either way is `here()`, later in this lecture.
+:::
+
 :::
 <!--end of panel-->
 

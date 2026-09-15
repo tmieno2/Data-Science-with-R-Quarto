@@ -825,6 +825,121 @@ Transcript
 </div>
 </div>
 <!--end of panel-->
+</section>
+<section id="working-with-a-qmd-file" class="slide level2 scrollable">
+<h2>Working with a qmd file</h2>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Console vs.&nbsp;render</a></li><li><a href="#tabset-3-2">See it yourself</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Here is the thing that confuses almost everybody in the first few weeks, and it is worth slowing down for, because it explains most of the errors you are going to hit. There is not one R involved when you work with a qmd file. There are two. The one in your Console pane is the session you have been typing into all along, and it holds on to everything you have ever made in it. The other one exists only while you render: it starts up, runs the document from top to bottom, and then exits. The table puts three ways of running the very same line of code side by side, and the three columns are which R session runs it, which folder R treats as the working directory, and whether the objects you made by hand in the console can be seen. Read the first row: typing a line at the console prompt uses your own session, the working directory is the project root, and everything you have made is there. Second row, clicking the green Run button on a chunk: it is still your own session, so your objects are still visible, but look at the middle column, because the working directory has changed to the folder the qmd file sits in. Third row, rendering: a brand new R process, the same qmd folder, and none of your console objects. So the working directory is the qmd’s folder in both of the rows where your code is actually inside the document, and it is only the console prompt that sits at the project root. That is the trap. Get-w-d typed at the prompt cheerfully tells you something that is not true of any code in your document. The callout then names the two error messages this produces, so you can recognize them: object not found comes from the third column, and cannot open file comes from the middle one.</p>
+</details>
+<p>Working with a qmd file involves <strong>two different R sessions</strong>, not one.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">How you run the code</th>
+<th style="text-align: left;">Which R session</th>
+<th style="text-align: left;">Working directory</th>
+<th style="text-align: left;">Your console objects</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Typed at the Console prompt</td>
+<td style="text-align: left;">yours</td>
+<td style="text-align: left;">the <strong>project root</strong></td>
+<td style="text-align: left;">visible</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Green <strong>Run</strong> button on a chunk</td>
+<td style="text-align: left;">yours</td>
+<td style="text-align: left;">the <strong>qmd’s own folder</strong></td>
+<td style="text-align: left;">visible</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Render</strong></td>
+<td style="text-align: left;">a new one, gone afterwards</td>
+<td style="text-align: left;">the <strong>qmd’s own folder</strong></td>
+<td style="text-align: left;"><strong>invisible</strong></td>
+</tr>
+</tbody>
+</table>
+<div title="The two errors this produces">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>The two errors this produces</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><code>object '...' not found</code> : the last column. The render cannot see what you made by hand.</li>
+<li><code>cannot open file '...'</code> : the middle column. You wrote a path that was right at the prompt and wrong inside the document.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-2">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Do not take that table on trust. Run it. The chunk on this slide is genuinely being executed while this deck renders, so the path printed underneath it is the folder this lecture file lives in, and it is not the project root. That is the third row of the table happening in front of you. Get-w-d takes no arguments and returns the folder R is currently treating as the working directory. Now reproduce the other two rows on your own machine by following the Direction. Step one, open an R Project and open a qmd file that lives in one of its subfolders, because a file sitting directly at the project root cannot show you the difference. Step two, type get-w-d with empty parentheses at the console prompt and read the answer. Step three, put that same get-w-d call inside a chunk and click the small green triangle at the right-hand edge of the chunk, and read that answer. Step four, render the file and read the answer printed in the output. Steps three and four agree with each other, and both disagree with step two. The note at the bottom is there in case your step three does not match mine. Which folder the green Run button uses is an RStudio setting, found under Tools, Global Options, R Markdown, labelled evaluate chunks in directory, and it arrives set to Document. If yours is set to Project instead, your step three prints the project root, which sounds more convenient but is actually worse, because now running the chunk and rendering the file disagree with each other and the same path cannot be right for both. The fix for all of this is the same one either way, and it is the here package, which the directory slides later in this lecture come to.</p>
+</details>
+<p>This chunk ran while the slide was being rendered:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-2-Quarto"</code></pre>
+</div>
+</div>
+<div title="Direction">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Direction</strong></p>
+</div>
+<div class="callout-content">
+<p>Reproduce the other two rows yourself:</p>
+<ol type="1">
+<li>Open an R Project, and open a qmd file that lives in <strong>a subfolder</strong> of it</li>
+<li>Type <code>getwd()</code> at the <strong>Console prompt</strong>, and read the answer</li>
+<li>Put <code>getwd()</code> in a <strong>chunk</strong> and click the green ▶ button, and read the answer</li>
+<li><strong>Render</strong>, and read the answer in the output</li>
+</ol>
+<p>3 and 4 agree with each other. 2 disagrees with both.</p>
+</div>
+</div>
+</div>
+</div>
+<div title="If your step 3 shows the project root">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>If your step 3 shows the project root</strong></p>
+</div>
+<div class="callout-content">
+<p>Which folder the green ▶ button uses is a setting: <strong>Tools &gt; Global Options &gt; R Markdown &gt; “Evaluate chunks in directory”</strong>, which arrives set to <em>Document</em>. Set to <em>Project</em>, running a chunk and rendering the file disagree, so no single path can be right for both. The answer either way is <code>here()</code>, later in this lecture.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!--end of panel-->
 <!-- ADDED (B3): entire slide below. The original asked students to write
      "dependson: cache_1" and referred to "the cache_1 chunk" repeatedly without
      ever teaching that chunks can be named. Labels are also required for the
@@ -833,9 +948,9 @@ Transcript
 <section id="chunk-labels" class="slide level2">
 <h2>Chunk labels</h2>
 <div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">What?</a></li><li><a href="#tabset-3-2">Why bother?</a></li><li><a href="#tabset-3-3">Rules</a></li></ul>
+<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1">What?</a></li><li><a href="#tabset-4-2">Why bother?</a></li><li><a href="#tabset-4-3">Rules</a></li></ul>
 <div class="tab-content">
-<div id="tabset-3-1">
+<div id="tabset-4-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -843,13 +958,13 @@ Transcript
 <p>You can give a chunk a name, using the label option on its own line inside the chunk. That is all there is to the syntax. It looks like a cosmetic detail and it is not, which is what the next tab is about. Notice the shape of it: the label goes on a comment line starting with a hash and a pipe, immediately after the chunk opens. That hash-pipe pattern is how every chunk option is written, so you are learning the general syntax here as well as this particular option. The example names the chunk read-corn-price because the code beneath it reads corn-underscore-price-dot-csv and stores the result in an object called corn-underscore-price. A descriptive label lets you recognize the job of the chunk without opening it.</p>
 </details>
 <p>You can give a code chunk a name using the <code>label</code> option:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>```{r}</span>
-<span id="cb5-2"><a></a>#| label: read-corn-price</span>
-<span id="cb5-3"><a></a></span>
-<span id="cb5-4"><a></a>corn_price &lt;- read.csv("corn_price.csv")</span>
-<span id="cb5-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>```{r}</span>
+<span id="cb7-2"><a></a>#| label: read-corn-price</span>
+<span id="cb7-3"><a></a></span>
+<span id="cb7-4"><a></a>corn_price &lt;- read.csv("corn_price.csv")</span>
+<span id="cb7-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="tabset-3-2">
+<div id="tabset-4-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -862,7 +977,7 @@ Transcript
 <li><p><strong>Caching options refer to them.</strong> The <code>dependson</code> option, later in this lecture, points at another chunk by its label.</p></li>
 </ul>
 </div>
-<div id="tabset-3-3">
+<div id="tabset-4-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -894,9 +1009,9 @@ Transcript
 <section id="chunk-options" class="slide level2">
 <h2>Chunk options</h2>
 <div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">What?</a></li><li><a href="#tabset-6-2">Example: <code>echo</code></a></li><li><a href="#tabset-6-3">How</a></li><li><a href="#tabset-6-4">Various options</a></li><li><a href="#tabset-6-5">Specify chunk options globally</a></li></ul>
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">What?</a></li><li><a href="#tabset-7-2">Example: <code>echo</code></a></li><li><a href="#tabset-7-3">How</a></li><li><a href="#tabset-7-4">Various options</a></li><li><a href="#tabset-7-5">Specify chunk options globally</a></li></ul>
 <div class="tab-content">
-<div id="tabset-6-1">
+<div id="tabset-7-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -919,7 +1034,7 @@ Transcript
 </ul>
 <p>See all the options <a href="https://quarto.org/docs/computations/execution-options.html#output-options">here</a>.</p>
 </div>
-<div id="tabset-6-2">
+<div id="tabset-7-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -933,7 +1048,7 @@ Transcript
 </ul>
 <p>The difference is the chunk option <code>echo: false</code> on the second one.</p>
 </div>
-<div id="tabset-6-3">
+<div id="tabset-7-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -941,18 +1056,18 @@ Transcript
 <p>Here is the syntax for setting an option, and it is the hash-pipe pattern you already saw with labels. Immediately inside the chunk, on its own line, you write hash, pipe, the option name, a colon, and the value. So hash-pipe echo colon false hides the code. Now read the Caveat, because this one is genuinely maddening when it happens: there must be no blank line between the start of the chunk and its options. Put a blank line in there and the option is silently ignored. Nothing warns you; the chunk just behaves as though you never set it.</p>
 </details>
 <p>To set a chunk option, use the following syntax:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>```{r}</span>
-<span id="cb6-2"><a></a>#| option-name: choice</span>
-<span id="cb6-3"><a></a></span>
-<span id="cb6-4"><a></a>R codes come here</span>
-<span id="cb6-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>```{r}</span>
+<span id="cb8-2"><a></a>#| option-name: choice</span>
+<span id="cb8-3"><a></a></span>
+<span id="cb8-4"><a></a>R codes come here</span>
+<span id="cb8-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
 <p><strong>Example</strong></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>```{r}</span>
-<span id="cb7-2"><a></a>#| echo: false</span>
-<span id="cb7-3"><a></a></span>
-<span id="cb7-4"><a></a>R codes come here</span>
-<span id="cb7-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>```{r}</span>
+<span id="cb9-2"><a></a>#| echo: false</span>
+<span id="cb9-3"><a></a></span>
+<span id="cb9-4"><a></a>R codes come here</span>
+<span id="cb9-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><br></p>
 <div title="Caveat">
 <div class="callout callout-important no-icon callout-titled callout-style-default">
@@ -965,18 +1080,18 @@ Transcript
      its title. Also quoted for consistency with every other callout title in
      this file (C6). -->
 <p>There must be no blank line between the start of an R code chunk and its options. In the example below, the <code>echo</code> option is ignored:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>```{r}</span>
-<span id="cb8-2"><a></a></span>
-<span id="cb8-3"><a></a>#| echo: false</span>
-<span id="cb8-4"><a></a></span>
-<span id="cb8-5"><a></a>R codes come here</span>
-<span id="cb8-6"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>```{r}</span>
+<span id="cb10-2"><a></a></span>
+<span id="cb10-3"><a></a>#| echo: false</span>
+<span id="cb10-4"><a></a></span>
+<span id="cb10-5"><a></a>R codes come here</span>
+<span id="cb10-6"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div id="tabset-6-4">
+<div id="tabset-7-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -985,9 +1100,9 @@ Transcript
 <p>Then look at output. Output true prints the results, including messages and warnings, output false hides all of those results while the code still runs, and output a-s-i-s inserts the result without Quarto adding its usual formatting. That last choice is for output that is already written as document content, so Quarto should not wrap it as ordinary printed output. The check chunk in the Direction callout proves that output false did not prevent evaluation. Include false is the all-at-once version for a chunk that must run but should contribute nothing visible: evaluation stays on, while code, output, warnings, and messages are all hidden. That is why it is so useful on a setup chunk that loads packages. The include-demo and include-demo-check pair in the sample makes that invisible evaluation visible to you. Finally, the figure tab separates four jobs. Figure-align chooses default, center, left, or right. Figure-width and figure-height set the drawing dimensions in inches, and figure-cap supplies the caption. Follow the Direction by changing the alignment or width in the sample, then render again so you see the option change rather than only reading its name. The link in that callout is the full figure-option reference for choices beyond these four.</p>
 </details>
 <div class="panel-tabset">
-<ul id="tabset-4" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-4-1"><code>echo</code> and <code>eval</code></a></li><li><a href="#tabset-4-2"><code>message</code> and <code>warning</code></a></li><li><a href="#tabset-4-3"><code>output</code></a></li><li><a href="#tabset-4-4"><code>include</code></a></li><li><a href="#tabset-4-5">figure-related</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1"><code>echo</code> and <code>eval</code></a></li><li><a href="#tabset-5-2"><code>message</code> and <code>warning</code></a></li><li><a href="#tabset-5-3"><code>output</code></a></li><li><a href="#tabset-5-4"><code>include</code></a></li><li><a href="#tabset-5-5">figure-related</a></li></ul>
 <div class="tab-content">
-<div id="tabset-4-1">
+<div id="tabset-5-1">
 <p><br></p>
 <ul>
 <li><p><code>echo</code> (<span style="color:red"> true </span> or false): whether the code itself appears in the output document</p></li>
@@ -1009,7 +1124,7 @@ Transcript
 <!-- CHANGED (C2): was "lines 75-103". Replaced with a chunk label reference
      here and in every other Direction callout below. -->
 </div>
-<div id="tabset-4-2">
+<div id="tabset-5-2">
 <p><br></p>
 <ul>
 <li><p><code>message</code> (true or <span style="color:red"> false </span>): whether messages produced while running the code appear in the output document</p></li>
@@ -1029,7 +1144,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-4-3">
+<div id="tabset-5-3">
 <p><br></p>
 <p><code>output</code> (<span style="color:red"> true </span>, false, asis)</p>
 <ul>
@@ -1051,7 +1166,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-4-4">
+<div id="tabset-5-4">
 <p><br></p>
 <p><code>include: false</code> runs the code but shows nothing at all. It is equivalent to setting <code>eval: true</code>, <code>echo: false</code>, <code>output: false</code>, <code>warning: false</code>, and <code>message: false</code> all at once.</p>
 <!-- CHANGED (A8): the original said it was equivalent to "eval: true,
@@ -1084,7 +1199,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-4-5">
+<div id="tabset-5-5">
 <p><br></p>
 <p><strong>Chunk options for figures</strong></p>
 <ul>
@@ -1117,7 +1232,7 @@ Transcript
 </div>
 <!--end of panel-->
 </div>
-<div id="tabset-6-5">
+<div id="tabset-7-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -1126,9 +1241,9 @@ Transcript
 <p>Now move to the code-fold tab. Code-fold true belongs inside the html format block because it changes how html displays code. It collapses each code block behind a Code button, so the report stays readable but the work remains available for inspection. Code-fold show uses the same folding interface but starts with the code expanded. Click the button on the sample’s code-fold-demo figure to see that this is a display choice, not removal of the code. The final callout gives you the precedence rule: a local option on one chunk overrides the global setting. That exception is what lets you establish a sensible document-wide default and still treat one chunk differently when it needs to be shown.</p>
 </details>
 <div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">What and why?</a></li><li><a href="#tabset-5-2">How</a></li><li><a href="#tabset-5-3">A better option than hiding: <code>code-fold</code></a></li><li><a href="#tabset-5-4">Note</a></li></ul>
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">What and why?</a></li><li><a href="#tabset-6-2">How</a></li><li><a href="#tabset-6-3">A better option than hiding: <code>code-fold</code></a></li><li><a href="#tabset-6-4">Note</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1">
+<div id="tabset-6-1">
 <p>Sometimes it is useful to set chunk options that apply globally, to the entire document.</p>
 <p>For example,</p>
 <ul>
@@ -1137,22 +1252,22 @@ Transcript
 <li>Typing <code>echo: false</code> in every single chunk is a waste of time.</li>
 </ul>
 </div>
-<div id="tabset-5-2">
+<div id="tabset-6-2">
 <p>You can set chunk options globally in the YAML header with the <code>execute</code> option like below:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>---</span>
-<span id="cb9-2"><a></a>title: "Reporting using Quarto"</span>
-<span id="cb9-3"><a></a>author: "Taro Mieno"</span>
-<span id="cb9-4"><a></a>format:</span>
-<span id="cb9-5"><a></a>  html:</span>
-<span id="cb9-6"><a></a>    toc: true</span>
-<span id="cb9-7"><a></a>    toc-depth: 2</span>
-<span id="cb9-8"><a></a>    number-sections: true</span>
-<span id="cb9-9"><a></a>    number-depth: 2</span>
-<span id="cb9-10"><a></a>execute:</span>
-<span id="cb9-11"><a></a>  echo: false</span>
-<span id="cb9-12"><a></a>  warning: false</span>
-<span id="cb9-13"><a></a>  message: false</span>
-<span id="cb9-14"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>---</span>
+<span id="cb11-2"><a></a>title: "Reporting using Quarto"</span>
+<span id="cb11-3"><a></a>author: "Taro Mieno"</span>
+<span id="cb11-4"><a></a>format:</span>
+<span id="cb11-5"><a></a>  html:</span>
+<span id="cb11-6"><a></a>    toc: true</span>
+<span id="cb11-7"><a></a>    toc-depth: 2</span>
+<span id="cb11-8"><a></a>    number-sections: true</span>
+<span id="cb11-9"><a></a>    number-depth: 2</span>
+<span id="cb11-10"><a></a>execute:</span>
+<span id="cb11-11"><a></a>  echo: false</span>
+<span id="cb11-12"><a></a>  warning: false</span>
+<span id="cb11-13"><a></a>  message: false</span>
+<span id="cb11-14"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <!-- CHANGED: added warning and message to the example, since hiding those
      globally is far more common in practice than hiding code. -->
 <div title="Direction">
@@ -1165,8 +1280,8 @@ Transcript
 <ul>
 <li>Insert the following in the YAML header of <code>sample_qmd.qmd</code> file so that it looks like above</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>execute:</span>
-<span id="cb10-2"><a></a>  echo: false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>execute:</span>
+<span id="cb12-2"><a></a>  echo: false</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>Render the qmd file again and then compare the <strong>echo-eval</strong> section of the qmd file and its corresponding output.</li>
 </ul>
@@ -1179,11 +1294,11 @@ Transcript
      because the code is still there if the reader wants it. You already use it
      in Chapter 5. -->
 </div>
-<div id="tabset-5-3">
+<div id="tabset-6-3">
 <p>Instead of removing the code from the document entirely, you can collapse it behind a “Code” button that the reader can click open:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>format:</span>
-<span id="cb11-2"><a></a>  html:</span>
-<span id="cb11-3"><a></a>    code-fold: true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>format:</span>
+<span id="cb13-2"><a></a>  html:</span>
+<span id="cb13-3"><a></a>    code-fold: true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>The document reads cleanly, without walls of code</li>
 <li>The reader who wants to check your work can still see every line</li>
@@ -1214,7 +1329,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-5-4">
+<div id="tabset-6-4">
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1240,9 +1355,9 @@ Transcript
 <section id="when-a-render-fails" class="slide level2 scrollable">
 <h2>When a render fails</h2>
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Read the message</a></li><li><a href="#tabset-7-2">Find the cause</a></li><li><a href="#tabset-7-3"><code>error: true</code></a></li></ul>
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Read the message</a></li><li><a href="#tabset-8-2">Find the cause</a></li><li><a href="#tabset-8-3"><code>error: true</code></a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
+<div id="tabset-8-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1255,7 +1370,7 @@ Transcript
 <li><strong>the error itself</strong>, which is an ordinary R error like <code>object 'corn_data' not found</code> or <code>cannot open file 'corn_price.csv'</code></li>
 </ul>
 </div>
-<div id="tabset-7-2">
+<div id="tabset-8-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1285,7 +1400,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-7-3">
+<div id="tabset-8-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -1293,11 +1408,11 @@ Transcript
 <p>One more tool for when things break. By default a single failing chunk stops the entire render, which is usually what you want but occasionally is not. Setting error true on a chunk tells Quarto to print the error into the document and carry on building. Two uses. First, when you are deliberately demonstrating an error, which is exactly what the sample file does with log of a. Log expects a numeric value, so giving it the character a produces the error you see. Second, and more practically, when several chunks are broken and you want to see all the failures in one render instead of fixing them one at a time.</p>
 </details>
 <p>By default, one failing chunk stops the whole render. Sometimes you want the document to build anyway and show the error where it happened:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>```{r}</span>
-<span id="cb12-2"><a></a>#| error: true</span>
-<span id="cb12-3"><a></a></span>
-<span id="cb12-4"><a></a>log("a")</span>
-<span id="cb12-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a></a>```{r}</span>
+<span id="cb14-2"><a></a>#| error: true</span>
+<span id="cb14-3"><a></a></span>
+<span id="cb14-4"><a></a>log("a")</span>
+<span id="cb14-5"><a></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>The error message is printed in the document instead of stopping the render</li>
 <li>Useful when you are deliberately demonstrating an error, and useful for isolating which of several chunks is broken</li>
@@ -1321,9 +1436,9 @@ Transcript
 <section id="caching" class="slide level2">
 <h2>Caching</h2>
 <div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">What?</a></li><li><a href="#tabset-8-2">Let’s try</a></li><li><a href="#tabset-8-3">The one trap</a></li><li><a href="#tabset-8-4">If you hit this: <code>dependson</code></a></li><li><a href="#tabset-8-5">Related: <code>freeze</code></a></li></ul>
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">What?</a></li><li><a href="#tabset-9-2">Let’s try</a></li><li><a href="#tabset-9-3">The one trap</a></li><li><a href="#tabset-9-4">If you hit this: <code>dependson</code></a></li><li><a href="#tabset-9-5">Related: <code>freeze</code></a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1">
+<div id="tabset-9-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1339,7 +1454,7 @@ Transcript
      YAML "true". --></p></li>
 </ul>
 </div>
-<div id="tabset-8-2">
+<div id="tabset-9-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1364,7 +1479,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-8-3">
+<div id="tabset-9-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -1398,7 +1513,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-8-4">
+<div id="tabset-9-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -1433,7 +1548,7 @@ Transcript
 <!-- ADDED (B8): entire tab below. Students building the Quarto website in 02-3
      run straight into this, and cache does not solve it. -->
 </div>
-<div id="tabset-8-5">
+<div id="tabset-9-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -1441,8 +1556,8 @@ Transcript
 <p>One related idea, which is useful when you work with a multi-document project. Cache speeds up repeated renders of a single document. Freeze solves the neighbouring problem: when you have a whole website or project made of many documents, you do not want to rebuild all of them every time you edit one. Putting freeze auto in _quarto.yml means only the documents whose source has actually changed get re-rendered. If you build a website and find yourself waiting through a full rebuild for a one-line edit, this is the setting you want.</p>
 </details>
 <p><code>cache</code> speeds up repeated renders of <strong>one document</strong>. When you have a whole Quarto <strong>website</strong> or project of many documents (Chapter 02-3), you want something else: <code>freeze</code> stops a document from being re-rendered at all unless its source has changed.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>execute:</span>
-<span id="cb13-2"><a></a>  freeze: auto</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>execute:</span>
+<span id="cb15-2"><a></a>  freeze: auto</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Put this in <code>_quarto.yml</code> and only the documents you have actually edited get re-rendered when you rebuild the site.</p>
 </div>
 </div>
@@ -1460,9 +1575,9 @@ Transcript
      reliably under Quarto. The here package, which this very lecture already
      loads, is now the recommended answer. -->
 <div class="panel-tabset">
-<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">The default</a></li><li><a href="#tabset-9-2">Option 1: same folder</a></li><li><a href="#tabset-9-3">Option 2: full path (avoid)</a></li><li><a href="#tabset-9-4">Option 3: <code>here</code> (recommended)</a></li><li><a href="#tabset-9-5">Project-wide alternative</a></li></ul>
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">The default</a></li><li><a href="#tabset-10-2">Option 1: same folder</a></li><li><a href="#tabset-10-3">Option 2: full path (avoid)</a></li><li><a href="#tabset-10-4">Option 3: <code>here</code> (recommended)</a></li><li><a href="#tabset-10-5">Project-wide alternative</a></li></ul>
 <div class="tab-content">
-<div id="tabset-9-1">
+<div id="tabset-10-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1471,7 +1586,7 @@ Transcript
 </details>
 <p>Suppose you want to read a dataset like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="fu">read.csv</span>(<span class="st">"corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="fu">read.csv</span>(<span class="st">"corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="callout callout-important no-icon callout-titled callout-style-default">
@@ -1494,7 +1609,7 @@ Transcript
 <li><p>If the file is not there, R cannot import it and returns an error. Everything downstream that depends on the dataset fails too.</p></li>
 </ul>
 </div>
-<div id="tabset-9-2">
+<div id="tabset-10-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1503,7 +1618,7 @@ Transcript
 </details>
 <p>Put the datasets you intend to use in the same folder as your qmd file, and refer to them by name alone:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="fu">read.csv</span>(<span class="st">"corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="fu">read.csv</span>(<span class="st">"corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Simplest thing that works, and fine for a single short assignment.</li>
@@ -1524,7 +1639,7 @@ Transcript
      folder" as the recommendation for beginners with no hint that it is
      temporary, so students carried it into projects where it does not scale. -->
 </div>
-<div id="tabset-9-3">
+<div id="tabset-10-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -1533,7 +1648,7 @@ Transcript
 </details>
 <p>You can spell out the entire path to the file:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="fu">read.csv</span>(<span class="st">"/Users/tmieno2/Dropbox/Data-Science-with-R/Chapter-2-Quarto/corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">read.csv</span>(<span class="st">"/Users/tmieno2/Dropbox/Data-Science-with-R/Chapter-2-Quarto/corn_price.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div title="Why to avoid this">
 <div class="callout callout-important no-icon callout-titled callout-style-default">
@@ -1552,7 +1667,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-9-4">
+<div id="tabset-10-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -1561,9 +1676,9 @@ Transcript
 </details>
 <p>The <code>here</code> package builds paths starting from your <strong>project root</strong>: the folder containing your <code>.Rproj</code> file or <code>_quarto.yml</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="fu">library</span>(here)</span>
-<span id="cb17-2"><a></a></span>
-<span id="cb17-3"><a></a><span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_price.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">library</span>(here)</span>
+<span id="cb19-2"><a></a></span>
+<span id="cb19-3"><a></a><span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_price.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Works no matter which subfolder the qmd file itself sits in</li>
@@ -1595,7 +1710,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-9-5">
+<div id="tabset-10-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -1603,8 +1718,8 @@ Transcript
 <p>One alternative worth knowing if you are working on a whole project rather than a single document. Nesting execute-dir project under project in _quarto.yml makes every document run as though it were sitting at the project root, so a plain relative path like data slash corn_price works from anywhere in the project. It solves the same problem here solves, which is exactly why the note warns you to pick one and not both. Mixing them means you can no longer tell at a glance which folder any given path is starting from, and that confusion is worse than either approach on its own.</p>
 </details>
 <p>If you would rather have every document in a project run as if it were sitting at the project root, set this once in <code>_quarto.yml</code>:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a></a>project:</span>
-<span id="cb18-2"><a></a>  execute-dir: project</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a></a>project:</span>
+<span id="cb20-2"><a></a>  execute-dir: project</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Then <code>read.csv("data/corn_price.csv")</code> works from any document in the project. This is a project-wide setting, so use it instead of <code>here</code>, not alongside it, to avoid confusion about which folder paths start from.</p>
 </div>
 </div>
@@ -1619,9 +1734,9 @@ Transcript
 <section id="submitting-your-html" class="slide level2 scrollable">
 <h2>Submitting your html</h2>
 <div class="panel-tabset">
-<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">What rendering actually produces</a></li><li><a href="#tabset-10-2">The fix: <code>embed-resources</code></a></li><li><a href="#tabset-10-3">Check it worked</a></li></ul>
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">What rendering actually produces</a></li><li><a href="#tabset-11-2">The fix: <code>embed-resources</code></a></li><li><a href="#tabset-11-3">Check it worked</a></li></ul>
 <div class="tab-content">
-<div id="tabset-10-1">
+<div id="tabset-11-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1646,7 +1761,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-10-2">
+<div id="tabset-11-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1654,9 +1769,9 @@ Transcript
 <p>The fix is one line in the YAML header: embed-resources set to true, indented under html. That tells Quarto to pack local resources such as figures, styles, and scripts inside the single html file. It gets bigger, but you can email or upload that one file and you no longer need the files folder. The math library is not embedded by default, so add self-contained-math true under html if it must also work without a network connection. Read the callout: embed-resources is required for everything you submit in this course. Set it once at the top of every assignment and then submit the single html file.</p>
 </details>
 <p>Add one line to the YAML header:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a></a>format:</span>
-<span id="cb19-2"><a></a>  html:</span>
-<span id="cb19-3"><a></a>    embed-resources: true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a></a>format:</span>
+<span id="cb21-2"><a></a>  html:</span>
+<span id="cb21-3"><a></a>    embed-resources: true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>Local resources get packed <strong>inside</strong> the single html file</li>
 <li>The file gets bigger, but you can now email or upload it without its local companion resources</li>
@@ -1676,7 +1791,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-10-3">
+<div id="tabset-11-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -1709,9 +1824,9 @@ Transcript
 <section id="output-types" class="slide level2">
 <h2>Output types</h2>
 <div class="panel-tabset">
-<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Various formats</a></li><li><a href="#tabset-11-2">How</a></li><li><a href="#tabset-11-3">Note</a></li></ul>
+<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">Various formats</a></li><li><a href="#tabset-12-2">How</a></li><li><a href="#tabset-12-3">Note</a></li></ul>
 <div class="tab-content">
-<div id="tabset-11-1">
+<div id="tabset-12-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1735,7 +1850,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-11-2">
+<div id="tabset-12-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1744,24 +1859,24 @@ Transcript
 </details>
 <p><strong>Step 1</strong></p>
 <p>To produce a given output type, add the appropriate option under <code>format</code> in the YAML header, as below.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a></a>---</span>
-<span id="cb20-2"><a></a>title: "Reporting using Quarto"</span>
-<span id="cb20-3"><a></a>author: "Taro Mieno"</span>
-<span id="cb20-4"><a></a>format:</span>
-<span id="cb20-5"><a></a>  html:</span>
-<span id="cb20-6"><a></a>    toc: true</span>
-<span id="cb20-7"><a></a>    toc-depth: 2</span>
-<span id="cb20-8"><a></a>    number-sections: true</span>
-<span id="cb20-9"><a></a>    number-depth: 2</span>
-<span id="cb20-10"><a></a>    embed-resources: true</span>
-<span id="cb20-11"><a></a>  docx: default</span>
-<span id="cb20-12"><a></a>  typst:</span>
-<span id="cb20-13"><a></a>    papersize: a5</span>
-<span id="cb20-14"><a></a>    margin:</span>
-<span id="cb20-15"><a></a>      x: 1cm</span>
-<span id="cb20-16"><a></a>      y: 1cm</span>
-<span id="cb20-17"><a></a>    columns: 2</span>
-<span id="cb20-18"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a></a>---</span>
+<span id="cb22-2"><a></a>title: "Reporting using Quarto"</span>
+<span id="cb22-3"><a></a>author: "Taro Mieno"</span>
+<span id="cb22-4"><a></a>format:</span>
+<span id="cb22-5"><a></a>  html:</span>
+<span id="cb22-6"><a></a>    toc: true</span>
+<span id="cb22-7"><a></a>    toc-depth: 2</span>
+<span id="cb22-8"><a></a>    number-sections: true</span>
+<span id="cb22-9"><a></a>    number-depth: 2</span>
+<span id="cb22-10"><a></a>    embed-resources: true</span>
+<span id="cb22-11"><a></a>  docx: default</span>
+<span id="cb22-12"><a></a>  typst:</span>
+<span id="cb22-13"><a></a>    papersize: a5</span>
+<span id="cb22-14"><a></a>    margin:</span>
+<span id="cb22-15"><a></a>      x: 1cm</span>
+<span id="cb22-16"><a></a>      y: 1cm</span>
+<span id="cb22-17"><a></a>    columns: 2</span>
+<span id="cb22-18"><a></a>---</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <!-- CHANGED: added the enclosing --- fences, which the original example was
      missing, and added embed-resources to keep the running example consistent
      with the submission slide. -->
@@ -1787,7 +1902,7 @@ Transcript
 <p><strong>Step 2</strong></p>
 <p>You should see a downward triangle to the right of the <strong>Render</strong> button. Use it to choose which format to render.</p>
 </div>
-<div id="tabset-11-3">
+<div id="tabset-12-3">
 <details class="transcript">
 <summary>
 Transcript

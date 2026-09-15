@@ -658,7 +658,7 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. It takes no arguments and prints the full path R is currently using, so compare that output with the folder you expect. Once you know that, the simple case makes sense: if the working directory is your project folder and the file is sitting in it, then the bare file name is enough. The example’s bare name is corn-yields-dot-c-s-v, the left arrow would store the imported data as corn-yield, and eval false leaves that line as an example rather than importing the file again on this tab. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
+<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. It takes no arguments and prints the full path R is currently using, so compare that output with the folder you expect. And look carefully at what it printed, because it is not the project root. It is the folder this very deck’s qmd file sits in. That is the rule you met in the Quarto lecture: code inside a qmd runs in the qmd’s own folder, both when you click Run on a chunk and when you render, and it is only the console prompt that sits at the project root. So type get-w-d at your own prompt and you will get a different answer from the one on this slide, which is exactly what the callout asks you to do, because comparing those two answers is the whole point. Once you know which folder R is actually using, the simple case makes sense: if the file is sitting in that same folder, then the bare file name is enough. The example’s bare name is corn-yields-dot-c-s-v, the left arrow would store the imported data as corn-yield, and eval false leaves that line as an example rather than importing the file again on this tab. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
 </details>
 <p>R always has one folder it treats as “here”, called the <strong>working directory</strong>. A path that does not start from the root of your disk is interpreted relative to it.</p>
 <div class="cell">
@@ -667,7 +667,24 @@ Transcript
 <pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling"</code></pre>
 </div>
 </div>
-<p>So if the working directory is your project folder, this is enough:</p>
+<!-- CHANGED (D2): this line used to read "So if the working directory is your
+     project folder, this is enough", directly under a getwd() chunk that really
+     runs and really prints this deck's own folder. The slide contradicted its
+     own live output. See "Console vs. render" in 02-1. -->
+<p>That path is the folder <strong>this qmd file sits in</strong>, not the project root, because the code ran inside a qmd.</p>
+<div title="Your console prompt will disagree">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Your console prompt will disagree</strong></p>
+</div>
+<div class="callout-content">
+<p>Type <code>getwd()</code> at the <strong>Console prompt</strong> and you get the <strong>project root</strong> instead. Code inside a qmd runs in the qmd’s own folder, whether you click Run or render. Only the prompt sits at the root. See <strong>“Console vs.&nbsp;render”</strong> in 02-1.</p>
+</div>
+</div>
+</div>
+</div>
+<p>If the file you want is in that same folder, the bare name is enough:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>corn_yield <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
