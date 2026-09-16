@@ -444,13 +444,13 @@ could be deleted and gitignored.
 <summary>
 Transcript
 </summary>
-<p>Before you can wrangle any data you have to get it into R, and getting it out again matters just as much. Three objectives today. First, reading datasets in the four formats you will actually meet: csv, Excel, STATA, and R’s own rds. Second, writing R objects back out to files. And third, which is the one people underestimate, understanding where R looks for a file. That third objective is the middle third of this lecture and it is the part that goes wrong in assignments, because code that works on your machine and nowhere else is not much use to anybody.</p>
+<p>Before you can wrangle any data you have to get it into R, and getting it out again matters just as much. Three objectives today. First, reading datasets in the four formats you will actually meet: csv, Excel, STATA, and R’s own rds. Second, writing R objects back out to files. And third, which is the one people underestimate, understanding where R looks for a file. That third one is not a section of its own. It sits inside the csv slide, on the tab called where R looks for your files, because a path is an argument to the very functions you are learning there. It is also the part that goes wrong in assignments, because code that works on your machine and nowhere else is not much use to anybody.</p>
 </details>
 <ul>
 <li><p>Read datasets in various formats (<strong>csv</strong>, <strong>xls</strong>, <strong>dta</strong>, and <strong>rds</strong>) containing corn yields in Nebraska counties</p></li>
 <li><p>Write R objects as files in various formats</p></li>
-<li><p>Understand where R looks for a file, so that your code runs on someone else’s computer too <!-- ADDED: the third objective. It is what the middle third of this lecture is
-     really about, and it is the part students get wrong in assignments. --></p></li>
+<li><p>Understand where R looks for a file, so that your code runs on someone else’s computer too <!-- ADDED: the third objective. It is the part students get wrong in
+     assignments. It lives on a tab of the csv slide. --></p></li>
 </ul>
 </div>
 <div id="tabset-1-2">
@@ -498,32 +498,80 @@ Transcript
 </div>
 <!--end of panel-->
 </section>
-<section id="read-a-csv-file" class="slide level2">
-<h2>Read a CSV file</h2>
+<section id="read-a-csv-file-and-where-r-looks-for-it" class="slide level2 scrollable">
+<h2>Read a CSV file, and where R looks for it</h2>
 <div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1"><code>read.csv()</code></a></li><li><a href="#tabset-2-2"><code>read_csv()</code></a></li><li><a href="#tabset-2-3">Compare</a></li><li><a href="#tabset-2-4">Awkward files</a></li><li><a href="#tabset-2-5">From a URL</a></li></ul>
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1"><code>read.csv()</code> and <code>read_csv()</code></a></li><li><a href="#tabset-3-2">Where R looks for your files</a></li><li><a href="#tabset-3-3">Compare</a></li><li><a href="#tabset-3-4">Awkward files</a></li><li><a href="#tabset-3-5">From a URL</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Two functions read a csv file, and their names are almost the same, which is a real source of confusion. The first is read.csv, spelled with a dot. It is built into R as part of the utils package, so there is nothing to install and nothing to load. The second is read_csv, spelled with an underscore, and it comes from the readr package, which is part of the tidyverse. Notice that naming convention, because it runs through the whole tidyverse: underscores rather than dots. From the outside the two behave the same way. You hand the function a path to a file and it hands you back your data. The syntax block shows that shape for both. The left arrow stores the returned data under the name on the left, and the quoted text is where the path goes. That block is marked eval false because path to the file to import is not a real file, so those lines are there to be read rather than run. The double colon in readr double-colon read-c-s-v is asking for that function directly from readr, so the line works without a separate library readr call. The example chunk underneath does run. It reads corn-yields-dot-c-s-v twice, once with each function, storing the first result as corn-yields-d-f and the second as corn-yields-t-b-l, and message false suppresses readr’s column-specification message so the slide stays focused on the data itself. What those two objects actually are is not the same, and the Compare tab is about that. But first look at what we typed as the path: a bare file name, with no folders in front of it. That works only when the file is sitting in the one folder R happens to be looking in, and it is the simplest of several ways to write a path. The next tab is about the rest of them.</p>
+</details>
+<p>Two functions read a csv file, and their names are nearly identical:</p>
+<ul>
+<li><code>read.csv()</code>, with a dot, from the <code>utils</code> package that comes with R</li>
+<li><code>read_csv()</code>, with an underscore, from the <code>readr</code> package in the tidyverse</li>
+</ul>
+<p><strong>Syntax</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"path to the file to import"</span>)</span>
+<span id="cb2-2"><a></a>data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"path to the file to import"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- CHANGED (A3): the chunk headers were ```{r eval = F}, the old R Markdown
+     style, while 02-1 teaches "#| eval: false". Applied throughout this file.
+     CHANGED: also switched "=" to "<-" for assignment, and quoted the
+     placeholder path so the line is at least syntactically valid R.
+     CHANGED: read.csv() and read_csv() were two tabs. They are one now, so the
+     path argument can be introduced once and handed straight to the tab that
+     explains it. -->
+<p><strong>Example</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>corn_yields_df  <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span>
+<span id="cb3-2"><a></a>corn_yields_tbl <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The quoted text is the <strong>path to the file</strong>. Here it is a bare file name, which only works when the file sits in the folder R is currently looking in.</p>
+</div>
+<div id="tabset-3-2">
+<p>A <strong>path</strong> is the address of a file, and the bare file name on the previous tab is only the simplest kind. These tabs run from the kind of path that works on your own computer only to the kind that works on anybody’s, and end with what to do when R cannot find the file.</p>
+<!-- CHANGED: "Where R looks for your files" used to be a slide of its own,
+     after this one. Its tabs now live here, because a path is an argument to
+     the very functions taught above and students met them apart from each
+     other. Order: absolute, relative, R Project, Windows, here().
+     CHANGED (B1/B2) kept from that section: it once taught setwd() as the main
+     tool. That is the wrong default for a course where everything is rendered:
+     setwd() does not survive from one chunk to the next, and a hard-coded path
+     breaks on every other computer. here() is the recommendation, matching
+     what 02-1 teaches and what this file already did in its own hidden
+     chunks. The "Why setwd fails" tab went with it. -->
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Absolute path</a></li><li><a href="#tabset-2-2">Relative path</a></li><li><a href="#tabset-2-3">R Projects</a></li><li><a href="#tabset-2-4">Windows paths</a></li><li><a href="#tabset-2-5"><code>here()</code></a></li><li><a href="#tabset-2-6">File not found</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
-<p>Start with csv, and with the function that comes built into R: read.csv, with a dot. You give it a path to a file and it hands you back a data.frame. The syntax block shows the shape, and the example actually runs, reading the corn yields file. In that syntax block, the quoted text is where the file path goes, and the left arrow stores the returned data under the name on the left. Eval false keeps that placeholder example from running because path to the file to import is not a real file. The second chunk reads corn-yields-dot-c-s-v and assigns the result to corn-yields-d-f.&nbsp;Notice that this example uses only the file name. That works when the file is in R’s working directory, and we will soon look closely at how R decides what that directory is. This function works, it needs no extra packages, and for a small clean file it is perfectly adequate. But it is not what I am going to recommend.</p>
+<p>Both functions on the previous tab take a path, and a path is simply the address of a file on your computer. There are two kinds, so start with the plainer one. An absolute path begins at the very top of your disk and names every folder on the way down to the file, which means it identifies exactly one file no matter what R is doing or which folder R happens to be pointing at. The first line is what one looks like on a Mac or on Linux: it starts with a slash, then Users, then taro, then Documents, then my-project, then data, and finally corn-yields-dot-c-s-v. The second line is the same idea on Windows, where the path starts with the drive letter C and a colon instead of a bare slash. On both lines the left arrow stores the imported data under the name corn, and eval false keeps them from running when the deck is rendered, because neither of those folders exists on your computer or on mine. That is exactly the problem the callout describes. An absolute path always works, on the one machine it was written on. Send the file to a classmate, or to me, or open it on another computer of your own, and the folders named in it are not there, so the line fails. Nobody else has a folder called taro inside Users. So absolute paths are worth recognising, and worth avoiding in anything you hand in. The remaining tabs are the alternatives.</p>
 </details>
-<p>You can use <code>read.csv()</code> from the <code>utils</code> package, which comes with R.</p>
-<p><br></p>
-<p><strong>Syntax</strong></p>
+<p>An <strong>absolute path</strong> starts at the top of your disk and names every folder down to the file, so it always points at the same file, whatever R is doing.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"path to the file to import"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"/Users/taro/Documents/my-project/data/corn_yields.csv"</span>)   <span class="co"># macOS, Linux</span></span>
+<span id="cb4-2"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/Documents/my-project/data/corn_yields.csv"</span>) <span class="co"># Windows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<!-- CHANGED (A3): the chunk header was ```{r eval = F}, the old R Markdown
-     style, while 02-1 teaches "#| eval: false". Applied throughout this file.
-     CHANGED: also switched "=" to "<-" for assignment, and quoted the
-     placeholder path so the line is at least syntactically valid R. -->
-<p><br></p>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>corn_yields_df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div title="It works on exactly one computer">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>It works on exactly one computer</strong></p>
+</div>
+<div class="callout-content">
+<p>Nobody else has a folder called <code>taro</code> inside <code>Users</code>. Send that code to a classmate and every line that reads a file fails. This is the most common reason an assignment that works on your machine does not run on mine.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="tabset-2-2">
@@ -531,26 +579,163 @@ Transcript
 <summary>
 Transcript
 </summary>
-<p>Here is the alternative: read_csv, with an underscore, from the readr package, which comes with tidyverse. Notice the naming convention, because it runs through the whole tidyverse: underscores rather than dots. The call looks almost identical, you hand it a path and get your data back. The double colon in readr double-colon read-c-s-v asks for that function directly from readr, so this line does not depend on a separate library readr call. The first chunk is a non-running syntax template. In the example, the file name is the input, the left arrow saves the imported data as corn-yields-t-b-l, and message false suppresses readr’s column-specification message so the slide stays focused on the object itself. The difference is in what you get back and how it behaves, and that is what the next tab is about. When you see both of these in code on the internet, and you will, the underscore version is the modern one.</p>
+<p>Now the second kind of path, and the one that starts to make your code portable. A relative path does not begin at the top of the disk. It is read starting from one particular folder, the folder R currently treats as here, which is called the working directory. The function get-w-d tells you what that folder is at the moment. It takes no arguments and prints the full path R is using. The path on the slide is only an illustration of what one looks like, so the one you get back will read differently, and that is fine. Run it yourself, because whatever comes back is where R starts looking for every path that does not begin at the top of the disk. Then read the callout, because the answer depends on where you ask the question. At the Console prompt you get your project root. Inside a chunk in one of your own qmd files you get the folder that qmd file is saved in, both when you click Run and when you render the document. That is the rule you met in the Quarto lecture, and the way to convince yourself is to run get-w-d in both places and compare the two answers. Once you know which folder R is using, the list of relative paths makes sense. A bare file name, corn-yields-dot-c-s-v with no folders in front of it, means the file sits in the working directory itself, and that is what the examples on the previous tab assumed. Data slash the file name goes down into a subfolder called data. Two dots followed by a slash goes up one level, into the folder that contains the working directory. And the two combine: up one level, then down into a folder called data. That third bullet also notes that two dots means the folder above this one, and that you can repeat it, so two dots slash two dots slash goes up two levels. These are worth being fluent in, because a sensible project keeps data and code in separate folders, and relative paths are how they find each other.</p>
 </details>
-<p>You can use <code>read_csv()</code> from the <code>readr</code> package.</p>
-<p><br></p>
-<p><strong>Syntax</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>data <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"path to the file to import"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A <strong>relative path</strong> does not start at the top of the disk. It is read from the one folder R currently treats as “here”, called the <strong>working directory</strong>. <code>getwd()</code> tells you which folder that is:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="fu">getwd</span>()</span>
+<span id="cb5-2"><a></a><span class="co">#&gt; [1] "/Users/you/Documents/my-project"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- CHANGED (D2 revised): getwd() used to run live here, so the slide printed
+     the lecture folder on Taro's laptop, and the prose then had to explain that
+     path away as "the folder this qmd file sits in", a file no student has in
+     front of them. The call is now shown with an illustrative path, and the
+     console-versus-chunk rule is stated about the student's own files. -->
+<div title="The answer depends on where you run it">
+<div class="callout callout-important no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>The answer depends on where you run it</strong></p>
 </div>
-<p><br></p>
-<p><strong>Example</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a>corn_yields_tbl <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-content">
+<p>At the <strong>Console prompt</strong> you get your <strong>project root</strong>. Inside a chunk in <strong>your own <code>.qmd</code></strong>, you get the folder that <code>.qmd</code> is saved in, whether you click Run or render. Run it in both places and compare. See <strong>“Console vs.&nbsp;render”</strong> in 02-1.</p>
 </div>
+</div>
+</div>
+</div>
+<p>Every path below is measured from that folder:</p>
+<ul>
+<li><code>"corn_yields.csv"</code>: the working directory itself, which is what the examples on the previous tab assume</li>
+<li><code>"data/corn_yields.csv"</code>: the <code>data</code> folder inside the working directory</li>
+<li><code>"../corn_yields.csv"</code>: one folder <strong>up</strong> from the working directory. <code>..</code> means “the folder above this one”, and repeats: <code>"../../corn_yields.csv"</code> goes up two</li>
+<li><code>"../data/corn_yields.csv"</code>: up one, then into <code>data</code></li>
+</ul>
 </div>
 <div id="tabset-2-3">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
-<p>So what actually differs, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. The two class calls produce those labels. A tibble’s class output can contain several inherited class names, including t-b-l-d-f, t-b-l, and data-dot-frame, and this readr result may also begin with spec-t-b-l-d-f.&nbsp;Those names describe one tibble with layers of behavior, not several separate objects. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. Because spaces cannot be used as ordinary bare names in R code, you refer to that preserved name by surrounding it with backticks. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.</p>
+<p>An R Project is the piece that makes all of this reliable, and if you take one practical habit from this lecture, make it this one. Creating a project sets the working directory for you, automatically, every time you open it, so you are never guessing where R thinks it is. You make one from the blue box with a plus in the upper left of RStudio, either starting a new folder or adopting one you already have. Do the exercise in the callout: make a project, close it, reopen it, and run getwd to confirm. This gives your project a fixed root, which is exactly what the here package, two tabs from now, measures every path from.</p>
+</details>
+<p>An <strong>R Project</strong> sets the working directory for you, every time you open it.</p>
+<ul>
+<li>Click the blue box with a plus sign at the upper left corner of RStudio</li>
+<li>Click “New Directory” to start a new folder, or “Existing Directory” to adopt one you already have</li>
+</ul>
+<div title="Let's try">
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Let’s try</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Create an R project</li>
+<li>Close and reopen it, then run <code>getwd()</code> and confirm it points at the project folder</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<p>It gives your project a fixed root, which is what <code>here()</code>, two tabs on, measures every path from.</p>
+</div>
+<div id="tabset-2-4">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. More precisely, a backslash starts an escape sequence, and in the first example the one before Users is treated as an escape instead of as a folder separator. Eval false is necessary because this line is deliberately showing the broken form. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. The two non-running lines show those fixes and both describe the same file. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
+</details>
+<!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
+     first week. -->
+<p>Windows shows paths with backslashes, but a backslash means something special inside an R string. Copying a path straight from File Explorer gives you this, which errors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:\Users</span><span class="sc">\t</span><span class="st">aro\data\corn_yields.csv"</span>)   <span class="co"># does not work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Two fixes, both fine:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>) <span class="co"># forward slashes</span></span>
+<span id="cb7-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p><code>here()</code>, in the next tab, sidesteps this entirely, because you never write the top part of the path.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-5">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. The double colon calls here directly from the here package. In the first chunk, the three quoted arguments are successive path pieces: the lectures folder, the Chapter-3-DataWrangling folder, and corn-yields-dot-c-s-v. The printed output is the complete operating-system path that here assembled. In the second chunk, here builds data slash corn-yields-dot-c-s-v and passes that path straight into read-c-s-v, whose result would be stored as corn. Eval false displays the portable pattern without reading the existing project copy. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root. As the callout notes, it finds that root by looking for the R Project file.</p>
+</details>
+<!-- ADDED (B1): entire tab. -->
+<p>Inside an R Project, the <code>here</code> package builds paths from the project root. <strong>This is the one to use.</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"lectures"</span>, <span class="st">"Chapter-3-DataWrangling"</span>, <span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/corn_yields.csv"</code></pre>
+</div>
+</div>
+<p><br></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Why:</p>
+<ul>
+<li>It works no matter which subfolder your qmd file sits in</li>
+<li>It works on any computer, because nothing above the project root is written down</li>
+<li>It works the same whether you run a chunk by hand or render the document</li>
+</ul>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Run <code>here::here()</code> on its own to see which folder it decided is the root. It looks for your <code>.Rproj</code> file.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-6">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files. The specific error on screen names corn-yields-dot-c-s-v. Both get-w-d and list-dot-files take no arguments here; the first prints the full folder path and the second prints the names inside it, so compare those outputs character for character against what you typed. Eval false means the calls are displayed for you to run when you need them, without adding machine-specific folder listings to the rendered slide.</p>
+</details>
+<!-- ADDED (B9): entire tab. "cannot open file" is the single most common error
+     in this chapter and the original offered no way to diagnose it. -->
+<p>The error looks like this:</p>
+<pre><code>Error: 'corn_yields.csv' does not exist in current working directory</code></pre>
+<p>Work through these in order:</p>
+<ol type="1">
+<li><code>getwd()</code>: where is R actually looking?</li>
+<li><code>list.files()</code>: what does R see in that folder? Compare against the name you typed.</li>
+<li>Check the <strong>extension</strong>. Windows hides extensions by default, so <code>corn_yields.csv</code> may really be <code>corn_yields.csv.txt</code>.</li>
+<li>Check spelling and capitalization. <code>Corn_Yields.csv</code> and <code>corn_yields.csv</code> are different files on some systems.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="fu">getwd</span>()</span>
+<span id="cb12-2"><a></a><span class="fu">list.files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<!--end of nested panel: where R looks-->
+</div>
+<div id="tabset-3-3">
+<details class="transcript">
+<summary>
+Transcript
+</summary>
+<p>Back to those two functions. So what actually differs between them, and does it matter to you? Three things. First, what you get back: read.csv gives a data.frame, read_csv gives a tibble. The two class calls produce those labels. A tibble’s class output can contain several inherited class names, including t-b-l-d-f, t-b-l, and data-dot-frame, and this readr result may also begin with spec-t-b-l-d-f.&nbsp;Those names describe one tibble with layers of behavior, not several separate objects. Second, how it prints: a tibble shows ten rows and tells you the type of every column, whereas a data.frame dumps the whole thing into your console, which is miserable for a large dataset. Third, and this is the one that bites, awkward column names. If your file has a column called county space name, read.csv silently renames it with a dot, while read_csv leaves it alone. Because spaces cannot be used as ordinary bare names in R code, you refer to that preserved name by surrounding it with backticks. The callout gives the recommendation: use read_csv. It is faster, it does not rename things behind your back, and a tibble is what the rest of this course expects.</p>
 </details>
 <!-- CHANGED (C1): the original Compare tab printed class() for each and stopped
      there. That tells a student the two objects differ without telling them
@@ -559,11 +744,11 @@ Transcript
 <p><strong>1. What you get back</strong></p>
 <div class="side-out tight">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">class</span>(corn_yields_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">class</span>(corn_yields_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "data.frame"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">class</span>(corn_yields_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="fu">class</span>(corn_yields_tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame" </code></pre>
 </div>
@@ -590,7 +775,7 @@ Transcript
 </div>
 </div>
 </div>
-<div id="tabset-2-4">
+<div id="tabset-3-4">
 <details class="transcript">
 <summary>
 Transcript
@@ -601,10 +786,10 @@ Transcript
      common real-world import problem and the original never mentioned it. -->
 <p><code>read_csv()</code> guesses each column’s type from the first rows. When it guesses wrong, say a zip code read as a number and stripped of its leading zero, tell it directly:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">read_csv</span>(</span>
-<span id="cb10-2"><a></a>  <span class="st">"corn_yields.csv"</span>,</span>
-<span id="cb10-3"><a></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">county_code =</span> <span class="fu">col_character</span>())</span>
-<span id="cb10-4"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="fu">read_csv</span>(</span>
+<span id="cb17-2"><a></a>  <span class="st">"corn_yields.csv"</span>,</span>
+<span id="cb17-3"><a></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">county_code =</span> <span class="fu">col_character</span>())</span>
+<span id="cb17-4"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Other arguments worth knowing:</p>
 <ul>
@@ -613,7 +798,7 @@ Transcript
 <li><code>col_names = FALSE</code>: the file has no header row</li>
 </ul>
 </div>
-<div id="tabset-2-5">
+<div id="tabset-3-5">
 <details class="transcript">
 <summary>
 Transcript
@@ -624,7 +809,7 @@ Transcript
      realise they can skip the download entirely. -->
 <p><code>read_csv()</code> accepts a web address wherever it accepts a file path:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/user/repo/main/corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/user/repo/main/corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-important no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -635,199 +820,6 @@ Transcript
 <p>This re-downloads the file every time you render. For anything you rely on, download it once, save it in your project, and read the local copy. A URL can change or disappear without warning.</p>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<!--end of panel-->
-</section>
-<section id="where-r-looks-for-your-files" class="slide level2 scrollable">
-<h2>Where R looks for your files</h2>
-<!-- CHANGED (B1/B2): this whole section was "Setting the working directory" and
-     taught setwd() as the main tool. That is the wrong default for a course
-     where everything is rendered: setwd() does not survive from one chunk to
-     the next (demonstrated in the "Why setwd fails" tab), and a hard-coded
-     path breaks on every other computer. here() is now the recommendation,
-     matching what 02-1 teaches and what this file already did in its own
-     hidden chunks. -->
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Working directory</a></li><li><a href="#tabset-3-2">Relative paths</a></li><li><a href="#tabset-3-3">RStudio projects</a></li><li><a href="#tabset-3-4"><code>here()</code> (recommended)</a></li><li><a href="#tabset-3-5">Windows paths</a></li><li><a href="#tabset-3-6">File not found</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Now the section that matters most for making your code work somewhere other than your own laptop. R always has one folder it treats as here, called the working directory, and any path that does not start from the root of your disk is interpreted relative to it. getwd tells you what it currently is; run it and look. It takes no arguments and prints the full path R is currently using, so compare that output with the folder you expect. And look carefully at what it printed, because it is not the project root. It is the folder this very deck’s qmd file sits in. That is the rule you met in the Quarto lecture: code inside a qmd runs in the qmd’s own folder, both when you click Run on a chunk and when you render, and it is only the console prompt that sits at the project root. So type get-w-d at your own prompt and you will get a different answer from the one on this slide, which is exactly what the callout asks you to do, because comparing those two answers is the whole point. Once you know which folder R is actually using, the simple case makes sense: if the file is sitting in that same folder, then the bare file name is enough. The example’s bare name is corn-yields-dot-c-s-v, the left arrow would store the imported data as corn-yield, and eval false leaves that line as an example rather than importing the file again on this tab. Everything else in this section is about controlling that folder deliberately rather than by accident.</p>
-</details>
-<p>R always has one folder it treats as “here”, called the <strong>working directory</strong>. A path that does not start from the root of your disk is interpreted relative to it.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling"</code></pre>
-</div>
-</div>
-<!-- CHANGED (D2): this line used to read "So if the working directory is your
-     project folder, this is enough", directly under a getwd() chunk that really
-     runs and really prints this deck's own folder. The slide contradicted its
-     own live output. See "Console vs. render" in 02-1. -->
-<p>That path is the folder <strong>this qmd file sits in</strong>, not the project root, because the code ran inside a qmd.</p>
-<div title="Your console prompt will disagree">
-<div class="callout callout-important no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Your console prompt will disagree</strong></p>
-</div>
-<div class="callout-content">
-<p>Type <code>getwd()</code> at the <strong>Console prompt</strong> and you get the <strong>project root</strong> instead. Code inside a qmd runs in the qmd’s own folder, whether you click Run or render. Only the prompt sits at the root. See <strong>“Console vs.&nbsp;render”</strong> in 02-1.</p>
-</div>
-</div>
-</div>
-</div>
-<p>If the file you want is in that same folder, the bare name is enough:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>corn_yield <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-3-2">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>You do not have to keep every file in one folder. A relative path lets you point at nearby folders starting from the working directory. Data slash the filename goes into a subfolder called data. Two dots followed by a slash goes up one level, to the folder containing your working directory. And you can combine them, going up one and then down into a different folder. The callout notes you can repeat the two dots to go up several levels. These are worth being fluent in, because a sensible project has data and code in separate folders, and relative paths are how they find each other.</p>
-</details>
-<p>You can point at files in nearby folders without writing the whole path:</p>
-<ul>
-<li><code>"data/corn_yields.csv"</code>: the <code>data</code> folder inside the working directory</li>
-<li><code>"../corn_yields.csv"</code>: one folder <strong>up</strong> from the working directory</li>
-<li><code>"../data/corn_yields.csv"</code>: up one, then into <code>data</code></li>
-</ul>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p><code>..</code> means “the folder above this one”. You can repeat it: <code>"../../corn_yields.csv"</code> goes up two levels.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-3">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>An R Project is the piece that makes all of this reliable, and if you take one practical habit from this lecture, make it this one. Creating a project sets the working directory for you, automatically, every time you open it, so you are never guessing where R thinks it is. You make one from the blue box with a plus in the upper left of RStudio, either starting a new folder or adopting one you already have. Do the exercise in the callout: make a project, close it, reopen it, and run getwd to confirm. This gives your project a fixed root, which is exactly what the next tab builds on.</p>
-</details>
-<p>An <strong>R Project</strong> sets the working directory for you, every time you open it.</p>
-<ul>
-<li>Click the blue box with a plus sign at the upper left corner of RStudio</li>
-<li>Click “New Directory” to start a new folder, or “Existing Directory” to adopt one you already have</li>
-</ul>
-<div title="Let's try">
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Let’s try</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Create an R project</li>
-<li>Close and reopen it, then run <code>getwd()</code> and confirm it points at the project folder</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<p>This is the foundation for the next tab: it gives your project a fixed root that everything else can be measured from.</p>
-</div>
-<div id="tabset-3-4">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>And here is the recommendation, which you first saw in Chapter 2. Inside an R Project, the here package builds paths starting from the project root rather than from wherever R happens to be pointing. You give it the folder and file names as separate pieces and it assembles a correct path for your operating system. The double colon calls here directly from the here package. In the first chunk, the three quoted arguments are successive path pieces: the lectures folder, the Chapter-3-DataWrangling folder, and corn-yields-dot-c-s-v. The printed output is the complete operating-system path that here assembled. In the second chunk, here builds data slash corn-yields-dot-c-s-v and passes that path straight into read-c-s-v, whose result would be stored as corn. Eval false displays the portable pattern without reading the existing project copy. Three reasons this is the one to use: it works no matter which subfolder your qmd sits in, it works on anybody’s computer because nothing above the project root is written down, and it behaves identically whether you run a chunk by hand or render the whole document. If you are ever unsure, run here on its own and it tells you which folder it decided was the root. As the callout notes, it finds that root by looking for the R Project file.</p>
-</details>
-<!-- ADDED (B1): entire tab. -->
-<p>Inside an R Project, the <code>here</code> package builds paths from the project root:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"lectures"</span>, <span class="st">"Chapter-3-DataWrangling"</span>, <span class="st">"corn_yields.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "/Users/taromieno/Teaching/Data-Science-with-R-Quarto/lectures/Chapter-3-DataWrangling/corn_yields.csv"</code></pre>
-</div>
-</div>
-<p><br></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>corn <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"corn_yields.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Why this is the one to use:</p>
-<ul>
-<li>It works no matter which subfolder your qmd file sits in</li>
-<li>It works on any computer, because nothing above the project root is written down</li>
-<li>It works the same whether you run a chunk by hand or render the document</li>
-</ul>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>Run <code>here::here()</code> on its own to see which folder it decided is the root. It looks for your <code>.Rproj</code> file.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-5">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>A tab for the Windows half of the room, because this bites in the first week. Windows displays paths with backslashes, but inside an R string a backslash is a special character that means the next character should be treated differently. So copying a path straight out of File Explorer and pasting it into quotes gives you something that errors, and the error message does not obviously point at backslashes. More precisely, a backslash starts an escape sequence, and in the first example the one before Users is treated as an escape instead of as a folder separator. Eval false is necessary because this line is deliberately showing the broken form. Two fixes, both perfectly acceptable: swap them for forward slashes, which R accepts on Windows, or double every backslash. The two non-running lines show those fixes and both describe the same file. And as the callout says, using here avoids the whole problem, because you never write that part of the path at all.</p>
-</details>
-<!-- ADDED (B8): entire tab. Half the class is on Windows and this bites in the
-     first week. -->
-<p>Windows shows paths with backslashes, but a backslash means something special inside an R string. Copying a path straight from File Explorer gives you this, which errors:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:\Users</span><span class="sc">\t</span><span class="st">aro\data\corn_yields.csv"</span>)   <span class="co"># does not work</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Two fixes, both fine:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">read_csv</span>(<span class="st">"C:/Users/taro/data/corn_yields.csv"</span>) <span class="co"># forward slashes</span></span>
-<span id="cb19-2"><a></a><span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">taro</span><span class="sc">\\</span><span class="st">data</span><span class="sc">\\</span><span class="st">corn_yields.csv"</span>) <span class="co"># doubled backslashes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Note</strong></p>
-</div>
-<div class="callout-content">
-<p>Using <code>here()</code> sidesteps this entirely, because you never write the top part of the path.</p>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-6">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>This tab is a checklist for the single most common error in this chapter, the one that says your file does not exist in the current working directory. Work through it in order rather than guessing. First, getwd: where is R actually looking, as opposed to where you assume it is. Second, list.files: what does R actually see in that folder, compared against the name you typed. Third, check the extension, and this catches a lot of people, because Windows hides extensions by default, so what looks like a csv may really have a dot txt on the end. Fourth, check spelling and capitalization, since on some systems capital and lowercase are different files. The specific error on screen names corn-yields-dot-c-s-v. Both get-w-d and list-dot-files take no arguments here; the first prints the full folder path and the second prints the names inside it, so compare those outputs character for character against what you typed. Eval false means the calls are displayed for you to run when you need them, without adding machine-specific folder listings to the rendered slide.</p>
-</details>
-<!-- ADDED (B9): entire tab. "cannot open file" is the single most common error
-     in this chapter and the original offered no way to diagnose it. -->
-<p>The error looks like this:</p>
-<pre><code>Error: 'corn_yields.csv' does not exist in current working directory</code></pre>
-<p>Work through these in order:</p>
-<ol type="1">
-<li><code>getwd()</code>: where is R actually looking?</li>
-<li><code>list.files()</code>: what does R see in that folder? Compare against the name you typed.</li>
-<li>Check the <strong>extension</strong>. Windows hides extensions by default, so <code>corn_yields.csv</code> may really be <code>corn_yields.csv.txt</code>.</li>
-<li>Check spelling and capitalization. <code>Corn_Yields.csv</code> and <code>corn_yields.csv</code> are different files on some systems.</li>
-</ol>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="fu">getwd</span>()</span>
-<span id="cb21-2"><a></a><span class="fu">list.files</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -855,7 +847,7 @@ Transcript
      replaced "you need to library the package", which uses library as a verb. --></p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="fu">library</span>(readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-2">
@@ -867,12 +859,12 @@ Transcript
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="fu">read_excel</span>(<span class="st">"path to the file"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="fu">read_excel</span>(<span class="st">"path to the file"</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Examples</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">1</span>) <span class="co"># 1st sheet</span></span>
-<span id="cb24-2"><a></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">2</span>) <span class="co"># 2nd sheet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">1</span>) <span class="co"># 1st sheet</span></span>
+<span id="cb21-2"><a></a>corn_09 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="dv">2</span>) <span class="co"># 2nd sheet</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-3">
@@ -888,7 +880,7 @@ Transcript
 <p>Referring to a sheet by number is fragile: insert a sheet and every number shifts. Use the name instead.</p>
 <p>First, list what is in the workbook:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">excel_sheets</span>(<span class="st">"corn_yields.xls"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="fu">excel_sheets</span>(<span class="st">"corn_yields.xls"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "corn_yields_08" "corn_yields_09"</code></pre>
 </div>
@@ -896,7 +888,7 @@ Transcript
 <p><br></p>
 <p>Then read the one you want:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="st">"corn_yields_08"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>corn_08 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"corn_yields.xls"</span>, <span class="at">sheet =</span> <span class="st">"corn_yields_08"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A12): this said sheet = "2008", which is not a sheet in the
      workbook; the sheets are corn_yields_08 and corn_yields_09, as the
@@ -911,7 +903,7 @@ Transcript
 <p>One short observation to close the Excel section. Check the class of what came back: it is a tibble, exactly the same kind of object read_csv produced. The class call asks R what kind of object corn-zero-eight is, and its output lists t-b-l-d-f, t-b-l, and data-dot-frame. The first two labels identify a tibble, while data-dot-frame appears because a tibble is built on top of a data.frame. That is worth noticing because it means everything you learn about working with tibbles applies regardless of what file format the data started life in. The format matters at the moment of reading and then stops mattering, which is a genuinely good property of the tidyverse tools.</p>
 </details>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">class</span>(corn_08)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
@@ -924,54 +916,43 @@ Transcript
 </section>
 <section id="read-a-stata-data-file-.dta" class="slide level2">
 <h2>Read a STATA data file (.dta)</h2>
-<div class="panel-tabset">
-<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Syntax and Examples</a></li><li><a href="#tabset-5-2">Note</a></li><li><a href="#tabset-5-3">Labelled columns</a></li></ul>
-<div class="tab-content">
-<div id="tabset-5-1">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
-<p>STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. The library call attaches haven so its functions are available by name. The syntax template is marked eval false because its quoted path is only a placeholder. The double colon in haven double-colon read-d-t-a is the other way to reach the function: it asks for read-d-t-a directly from haven, even without relying on the earlier library call. In the running example, corn-yields-dot-d-t-a is the input path and the left arrow stores the imported object as corn-yields. There is nothing more to the basic case than that. The two tabs after this one cover the two things about STATA files that do occasionally surprise people.</p>
+<p>STATA files, which have a dta extension, are read with read_dta from the haven package. If you work anywhere near economics you will meet these constantly, because STATA remains the standard tool in a lot of that world. Load haven, call read_dta with a path, and you have your data. The library call attaches haven so its functions are available by name. The syntax template is marked eval false because its quoted path is only a placeholder. The double colon in haven double-colon read-d-t-a is the other way to reach the function: it asks for read-d-t-a directly from haven, even without relying on the earlier library call. In the running example, corn-yields-dot-d-t-a is the input path and the left arrow stores the imported object as corn-yields. There is nothing more to the basic case than that. The last chunk checks what you were handed, and the class call prints three things: tbl_df, tbl, and data.frame. So what did you actually get? A tibble, the same as everywhere else. The reason data.frame appears at the end of that list is explained in the callout, and it is worth understanding properly because it causes real confusion. A tibble is built on top of a data.frame, with extra behaviour layered over it, so it truthfully reports that it is also a data.frame. Seeing data.frame in that list does not mean you have a plain data.frame.</p>
 </details>
 <p>Use the <code>read_dta()</code> function from the <code>haven</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">library</span>(haven)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="fu">library</span>(haven)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A3): the original had this twice, once with eval=FALSE to show and
      once with echo=FALSE to actually run. One visible chunk that runs does the
      same job with half the code. -->
-<p><br></p>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"corn_yields.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(<span class="st">"corn_yields.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<div id="tabset-5-2">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Check the class and you will see three things listed: tbl_df, tbl, and data.frame. So what did you actually get? A tibble, the same as everywhere else. The reason data.frame appears at the end of that list is explained in the callout, and it is worth understanding properly because it causes real confusion. A tibble is built on top of a data.frame, with extra behaviour layered over it, so it truthfully reports that it is also a data.frame. Seeing data.frame in that list does not mean you have a plain data.frame.</p>
-</details>
+<p><code>read_dta()</code> returns a <strong>tibble</strong>, just like <code>read_csv()</code> and <code>read_excel()</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
 </div>
-<p><code>read_dta()</code> returns a <strong>tibble</strong>, just like <code>read_csv()</code> and <code>read_excel()</code>.</p>
 <!-- CHANGED (A1): THIS IS THE IMPORTANT ONE. The original said "Notice that the
      data is converted into a data.frame object, not a tibble." That is wrong.
      Verified by running it: class() returns
      "tbl_df" "tbl" "data.frame", which is a tibble. A tibble always reports
      data.frame as its last class because it is built on one, and that is
-     probably what caused the confusion. -->
+     probably what caused the confusion.
+     CHANGED: this slide was three tabs (Syntax and Examples / Note / Labelled
+     columns). The first two are now one untabbed slide; the zap_labels tab was
+     dropped. -->
 <div title="Why data.frame still shows up in the class">
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
@@ -984,88 +965,45 @@ Transcript
 </div>
 </div>
 </div>
-</div>
-<div id="tabset-5-3">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>One genuine oddity of STATA files. STATA lets you attach labels to variables, and haven preserves them, which means a column can come back as a special labelled type rather than a plain number. Most of the time this is invisible and harmless. But occasionally a column will refuse to behave in arithmetic or will plot strangely, and the labels are why. The fix is one function, zap_labels, which strips them off and leaves you with ordinary columns. The code calls it directly from haven, passes in the whole corn-yields object, and assigns the cleaned result back to that same name. Eval false keeps this as a remedy to use when you actually encounter labelled columns, rather than stripping information from the lecture object automatically. Worth filing away, because when it happens the symptoms are baffling if you have never heard of it.</p>
-</details>
-<!-- ADDED: STATA files carry variable labels, which surprise people the first
-     time a column refuses to behave like a plain number. -->
-<p>STATA files often carry labels that R keeps as a <code>haven_labelled</code> column. If a column will not cooperate in arithmetic or plotting, strip the labels:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>corn_yields <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">zap_labels</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-<!--end of panel-->
 </section>
 <section id="read-an-rds-file" class="slide level2">
 <h2>Read an <strong>rds</strong> file</h2>
-<div class="panel-tabset">
-<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Instruction</a></li><li><a href="#tabset-6-2">Syntax and Examples</a></li><li><a href="#tabset-6-3">Note</a></li></ul>
-<div class="tab-content">
-<div id="tabset-6-1">
 <details class="transcript">
 <summary>
 Transcript
 </summary>
-<p>The last format is R’s own, the rds file, and it is different in kind from the others. An rds file stores a single R object exactly as it is, and only R can read it. Note the wording carefully: a single R object, not necessarily a dataset. That distinction matters, and we come back to it when we export. Reading one needs no packages at all, because readRDS is built into R. This is the format you will use for saving your own intermediate results.</p>
+<p>The last format is R’s own, the rds file, and it is different in kind from the others. An rds file stores a single R object exactly as it is, and only R can read it. Note the wording carefully: a single R object, not necessarily a dataset. That distinction matters, and we come back to it when we export. Reading one needs no packages at all, because readRDS is built into R. This is the format you will use for saving your own intermediate results. The syntax is the simplest of the lot: readRDS, and a path. The first chunk is marked eval false because path to the file is only a placeholder. In the running example, read-R-D-S opens corn-yields-dot-r-d-s and the left arrow stores the returned object as corn-yields. No sheet to specify, no package to load, no column types to worry about, because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. The last chunk checks the class, and you get a tibble again, but for a completely different reason than before. The output lists t-b-l-d-f, t-b-l, and data-dot-frame, which identifies corn-yields as that tibble. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
 </details>
 <ul>
 <li><p>An <strong>rds</strong> file stores a single R object exactly as it is, and is read only by R. <!-- CHANGED (A9): the original glossed rds as "r data set", which is misleading
      in a way the lecture then contradicts two slides later when it saves a
-     list. An rds file holds any single R object, not just a dataset. --></p></li>
-<li><p>You can use the <code>readRDS()</code> function to read an <strong>rds</strong> file.</p></li>
-<li><p>No special packages are necessary.</p></li>
+     list. An rds file holds any single R object, not just a dataset.
+     CHANGED: this slide was three tabs (Instruction / Syntax and Examples /
+     Note). It is one untabbed slide now. --></p></li>
+<li><p>You can use the <code>readRDS()</code> function to read an <strong>rds</strong> file. No special packages are necessary.</p></li>
 </ul>
-</div>
-<div id="tabset-6-2">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>The syntax is the simplest of the lot: readRDS, and a path. The first chunk is marked eval false because path to the file is only a placeholder. In the running example, read-R-D-S opens corn-yields-dot-r-d-s and the left arrow stores the returned object as corn-yields. No sheet to specify, no package to load, no column types to worry about. That is because the file already contains a complete R object, so there is nothing to interpret or guess at. It simply hands the object back to you. Which is exactly the point of the format, and it leads directly into the note on the next tab.</p>
-</details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">readRDS</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a><span class="fu">readRDS</span>(<span class="st">"path to the file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><br></p>
 <p><strong>Example</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>corn_yields <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"corn_yields.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>corn_yields <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"corn_yields.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<div id="tabset-6-3">
-<details class="transcript">
-<summary>
-Transcript
-</summary>
-<p>Check the class here and you get a tibble again, but for a completely different reason than before. The output lists t-b-l-d-f, t-b-l, and data-dot-frame, which identifies corn-yields as that tibble. With csv, the function decided to build you a tibble. Here, the object that was originally saved into this file happened to be a tibble, and an rds file gives you back precisely what was put into it. No conversion, no guessing, no types lost along the way. That fidelity is the whole selling point of the format, and it is why it is the right choice for saving work in progress.</p>
-</details>
+<p>The imported dataset is already a <code>tibble</code>, because the object saved into <strong>corn_yields.rds</strong> was a <code>tibble</code>, and an rds file gives you back exactly what was put in.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a><span class="fu">class</span>(corn_yields)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
 </div>
 </div>
-<p><br></p>
-<p>The imported dataset is already a <code>tibble</code>. That is because the object that was saved into <strong>corn_yields.rds</strong> was a <code>tibble</code>, and an rds file gives you back exactly what was put in.</p>
-</div>
-</div>
-</div>
-<!--end of panel-->
 </section>
 <section id="export-an-r-object" class="slide level2">
 <h2>Export an R object</h2>
 <div class="panel-tabset">
-<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Instruction</a></li><li><a href="#tabset-8-2">Syntax and Examples</a></li><li><a href="#tabset-8-3">Notes on RDS</a></li></ul>
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Instruction</a></li><li><a href="#tabset-6-2">Syntax and Examples</a></li><li><a href="#tabset-6-3">Notes on RDS</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1">
+<div id="tabset-6-1">
 <details class="transcript">
 <summary>
 Transcript
@@ -1082,7 +1020,7 @@ Transcript
 </ul></li>
 </ul>
 </div>
-<div id="tabset-8-2">
+<div id="tabset-6-2">
 <details class="transcript">
 <summary>
 Transcript
@@ -1091,20 +1029,20 @@ Transcript
 </details>
 <p><strong>Syntax</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">export_function</span>(object_name, <span class="st">"file name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="fu">export_function</span>(object_name, <span class="st">"file name"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A10): "obeject" -> "object". -->
 <p><br></p>
 <p><strong>Examples</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="co">#--- export as csv ---#</span></span>
-<span id="cb41-2"><a></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(corn_yields, <span class="st">"corn_yields_exp.csv"</span>)</span>
-<span id="cb41-3"><a></a></span>
-<span id="cb41-4"><a></a><span class="co">#--- export as dta ---#</span></span>
-<span id="cb41-5"><a></a>haven<span class="sc">::</span><span class="fu">write_dta</span>(corn_yields, <span class="st">"corn_yields_exp.dta"</span>)</span>
-<span id="cb41-6"><a></a></span>
-<span id="cb41-7"><a></a><span class="co">#--- export as rds ---#</span></span>
-<span id="cb41-8"><a></a><span class="fu">saveRDS</span>(corn_yields, <span class="st">"corn_yields_exp.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a><span class="co">#--- export as csv ---#</span></span>
+<span id="cb37-2"><a></a>readr<span class="sc">::</span><span class="fu">write_csv</span>(corn_yields, <span class="st">"corn_yields_exp.csv"</span>)</span>
+<span id="cb37-3"><a></a></span>
+<span id="cb37-4"><a></a><span class="co">#--- export as dta ---#</span></span>
+<span id="cb37-5"><a></a>haven<span class="sc">::</span><span class="fu">write_dta</span>(corn_yields, <span class="st">"corn_yields_exp.dta"</span>)</span>
+<span id="cb37-6"><a></a></span>
+<span id="cb37-7"><a></a><span class="co">#--- export as rds ---#</span></span>
+<span id="cb37-8"><a></a><span class="fu">saveRDS</span>(corn_yields, <span class="st">"corn_yields_exp.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <!-- CHANGED (A11): the csv filename was "corn_yields_exp_rownames.csv". There
      are no row names involved anywhere here; write_csv has no such concept.
@@ -1126,7 +1064,7 @@ Transcript
      plus the function to use when the requirement is real (a supervisor or a
      journal asking for a spreadsheet). -->
 </div>
-<div id="tabset-8-3">
+<div id="tabset-6-3">
 <details class="transcript">
 <summary>
 Transcript
@@ -1136,18 +1074,18 @@ Transcript
 <p>Now move to Which format should you use. The data-dot-frame call builds the comparison table on screen. The file column is a character vector of the three file names. File-dot-size returns each size in bytes, division by one thousand twenty-four converts those values to kibibytes, and round with one as its second argument keeps one decimal place before the values become the K-i-B column. For these files, the output is fourteen-point-seven kibibytes for csv, eight-point-eight for dta, and one-point-five for rds, so rds is the smallest. The size comparison is not the only decision. Csv stays broadly readable but loses stored types, rds preserves the exact R object but only R can read it, and dta is the choice when the recipient works in STATA. That is why the callout recommends csv for raw data and rds for intermediate results whose types need to survive between scripts.</p>
 </details>
 <div class="panel-tabset">
-<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Object type preservation</a></li><li><a href="#tabset-7-2">Which format should you use?</a></li></ul>
+<ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Object type preservation</a></li><li><a href="#tabset-5-2">Which format should you use?</a></li></ul>
 <div class="tab-content">
-<div id="tabset-7-1">
+<div id="tabset-5-1">
 <p>You can export any kind of R object as an <strong>rds</strong> file, not just a dataset.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>a_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="st">"R"</span>, <span class="st">"rocks"</span>), <span class="at">b =</span> corn_yields)</span>
-<span id="cb42-2"><a></a></span>
-<span id="cb42-3"><a></a>rds_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"a_list.rds"</span>)</span>
-<span id="cb42-4"><a></a></span>
-<span id="cb42-5"><a></a><span class="fu">saveRDS</span>(a_list, rds_path)</span>
-<span id="cb42-6"><a></a></span>
-<span id="cb42-7"><a></a><span class="fu">readRDS</span>(rds_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>a_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="st">"R"</span>, <span class="st">"rocks"</span>), <span class="at">b =</span> corn_yields)</span>
+<span id="cb38-2"><a></a></span>
+<span id="cb38-3"><a></a>rds_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"a_list.rds"</span>)</span>
+<span id="cb38-4"><a></a></span>
+<span id="cb38-5"><a></a><span class="fu">saveRDS</span>(a_list, rds_path)</span>
+<span id="cb38-6"><a></a></span>
+<span id="cb38-7"><a></a><span class="fu">readRDS</span>(rds_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$a
 [1] "R"     "rocks"
@@ -1176,17 +1114,20 @@ $b
      after itself. -->
 <p>A list goes in, and a list comes back out, with every column type intact.</p>
 </div>
-<div id="tabset-7-2">
+<div id="tabset-5-2">
 <!-- CHANGED (C4): the original tab asked "Which one is the smallest?" and then
      simply stopped, leaving the question hanging. Here is the answer, plus the
      part that actually matters more than size. -->
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">data.frame</span>(</span>
-<span id="cb44-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
-<span id="cb44-3"><a></a>  <span class="at">KiB =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
-<span id="cb44-4"><a></a>    <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)</span>
-<span id="cb44-5"><a></a>  ) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
-<span id="cb44-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">data.frame</span>(</span>
+<span id="cb40-2"><a></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>),</span>
+<span id="cb40-3"><a></a>  <span class="at">KiB =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(</span>
+<span id="cb40-4"><a></a>    <span class="fu">c</span>(<span class="st">"corn_yields.csv"</span>, <span class="st">"corn_yields.dta"</span>, <span class="st">"corn_yields.rds"</span>)</span>
+<span id="cb40-5"><a></a>  ) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>)</span>
+<span id="cb40-6"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>             file  KiB
 1 corn_yields.csv 14.7

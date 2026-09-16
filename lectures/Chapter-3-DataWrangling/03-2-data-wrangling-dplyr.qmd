@@ -129,7 +129,7 @@ The tidyverse is not one package but a collection bundled together, and the list
 <details class="transcript">
 <summary>Transcript</summary>
 
-Install tidyverse once, if you have not already, and then load it. Pay attention to what appears when you run library of tidyverse: it prints a list of the packages it has attached on your behalf. That is the point of the bundle, one call loading nine or ten packages. It also prints something about conflicts, which looks alarming the first time and is the subject of the next tab.
+Install tidyverse once, if you have not already, and then load it. Pay attention to what appears when you run library of tidyverse: it prints a list of the packages it has attached on your behalf. That is the point of the bundle, one call loading nine or ten packages. It also prints something about conflicts, which looks alarming the first time. Sometimes two packages define a function with the same name, and R has to decide which one you meant. The rule is simple: the package loaded later wins, and its version masks the earlier one. The classic case is filter, which exists in both dplyr and base R's stats package. This is why you will see me write dplyr colon colon filter throughout these notes. Those two colons say explicitly which package's version I want, and they remove all doubt.
 
 </details>
 
@@ -147,18 +147,9 @@ When you load the `tidyverse` package, it automatically loads many of the packag
 library(tidyverse)
 ```
 
-### Conflicts?
+<br>
 
-<details class="transcript">
-<summary>Transcript</summary>
-
-So what are those conflicts it warned you about? Sometimes two packages define a function with the same name, and R has to decide which one you meant. The rule is simple: the package loaded later wins, and its version masks the earlier one. The classic case is filter, which exists in both dplyr and base R's stats package. This is why you will see me write dplyr colon colon filter throughout these notes. Those two colons say explicitly which package's version I want, and they remove all doubt.
-
-</details>
-
-Sometimes two packages define functions with the same name. 
-
-When both are loaded, the name conflicts, and the function from the package loaded later masks the one from the package loaded earlier.
+It also reports conflicts: sometimes two packages define functions with the same name. When both are loaded, the function from the package loaded later masks the one from the package loaded earlier.
 :::
 <!--end of panel-->
 
@@ -699,20 +690,43 @@ seq(1, 99, by = 2) |> mean()
 <details class="transcript">
 <summary>Transcript</summary>
 
-You just met the dot, which lets you send the piped object somewhere other than the first argument. The native pipe has the same idea, written as an underscore, but it is far more restricted, and this is where people get caught. Two restrictions. First, when the underscore is used as an ordinary function argument, it has to be attached to a named argument: you cannot just drop it in positionally the way you can with a dot. Extraction chains are an exception in R 4.3 and later. Second, it may appear only once in the call, so anything where you need the piped object in two places is simply out of reach. Both restrictions produce errors, not silent misbehaviour, so at least you find out immediately.
+You just met the dot, which lets you send the piped object somewhere other than the first argument. The native pipe has the same idea, written as an underscore, but it is far more restricted, and this is where people get caught. Two restrictions. First, when the underscore is used as an ordinary function argument, it has to be attached to a named argument: you cannot just drop it in positionally the way you can with a dot. Extraction chains are an exception in R 4.3 and later. Second, it may appear only once in the call, so anything where you need the piped object in two places is simply out of reach. Both restrictions produce errors, not silent misbehaviour, so at least you find out immediately. The cell is a live one, so run it. Its first line recreates a_string, the sentence about not liking space, so this tab works whichever tab you opened first. The second line is the magrittr version with a dot in gsub's third position, and the third line is the native version, where the underscore has to be handed to the argument by name, x equals underscore. Both print the same sentence with its spaces removed. Then do what the Direction asks, because seeing the error is the point of the tab: delete the x equals from that last line, leaving a bare underscore, and run it again. R refuses it, and now you know what that message looks like before it turns up in your own code.
 
 </details>
 
 You just used `.` to send the piped object somewhere other than the first argument. `|>` has the same idea, written `_`, but with two restrictions:
 
-```{r}
-#| eval: false
-a_string %>% gsub(" ", "", .) # magrittr: positional is fine
-a_string |> gsub(" ", "", x = _) # native: must be a NAMED argument
+<!-- CHANGED (D3): was a display-only eval-false chunk on a deck where
+     every other example is runnable. Nothing forced that: WebR serves R 4.4
+     (repo.r-wasm.org/bin/emscripten/contrib/4.4), so both the `x = _` form and
+     the `_$a` extraction below are supported. It is NOT the deliberate static
+     chunk of CHANGED (A2) above -- that one is display-only because running it
+     corrupted `a_string` for the next example. This one recreates `a_string`
+     with its correct value, so the tab stands on its own no matter which tab
+     the student opened first, and repairs the session rather than polluting
+     it. -->
+
+::: {.side-out}
+
+```{webr-r}
+#| code-track: 0.5
+a_string <- "I do not like space"
+
+# magrittr: the dot can go anywhere
+a_string %>% gsub(" ", "", .)
+
+# native: the underscore must be named
+a_string |> gsub(" ", "", x = _)
 ```
+
+:::
 
 + When `_` is used as an ordinary function argument, it must attach to a **named** argument. `gsub(" ", "", _)` is an error, but extraction chains such as `_$a` work in R 4.3 and later.
 + `_` may appear **only once**. `%>%` lets you write `rep(., .)`; `|>` cannot.
+
+:::{.callout-note title="Direction"}
+In the cell above, delete the `x = ` from the last line and Run it again. The error is R refusing an unnamed `_`.
+:::
 
 #### Gotchas
 
@@ -867,14 +881,16 @@ a3 <-
 <details class="transcript">
 <summary>Transcript</summary>
 
-Now the core of the lecture: five dplyr verbs that between them do most of what data wrangling consists of. filter picks rows that meet a condition. select picks columns. mutate creates new variables or overwrites existing ones. rename changes variable names. arrange sorts. That is the whole vocabulary, and it is deliberately small. The callout is honest that there are more functions, but these five plus grouping will carry you through the rest of this course. Learn these properly rather than skimming a longer list.
+Now the core of the lecture: seven dplyr verbs that between them do most of what data wrangling consists of. filter picks rows that meet a condition, and slice picks rows by their position. select picks columns, and pull takes a single column out as a plain vector. mutate creates new variables or overwrites existing ones. rename changes variable names. arrange sorts. That is the whole vocabulary, and it is deliberately small. The callout is honest that there are more functions, but these seven plus grouping will carry you through the rest of this course. Learn these properly rather than skimming a longer list.
 
 </details>
 
 The `dplyr` package provides a set of functions for transforming data. 
 
 + `filter()`: select rows that satisfy user-specified conditions
++ `slice()`: select rows by their position (row number)
 + `select()`: keep (remove) only the variables the user specified
++ `pull()`: extract a single variable as a vector
 + `mutate()`: create (over-write) a variable based on user-specified formula
 + `rename()`: rename variables
 + `arrange()`: sort by variables specified by the user
@@ -1036,6 +1052,120 @@ dplyr::filter(flights_slim, carrier == "US")
 :::
 <!--end of panel-->
 
+### `slice`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+filter chooses rows by a condition; slice chooses rows by their position. You hand it the data and the row numbers you want, and it returns those rows in the order you asked for. Nothing about the columns changes. The syntax box shows the general form: the data, then a vector of positions. Positive positions keep those rows, and a minus sign in front drops them and keeps everything else, exactly the way the minus sign works in select.
+In the Examples tab, the first cell uses one colon five, which is the sequence one through five, so you get the first five rows of flights_mini. The second cell uses c of one comma three comma five, an explicit vector of positions, so you get the first, third, and fifth rows only. The third cell puts a minus sign before the parenthesised one colon twenty, so the first twenty rows are dropped and the four remaining rows, twenty-one through twenty-four, are what prints. The callout underneath names the helpers you will meet in other people's code: slice_head and slice_tail take rows from the top or bottom, and slice_max and slice_min take the rows with the largest or smallest value of a variable. They are conveniences built on the same idea and you do not need them today.
+The exercises make you write positions yourself. Rows ten through fifteen is the sequence ten colon fifteen. Dropping the first two rows is a minus sign in front of the parenthesised one colon two. Try each empty live cell before unfolding the answer.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`dplyr::slice()` subsets data row-wise using row positions (row numbers) rather than logical conditions.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+#--- syntax ---#
+dplyr::slice(dataset, positions)
+```
+
+<br>
+
+---
+
+<br>
+
+Just like `dplyr::select()`, a `-` in front of the positions drops those rows and keeps everything else:
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::slice(dataset, -positions)
+```
+
+#### Examples
+
+The first five rows:
+
+```{webr-r}
+dplyr::slice(flights_mini, 1:5)
+```
+
+<br>
+
+The first, third, and fifth rows:
+
+```{webr-r}
+dplyr::slice(flights_mini, c(1, 3, 5))
+```
+
+<br>
+
+Everything except the first twenty rows:
+
+```{webr-r}
+dplyr::slice(flights_mini, -(1:20))
+```
+
+<br>
+
+:::{.callout-note}
+`dplyr` also has `slice_head()`, `slice_tail()`, `slice_max()`, and `slice_min()`, which take rows from the top, the bottom, or by the largest or smallest value of a variable. They are conveniences built on the same idea.
+:::
+
+#### Exercises
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Get rows 10 through 15 of `flights_mini`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::slice(flights_mini, 10:15)
+```
+
+##### Exercise 2
+
+Drop the first two rows of `flights_mini`
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+dplyr::slice(flights_mini, -(1:2))
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
+
 ### `select`
 
 <details class="transcript">
@@ -1150,6 +1280,107 @@ dplyr::select(flights_mini, month, arr_delay)
 :::
 <!--end of panel-->
 
+
+### `pull`
+
+<details class="transcript">
+<summary>Transcript</summary>
+
+select with one variable gives you back a tibble with one column. Often that is not what you want: you want the values themselves, as a plain vector, so you can hand them to mean or max or plot them. That is what pull does. The syntax is the data and then the name of one variable, unquoted, and the result is a vector, not a tibble. This is the same job the dollar sign did back in the tibble section, and the reason to prefer pull is that it slots into a pipe.
+In the Examples tab, the first two cells are the contrast to hold in your head. select of dep_delay prints a tibble with one column and twenty-four rows, with the column header and the type label. pull of dep_delay prints a bare vector of twenty-four numbers. Same data, different container. The third cell shows why the difference matters: flights_mini, then pull dep_delay, then mean, computes the average departure delay in one readable line. You could not pipe a one-column tibble into mean, because mean wants a vector.
+The exercises ask for exactly that pattern. Pulling arr_delay and taking its maximum is flights_mini, pull arr_delay, max. Counting the flights from JFK is pull origin, then sum of origin equals equals the quoted text J-F-K, because summing a logical vector counts the trues. Try the empty live cells first, then unfold the answers.
+
+</details>
+
+::: {.panel-tabset}
+
+#### Introduction
+
+`dplyr::pull()` extracts a single variable as a vector. Unlike `dplyr::select()`, which returns a one-column tibble, `dplyr::pull()` returns the values themselves.
+
+<br>
+
+**Syntax**
+
+```{r eval = F}
+dplyr::pull(dataset, variable)
+```
+
+<br>
+
+This is the same thing `$` does, but `dplyr::pull()` works inside a pipe.
+
+#### Examples
+
+`dplyr::select()` returns a one-column tibble:
+
+```{webr-r}
+dplyr::select(flights_mini, dep_delay)
+```
+
+<br>
+
+`dplyr::pull()` returns a vector:
+
+```{webr-r}
+dplyr::pull(flights_mini, dep_delay)
+```
+
+<br>
+
+A vector is what functions like `mean()` want, so `dplyr::pull()` fits naturally in a pipe:
+
+```{webr-r}
+flights_mini %>%
+  dplyr::pull(dep_delay) %>%
+  mean()
+```
+
+#### Exercises
+
+::: {.panel-tabset}
+
+##### Exercise 1
+
+Pull `arr_delay` from `flights_mini` and find its maximum
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+flights_mini %>%
+  dplyr::pull(arr_delay) %>%
+  max()
+```
+
+##### Exercise 2
+
+Count how many flights in `flights_mini` departed from `"JFK"` (hint: `sum()` of a logical vector counts the `TRUE`s)
+
+```{webr-r}
+
+```
+
+<br>
+
+**Answer**
+```{r, eval = FALSE}
+#| code-fold: true
+flights_mini %>%
+  dplyr::pull(origin) %>%
+  {sum(. == "JFK")}
+```
+
+:::
+<!--end of panel-->
+
+:::
+<!--end of panel-->
 
 ### `relocate`
 

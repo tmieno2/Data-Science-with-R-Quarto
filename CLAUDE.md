@@ -218,6 +218,23 @@ browser.
    Exit code 1 means it found something. It scans every `.qmd`/`.rmd` outside
    `docs/`, so it is cheap enough to run every time.
 
+9. **Inline `` `{r} ...` `` runs even inside an HTML comment.** The sibling of
+   trap 8, and it bites when you are writing a *change-log comment about* a
+   chunk. Backtick-brace-`r` is Quarto's inline-code syntax, and knitr scans
+   raw markdown line by line without knowing the line sits inside `<!-- -->`,
+   so it evaluates it. Writing "was a display-only `` `{r} eval: false` ``
+   chunk" in a comment halted the render of `03-2` with
+
+   ```
+   Error: object 'false' not found
+   1. .QuartoInlineRender(eval:false)
+   ```
+
+   which names neither the comment nor a chunk you wrote. In prose, name the
+   option alone (`eval: false`, `eval-false`) and never wrap `{r}` in
+   backticks. `check-verbatim-fences.py` looks at fences, not inline spans, so
+   it does not catch this.
+
 ## Two dataset packages, and which to use
 
 | Package | Contents | Deps | Size | Used by |
