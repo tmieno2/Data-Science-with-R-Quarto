@@ -303,13 +303,16 @@ Read the pipeline from top to bottom. Yield data long enters pivot wider, names 
 You can append a character string to the new variable names. The previous example had `2019` and `2020` as the name of the new variables.
 
 ```{webr-r}
-yield_data_long %>%
-  tidyr::pivot_wider(
-    #--- let R know what the prefix is ---#
-    names_prefix = "yield_",
-    names_from = "year",
-    values_from = "yield"
-  )
+(
+  yield_data_wide <-
+    yield_data_long %>%
+    tidyr::pivot_wider(
+      #--- let R know what the prefix is ---#
+      names_prefix = "yield_",
+      names_from = "year",
+      values_from = "yield"
+    )
+)
 ```
 
 ### multiple columns
