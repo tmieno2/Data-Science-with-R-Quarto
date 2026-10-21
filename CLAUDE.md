@@ -320,6 +320,74 @@ Copy the whole file — it is nothing but the prompt. Its reference paths are
 absolute and assume this repo stays at
 `~/Teaching/Data-Science-with-R-Quarto`; update them if it moves.
 
+## Assignments
+
+In use since 2026-10-21, part way through Assignment 1 of Fall 2026. Before
+that, assignments went out by Dropbox links built from the
+`assignments/Assignment_N*/` folders, which are kept but no longer used. This
+is a copy of the AE-MS assignment system (`../AE-MS/CLAUDE.md`, section 3), so
+a fix to the tooling in one course belongs in the other too.
+
+**Assignments have no due dates here, deliberately.** Nothing is restricted by
+date, so `course-dates.json` holds only the final-project dates and the
+assignment sources carry no `{{assignment-N-due}}` placeholder.
+
+| Path | What it is |
+|---|---|
+| `assignments/instructor/assignment-N.qmd` | **Source of truth**, with answers. Its own git repository, private remote `tmieno2/Data-Science-with-R-answers`; ignored here because this repository is public. Commit and push answer changes from inside that folder. |
+| `assignments/instructor/data-prep/` | The scripts that made each assignment's datasets. Reference only. |
+| `assignments/data/` | Every dataset and figure students receive. Untracked (one file is 170 MB); the originals are in `assignments/Assignment_N*/`. |
+| `assignments/keys/<year>/` | Built answer keys. Ignored. |
+| `assignments/students/<year>/` | Built student copies. The `.qmd` files are tracked. |
+| `assignments/submission` | Symlink to the Google Drive folder the submission form writes into. Ignored. |
+| `assignments/webform/` | The submission form (Apps Script). Its `README.md` covers deployment. |
+| `course-dates.json`, `course-dates.R` | Final-project dates, the form URL and the download link. |
+| `assignments.qmd` | The page students start from: the download link and the form, both read from `course-dates.json`. |
+
+**Build** (renders every key and student copy, checks no answer reached a
+student file, then copies the year folder into the Drive folder in
+`materials.publish_dir`; copying does not share it):
+
+```sh
+Rscript assignments/build-assignments.R
+```
+
+**Authoring rules**, same as AE-MS:
+
+- R chunks are removed from the student copy unless marked `#| keep: true`
+  (kept as is) or `#| scaffold: true` (body replaced by `# YOUR CODE HERE`).
+  Most answers here are R chunks, so they need no marking.
+- A written answer goes in a `::: {.answer}` div, with a blank line before and
+  after it; the whole div is removed from the student copy.
+- The form link is a placeholder, `{{submission}}`, never a typed URL. So is
+  any date (`{{final-paper|%B %e}}`).
+- Data is read by bare filename (`readRDS("yield.rds")`), never through
+  `here::here()`. Every file a student needs is listed under `data` in the
+  manifest at the top of `build-assignments.R`; a file only the key reads goes
+  under `key_data`.
+- A figure or table students must reproduce ("should look like below") is an
+  image in `assignments/data/`, listed in the manifest. The key also saves it
+  when rendered, but only into `keys/<year>/`; copy it into `data/` if the
+  answer changes.
+- Assignment 1 students also get `assignment-1-expected-output.html`, the
+  rendered key, on purpose: it shows the intended figures and tables so they
+  can check their work. It is copied only because that key shows no code
+  (`expected_output = TRUE` in the manifest); the build refuses to copy a key
+  that shows any. The Assignment 2 and 3 keys show code and stay private.
+
+**Rolling to a new year:**
+
+1. Edit the `term` block of `course-dates.json` (dates and the registrar's
+   no-class days).
+2. Set `COURSE_YEAR` in `setup()` in `assignments/webform/Code.gs`, push and
+   redeploy (see `assignments/webform/README.md`), and run `setup()` again.
+3. `Rscript assignments/build-assignments.R`
+4. Run `shareMaterials()` in the Apps Script project, paste the `url` and
+   `year` it prints into `materials` in `course-dates.json`, then check the
+   folder as a signed-out student would:
+   `python3 assignments/test-student-download.py`
+5. Render the whole site and commit.
+
 ## Rule: anything meant to be copied must be copiable
 
 When producing a prompt, a config block, a command, or any other artifact whose

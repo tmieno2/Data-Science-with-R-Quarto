@@ -1,0 +1,306 @@
+# =============================================================================
+# Build year-specific assignments from the instructor sources.
+#
+#   Rscript assignments/build-assignments.R          # build the current year
+#   Rscript assignments/build-assignments.R 2027     # build a specific year
+#
+# From R:
+#   source(here::here("assignments/build-assignments.R"))
+#   build_assignments()            # build + render everything
+#   build_assignments(render = FALSE)
+#   build_assignments(only = "assignment-1")
+#
+# Layout produced (see CLAUDE.md for the full process):
+#
+#   assignments/instructor/assignment-1.qmd   source of truth, {{placeholders}}
+#   assignments/data/                         shared data pool
+#   assignments/keys/<year>/                  answer key,  dates resolved
+#   assignments/students/<year>/assignment-1/ student copy, dates resolved,
+#                                             data files alongside
+#
+# NEVER edit anything under keys/ or students/ by hand -- it is overwritten.
+# =============================================================================
+
+if (!requireNamespace("here", quietly = TRUE)) {
+  stop("the `here` package is required", call. = FALSE)
+}
+source(here::here("course-dates.R"))
+source(here::here("assignments/strip-answers.R"))
+
+# --- manifest ----------------------------------------------------------------
+# One entry per assignment. `data` lists the files a student needs next to the
+# qmd; they are copied from assignments/data/. `key_data` lists files only the
+# answer key reads, copied next to the key alone. Keep this in step with the
+# instructor source -- build_assignments() checks that every file listed here
+# exists, and warns about any data file the source reads but does not list.
+
+ASSIGNMENTS <- list(
+  "assignment-1" = list(
+    source = "assignment-1.qmd",
+    data = c("data_CO_as1.rds", "all_sat_CO_as1.csv", "daymet_raw_as1.dta"),
+    # Students also get the rendered key, which shows the expected output and
+    # no code, so they can check their work. See ship_expected_output().
+    expected_output = TRUE
+  ),
+  "assignment-2" = list(
+    source = "assignment-2.qmd",
+    data = c("soybean_trial_data.rds", "yield_seed.png")
+  ),
+  "assignment-3" = list(
+    source = "assignment-3.qmd",
+    data = c("trial_design.rds", "yield.rds", "NH3.gpkg", "ec.tif",
+             "g_trial_design.png", "g_yield.png", "g_NH3.png", "g_ec.png",
+             "g_three.png", "sum_table_1.png", "sum_table_2.png",
+             "reg_table.png"),
+    # The key reads EC from a saved raster; students are asked to read ec.tif.
+    key_data = "ec.rds"
+  )
+)
+
+# -----------------------------------------------------------------------------
+
+assignment_paths <- function(id, year) {
+  spec <- ASSIGNMENTS[[id]]
+  list(
+    instructor = here::here("assignments/instructor", spec$source),
+    key = here::here("assignments/keys", year, paste0(id, "-key.qmd")),
+    student_dir = here::here("assignments/students", year, id),
+    student = here::here("assignments/students", year, id, paste0(id, ".qmd")),
+    data = spec$data,
+    key_data = spec$key_data
+  )
+}
+
+#' Copy the data files a student needs next to their qmd.
+place_data <- function(files, dest_dir) {
+  pool <- here::here("assignments/data")
+  for (f in files) {
+    src <- file.path(pool, f)
+    if (!file.exists(src)) {
+      stop(sprintf("data file '%s' is listed in the manifest but missing from %s",
+                   f, pool), call. = FALSE)
+    }
+    file.copy(src, file.path(dest_dir, f), overwrite = TRUE, copy.date = TRUE)
+  }
+  invisible(files)
+}
+
+#' Warn about data the source reads but the manifest does not ship.
+check_manifest <- function(instructor_path, listed) {
+  src <- readLines(instructor_path, warn = FALSE)
+  read <- unique(unlist(regmatches(
+    src, gregexpr('[A-Za-z0-9_.-]+\\.(csv|dta|rds|RDS|DTA|gpkg|tif|shp|png)(?![A-Za-z0-9])', src, perl = TRUE)
+  )))
+  # strip markdown emphasis: the source writes __401K.csv__, not the filename
+  read <- sub('^_+', '', read)
+  missing <- setdiff(read, listed)
+  if (length(missing)) {
+    warning(sprintf("%s reads %s but the manifest does not ship it",
+                    basename(instructor_path), paste(missing, collapse = ", ")),
+            call. = FALSE)
+  }
+  unused <- setdiff(listed, read)
+  if (length(unused)) {
+    message(sprintf("    note: %s ships %s, which the source never reads",
+                    basename(instructor_path), paste(unused, collapse = ", ")))
+  }
+  invisible(TRUE)
+}
+
+#' Build (and optionally render) the assignments for one year.
+#'
+#' @param year   character/numeric year; defaults to the year of the term in
+#'               course-dates.json
+#' @param only   optional vector of assignment ids to build
+#' @param render render the key and the student copy to HTML
+build_assignments <- function(year = NULL, only = NULL, render = TRUE) {
+  cal <- read_course_dates(refresh = TRUE)
+  if (is.null(year)) year <- format(cal$first_class_day, "%Y")
+  year <- as.character(year)
+
+  ids <- if (is.null(only)) names(ASSIGNMENTS) else only
+  unknown <- setdiff(ids, names(ASSIGNMENTS))
+  if (length(unknown)) {
+    stop("not in the manifest: ", paste(unknown, collapse = ", "), call. = FALSE)
+  }
+
+  message(sprintf("Building %s for %s (term starts %s)",
+                  paste(ids, collapse = ", "), year,
+                  format(cal$first_class_day, "%b %e, %Y")))
+
+  built <- lapply(ids, function(id) {
+    p <- assignment_paths(id, year)
+    check_manifest(p$instructor, c(p$data, p$key_data))
+
+    gen_key_version(p$instructor, p$key, cal)
+    dir.create(p$student_dir, showWarnings = FALSE, recursive = TRUE)
+    gen_student_version(p$instructor, p$student, cal)
+    # Data sits next to BOTH built files. The instructor source therefore reads
+    # a bare filename -- exactly what a student writes -- and a chunk marked
+    # `keep` works identically in the key and in the student copy.
+    place_data(p$data, p$student_dir)
+    place_data(c(p$data, p$key_data), dirname(p$key))
+
+    if (render) {
+      for (f in c(p$key, p$student)) {
+        rmarkdown::render(f, quiet = TRUE)
+      }
+      if (isTRUE(ASSIGNMENTS[[id]]$expected_output)) ship_expected_output(p, id)
+    }
+    p
+  })
+  names(built) <- ids
+
+  # The student copy is what actually goes out, so verify it one last time.
+  for (id in ids) {
+    verify_student_copy(built[[id]])
+  }
+
+  check_materials_link(cal, year)
+  assert_students_dir_shareable()
+  publish_materials(year, full = is.null(only))
+
+  message(sprintf("Done. Student files: assignments/students/%s/", year))
+  invisible(built)
+}
+
+#' Copy the year's built materials into the folder Drive shares with students.
+#'
+#' The repository lives on local disk; the folder students download from lives
+#' in Google Drive, which syncs it and hands out the link. `materials.publish_dir`
+#' in course-dates.json is the local path of that Drive folder -- the parent of
+#' the year folders. With the key unset nothing is published, which is what you
+#' want on a machine that has no Drive folder.
+#'
+#' Called only after assert_students_dir_shareable(), never before: nothing is
+#' copied into a link-shared folder until the tree has been checked.
+#'
+#' `full` says whether every assignment was rebuilt. Only then is the year
+#' folder pruned of files the build no longer produces -- pruning after
+#' `only = "assignment-1"` would delete the other assignments from under the
+#' class.
+publish_materials <- function(year, full = TRUE) {
+  cal <- read_course_dates()
+  dest_root <- cal$materials$publish_dir
+  if (is.null(dest_root) || !nzchar(dest_root)) {
+    message("materials.publish_dir is not set; nothing published.")
+    return(invisible(FALSE))
+  }
+  if (!dir.exists(dest_root)) {
+    stop("materials.publish_dir does not exist: ", dest_root,
+         "\n  Is Google Drive running?", call. = FALSE)
+  }
+
+  src <- here::here("assignments/students", year)
+  dest <- file.path(dest_root, year)
+  dir.create(dest, showWarnings = FALSE, recursive = TRUE)
+
+  files <- list.files(src, recursive = TRUE)
+  for (f in files) {
+    to <- file.path(dest, f)
+    dir.create(dirname(to), showWarnings = FALSE, recursive = TRUE)
+    file.copy(file.path(src, f), to, overwrite = TRUE, copy.date = TRUE)
+  }
+
+  if (full) {
+    stale <- setdiff(list.files(dest, recursive = TRUE), files)
+    if (length(stale)) {
+      file.remove(file.path(dest, stale))
+      message(sprintf("  removed %d file(s) the build no longer produces", length(stale)))
+    }
+  }
+
+  message(sprintf("Published %d file(s) to %s", length(files), dest))
+  invisible(TRUE)
+}
+
+#' The download link students use is scoped to a single year, so that nobody can
+#' browse into another year's folder. Rolling the term without re-sharing leaves
+#' the class downloading last year's assignments -- catch it at build time
+#' rather than at render time.
+#'
+#' An unset link is a warning (the course may not be published yet); a link
+#' pointing at the wrong year is an error.
+check_materials_link <- function(cal, year) {
+  url <- cal$materials$url
+  if (is.null(url) || !nzchar(url)) {
+    warning("materials.url is not set -- run shareMaterials() in the Apps ",
+            "Script project and paste its two lines into course-dates.json ",
+            "before rendering the site", call. = FALSE)
+    return(invisible(FALSE))
+  }
+  if (!identical(as.character(cal$materials$year), year)) {
+    stop("materials.url points at year ", cal$materials$year, " but you are ",
+         "building ", year, ". Run shareMaterials() in the Apps Script ",
+         "project, then update materials.url and materials.year.",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+#' Give students the rendered key as `<id>-expected-output.html`, so they can
+#' compare their figures and tables with the intended ones. Only for a key that
+#' shows results and no code: it refuses if any R code is visible, which is
+#' what would turn it into an answer key.
+ship_expected_output <- function(p, id) {
+  html <- sub("[.]qmd$", ".html", p$key)
+  if (any(grepl('<pre class="r"|class="sourceCode', readLines(html, warn = FALSE)))) {
+    stop(sprintf("%s shows R code, so it cannot go to students as expected output",
+                 basename(html)), call. = FALSE)
+  }
+  file.copy(html, file.path(p$student_dir, paste0(id, "-expected-output.html")),
+            overwrite = TRUE)
+  invisible(TRUE)
+}
+
+#' assignments/students/ is shared publicly with the class, so anything that
+#' leaks into it is published. Refuse to finish a build if something that looks
+#' like an answer key or a submission has ended up there.
+assert_students_dir_shareable <- function() {
+  root <- here::here("assignments/students")
+  files <- list.files(root, recursive = TRUE, full.names = TRUE, all.files = TRUE)
+  files <- files[!dir.exists(files)]
+
+  named <- grep("key|solution|answer|submission|roster|grade", basename(files),
+                ignore.case = TRUE, value = TRUE)
+  qmds <- files[grepl("[.]qmd$", files)]
+  with_answers <- qmds[vapply(qmds, function(f) {
+    any(grepl("^:{3,}\\s*\\{[^}]*[.]answer", readLines(f, warn = FALSE)))
+  }, logical(1))]
+
+  problems <- c(
+    if (length(named)) paste("suspiciously named:", paste(named, collapse = ", ")),
+    if (length(with_answers)) paste("contains answer divs:",
+                                    paste(basename(with_answers), collapse = ", "))
+  )
+  if (length(problems)) {
+    stop("assignments/students/ is shared with the class and is not safe to ",
+         "publish:\n  ", paste(problems, collapse = "\n  "), call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+#' Last line of defence before a file reaches students.
+verify_student_copy <- function(p) {
+  lines <- readLines(p$student, warn = FALSE)
+  problems <- c()
+  if (any(grepl("\\{\\{", lines))) problems <- c(problems, "unresolved placeholder")
+  if (any(grepl("^:{3,}\\s*\\{[^}]*\\.answer", lines))) {
+    problems <- c(problems, "answer div")
+  }
+  if (any(grepl("assignments/data", lines))) {
+    problems <- c(problems, "repo-relative data path (students have no repo)")
+  }
+  missing <- p$data[!file.exists(file.path(p$student_dir, p$data))]
+  if (length(missing)) problems <- c(problems, paste("missing data:", paste(missing, collapse = ", ")))
+  if (length(problems)) {
+    stop(sprintf("%s is not fit to distribute: %s", basename(p$student),
+                 paste(problems, collapse = "; ")), call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+if (sys.nframe() == 0L) {
+  args <- commandArgs(trailingOnly = TRUE)
+  build_assignments(year = if (length(args)) args[1] else NULL)
+}

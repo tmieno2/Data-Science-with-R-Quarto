@@ -24,12 +24,30 @@
 /templates/**/*_files/
 /templates/**/*_cache/
 
-# ── Student work: never in a public repository ───────────────────────────────
-# 825 MB, and *_submission/ holds identifiable student work (FERPA).
-# Assignments are distributed to students by Dropbox link, not from this repo,
-# so nothing here is published. The old rule said "Assignments/" (capital A)
-# and did not match the directory, which is actually named "assignments/".
-/assignments/
+# ── Assignments: an allowlist, because this repository is public ─────────────
+# assignments/ holds answer keys, identifiable student work (FERPA) and large
+# datasets, so everything in it is ignored except the build tooling and the
+# built student copies. In particular these stay out:
+#   instructor/   answer sources; its own git repository with a private
+#                 remote, tmieno2/Data-Science-with-R-answers
+#   keys/         built answer keys
+#   submission    a SYMLINK into Google Drive; a directory rule would not
+#                 match it, which is why this is an allowlist
+#   data/         datasets, one of them 170 MB
+#   Assignment_*  the 2026-and-earlier folders, including *_submission/
+# The old rule said "Assignments/" (capital A) and did not match the directory.
+/assignments/*
+!/assignments/build-assignments.R
+!/assignments/strip-answers.R
+!/assignments/sort-submissions.R
+!/assignments/test-student-download.py
+!/assignments/webform/
+/assignments/webform/.clasp.json
+# Built student copies are tracked as the record of what students received;
+# their data, HTML and Quarto output are not.
+!/assignments/students/
+/assignments/students/*/*/*
+!/assignments/students/*/*/*.qmd
 
 # Student names and @huskers.unl.edu addresses.
 /roster/

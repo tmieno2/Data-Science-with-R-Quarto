@@ -1,0 +1,129 @@
+{
+  "_readme": [
+    "Single source of truth for final-project dates. Assignments have no due dates.",
+    "",
+    "Dates are stored as (week, day) offsets, not calendar dates, so rolling the",
+    "course to a new year means editing the `term` block only -- every deadline",
+    "moves with it.",
+    "",
+    "week: 1 = the week containing term.first_class_day. Weeks start on Monday.",
+    "day : Mon | Tue | Wed | Thu | Fri.",
+    "anchor: 'term' (default) counts weeks from the first class week.",
+    "        'finals' counts weeks from term.finals_week_starts, so week 1 of the",
+    "        finals anchor is finals week itself.",
+    "",
+    "Resolve with course-dates.R:  read_course_dates('course-dates.json')",
+    "",
+    "Not yet read by syllabus/ or the course calendar, which still compute or",
+    "type their own dates."
+  ],
+  "term": {
+    "label": "Fall 2026",
+    "first_class_day": "2026-08-24",
+    "last_class_day": "2026-12-12",
+    "finals_week_starts": "2026-12-14",
+    "registrar_calendar": "https://registrar.unl.edu/calendars/academic-calendar/projected-calendars/academic-calendar-2026-2027/",
+    "meeting_days": {
+      "lecture": {
+        "days": [
+          "Mon",
+          "Wed"
+        ]
+      }
+    },
+    "no_class": [
+      {
+        "date": "2026-09-07",
+        "label": "Labor Day \u2014 no class"
+      },
+      {
+        "date": "2026-10-19",
+        "label": "Fall break"
+      },
+      {
+        "date": "2026-10-20",
+        "label": "Fall break"
+      },
+      {
+        "date": "2026-11-25",
+        "label": "Student holiday"
+      },
+      {
+        "date": "2026-11-26",
+        "label": "Thanksgiving"
+      },
+      {
+        "date": "2026-11-27",
+        "label": "Thanksgiving break"
+      }
+    ]
+  },
+  "_submission_readme": [
+    "ONE permanent submission form for the whole course: an Apps Script web app",
+    "whose source is assignments/webform/. Everything students upload -- every",
+    "assignment and the final project -- is written straight into a Google Drive",
+    "folder, organised as <year>/<assignment>/. assignments/submission in this",
+    "repository is a symlink to that folder, and .gitignore excludes it.",
+    "",
+    "`url` is the /exec URL of the deployed web app. It does not change year to",
+    "year, and it changes only if you create a NEW deployment rather than a new",
+    "version of the existing one. Referenced from the assignment sources as",
+    "{{submission}}, so it is never typed out twice.",
+    "",
+    "`drive_folder_id` is the Drive id of the destination folder, which is what",
+    "the web app is configured with (DEFAULT_FOLDER_ID in",
+    "assignments/webform/Code.gs)."
+  ],
+  "submission": {
+    "url": "https://script.google.com/macros/s/AKfycbzY-DxWZIrZQdBGxogL5JJ_zUJfio_4pdO5FAUmD8yHZQu-bfsTz9DoLq4zbnqC370Tjw/exec",
+    "folder": "assignments/submission",
+    "drive_folder_id": "1wTsyExA4upHbX2_7wJTfPY-dcJl7BFWg"
+  },
+  "_materials_readme": [
+    "The Google Drive shared-folder link students use to download everything:",
+    "the qmd and its data files, for every assignment.",
+    "",
+    "`publish_dir` is the local path of the Drive folder that holds the year",
+    "folders. `Rscript assignments/build-assignments.R` copies",
+    "assignments/students/<year>/ into it. Copying does not share it: run",
+    "shareMaterials() in the Apps Script project, which shares THE YEAR FOLDER",
+    "only and prints the `url` and `year` lines to paste below.",
+    "",
+    "The build warns while `url` is empty and fails if `year` disagrees with",
+    "the term.",
+    "",
+    "NEVER share assignments/ or the repo root: that would expose keys/ (the",
+    "answer keys) and submission/ (other students' work)."
+  ],
+  "materials": {
+    "url": "https://drive.google.com/drive/folders/1YRrA38bO48KF8cocSiYP4LV9rJqW_5GN",
+    "year": "2026",
+    "publish_dir": "/Users/taromieno/Library/CloudStorage/GoogleDrive-taro.mieno.pf@gmail.com/My Drive/Teaching/Data-Science-with-R-Quarto/assignments/students"
+  },
+  "events": [
+    {
+      "id": "final-project-topic",
+      "type": "deadline",
+      "title": "Final project topic approved",
+      "week": 10,
+      "day": "Wed",
+      "_internal": "syllabus_26.qmd rule: first Wednesday on or after two months into the term."
+    },
+    {
+      "id": "final-project-proposal",
+      "type": "deadline",
+      "title": "Final project proposal",
+      "week": 12,
+      "day": "Wed",
+      "_internal": "syllabus_26.qmd rule: two weeks after topic approval."
+    },
+    {
+      "id": "final-paper",
+      "type": "deadline",
+      "title": "Final project",
+      "anchor": "finals",
+      "week": 1,
+      "day": "Fri"
+    }
+  ]
+}

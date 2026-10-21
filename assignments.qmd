@@ -2,24 +2,42 @@
 title: Assignments
 ---
 
-## Assignment 1
+```{r}
+#| include: false
+# Links and dates come from course-dates.json, never typed here.
+source(here::here("course-dates.R"))
 
-**Instruction:**
+cal <- read_course_dates()
+```
 
-1. Visit [here](https://www.dropbox.com/scl/fo/ksuiu7zn1vl5baxmpnqwz/ADbLBTK7JLtTxoGDDh7hs7Q?rlkey=jnylnevj305ydb4zdsh7c4m1y&st=tmew5dx7&dl=0) and download all the files.
-2. Open **Assignment-1-student.qmd** and start working on problems.
+All assignment files for `r cal$label` are in one Google Drive folder:
+**[download the course materials here](`r materials_url()`)**.
+Open the folder for the assignment you need. Each one contains the `.qmd` to
+work on and every dataset it uses.
 
-## Assignment 2
+Submit through the same form every time:
+**[submission form](`r submission_url()`)**.
+Submit both the `.qmd` and the rendered `.html`.
 
-**Instruction:**
+```{r}
+#| echo: false
+#| results: asis
 
-1. Visit [here](https://www.dropbox.com/scl/fo/k6ax1biv9ht9bj97v2u4r/AJjSmot36-BmrEs0AxPyDJc?rlkey=rxjj35fai80rdtz2hr2o1fbkr&st=awulunh5&dl=0) and download all the files.
-2. Open **Assignment-2-student.qmd** and start working on problems.
+for (n in 1:3) {
+  id <- paste0("assignment-", n)
+  cat(sprintf("\n## Assignment %d\n\n", n))
+  cat(sprintf("1. Download the `%s/` folder from the [course materials](%s)\n",
+              id, materials_url()))
+  cat(sprintf("2. Work on **%s.qmd**, leaving all your R code and output in place\n", id))
+  cat(sprintf("3. Submit the qmd and the html [here](%s)\n", submission_url()))
+}
+```
 
-## Assignment 3
+## Final project
 
-**Instruction:**
+Due **`r format_course_date('final-paper', '%A, %B %e')`**. Submit the qmd and
+the html [here](`r submission_url()`).
 
-1. Visit [here](https://www.dropbox.com/scl/fo/gh4tt6viuue9sj5f8fpel/AOpf7JENByZJ8DK8vb5DZz4?rlkey=s615cywkv2z17wq8gvn7rkhpa&st=wkwajv3o&dl=0) and download all the files.
-2. Open **Assignment-3-student.qmd** and start working on problems.
-
+Milestones: topic approved by
+**`r format_course_date('final-project-topic', '%A, %B %e')`**; proposal due
+**`r format_course_date('final-project-proposal', '%A, %B %e')`**.
