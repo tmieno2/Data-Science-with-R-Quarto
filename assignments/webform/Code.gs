@@ -51,15 +51,13 @@ var ASSIGNMENTS = [
 ];
 
 /** Extensions a submission may contain, lower case, without the dot. */
-var ALLOWED_EXT = ['qmd', 'rmd', 'html', 'htm', 'pdf', 'r', 'ipynb', 'zip'];
+var ALLOWED_EXT = ['qmd', 'html', 'pdf', 'r', 'ipynb', 'zip'];
 
 /** Drive is happier previewing these than application/octet-stream. */
 var MIME_BY_EXT = {
   qmd: 'text/plain',
-  rmd: 'text/plain',
   r: 'text/plain',
   html: 'text/html',
-  htm: 'text/html',
   pdf: 'application/pdf',
   ipynb: 'application/json',
   zip: 'application/zip'
