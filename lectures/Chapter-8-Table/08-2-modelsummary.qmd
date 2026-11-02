@@ -752,7 +752,7 @@ list(
 <summary>Transcript</summary>
 
 Before we get into syntax, here is where we are heading. This is one call to datasummary, and it produces a table with years down the side, three variables nested under each year, and mean and standard deviation for each state across the top. That is a genuinely complicated layout, described by a single formula. It will look impenetrable right now. The next few slides build it up piece by piece, so come back to this slide at the end, and you should be able to read every part of it.
-Read the pipeline from the top. Filter keeps observations whose year is in twenty-ten through twenty-twelve. The filtered data then flows into datasummary, and data equals dot tells datasummary to use that piped result. On the left of the tilde, factor of year makes year categorical. The asterisk nests the parenthesized group of corn yield, soy yield, and drought category four within each year, while plus joins those three variables. Each parenthesized left-arrow expression supplies the polished label you see in the table, including the yield units.
+Read the pipeline from the top. Filter keeps observations whose year is in twenty-ten through twenty-twelve. The filtered data then flows into datasummary, and data equals dot tells datasummary to use that piped result. On the left of the tilde, factor of year makes year categorical, and Heading of Year in front of it names that column Year. The asterisk nests the parenthesized group of corn yield, soy yield, and drought category four within each year, while plus joins those three variables. Each Heading in front of a variable supplies the polished label you see in the table, including the yield units.
 On the right of the tilde, state name times Mean plus S-D creates a Mean and an S-D column inside each state. Putting the two sides together asks for both statistics for every displayed variable, year, and state combination. The parentheses are not decoration. They control which items are added together before nesting takes place. Keep this output in mind as the target; the Basics tab starts by reducing the formula to one variable and one statistic.
 
 </details>
@@ -761,10 +761,10 @@ On the right of the tilde, state name times Mean plus S-D creates a Mean and an 
 county_yield %>%
   dplyr::filter(year %in% 2010:2012) %>%
   modelsummary::datasummary(
-    (Year <- factor(year)) * (
-      (`Corn Yield (bu/acre)` <- corn_yield) +
-        (`Soy Yield (bu/acre)` <- soy_yield) +
-        (`DI: category 4` <- d4_5_9)
+    Heading("Year") * factor(year) * (
+      Heading("Corn Yield (bu/acre)") * corn_yield +
+        Heading("Soy Yield (bu/acre)") * soy_yield +
+        Heading("DI: category 4") * d4_5_9
     ) ~
       state_name * (Mean + SD),
     data = .
@@ -1027,14 +1027,14 @@ For each of the unique combinations of `state_name` (`Nebraska`, `Kansas`) and `
 <details class="transcript">
 <summary>Transcript</summary>
 
-By default your column names and the statistic names become the labels, which is rarely what you want in a finished table. The renaming syntax is a label, an equals sign, and the thing being labelled, all wrapped in parentheses, and it works on both variables and statistics. The example renames corn yield to a proper label with units, and SD to Std dot Dev. Then read the callout: if your label contains spaces you must wrap it in back quotes. And note the last line, which is honest advice. If this syntax annoys you, rename in gt afterwards instead.
-The two filters and data equals dot work exactly as on the previous tab, so the table still contains only two years and two states. On the row side, the parenthesized label mapping turns corn yield into Corn Yield, with bushels per acre shown in parentheses. On the column side, Mean keeps its default name while the nested mapping changes S-D to Std dot Dev. The Corn Yield label contains spaces and punctuation, so the back quotes make it one valid label rather than several pieces of R code. Std dot Dev contains no spaces, so it does not need back quotes. Renaming here keeps the label logic in the formula; renaming later with g-t can be easier when you are already doing final visual formatting there.
+By default your column names and the statistic names become the labels, which is rarely what you want in a finished table. To give something a label, write Heading with the label in quotes, then an asterisk, then the thing being labelled. It works on both variables and statistics. The example renames corn yield to a proper label with units, and S-D to Std dot Dev. Then read the callout. The modelsummary documentation shows a shorter way: the label, an equals sign and the variable, all in parentheses. It works, but the styler code formatter, which RStudio and VS Code can run for you on save or paste, rewrites that equals sign as a left arrow, and the table then shows your code instead of your label. Heading has no equals sign to rewrite, which is why we use it here. And note the last line, which is honest advice. If this syntax annoys you, rename in gt afterwards instead.
+The two filters and data equals dot work exactly as on the previous tab, so the table still contains only two years and two states. On the row side, Heading of Corn Yield bushels per acre, times corn yield, labels corn yield with its units. On the column side, Mean keeps its default name, while Heading of Std dot Dev, times S-D, changes the S-D label. Because each label is a quoted string, it can contain spaces and punctuation as it is. Renaming here keeps the label logic in the formula; renaming later with g-t can be easier when you are already doing final visual formatting there.
 
 </details>
 
 By default variable and statistics names are used as the labels in the table.
 
-You can provide labels by the following syntax: `(label = variable/stat)`
+You can provide labels by the following syntax: `Heading("label") * variable/stat`
 
 <br>
 
@@ -1045,8 +1045,8 @@ county_yield %>%
   dplyr::filter(year %in% 2011:2012) %>%
   dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
-    (`Corn Yield (bu/acre)` <- corn_yield)
-    ~ state_name * (Mean + (Std.Dev. <- SD)),
+    Heading("Corn Yield (bu/acre)") * corn_yield
+    ~ state_name * (Mean + Heading("Std.Dev.") * SD),
     data = .
   )
 ```
@@ -1059,8 +1059,13 @@ syntax left over from an earlier version of these slides. Quarto does not
 understand it, so it rendered on the slide as the literal text
 ".content-box-red[Note: ...]", brackets and all. -->
 
-::: {.callout-note title="Labels with spaces"}
-When your label contains spaces, surround it with back quotes.
+<!-- CHANGED: the renames on this deck were written (label <- variable).
+tables only renames with =, so the slides showed the code itself as the label.
+The styler formatter turns that = into <-, so all three tables now use
+Heading(), which it leaves alone. -->
+
+::: {.callout-note title="Another way you will see"}
+The `modelsummary` documentation writes `(label = variable)`. It works, but the styler code formatter (RStudio and VS Code can run it on save or paste) rewrites the `=` as `<-`, and the table then shows the code instead of the label.
 :::
 
 If you do not like this way of changing labels, you can always use `gt` package.
@@ -1131,7 +1136,7 @@ county_yield %>%
 <summary>Transcript</summary>
 
 Column alignment, controlled by the align argument. You pass a single string with one letter per column: l for left, r for right, c for centre, and d for decimal alignment. So the nth letter aligns the nth column, and the string needs to be as long as the table is wide. The example uses four letters for a four-column table. Only those four letters are valid, so a stray character will not do what you hope. In practice you want left for the label column and either right or decimal alignment for the numbers, which is what makes columns of figures line up.
-In the exact string l-r-l-c, the first displayed column is left-aligned, the second is right-aligned, the third is left-aligned, and the fourth is centred. This is an intentionally visible demonstration of positional control, not a claim that every numeric column should use a different alignment. The formula also combines ideas from the previous tabs. The filters restrict the sample, the parenthesized mappings give readable labels to mean and quantile, and the Arguments calls handle missing values and select the tenth percentile. Data equals dot uses the piped sample. Once the table content is fixed, align changes presentation only; it does not change any calculated value.
+In the exact string l-r-l-c, the first displayed column is left-aligned, the second is right-aligned, the third is left-aligned, and the fourth is centred. This is an intentionally visible demonstration of positional control, not a claim that every numeric column should use a different alignment. The formula also combines ideas from the previous tabs. The filters restrict the sample, the two Headings give readable labels to mean and quantile, and the Arguments calls handle missing values and select the tenth percentile. Data equals dot uses the piped sample. Once the table content is fixed, align changes presentation only; it does not change any calculated value.
 
 </details>
 
@@ -1154,8 +1159,8 @@ county_yield %>%
   dplyr::filter(state_name %in% c("Kansas", "Nebraska")) %>%
   modelsummary::datasummary(
     corn_yield
-    ~ state_name * (`This is M E A N` <- mean) * Arguments(na.rm = TRUE) +
-      (`This is Q U A N T I L E` <- quantile) * Arguments(probs = 0.1, na.rm = TRUE),
+    ~ state_name * Heading("This is M E A N") * mean * Arguments(na.rm = TRUE) +
+      Heading("This is Q U A N T I L E") * quantile * Arguments(probs = 0.1, na.rm = TRUE),
     data = .,
     align = "lrlc"
   )
